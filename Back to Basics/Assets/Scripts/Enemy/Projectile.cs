@@ -37,13 +37,21 @@ public class Projectile : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        //GameObject playerBody = GameObject.FindGameObjectWithTag("Player");
         if (player)
         {
             DestroyProjectile();
         }
+    }
 
-        //If the Projectile touches the Player, damage the player
+    private void OnTriggerEnter(Collider other)
+    {
+        GameObject playerBody = GameObject.FindGameObjectWithTag("Player");
+        if (playerBody)
+        {
+            Debug.Log("This should be taking away Player Health");
+            healthManager.TakeDamage(projectileDamage);
+            DestroyProjectile();
+        }
     }
 
     void DestroyProjectile()
