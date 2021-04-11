@@ -8,6 +8,12 @@ public class PauseMenu : MonoBehaviour
 
     public GameObject pauseMenuUI;
 
+    private void Awake()
+    {
+        pauseMenuUI.SetActive(false);
+        Time.timeScale = 1f;
+    }
+
     private void Start()
     {
         pauseMenuUI.SetActive(false);

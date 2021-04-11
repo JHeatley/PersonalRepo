@@ -23,7 +23,7 @@ public class BaseEnemy : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    protected void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "PlayerWeapon")
         {

@@ -6,11 +6,11 @@ public class KillTrigger : MonoBehaviour
 {
     private GameObject player;
     public HealthManager healthManager;
-    public CharacterManager characterManager;
 
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
+        healthManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<HealthManager>();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -18,7 +18,6 @@ public class KillTrigger : MonoBehaviour
         if (other.gameObject == player)
         {
             healthManager.SetHealth(0);
-            
         }
     }
 }

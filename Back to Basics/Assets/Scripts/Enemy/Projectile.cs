@@ -7,6 +7,8 @@ public class Projectile : MonoBehaviour
     public float speed;
     public float timeAlive;
     public int projectileDamage;
+    public AudioSource audioClip;
+    GameObject playerBody;
 
     private Transform player;
     private Vector3 target;
@@ -16,9 +18,10 @@ public class Projectile : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        playerBody = GameObject.FindGameObjectWithTag("Player");
         player = GameObject.FindGameObjectWithTag("Player").transform;
-        healthManager = player.GetComponent<HealthManager>();
-        target = new Vector3(player.position.x, player.position.y, player.position.z);
+        healthManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<HealthManager>();
+        target = new Vector3(playerBody.transform.position.x, playerBody.transform.position.y, playerBody.transform.position.z);
     }
 
     // Update is called once per frame
@@ -35,21 +38,17 @@ public class Projectile : MonoBehaviour
             DestroyProjectile();
     }
 
-    private void OnCollisionEnter(Collision other)
-    {
-        if (player)
-        {
-            DestroyProjectile();
-        }
-    }
-
     private void OnTriggerEnter(Collider other)
     {
-        GameObject playerBody = GameObject.FindGameObjectWithTag("Player");
-        if (playerBody)
+        if (other.gameObject == playerBody)
         {
             Debug.Log("This should be taking away Player Health");
             healthManager.TakeDamage(projectileDamage);
+            DestroyProjectile();
+        }
+
+        else if (other.gameObject != playerBody)
+        {
             DestroyProjectile();
         }
     }

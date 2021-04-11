@@ -8,6 +8,7 @@ public class RangedEnemy : BaseEnemy
     public float startTimeBetweenShots;
 
     public GameObject projectile;
+    public GameObject projectileSpawnPoint;
     Transform player;
 
     // Start is called before the first frame update
@@ -22,7 +23,7 @@ public class RangedEnemy : BaseEnemy
     {
         if (timeBetweenShots <= 0)
         {
-            Instantiate(projectile, transform.position, projectile.transform.rotation);
+            Instantiate(projectile, projectileSpawnPoint.transform.position, projectile.transform.rotation);
             timeBetweenShots = startTimeBetweenShots;
         }
         else
@@ -30,4 +31,9 @@ public class RangedEnemy : BaseEnemy
             timeBetweenShots -= Time.deltaTime;
         }
     }
+
+    //private void OnCollisionEnter(Collision collision)
+    //{
+    //    //base.OnCollisionEnter(collision);
+    //}
 }
