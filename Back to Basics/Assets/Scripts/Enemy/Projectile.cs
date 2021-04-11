@@ -47,7 +47,7 @@ public class Projectile : MonoBehaviour
             DestroyProjectile();
         }
 
-        else if (other.gameObject != playerBody)
+        else if (other.gameObject.isStatic)
         {
             DestroyProjectile();
         }

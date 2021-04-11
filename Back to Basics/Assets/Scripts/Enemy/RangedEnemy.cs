@@ -14,6 +14,7 @@ public class RangedEnemy : BaseEnemy
     // Start is called before the first frame update
     void Start()
     {
+        currentHealth = maxHealth;
         player = GameObject.FindGameObjectWithTag("Player").transform;
         timeBetweenShots = startTimeBetweenShots;
     }
@@ -21,6 +22,7 @@ public class RangedEnemy : BaseEnemy
     // Update is called once per frame
     void Update()
     {
+        transform.rotation = player.rotation;
         if (timeBetweenShots <= 0)
         {
             Instantiate(projectile, projectileSpawnPoint.transform.position, projectile.transform.rotation);

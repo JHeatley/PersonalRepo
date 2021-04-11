@@ -7,11 +7,9 @@ public class CheckpointSystem : MonoBehaviour
 {
     public GameObject player;
     public GameObject lastCheckPointPos;
-    public Scene scene;
 
     void Start()
     {
-        scene = SceneManager.GetActiveScene();
         player = GameObject.FindGameObjectWithTag("Player");
         player.GetComponentInChildren<CharacterController>().enabled = false;
         player.transform.position = lastCheckPointPos.transform.position;
