@@ -29,6 +29,7 @@ public class CharacterManager : MonoBehaviour
             audioToPlay.Play();
             GetComponent<CharacterController>().enabled = false;
             transform.position = checkPointSystem.lastCheckPointPos.transform.position;
+            transform.rotation = checkPointSystem.lastCheckPointPos.transform.rotation;
             GetComponent<CharacterController>().enabled = true;
             healthManager.SetHealth(maxHealth);
             currentHealth = maxHealth;

@@ -7,6 +7,7 @@ public class HealthManager : MonoBehaviour
 {
     public Slider healthSlider;
     public AudioSource audioClip;
+    public AudioSource healClip;
 
     public void SetMaxHealth(int health)
     {
@@ -29,6 +30,7 @@ public class HealthManager : MonoBehaviour
 
     public void HealDamage(int healAmount)
     {
+        healClip.Play();
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         player.GetComponent<CharacterManager>().currentHealth += healAmount;
         SetHealth(player.GetComponent<CharacterManager>().currentHealth);

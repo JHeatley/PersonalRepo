@@ -21,36 +21,33 @@ public class PlayerSword : MonoBehaviour
         {
             if (Input.GetMouseButton(0))
             {
-                Attack();
-                nextAttackTime = Time.time + 1f / attackRate;
+                if (Time.timeScale == 1)
+                {
+                    Attack();
+                    nextAttackTime = Time.time + 1f / attackRate;
+                }
             }
         }
-        
     }
 
     void Attack()
     {
         animator.SetTrigger("Attack");
-
         swordSlashAudioClip.Play();
 
         Collider[] hitEnemies = Physics.OverlapSphere(attackPoint.position, attackRange, enemyLayers);
 
-        foreach(Collider enemy in hitEnemies)
+        foreach (Collider enemy in hitEnemies)
         {
-            enemy.GetComponent<RangedEnemy>().TakeDamage(attackStrength);
+            if (GameObject.FindGameObjectWithTag("RangedEnemy"))
+                enemy.GetComponent<RangedEnemy>().TakeDamage(attackStrength);
+
+            if (GameObject.FindGameObjectWithTag("PatrolEnemy"))
+                enemy.GetComponent<PatrolEnemy>().TakeDamage(attackStrength);
+
             Debug.Log(enemy.name + " is taking " + attackStrength + " damage.");
         }
     }
-
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    if (other.gameObject.CompareTag("Enemy"))
-    //    {
-    //        other.gameObject.GetComponent<RangedEnemy>().TakeDamage(attackStrength);
-    //        Debug.Log(other.gameObject.name + " is taking " + attackStrength + " damage.");
-    //    }
-    //}
 
     private void OnDrawGizmosSelected()
     {
