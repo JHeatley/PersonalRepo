@@ -11,15 +11,20 @@ namespace CMF
         private Mover mover;
         float currentVerticalSpeed = 0f;
         bool isGrounded;
+        public bool isMoving = false;
         public float movementSpeed = 7f;
         public float jumpSpeed = 10f;
         public float gravity = 10f;
+
+
+        Stamina staminaScript;
 
 		Vector3 lastVelocity = Vector3.zero;
 
 		public Transform cameraTransform;
         CharacterInput characterInput;
         Transform tr;
+        Rigidbody rigidbody;
 
         // Use this for initialization
         void Start()
@@ -27,6 +32,8 @@ namespace CMF
             tr = transform;
             mover = GetComponent<Mover>();
             characterInput = GetComponent<CharacterInput>();
+            staminaScript = GetComponent<Stamina>();
+            rigidbody = GetComponent<Rigidbody>();
         }
 
         void FixedUpdate()
@@ -73,6 +80,8 @@ namespace CMF
 
             mover.SetExtendSensorRange(isGrounded);
             mover.SetVelocity(_velocity);
+
+            
         }
 
         private Vector3 CalculateMovementDirection()
@@ -95,13 +104,30 @@ namespace CMF
 				//Project movement direction so movement stays parallel to the ground;
 				_direction += Vector3.ProjectOnPlane(cameraTransform.right, tr.up).normalized * characterInput.GetHorizontalMovementInput();
 				_direction += Vector3.ProjectOnPlane(cameraTransform.forward, tr.up).normalized * characterInput.GetVerticalMovementInput();
-			}
+                
+            }
 
 			//If necessary, clamp movement vector to magnitude of 1f;
 			if(_direction.magnitude > 1f)
 				_direction.Normalize();
 
-			return _direction;
+            if (isMoving == true)
+            {
+                movementSpeed = 14;
+                StartCoroutine(staminaScript.UseSprintStamina());
+            }
+            else
+                movementSpeed = 7;
+
+            if (Input.GetKey(KeyCode.LeftShift) && staminaScript.stamina > staminaScript.staminaSprintAmount && rigidbody.velocity.magnitude > 0.01f)
+            {
+                isMoving = true;
+            }
+            else
+                isMoving = false;
+
+            return _direction;
+            
         }
 
         //This function is called when the controller has landed on a surface after being in the air;
@@ -137,8 +163,5 @@ namespace CMF
         {
             return isGrounded;
         }
-
     }
-
 }
-

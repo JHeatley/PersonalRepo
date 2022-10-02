@@ -5,7 +5,7 @@ using UnityEngine;
 public class Sword : MonoBehaviour
 {
     private Animator animator;
-    bool disabledWeapon = false;
+    public bool disabledWeapon = false;
 
     public int swordDamageAmount;
 
@@ -51,18 +51,17 @@ public class Sword : MonoBehaviour
         }
     }
 
-    void SheaveWeapon()
+    public void SheaveWeapon()
     {
         Debug.Log("Putting away the sword.");
+        animator.SetTrigger("Sheave_Weapon");
         NoAttack();
-        GetComponent<MeshRenderer>().enabled = false;
-        animator.enabled = false;
         disabledWeapon = true;
     }
 
-    void TakeOutWeapon()
+    public void TakeOutWeapon()
     {
-        animator.enabled = true;
+        animator.SetTrigger("Take_Out_Weapon");
         GetComponent<MeshRenderer>().enabled = true;
         disabledWeapon = false;
     }
