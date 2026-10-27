@@ -21,6 +21,9 @@ python play.py --watch                         # watch the bot play itself
 python evaluate.py checkpoints/best.pt:greedy heuristic --games 1000 --matchups
 ```
 
+**Unity front end:** run `python server.py` and open `../PokemonTCGUnity` in
+Unity 6000.2.8f1 to play on a proper board (see that folder's README).
+
 `play.py` picks random decks unless you pass `--deck` / `--bot-deck`
 (a name from `decks/`, or the path of any decklist file).
 
