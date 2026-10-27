@@ -321,3 +321,29 @@ def test_seen_cards_stay_remembered_after_leaving_play():
     opp.hand.append(lux)                                       # e.g. Night Stretcher took it back
     g._update_knowledge()
     assert opp.seen[lux.id] == 1
+
+
+def test_sequencing_mistakes_are_spotted():
+    from tcg.core import Option, Decision
+    from bot.sequencing import TurnTracker, mistakes
+    g = fresh()
+    me = g.current
+    mon = g.players[me].active.card
+    attach = Option("attach", BASIC_ENERGY[FIGHTING], g.players[me].active)
+    attack = Option("attack", mon, data=0)
+    g.decision = Decision(me, "main", [attach, attack])
+    t = TurnTracker()
+    assert mistakes(t.events(g, attack)) == 1                 # attacked with an attachment left
+    g.decision = Decision(me, "main", [attack])
+    assert mistakes(t.events(g, attack)) == 0
+    judge = Option("play", card("Judge"))
+    g.decision = Decision(me, "main", [attach, judge])
+    assert "shuffled with plays left" in t.events(g, judge)
+
+
+def test_selfplay_penalises_sequencing_mistakes():
+    from bot.selfplay import _finish
+    traj = [[None, 0, 0.0, 0.0, 0, bad] for bad in (0, 1, 0)]
+    plain = _finish(traj, 1.0, 0, 1.0, 1.0, 0.05)
+    penalised = _finish(traj, 1.0, 0, 1.0, 1.0, 0.05, sequence_penalty=0.1)
+    assert [round(a["ret"] - b["ret"], 6) for a, b in zip(plain, penalised)] == [0.1, 0.1, 0.0]

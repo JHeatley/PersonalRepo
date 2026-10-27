@@ -89,6 +89,8 @@ def main():
     ap.add_argument("--gamma", type=float, default=0.999)
     ap.add_argument("--lam", type=float, default=0.95)
     ap.add_argument("--prize-reward", type=float, default=0.05, help="shaping reward per prize-card swing")
+    ap.add_argument("--sequence-penalty", type=float, default=0.0,
+                    help="reward taken off per sequencing mistake (see bot/sequencing.py), e.g. 0.02")
     ap.add_argument("--self-weight", type=float, default=0.6, help="share of games against itself")
     ap.add_argument("--pool-weight", type=float, default=0.3, help="share against past snapshots")
     ap.add_argument("--heuristic-weight", type=float, default=0.1, help="share against the heuristic bot")
@@ -137,7 +139,8 @@ def main():
     ref_agent = NeuralAgent(load(args.eval_ref)[0], greedy=True) if args.eval_ref else None
     workers = mp.get_context("fork").Pool(args.workers) if args.workers > 1 else None
     torch.set_num_threads(max(1, os.cpu_count() or 1))
-    kw = {"gamma": args.gamma, "lam": args.lam, "prize_reward": args.prize_reward, "focus": args.focus_deck}
+    kw = {"gamma": args.gamma, "lam": args.lam, "prize_reward": args.prize_reward, "focus": args.focus_deck,
+          "sequence_penalty": args.sequence_penalty}
     if args.focus_deck:
         if args.focus_deck not in decks:
             raise SystemExit(f"--focus-deck {args.focus_deck} isn't in the deck pool")
@@ -164,6 +167,7 @@ def main():
         pool_wr = stats["pool_wins"] / stats["vs_pool"] if stats["vs_pool"] else float("nan")
         print(f"it {iteration:4d} | games {games_done:7d} | {stats['decisions'] / (t1 - t0):6.0f} dec/s | "
               f"avg turns {stats['turns'] / max(stats['games'], 1):5.1f} | draws {stats['draws']:3d} | "
+              f"seq mistakes/game {stats['mistakes'] / max(stats['games'], 1):4.1f} | "
               f"vs pool/heur {pool_wr:.2f} | pi {loss['policy']:+.3f} v {loss['value']:.3f} "
               f"H {loss['entropy']:.2f} clip {loss['clipfrac']:.2f} | collect {t1 - t0:4.1f}s train {t2 - t1:4.1f}s",
               flush=True)
