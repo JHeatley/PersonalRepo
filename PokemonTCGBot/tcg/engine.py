@@ -571,7 +571,7 @@ class Game:
                 self.say(f"P{p.idx} ends their turn")
                 break
             if opt.kind == "attack":
-                yield from self._attack_turn(p, opt.data)
+                yield from self._attack_turn(p, opt.card, opt.data)
                 break
             yield from self._do(p, opt)
             yield from self.knockouts()
@@ -612,9 +612,7 @@ class Game:
         a = p.active
         can_act = not (a.asleep or a.paralyzed)
         if can_act and self.turn > 1:
-            for atk in a.card.attacks:
-                if self.can_attack_with(a, atk):
-                    opts.append(Option("attack", card=a.card, target=a, data=atk.index, label=atk.name))
+            opts += self.attack_options(a)
         if can_act and p.bench and not p.retreated and not a.marker("no_retreat", self.turn):
             if self.energy_count(a) >= self.retreat_cost(a):
                 opts += [Option("retreat", card=b.card, target=b) for b in p.bench]
@@ -774,9 +772,22 @@ class Game:
         p.discard.append(c)
         return result
 
-    def _attack(self, p, index):
+    def attack_options(self, mon):
+        """Attacks mon can use now: its own, plus any an Ability lends it (Mew ex's Memory Helix).
+        Each option's card is the card the attack is printed on."""
+        found = [(mon.card, atk) for atk in mon.card.attacks]
+        for fn, src in self.hook_sources("extra_attacks"):
+            found += fn(self, src, mon)
+        opts, seen = [], set()
+        for card, atk in found:
+            if (card.id, atk.index) not in seen and self.can_attack_with(mon, atk):
+                seen.add((card.id, atk.index))
+                opts.append(Option("attack", card=card, target=mon, data=atk.index, label=atk.name))
+        return opts
+
+    def _attack(self, p, card, index):
         a = p.active
-        atk = a.card.attacks[index]
+        atk = card.attacks[index]
         self.say(f"P{p.idx}'s {a.name} uses {atk.name}")
         if a.confused and not self.flip():
             a.damage += 30
@@ -784,7 +795,7 @@ class Game:
         else:
             ctx = AttackCtx(self, p, a, atk)
             self.attacking = ctx
-            yield from run(fx.attack_impl(a.card, atk)(self, ctx))
+            yield from run(fx.attack_impl(card, atk)(self, ctx))
             for e in ctx.boomerang:
                 if e in p.discard and self.in_play(a):
                     p.discard.remove(e)
@@ -793,18 +804,16 @@ class Game:
         yield from self.knockouts()
         self.attacking = None
 
-    def _attack_turn(self, p, index):
+    def _attack_turn(self, p, card, index):
         """An attack, plus a second one for Pokemon allowed to attack twice (Festival Lead)."""
         attacker = p.active
-        yield from self._attack(p, index)
+        yield from self._attack(p, card, index)
         if p.active is attacker and self.any_hook("attack_twice", attacker) \
                 and not (attacker.asleep or attacker.paralyzed):
-            opts = [Option("end")] + [Option("attack", card=attacker.card, target=attacker, data=atk.index,
-                                             label=atk.name)
-                                      for atk in attacker.card.attacks if self.can_attack_with(attacker, atk)]
+            opts = [Option("end")] + self.attack_options(attacker)
             opt = yield from self.ask(p.idx, "main", opts, attacker.card, "attack again?")
             if opt.kind == "attack":
-                yield from self._attack(p, opt.data)
+                yield from self._attack(p, opt.card, opt.data)
 
     def _flush_triggers(self):
         while self._pending_triggers:
