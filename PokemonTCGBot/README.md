@@ -14,7 +14,7 @@ pip install -r requirements.txt
 ## Quick start
 
 ```
-python play.py                                 # play the included trained bot (models/bot_53k.pt)
+python play.py                                 # play the included trained bot (models/bot_126k.pt)
 python train.py --games 300000                 # train your own by self-play (hours)
 python play.py                                 # now plays your checkpoints/best.pt instead
 python play.py --watch                         # watch the bot play itself
@@ -73,14 +73,19 @@ against the current network, sometimes against older snapshots of itself
 and the heuristic bot, and the network learns from the results. The reward
 is +1 for a win and −1 for a loss, plus a small bonus per prize card swing.
 
-## Included model
+## Included models
 
-`models/bot_53k.pt` has trained for 53,295 self-play games on the 16
-original decks (Mega Venusaur ex was added afterwards). Over 1,000 games it
-beats the earlier 40k-game model 58.5% of the time (584-2-414) and the
-rule-based bot 74.7% (746-2-252), both sides always playing their top-rated
-move. It's a starting point: continue training from it with
-`python train.py --resume models/bot_53k.pt --games 300000`.
+`models/bot_126k.pt` is the default. It has trained for 126,225 self-play
+games on all 17 decks, and it remembers what it has seen during a game
+(revealed cards, what's left in its deck) and what it has already done this
+turn. Over 1,000 games it beats `bot_53k.pt` 58.6% of the time (585-1-414)
+and the rule-based bot 83.3% (831-4-165), both sides always playing their
+top-rated move. Continue training from it with
+`python train.py --resume models/bot_126k.pt --games 300000`.
+
+`models/bot_53k.pt` is the earlier default (53,295 games on the 16 original
+decks), kept as an easier opponent. It beats the 40k-game model before it
+58.5% (584-2-414) and the rule-based bot 74.7% (746-2-252).
 
 `models/bot_venusaur.pt` is a Mega Venusaur ex specialist: `bot_53k.pt` trained
 for 40,000 more games with Venusaur in every game (`--focus-deck venusaur`).

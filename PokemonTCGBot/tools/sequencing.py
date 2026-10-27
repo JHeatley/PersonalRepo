@@ -1,6 +1,6 @@
 """Measure how well a bot sequences its turns.
 
-    python tools/sequencing.py models/bot_53k.pt --games 200
+    python tools/sequencing.py models/bot_126k.pt --games 200
     python tools/sequencing.py checkpoints/latest.pt --deck venusaur
 
 The bot plays itself (top-rated move each time) and these common

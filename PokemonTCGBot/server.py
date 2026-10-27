@@ -38,7 +38,8 @@ _agents = {}
 
 def bot_options():
     out = []
-    for path in ("checkpoints/best.pt", "models/bot_53k.pt", "models/bot_venusaur.pt", "checkpoints/latest.pt"):
+    for path in ("checkpoints/best.pt", "models/bot_126k.pt", "models/bot_53k.pt", "models/bot_venusaur.pt",
+                 "checkpoints/latest.pt"):
         if os.path.exists(path):
             out.append(path + ":greedy")
     return out + ["heuristic", "random"]

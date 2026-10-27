@@ -99,7 +99,7 @@ def main():
     ap.add_argument("--eval-every", type=int, default=10)
     ap.add_argument("--eval-games", type=int, default=200)
     ap.add_argument("--eval-ref", default=None,
-                    help="also evaluate against this checkpoint (e.g. models/bot_53k.pt); >0.5 means stronger")
+                    help="also evaluate against this checkpoint (e.g. models/bot_126k.pt); >0.5 means stronger")
     ap.add_argument("--width", type=int, default=384)
     ap.add_argument("--blocks", type=int, default=3)
     ap.add_argument("--out", default="checkpoints")
