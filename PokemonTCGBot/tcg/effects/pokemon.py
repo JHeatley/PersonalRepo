@@ -470,17 +470,27 @@ def _(g, p, mon):
         g.shuffle(p)
 
 
+def _grass(e):
+    return e.basic_energy and e.energy_type == GRASS
+
+
+def _movable_grass(p, m):
+    """Grass Energy on m that hasn't already been moved this turn. Moving each card at most once reaches
+    every arrangement that repeated moves could, and stops the bot shuffling Energy back and forth."""
+    moved_in = sum(1 for k in p.used if k[:2] == ("solar_in", m.uid))
+    return sum(_grass(e) for e in m.energy) - moved_in
+
+
 def _solar_transfer_ok(g, p, mon):
-    mons = p.in_play()
-    return len(mons) > 1 and any(e.basic_energy and e.energy_type == GRASS for m in mons for e in m.energy)
+    return len(p.in_play()) > 1 and any(_movable_grass(p, m) > 0 for m in p.in_play())
 
 
 @ability("Mega Venusaur ex", "Solar Transfer", once=None, can_use=_solar_transfer_ok)
 def _(g, p, mon):
-    grass = lambda e: e.basic_energy and e.energy_type == GRASS
-    frm = yield from g.choose_pokemon(p.idx, [m for m in p.in_play() if any(grass(e) for e in m.energy)],
+    frm = yield from g.choose_pokemon(p.idx, [m for m in p.in_play() if _movable_grass(p, m) > 0],
                                       mon.card, "move Grass Energy from")
-    e = (yield from g.choose_energy(p.idx, frm, 1, mon.card, grass))[0]
+    e = (yield from g.choose_energy(p.idx, frm, 1, mon.card, _grass))[0]
     to = yield from g.choose_pokemon(p.idx, [m for m in p.in_play() if m is not frm], mon.card, "move it to")
     frm.energy.remove(e)
     to.energy.append(e)
+    p.used.add(("solar_in", to.uid, len(p.used)))
