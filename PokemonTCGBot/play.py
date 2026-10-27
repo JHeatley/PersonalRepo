@@ -1,6 +1,6 @@
 """Play against the bot in the terminal.
 
-    python play.py                                   # random decks vs your best checkpoint, else models/bot_53k.pt
+    python play.py                                   # random decks vs your best checkpoint, else models/bot_126k.pt
     python play.py --deck dragapult --bot-deck basic_box
     python play.py --bot checkpoints/latest.pt
     python play.py --bot heuristic
@@ -76,7 +76,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--deck", help="your deck: a name from decks/ or a file path (default random)")
     ap.add_argument("--bot-deck", help="the bot's deck (default random)")
-    default_bot = next((f"{p}:greedy" for p in ("checkpoints/best.pt", "models/bot_53k.pt") if os.path.exists(p)),
+    default_bot = next((f"{p}:greedy" for p in ("checkpoints/best.pt", "models/bot_126k.pt") if os.path.exists(p)),
                        "heuristic")
     ap.add_argument("--bot", default=default_bot, help="checkpoint path, 'path:greedy', or 'heuristic'")
     ap.add_argument("--seed", type=int, default=None)
