@@ -316,6 +316,20 @@ def _(m, atk):
     return ("post" if also else "replace"), step
 
 
+@clause(r"This attack does (\d+) damage to 1 of your opponent's Pokémon for each (?:" + TYPES +
+        r" )?Energy attached to this Pokémon\." + NO_WR)
+def _(m, atk):
+    per = int(m.group(1))
+    t = TYPE[m.group(2)] if m.group(2) else None
+
+    def step(g, ctx):
+        n = g.energy_count(ctx.attacker, t)
+        if n:
+            target = yield from g.choose_pokemon(ctx.player.idx, ctx.opponent.in_play(), ctx.attacker.card, "damage target")
+            ctx.snipe(target, per * n)
+    return "replace", step
+
+
 @clause(r"This attack (also )?does (\d+) damage to (\d+|each) of your Benched Pokémon\." + NO_WR)
 def _(m, atk):
     n, count = int(m.group(2)), m.group(3)
