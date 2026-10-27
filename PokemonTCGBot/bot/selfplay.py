@@ -12,6 +12,7 @@ import torch
 
 from tcg.engine import Game
 from .agents import NeuralAgent, HeuristicAgent
+from .sequencing import TurnTracker, mistakes
 
 
 def _progress(g, seat):
@@ -20,12 +21,13 @@ def _progress(g, seat):
 
 
 def collect(model, opponents, decks, n_games, concurrency=64, seed=0, gamma=0.999, lam=0.95,
-            prize_reward=0.05, focus=None):
+            prize_reward=0.05, focus=None, sequence_penalty=0.0):
     """Play n_games and return (samples, stats).
 
     opponents: list of (agent or None, weight); None means self-play.
     focus: a deck name that is in every game, played by the learner's seat
            (the other seat gets a random deck from the pool).
+    sequence_penalty: reward taken off for each sequencing mistake (bot/sequencing.py).
     samples: list of dicts with enc, action, logp, value, adv, ret.
     """
     rng = random.Random(seed)
@@ -33,7 +35,8 @@ def collect(model, opponents, decks, n_games, concurrency=64, seed=0, gamma=0.99
     names = list(decks)
     weights = [w for _, w in opponents]
     samples = []
-    stats = {"games": 0, "learner_wins": 0, "draws": 0, "decisions": 0, "turns": 0, "vs_pool": 0, "pool_wins": 0}
+    stats = {"games": 0, "learner_wins": 0, "draws": 0, "decisions": 0, "turns": 0, "vs_pool": 0, "pool_wins": 0,
+             "mistakes": 0}
     started = 0
     live = []
 
@@ -44,7 +47,8 @@ def collect(model, opponents, decks, n_games, concurrency=64, seed=0, gamma=0.99
         mine = focus or rng.choice(names)
         pair = (mine, rng.choice(names)) if seat == 0 else (rng.choice(names), mine)
         g = Game(decks[pair[0]], decks[pair[1]], seed=rng.randrange(1 << 30))
-        live.append({"g": g, "opp": opp, "seat": seat, "traj": {0: [], 1: []}})
+        live.append({"g": g, "opp": opp, "seat": seat, "traj": {0: [], 1: []},
+                     "track": (TurnTracker(), TurnTracker())})
         started += 1
 
     while started < min(concurrency, n_games):
@@ -63,7 +67,9 @@ def collect(model, opponents, decks, n_games, concurrency=64, seed=0, gamma=0.99
                 actions, logps, values, encs = learner.act_full(games)
                 for x, a, lp, v, e in zip(batch, actions, logps, values, encs):
                     seat = x["g"].actor()
-                    x["traj"][seat].append([e, a, float(lp), float(v), _progress(x["g"], seat)])
+                    bad = mistakes(x["track"][seat].events(x["g"], x["g"].decision.options[a]))
+                    stats["mistakes"] += bad
+                    x["traj"][seat].append([e, a, float(lp), float(v), _progress(x["g"], seat), bad])
             else:
                 actions = agent.act(games)
             for g, a in zip(games, actions):
@@ -86,20 +92,20 @@ def collect(model, opponents, decks, n_games, concurrency=64, seed=0, gamma=0.99
             for seat, traj in x["traj"].items():
                 if traj:
                     outcome = 0.0 if g.winner is None else (1.0 if g.winner == seat else -1.0)
-                    samples += _finish(traj, outcome, _progress(g, seat), gamma, lam, prize_reward)
+                    samples += _finish(traj, outcome, _progress(g, seat), gamma, lam, prize_reward, sequence_penalty)
         live[:] = still
         while started < n_games and len(live) < concurrency:
             start()
     return samples, stats
 
 
-def _finish(traj, outcome, final_progress, gamma, lam, prize_reward):
+def _finish(traj, outcome, final_progress, gamma, lam, prize_reward, sequence_penalty=0.0):
     """GAE over one player's decisions in one game."""
     n = len(traj)
     rewards = np.zeros(n, dtype=np.float32)
     for t in range(n):
         nxt = traj[t + 1][4] if t + 1 < n else final_progress
-        rewards[t] = prize_reward * (nxt - traj[t][4])
+        rewards[t] = prize_reward * (nxt - traj[t][4]) - sequence_penalty * traj[t][5]
     rewards[-1] += outcome
     values = np.array([s[3] for s in traj], dtype=np.float32)
     adv = np.zeros(n, dtype=np.float32)

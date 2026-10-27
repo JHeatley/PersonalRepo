@@ -100,6 +100,10 @@ the Unity bot picker.
   above 0.5.
 - `--decks dragapult,basic_box` trains on a subset; specialising helps if
   you mostly want to practise against one matchup.
+- `--sequence-penalty 0.02` takes a little reward off for each common
+  sequencing mistake (shuffling your hand away with plays left, attacking
+  with an attachment or Ability unused...; see `bot/sequencing.py`).
+  `python tools/sequencing.py <model>` measures how often a bot makes them.
 
 ## Tests
 
