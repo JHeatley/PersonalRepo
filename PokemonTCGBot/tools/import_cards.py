@@ -97,11 +97,11 @@ def _gameplay(c):
 
 
 def build():
-    with open(os.path.join(RAW, "sets.json")) as f:
+    with open(os.path.join(RAW, "sets.json"), encoding="utf-8") as f:
         codes = {s["id"]: s.get("ptcgoCode") for s in json.load(f)}
     cards, by_key = [], {}
     for set_id in SETS:
-        with open(os.path.join(RAW, set_id + ".json")) as f:
+        with open(os.path.join(RAW, set_id + ".json"), encoding="utf-8") as f:
             printings = json.load(f)
         for c in printings:
             if not _legal(c):
@@ -116,7 +116,7 @@ def build():
                 by_key[key] = g
                 cards.append(g)
             by_key[key]["printings"].append([codes.get(set_id) or set_id, c["number"]])
-    with open(OUT, "w") as f:
+    with open(OUT, "w", encoding="utf-8") as f:
         json.dump(cards, f, ensure_ascii=False, separators=(",", ":"))
     kinds = {}
     for c in cards:

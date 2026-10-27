@@ -26,7 +26,7 @@ def show(c):
 
 
 if __name__ == "__main__":
-    with open(os.path.join(ROOT, "data", "cards.json")) as f:
+    with open(os.path.join(ROOT, "data", "cards.json"), encoding="utf-8") as f:
         cards = json.load(f)
     for q in sys.argv[1:]:
         for c in cards:

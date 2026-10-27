@@ -116,7 +116,7 @@ class CardDef:
 
 
 def _load():
-    with open(DATA) as f:
+    with open(DATA, encoding="utf-8") as f:
         return [CardDef(d) for d in json.load(f)]
 
 

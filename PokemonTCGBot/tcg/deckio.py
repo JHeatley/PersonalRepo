@@ -81,7 +81,7 @@ def load_deck(name_or_path):
     path = name_or_path
     if not os.path.exists(path):
         path = os.path.join(DECK_DIR, name_or_path + ".txt")
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         deck = parse_deck(f.read())
     problems = validate(deck)
     if problems:

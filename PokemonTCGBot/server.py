@@ -209,6 +209,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))  # find models/ and decks/ from anywhere
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8765)

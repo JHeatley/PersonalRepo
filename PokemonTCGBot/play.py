@@ -72,6 +72,7 @@ def ask_human(g, me):
 
 
 def main():
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))  # find models/ and decks/ from anywhere
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--deck", help="your deck: a name from decks/ or a file path (default random)")
     ap.add_argument("--bot-deck", help="the bot's deck (default random)")
