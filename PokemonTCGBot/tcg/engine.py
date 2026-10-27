@@ -233,28 +233,28 @@ class Game:
     def hook_sources(self, name):
         """(fn, src) for every active hook with this name."""
         out = []
-        tools_on = True
         if self.stadium is not None:
-            h = fx.trainer_impl(self.stadium)
-            if h and name in h.hooks:
-                out.append((h.hooks[name], None))
+            h = fx.trainer_hooks(self.stadium)
+            if name in h:
+                out.append((h[name], None))
+        tools_on = None
         for q in self.players:
             for m in q.in_play():
-                for ab in m.card.abilities:
-                    impl = fx.ABILITIES.get((m.name, ab.name))
-                    if impl and impl.kind == "passive" and name in impl.hooks and not self.ability_blocked(m):
-                        out.append((impl.hooks[name], m))
-                if m.tool is not None and name != "tools_blocked":
-                    impl = fx.trainer_impl(m.tool)
-                    if impl and name in impl.hooks:
-                        if tools_on is True:
+                for hooks in fx.ability_hooks(m.card):
+                    if name in hooks and not self.ability_blocked(m):
+                        out.append((hooks[name], m))
+                if m.tool is not None:
+                    h = fx.trainer_hooks(m.tool)
+                    if name in h:
+                        if tools_on is None:
                             tools_on = not self.tools_blocked()
                         if tools_on:
-                            out.append((impl.hooks[name], m))
+                            out.append((h[name], m))
                 for e in m.energy:
-                    impl = fx.ENERGY.get(e.name)
-                    if impl and name in impl.hooks:
-                        out.append((impl.hooks[name], m))
+                    if not e.basic_energy:
+                        h = fx.energy_hooks(e)
+                        if name in h:
+                            out.append((h[name], m))
         return out
 
     def fold(self, name, value, *args):

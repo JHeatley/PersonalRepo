@@ -57,7 +57,7 @@ def _(g, p, mon):
 
 
 for _name, _n in (("Kadabra", 2), ("Alakazam", 3)):
-    @ability(_name, "Psychic Draw", kind="on_evolve")
+    @ability(_name, "Psychic Draw", kind="on_evolve", once=None)
     def _(g, p, mon, n=_n):
         g.draw(p, n)
 
@@ -216,8 +216,7 @@ ability("Dusknoir", "Cursed Blast")(_cursed_blast(13))
 
 
 def _adrena_ok(g, p, mon):
-    return any(e.basic_energy and e.energy_type == DARKNESS or g.energy_count(mon, DARKNESS) for e in mon.energy) \
-        and any(m.damage for m in p.in_play())
+    return g.energy_count(mon, DARKNESS) > 0 and any(m.damage for m in p.in_play())
 
 
 @ability("Munkidori", "Adrena-Brain", can_use=_adrena_ok)
@@ -372,7 +371,7 @@ def _(g, ctx):
 @attack("Metagross", "Metallic Hammer")
 def _(g, ctx):
     a, p = ctx.attacker, ctx.player
-    metal = [e for e in a.energy if g.energy_count(a, METAL) and (e.basic_energy and e.energy_type == METAL)]
+    metal = [e for e in a.energy if e.basic_energy and e.energy_type == METAL]
     if len(metal) >= 3 and (yield from g.yes_no(p.idx, a.card, "discard 3 Metal Energy for +150?")):
         g.discard_energy(a, metal[:3])
         ctx.damage += 150

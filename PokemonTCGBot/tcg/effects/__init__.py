@@ -35,6 +35,35 @@ def trainer_impl(card):
     return TRAINERS.get(card.name)
 
 
+_ability_hooks, _trainer_hooks, _energy_hooks = {}, {}, {}
+
+
+def ability_hooks(card):
+    """Hook tables of this card's passive Abilities (cached)."""
+    h = _ability_hooks.get(card.id)
+    if h is None:
+        h = _ability_hooks[card.id] = [impl.hooks for a in card.abilities
+                                       for impl in [ABILITIES.get((card.name, a.name))]
+                                       if impl is not None and impl.kind == "passive"]
+    return h
+
+
+def trainer_hooks(card):
+    h = _trainer_hooks.get(card.id)
+    if h is None:
+        impl = TRAINERS.get(card.name)
+        h = _trainer_hooks[card.id] = impl.hooks if impl else {}
+    return h
+
+
+def energy_hooks(card):
+    h = _energy_hooks.get(card.id)
+    if h is None:
+        impl = ENERGY.get(card.name)
+        h = _energy_hooks[card.id] = impl.hooks if impl else {}
+    return h
+
+
 def attack_implemented(card, atk):
     if not atk.text or (card.name, atk.name) in ATTACKS:
         return True
