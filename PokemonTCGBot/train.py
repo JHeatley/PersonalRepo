@@ -66,9 +66,9 @@ def ppo_update(model, opt, samples, epochs, minibatch, clip, vf_coef, ent_coef, 
     return {k: v / n for k, v in stats.items()}
 
 
-def evaluate(model, decks, n_games):
+def evaluate(model, decks, n_games, opponent=None):
     agent = NeuralAgent(model, greedy=True)
-    return play_match(agent, HeuristicAgent(0), decks, n_games, concurrency=64, seed=12345)
+    return play_match(agent, opponent or HeuristicAgent(0), decks, n_games, concurrency=64, seed=12345)
 
 
 def main():
@@ -94,6 +94,8 @@ def main():
     ap.add_argument("--pool-size", type=int, default=8)
     ap.add_argument("--eval-every", type=int, default=10)
     ap.add_argument("--eval-games", type=int, default=200)
+    ap.add_argument("--eval-ref", default=None,
+                    help="also evaluate against this checkpoint (e.g. models/bot_40k.pt); >0.5 means stronger")
     ap.add_argument("--width", type=int, default=384)
     ap.add_argument("--blocks", type=int, default=3)
     ap.add_argument("--out", default="checkpoints")
@@ -124,6 +126,7 @@ def main():
             pool.append(load(os.path.join(args.out, f))[0].state_dict())
     pool = pool[-args.pool_size:]
 
+    ref_agent = NeuralAgent(load(args.eval_ref)[0], greedy=True) if args.eval_ref else None
     workers = mp.get_context("fork").Pool(args.workers) if args.workers > 1 else None
     torch.set_num_threads(max(1, os.cpu_count() or 1))
     kw = {"gamma": args.gamma, "lam": args.lam, "prize_reward": args.prize_reward}
@@ -161,6 +164,10 @@ def main():
             r = evaluate(model, decks, args.eval_games)
             print(f"   eval vs heuristic (greedy): win rate {r['win_rate']:.3f} "
                   f"({r['wins']}-{r['draws']}-{r['losses']}), avg turns {r['avg_turns']:.1f}", flush=True)
+            if ref_agent is not None:
+                rr = evaluate(model, decks, args.eval_games, ref_agent)
+                print(f"   eval vs {args.eval_ref} (both greedy): win rate {rr['win_rate']:.3f} "
+                      f"({rr['wins']}-{rr['draws']}-{rr['losses']})", flush=True)
             if r["win_rate"] > best:
                 best = r["win_rate"]
                 save(model, os.path.join(args.out, "best.pt"), games=games_done, iteration=iteration, best=best)
