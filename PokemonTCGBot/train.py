@@ -4,6 +4,8 @@
     python train.py --games 2000 --workers 2       # quick smoke test
     python train.py --resume checkpoints/latest.pt --games 100000
     python train.py --decks dragapult,basic_box    # only some decks
+    python train.py --resume models/bot_53k.pt --focus-deck venusaur --games 40000 --reset-best
+                                                   # learn one deck: it's in every game, vs the field
 
 Each iteration the workers play --games-per-iter games with the current
 network (mostly against itself, sometimes against past snapshots or the
@@ -66,9 +68,9 @@ def ppo_update(model, opt, samples, epochs, minibatch, clip, vf_coef, ent_coef, 
     return {k: v / n for k, v in stats.items()}
 
 
-def evaluate(model, decks, n_games, opponent=None):
+def evaluate(model, decks, n_games, opponent=None, deck=None):
     agent = NeuralAgent(model, greedy=True)
-    return play_match(agent, opponent or HeuristicAgent(0), decks, n_games, concurrency=64, seed=12345)
+    return play_match(agent, opponent or HeuristicAgent(0), decks, n_games, concurrency=64, seed=12345, deck_a=deck)
 
 
 def main():
@@ -100,6 +102,10 @@ def main():
     ap.add_argument("--blocks", type=int, default=3)
     ap.add_argument("--out", default="checkpoints")
     ap.add_argument("--resume", default=None)
+    ap.add_argument("--focus-deck", default=None,
+                    help="put this deck in every game (learner plays it vs a random deck); evals use it too")
+    ap.add_argument("--reset-best", action="store_true",
+                    help="ignore the resumed checkpoint's best score (use when the eval changes)")
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
 
@@ -115,6 +121,8 @@ def main():
     if args.resume:
         model, ckpt = load(args.resume)
         games_done, iteration, best = ckpt.get("games", 0), ckpt.get("iteration", 0), ckpt.get("best", -1.0)
+        if args.reset_best:
+            best = -1.0
         print(f"resumed {args.resume} at {games_done} games")
     else:
         model = PolicyValueNet(width=args.width, blocks=args.blocks)
@@ -129,7 +137,11 @@ def main():
     ref_agent = NeuralAgent(load(args.eval_ref)[0], greedy=True) if args.eval_ref else None
     workers = mp.get_context("fork").Pool(args.workers) if args.workers > 1 else None
     torch.set_num_threads(max(1, os.cpu_count() or 1))
-    kw = {"gamma": args.gamma, "lam": args.lam, "prize_reward": args.prize_reward}
+    kw = {"gamma": args.gamma, "lam": args.lam, "prize_reward": args.prize_reward, "focus": args.focus_deck}
+    if args.focus_deck:
+        if args.focus_deck not in decks:
+            raise SystemExit(f"--focus-deck {args.focus_deck} isn't in the deck pool")
+        print(f"focus deck: {args.focus_deck} in every game")
     t_start = time.time()
     while games_done < args.games:
         iteration += 1
@@ -161,12 +173,12 @@ def main():
             save(model, path)
             pool = (pool + [{k: v.clone() for k, v in model.state_dict().items()}])[-args.pool_size:]
         if iteration % args.eval_every == 0 or games_done >= args.games:
-            r = evaluate(model, decks, args.eval_games)
-            print(f"   eval vs heuristic (greedy): win rate {r['win_rate']:.3f} "
+            r = evaluate(model, decks, args.eval_games, deck=args.focus_deck)
+            print(f"   eval {args.focus_deck + ' ' if args.focus_deck else ''}vs heuristic (greedy): win rate {r['win_rate']:.3f} "
                   f"({r['wins']}-{r['draws']}-{r['losses']}), avg turns {r['avg_turns']:.1f}", flush=True)
             if ref_agent is not None:
-                rr = evaluate(model, decks, args.eval_games, ref_agent)
-                print(f"   eval vs {args.eval_ref} (both greedy): win rate {rr['win_rate']:.3f} "
+                rr = evaluate(model, decks, args.eval_games, ref_agent, deck=args.focus_deck)
+                print(f"   eval {args.focus_deck + ' ' if args.focus_deck else ''}vs {args.eval_ref} (both greedy): win rate {rr['win_rate']:.3f} "
                       f"({rr['wins']}-{rr['draws']}-{rr['losses']})", flush=True)
             if r["win_rate"] > best:
                 best = r["win_rate"]

@@ -90,13 +90,15 @@ def main():
     dt = time.time() - t
     print(f"{args.a} vs {args.b}: {r['wins']}-{r['draws']}-{r['losses']} (W-D-L), "
           f"win rate {r['win_rate']:.3f}, avg {r['avg_turns']:.1f} turns, {r['games'] / dt:.1f} games/s")
+    matchups = merge_saved(args.save, r["matchups"]) if args.save else r["matchups"]
     if args.matchups:
-        rows = sorted(r["matchups"].items(), key=lambda kv: -sum(kv[1]))
+        if args.save:
+            print(f"\n(running totals over {sum(sum(v) for v in matchups.values())} games in {args.save})")
+        rows = sorted(matchups.items(), key=lambda kv: -(kv[1][0] + kv[1][1] / 2) / max(sum(kv[1]), 1))
         print(f"\n{'A deck':24} {'B deck':24} {'W-D-L':>10} {'win%':>6}")
         for (da, db), (w, d, l) in rows:
             n = w + d + l
             print(f"{da:24} {db:24} {f'{w}-{d}-{l}':>10} {100 * (w + d / 2) / n:6.1f}")
-    matchups = merge_saved(args.save, r["matchups"]) if args.save else r["matchups"]
     if args.deck_table:
         if args.save:
             print(f"\n(running totals over {sum(sum(v) for v in matchups.values())} games in {args.save})")
