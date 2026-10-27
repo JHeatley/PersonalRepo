@@ -12,7 +12,8 @@ import torch.nn as nn
 
 from tcg.carddb import NUM_CARDS
 from tcg.core import OPTION_KINDS
-from .encode import (CARD_STATIC, NUM_SLOTS, SLOT_FEATURES, GLOBAL_FEATURES, OPTION_FEATURES, MEMORY_KEYS)
+from .encode import (CARD_STATIC, NUM_SLOTS, SLOT_FEATURES, GLOBAL_FEATURES, OPTION_FEATURES, MEMORY_KEYS,
+                     HISTORY_KEYS, TURN_FEATURES)
 
 NEG_INF = -1e9
 
@@ -47,11 +48,12 @@ def _bag(emb, ids):
 
 
 class PolicyValueNet(nn.Module):
-    def __init__(self, card_dim=48, slot_dim=96, width=384, blocks=3, option_dim=128, memory=True):
+    def __init__(self, card_dim=48, slot_dim=96, width=384, blocks=3, option_dim=128, memory=True, history=True):
         super().__init__()
         self.config = {"card_dim": card_dim, "slot_dim": slot_dim, "width": width, "blocks": blocks,
-                       "option_dim": option_dim, "memory": memory}
+                       "option_dim": option_dim, "memory": memory, "history": history}
         self.memory = memory
+        self.history = history
         self.cards = CardEmbedding(card_dim)
         self.slot = nn.Sequential(nn.Linear(2 * card_dim + SLOT_FEATURES, slot_dim), nn.GELU(),
                                   nn.Linear(slot_dim, slot_dim))
@@ -59,6 +61,8 @@ class PolicyValueNet(nn.Module):
         self.base_inputs = state_in
         if memory:
             state_in += len(MEMORY_KEYS) * (card_dim + 1)
+        if history:
+            state_in += len(HISTORY_KEYS) * (card_dim + 1) + TURN_FEATURES
         self.inp = nn.Sequential(nn.Linear(state_in, width), nn.GELU())
         self.body = nn.Sequential(*[ResBlock(width) for _ in range(blocks)], nn.LayerNorm(width))
         self.kind = nn.Embedding(len(OPTION_KINDS), card_dim)
@@ -80,7 +84,8 @@ class PolicyValueNet(nn.Module):
             _bag(self.cards(b["discards"][:, 1]), b["discards"][:, 1]),
             self.cards(b["stadium"]), self.cards(b["source"]),
             b["globals"],
-        ] + ([_bag(self.cards(b[k]), b[k]) for k in MEMORY_KEYS] if self.memory else []), -1)
+        ] + ([_bag(self.cards(b[k]), b[k]) for k in MEMORY_KEYS] if self.memory else [])
+          + ([_bag(self.cards(b[k]), b[k]) for k in HISTORY_KEYS] + [b["turn_feats"]] if self.history else []), -1)
         h = self.body(self.inp(state))
 
         # Option encodings; target index NUM_SLOTS means "no target"
@@ -109,11 +114,11 @@ def load(path, device="cpu"):
         raise ValueError(f"{path} was trained on a different card database; retrain it")
     config = dict(ckpt["config"])
     state = ckpt["state_dict"]
-    if not config.get("memory", False):
-        config["memory"] = True
+    if not config.get("memory", False) or not config.get("history", False):
+        # New inputs are appended after the old ones, so pad the first layer with zero columns
+        config["memory"] = config["history"] = True
         old = state["inp.0.weight"]
-        model = PolicyValueNet(**config)
-        new = torch.zeros_like(model.inp[0].weight)
+        new = torch.zeros_like(PolicyValueNet(**config).inp[0].weight)
         new[:, :old.shape[1]] = old
         state = dict(state, **{"inp.0.weight": new})
     model = PolicyValueNet(**config).to(device)
