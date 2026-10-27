@@ -82,6 +82,14 @@ rule-based bot 74.7% (746-2-252), both sides always playing their top-rated
 move. It's a starting point: continue training from it with
 `python train.py --resume models/bot_53k.pt --games 300000`.
 
+`models/bot_venusaur.pt` is a Mega Venusaur ex specialist: `bot_53k.pt` trained
+for 40,000 more games with Venusaur in every game (`--focus-deck venusaur`).
+Piloting Venusaur against `bot_53k.pt` on the field it wins 83.0% over 1,000
+games (828-4-168); across all decks it's slightly weaker than `bot_53k.pt`
+(46.0%), so `bot_53k.pt` stays the default. Pick it with
+`python play.py --bot models/bot_venusaur.pt:greedy --bot-deck venusaur` or in
+the Unity bot picker.
+
 ## Training tips
 
 - Throughput is roughly 5–10 games/sec per CPU core. `--workers` defaults
