@@ -20,10 +20,12 @@ def _progress(g, seat):
 
 
 def collect(model, opponents, decks, n_games, concurrency=64, seed=0, gamma=0.999, lam=0.95,
-            prize_reward=0.05):
+            prize_reward=0.05, focus=None):
     """Play n_games and return (samples, stats).
 
     opponents: list of (agent or None, weight); None means self-play.
+    focus: a deck name that is in every game, played by the learner's seat
+           (the other seat gets a random deck from the pool).
     samples: list of dicts with enc, action, logp, value, adv, ret.
     """
     rng = random.Random(seed)
@@ -38,8 +40,10 @@ def collect(model, opponents, decks, n_games, concurrency=64, seed=0, gamma=0.99
     def start():
         nonlocal started
         opp = rng.choices(opponents, weights)[0][0]
-        g = Game(decks[rng.choice(names)], decks[rng.choice(names)], seed=rng.randrange(1 << 30))
         seat = rng.randrange(2)
+        mine = focus or rng.choice(names)
+        pair = (mine, rng.choice(names)) if seat == 0 else (rng.choice(names), mine)
+        g = Game(decks[pair[0]], decks[pair[1]], seed=rng.randrange(1 << 30))
         live.append({"g": g, "opp": opp, "seat": seat, "traj": {0: [], 1: []}})
         started += 1
 
