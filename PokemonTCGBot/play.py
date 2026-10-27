@@ -1,6 +1,6 @@
 """Play against the bot in the terminal.
 
-    python play.py                                   # random decks, best checkpoint (or heuristic bot)
+    python play.py                                   # random decks vs your best checkpoint, else models/bot_40k.pt
     python play.py --deck dragapult --bot-deck basic_box
     python play.py --bot checkpoints/latest.pt
     python play.py --bot heuristic
@@ -75,7 +75,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--deck", help="your deck: a name from decks/ or a file path (default random)")
     ap.add_argument("--bot-deck", help="the bot's deck (default random)")
-    default_bot = "checkpoints/best.pt:greedy" if os.path.exists("checkpoints/best.pt") else "heuristic"
+    default_bot = next((f"{p}:greedy" for p in ("checkpoints/best.pt", "models/bot_40k.pt") if os.path.exists(p)),
+                       "heuristic")
     ap.add_argument("--bot", default=default_bot, help="checkpoint path, 'path:greedy', or 'heuristic'")
     ap.add_argument("--seed", type=int, default=None)
     ap.add_argument("--watch", action="store_true", help="watch the bot play itself instead of playing")

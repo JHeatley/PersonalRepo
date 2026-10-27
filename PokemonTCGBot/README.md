@@ -14,9 +14,9 @@ pip install -r requirements.txt
 ## Quick start
 
 ```
-python play.py --bot heuristic                 # play right away against the rule-based bot
-python train.py --games 300000                 # train the neural bot by self-play (hours)
-python play.py                                 # play against your best checkpoint
+python play.py                                 # play the included trained bot (models/bot_40k.pt)
+python train.py --games 300000                 # train your own by self-play (hours)
+python play.py                                 # now plays your checkpoints/best.pt instead
 python play.py --watch                         # watch the bot play itself
 python evaluate.py checkpoints/best.pt:greedy heuristic --games 1000 --matchups
 ```
@@ -68,6 +68,14 @@ card, kind and target, so one network handles every kind of decision.
 against the current network, sometimes against older snapshots of itself
 and the heuristic bot, and the network learns from the results. The reward
 is +1 for a win and −1 for a loss, plus a small bonus per prize card swing.
+
+## Included model
+
+`models/bot_40k.pt` comes from a 40,000-game self-play run on all 16 decks
+(about 70 minutes on 4 CPU cores); this snapshot is from game 28,050. Over
+1,000 games against the rule-based bot it won 73.9% (738-2-260), playing
+its top-rated move each time. It's a starting point: continue training from it with
+`python train.py --resume models/bot_40k.pt --games 300000`.
 
 ## Training tips
 
