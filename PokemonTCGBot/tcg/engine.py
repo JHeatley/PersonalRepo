@@ -109,6 +109,7 @@ class Game:
         self.end_reason = None
         self.in_setup = True
         self.attacking = None   # AttackCtx while an attack resolves
+        self.actions_this_turn = 0
         self._pending_triggers = []
         self.logging = log
         self.log = []
@@ -600,6 +601,8 @@ class Game:
         p = self.players[self.current]
         p.energy_attached = p.supporter_played = p.retreated = p.stadium_played = False
         p.used = set()
+        p.played_this_turn = []
+        self.actions_this_turn = 0
         self._pending_triggers = []
         self.force_end_turn = False
         self.say(f"--- Turn {self.turn}: P{p.idx} ---")
@@ -615,6 +618,7 @@ class Game:
             if opt.kind == "attack":
                 yield from self._attack_turn(p, opt.card, opt.data)
                 break
+            self.actions_this_turn += 1
             yield from self._do(p, opt)
             yield from self.knockouts()
             if self.force_end_turn:
@@ -724,6 +728,8 @@ class Game:
 
     def _do(self, p, opt):
         k, c, t = opt.kind, opt.card, opt.target
+        if k in ("bench", "evolve", "attach", "tool", "play"):
+            p.played_this_turn.append(c)
         if k == "bench":
             p.hand.remove(c)
             mon = self.put_on_bench(p, c)

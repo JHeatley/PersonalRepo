@@ -22,6 +22,7 @@ MAX_DISCARD = 60
 MAX_UNSEEN = 60
 MAX_KNOWN_HAND = 20
 MAX_SEEN = 60
+MAX_TURN_PLAYS = 20
 NO_TARGET = NUM_SLOTS          # option target index meaning "none"
 SLOT_FEATURES = 26
 GLOBAL_FEATURES = 20 + len(DECISION_KINDS)
@@ -98,6 +99,22 @@ def _ids(counts, size):
             out[i] = cid + 1
             i += 1
     return out
+
+
+TURN_FEATURES = 2 + SLOTS
+
+
+def turn_features(g, me):
+    """What this player has already done this turn, so it can plan the order of its plays."""
+    f = np.zeros(TURN_FEATURES, dtype=np.float32)
+    if g.current != me.idx or g.in_setup:
+        return f
+    f[0] = min(g.actions_this_turn, 40) / 20
+    f[1] = sum(1 for k in me.used if k[0] != "solar_in") / 5
+    for s, mon in enumerate(me.in_play()[:SLOTS]):
+        names = {a.name for a in mon.card.abilities}
+        f[2 + s] = any(k[0] == mon.uid or (k[0] == "name" and k[1] in names) for k in me.used)
+    return f
 
 
 def unseen_cards(g, p):
@@ -179,13 +196,18 @@ def encode(g):
         "unseen": _ids(unseen_cards(g, me), MAX_UNSEEN),
         "opp_known_hand": _ids(opp.known_hand, MAX_KNOWN_HAND),
         "opp_seen": _ids(opp.seen, MAX_SEEN),
+        "turn_played": _ids(Counter(c.id for c in me.played_this_turn) if g.current == me.idx else {},
+                            MAX_TURN_PLAYS),
+        "opp_last_turn": _ids(Counter(c.id for c in opp.played_this_turn), MAX_TURN_PLAYS),
+        "turn_feats": turn_features(g, me),
         "opt_kind": opt_kind, "opt_card": opt_card, "opt_target": opt_target, "opt_feat": opt_feat,
     }
 
 
 FIXED_KEYS = ["slot_card", "slot_tool", "slot_feat", "hand", "discards", "globals", "stadium", "source",
-              "unseen", "opp_known_hand", "opp_seen"]
+              "unseen", "opp_known_hand", "opp_seen", "turn_played", "opp_last_turn", "turn_feats"]
 MEMORY_KEYS = ["unseen", "opp_known_hand", "opp_seen"]  # the "what a real player keeps track of" inputs
+HISTORY_KEYS = ["turn_played", "opp_last_turn"]         # this turn's plays (sequencing) + opponent's last turn
 OPTION_KEYS = ["opt_kind", "opt_card", "opt_target", "opt_feat"]
 
 

@@ -123,6 +123,7 @@ class Player:
         self.bench = []
         self.markers = {}
         self.used = set()
+        self.played_this_turn = []  # cards played from hand during this player's current/last turn
         self.turns_taken = 0
         self.mulligans = 0
         self.kod_turn = -9  # last turn one of this player's Pokemon was Knocked Out
