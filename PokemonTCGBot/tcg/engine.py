@@ -28,6 +28,7 @@ from . import effects as fx
 HAND_SIZE = 7
 PRIZE_COUNT = 6
 MAX_TURNS = 120
+MAX_ACTIONS_PER_TURN = 80  # safety net for "as often as you like" Abilities
 ANY_TYPE = frozenset(range(NUM_TYPES))
 
 
@@ -563,7 +564,7 @@ class Game:
         if not p.deck:
             raise GameOver(1 - p.idx, "opponent couldn't draw")
         self.draw(p)
-        while True:
+        for _ in range(MAX_ACTIONS_PER_TURN):
             opts = self.main_options(p)
             opt = yield from self.ask(p.idx, "main", opts, force=True)
             if opt.kind == "end":

@@ -468,3 +468,19 @@ def _(g, p, mon):
             p.discard.remove(c)
             p.deck.append(c)
         g.shuffle(p)
+
+
+def _solar_transfer_ok(g, p, mon):
+    mons = p.in_play()
+    return len(mons) > 1 and any(e.basic_energy and e.energy_type == GRASS for m in mons for e in m.energy)
+
+
+@ability("Mega Venusaur ex", "Solar Transfer", once=None, can_use=_solar_transfer_ok)
+def _(g, p, mon):
+    grass = lambda e: e.basic_energy and e.energy_type == GRASS
+    frm = yield from g.choose_pokemon(p.idx, [m for m in p.in_play() if any(grass(e) for e in m.energy)],
+                                      mon.card, "move Grass Energy from")
+    e = (yield from g.choose_energy(p.idx, frm, 1, mon.card, grass))[0]
+    to = yield from g.choose_pokemon(p.idx, [m for m in p.in_play() if m is not frm], mon.card, "move it to")
+    frm.energy.remove(e)
+    to.energy.append(e)

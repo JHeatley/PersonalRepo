@@ -444,3 +444,12 @@ def _(g, p):
     t = yield from g.choose_pokemon(p.idx, [m for m in p.in_play() if m.card.stage == 2], s, "attach to")
     for e in (yield from take_from_discard(g, p, lambda c: c.basic_energy, 2, s)):
         t.energy.append(e)
+
+
+@trainer("Scoop Up Cyclone", can_play=lambda g, p: len(p.in_play()) > 1)
+def _(g, p):
+    mon = yield from g.choose_pokemon(p.idx, p.in_play(), src("Scoop Up Cyclone"), "put into your hand")
+    g.discard_pokemon(mon)
+    for c in mon.cards + mon.energy + ([mon.tool] if mon.tool else []):
+        p.discard.remove(c)
+        p.hand.append(c)
