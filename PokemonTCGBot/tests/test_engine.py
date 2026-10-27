@@ -268,3 +268,56 @@ def test_moltres_fighting_wings_bonus_against_ex():
     o = place(g, opp, pr("SSP", 76))
     _use_attack(g, p, p.active.card, "Fighting Wings")
     assert o.active.damage == 110
+
+
+# ------------------------------------------------------- hidden information
+def test_encoding_never_uses_hidden_cards():
+    """Shuffling everything a player can't see (their deck and prizes, the opponent's hand, deck and
+    prizes) must not change what the network is shown."""
+    import numpy as np
+    from bot.encode import encode
+    g = Game(load_deck("dragapult"), load_deck("lucario"), seed=5)
+    rng = random.Random(0)
+    for _ in range(80):
+        g.step(rng.randrange(len(g.decision.options)))
+    me = g.decision.player
+    before = encode(g)
+    opp, mine = g.players[1 - me], g.players[me]
+    pool = opp.hand + opp.prizes + opp.deck
+    rng.shuffle(pool)
+    a, b = len(opp.hand), len(opp.hand) + len(opp.prizes)
+    opp.hand, opp.prizes, opp.deck = pool[:a], pool[a:b], pool[b:]
+    pool = mine.prizes + mine.deck
+    rng.shuffle(pool)
+    mine.prizes, mine.deck = pool[:len(mine.prizes)], pool[len(mine.prizes):]
+    after = encode(g)
+    assert all(np.array_equal(before[k], after[k]) for k in before)
+
+
+def test_revealed_search_is_remembered_until_the_hand_is_shuffled_away():
+    g = fresh(a="venusaur", b="lucario")
+    me = g.current
+    p = g.players[me]
+    ball = card("Ultra Ball")
+    p.hand = [ball, BASIC_ENERGY[GRASS], BASIC_ENERGY[GRASS]]
+    drive(g._play_trainer(p, ball))
+    g._update_knowledge()
+    found = [c for c in p.hand if c.is_pokemon]
+    assert found and p.known_hand[found[0].id] == 1          # Ultra Ball reveals what it finds
+    lillie = card("Lillie's Determination")
+    p.hand.append(lillie)
+    drive(g._play_trainer(p, lillie))
+    g._update_knowledge()
+    assert not p.known_hand                                    # new hand after shuffling: nothing known
+
+
+def test_seen_cards_stay_remembered_after_leaving_play():
+    g = fresh()
+    opp = g.players[1 - g.current]
+    lux = BY_PRINT[("MEG", "77")]
+    opp.discard.append(lux)
+    g._update_knowledge()
+    opp.discard.remove(lux)
+    opp.hand.append(lux)                                       # e.g. Night Stretcher took it back
+    g._update_knowledge()
+    assert opp.seen[lux.id] == 1

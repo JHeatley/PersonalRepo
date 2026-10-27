@@ -20,6 +20,7 @@ Not covered: any effect whose card isn't implemented (see tools/coverage.py).
 """
 import inspect
 import random
+from collections import Counter
 
 from .carddb import COLORLESS, NUM_TYPES, CARDS
 from .core import (Option, Decision, GameOver, Pokemon, Player, DEFAULT_BENCH, MAX_BENCH)
@@ -37,6 +38,14 @@ def run(result):
     if inspect.isgenerator(result):
         return (yield from result)
     return result
+
+
+def reveals(source):
+    """Does this card's text show the cards it finds to both players?"""
+    if source is None:
+        return False
+    texts = [source.text] + [a.text for a in source.attacks] + [a.text for a in source.abilities]
+    return any("reveal" in t for t in texts)
 
 
 def can_pay(units, cost):
@@ -107,6 +116,7 @@ class Game:
         self.decision = None
         self._flow = self._run()
         self._advance(None)
+        self._update_knowledge()
 
     # ================================================================ driving
     def _advance(self, answer):
@@ -119,9 +129,39 @@ class Game:
         assert not self.done
         assert 0 <= index < len(self.decision.options), "option out of range"
         self._advance(index)
+        self._update_knowledge()
 
     def actor(self):
         return self.decision.player if self.decision else None
+
+    # ============================================================ knowledge
+    def reveal(self, p, cards):
+        """Cards shown to both players on their way into p's hand (e.g. 'reveal it' searches)."""
+        for c in cards:
+            p.known_hand[c.id] += 1
+
+    def reveal_hand(self, p):
+        p.known_hand = Counter(c.id for c in p.hand)
+
+    def forget_hand(self, p):
+        """p's hand went back into the deck: nothing in the new hand is known."""
+        p.known_hand = Counter()
+
+    def _update_knowledge(self):
+        for p in self.players:
+            in_hand = Counter(c.id for c in p.hand)
+            p.known_hand = Counter({k: min(v, in_hand[k]) for k, v in p.known_hand.items() if in_hand[k]})
+            shown = Counter(c.id for c in p.discard + p.lost)
+            for m in p.in_play():
+                shown.update(c.id for c in m.cards + m.energy)
+                if m.tool is not None:
+                    shown[m.tool.id] += 1
+            if self.stadium is not None and self.stadium_owner == p.idx:
+                shown[self.stadium.id] += 1
+            shown.update(p.known_hand)
+            for k, v in shown.items():
+                if v > p.seen[k]:
+                    p.seen[k] = v
 
     def _run(self):
         try:
@@ -198,6 +238,8 @@ class Game:
         for c in picked:
             p.deck.remove(c)
         self.rng.shuffle(p.deck)
+        if reveals(source):
+            self.reveal(p, picked)
         return picked
 
     def choose_option(self, player, labels, source=None, prompt=""):

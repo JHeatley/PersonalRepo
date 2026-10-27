@@ -349,6 +349,7 @@ def _(g, ctx):
     for c in picked:
         p.discard.remove(c)
         p.hand.append(c)
+    g.reveal(p, picked)
 
 
 @attack("Slowking", "Seek Inspiration")
