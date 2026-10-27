@@ -32,6 +32,7 @@ def shuffle_hand_in(g, p):
     p.deck += p.hand
     p.hand = []
     g.shuffle(p)
+    g.forget_hand(p)
 
 
 def take_from_discard(g, p, pred, max_n, source, min_n=0):
@@ -51,6 +52,8 @@ def look_at_top(g, p, n, pred, max_n, source):
         top.remove(c)
     p.deck += top
     g.shuffle(p)
+    if "reveal" in source.text:
+        g.reveal(p, picked)
     return picked
 
 
@@ -148,6 +151,7 @@ def _(g, p):
 @trainer("Eri")
 def _(g, p):
     o = g.opponent(p)
+    g.reveal_hand(o)
     s = src("Eri")
     picked = yield from g.choose_cards(p.idx, [c for c in o.hand if c.is_item], 0, 2, s, "discard")
     for c in picked:
@@ -187,8 +191,10 @@ def _(g, p):
 
 @trainer("Lana's Aid")
 def _(g, p):
-    p.hand += yield from take_from_discard(
+    picked = yield from take_from_discard(
         g, p, lambda c: non_rule_box_pokemon(c) or c.basic_energy, 3, src("Lana's Aid"))
+    p.hand += picked
+    g.reveal(p, picked)
 
 
 @trainer("Gwynn", can_play=lambda g, p: any(non_rule_box_pokemon(c) for c in p.hand))
@@ -224,8 +230,10 @@ def _(g, p):
 
 @trainer("Night Stretcher", can_play=lambda g, p: any(c.is_pokemon or c.basic_energy for c in p.discard))
 def _(g, p):
-    p.hand += yield from take_from_discard(g, p, lambda c: c.is_pokemon or c.basic_energy, 1,
-                                           src("Night Stretcher"), min_n=1)
+    picked = yield from take_from_discard(g, p, lambda c: c.is_pokemon or c.basic_energy, 1,
+                                          src("Night Stretcher"), min_n=1)
+    p.hand += picked
+    g.reveal(p, picked)
 
 
 def _candy_targets(g, p):
@@ -310,6 +318,7 @@ def _(g, p):
         g.rng.shuffle(o.hand)
         o.deck[:0] = o.hand
         o.hand = []
+        g.forget_hand(o)
         g.draw(o, 3)
 
 
@@ -430,7 +439,9 @@ def _(g, p):
 
 @trainer("Miracle Headset", can_play=lambda g, p: any(c.is_supporter for c in p.discard))
 def _(g, p):
-    p.hand += yield from take_from_discard(g, p, lambda c: c.is_supporter, 2, src("Miracle Headset"))
+    picked = yield from take_from_discard(g, p, lambda c: c.is_supporter, 2, src("Miracle Headset"))
+    p.hand += picked
+    g.reveal(p, picked)
 
 
 def _rosa_ok(g, p):
@@ -453,3 +464,4 @@ def _(g, p):
     for c in mon.cards + mon.energy + ([mon.tool] if mon.tool else []):
         p.discard.remove(c)
         p.hand.append(c)
+    g.reveal(p, mon.cards + mon.energy + ([mon.tool] if mon.tool else []))

@@ -1,4 +1,5 @@
 """Game objects shared by the engine and the card effects."""
+from collections import Counter
 
 MAX_BENCH = 8  # hard ceiling (Area Zero Underdepths); the normal limit is 5
 DEFAULT_BENCH = 5
@@ -109,7 +110,11 @@ class Pokemon:
 class Player:
     def __init__(self, idx, deck):
         self.idx = idx
+        self.decklist = list(deck)  # the 60 cards this player registered (they know their own list)
         self.deck = list(deck)
+        # What the opponent can know about this player, the way a real player keeps track:
+        self.known_hand = Counter()  # cards revealed into this hand (searches that reveal, Eri...)
+        self.seen = Counter()        # most copies of each card this player has shown at once this game
         self.hand = []
         self.discard = []
         self.prizes = []

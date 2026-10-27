@@ -505,6 +505,7 @@ def _(m, atk):
         p.deck += p.hand
         p.hand = []
         g.shuffle(p)
+        g.forget_hand(p)
         g.draw(p, n)
     return "post", step
 
@@ -615,7 +616,7 @@ def _(m, atk):
 
 @clause(r"Your opponent reveals their hand\.")
 def _(m, atk):
-    return "post", lambda g, ctx: None
+    return "post", lambda g, ctx: g.reveal_hand(ctx.opponent)
 
 
 @clause(r"Discard a Stadium in play\.")
@@ -633,6 +634,7 @@ def _(m, atk):
         for e in picked:
             ctx.attacker.energy.remove(e)
             ctx.player.hand.append(e)
+        g.reveal(ctx.player, picked)
     return "post", step
 
 
@@ -645,6 +647,7 @@ def _(m, atk):
             for c in mon.cards + mon.energy + ([mon.tool] if mon.tool else []):
                 ctx.player.discard.remove(c)
                 ctx.player.hand.append(c)
+            g.reveal(ctx.player, mon.cards + mon.energy + ([mon.tool] if mon.tool else []))
     return "post", step
 
 

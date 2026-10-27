@@ -1,10 +1,15 @@
 """Encode a pending Decision as numpy arrays for the network.
 
 Everything is from the deciding player's point of view and only uses
-information that player could see: both boards, their own hand, both
-discard piles, and sizes of hidden zones. Card identities are passed as
-ids (0 = empty, card.id + 1 otherwise) so the network can embed them.
+information that player could know, the way a real player keeps track:
+both boards, their own hand, both discard piles, sizes of hidden zones,
+which of their own cards are still unseen (in deck or prizes, worked out
+from their decklist), cards known to be in the opponent's hand (revealed
+by searches, Eri...), and every card the opponent has shown this game.
+Card identities are passed as ids (0 = empty, card.id + 1 otherwise).
 """
+from collections import Counter
+
 import numpy as np
 
 from tcg.carddb import CARDS, NUM_CARDS, NUM_TYPES, COLORLESS
@@ -14,6 +19,9 @@ SLOTS = 1 + MAX_BENCH          # per side
 NUM_SLOTS = 2 * SLOTS          # me then opponent
 MAX_HAND = 40
 MAX_DISCARD = 60
+MAX_UNSEEN = 60
+MAX_KNOWN_HAND = 20
+MAX_SEEN = 60
 NO_TARGET = NUM_SLOTS          # option target index meaning "none"
 SLOT_FEATURES = 26
 GLOBAL_FEATURES = 20 + len(DECISION_KINDS)
@@ -80,6 +88,30 @@ def _slot(g, mon, active, out):
     f[25] = (len(mon.cards) - 1) / 2
 
 
+def _ids(counts, size):
+    out = np.zeros(size, dtype=np.int64)
+    i = 0
+    for cid, n in sorted(counts.items()):
+        for _ in range(n):
+            if i >= size:
+                return out
+            out[i] = cid + 1
+            i += 1
+    return out
+
+
+def unseen_cards(g, p):
+    """p's decklist minus every card of theirs they can see: what's in their deck and prizes."""
+    left = Counter(c.id for c in p.decklist)
+    visible = [c.id for c in p.hand + p.discard + p.lost]
+    for m in p.in_play():
+        visible += [c.id for c in m.cards + m.energy] + ([m.tool.id] if m.tool else [])
+    if g.stadium is not None and g.stadium_owner == p.idx:
+        visible.append(g.stadium.id)
+    left.subtract(visible)
+    return Counter({k: v for k, v in left.items() if v > 0})
+
+
 def encode(g):
     """Encode g.decision for the player who must answer it."""
     d = g.decision
@@ -144,11 +176,16 @@ def encode(g):
         "slot_card": slot_card, "slot_tool": slot_tool, "slot_feat": slot_feat,
         "hand": hand, "discards": discards, "globals": gl,
         "stadium": np.int64(stadium), "source": np.int64(source),
+        "unseen": _ids(unseen_cards(g, me), MAX_UNSEEN),
+        "opp_known_hand": _ids(opp.known_hand, MAX_KNOWN_HAND),
+        "opp_seen": _ids(opp.seen, MAX_SEEN),
         "opt_kind": opt_kind, "opt_card": opt_card, "opt_target": opt_target, "opt_feat": opt_feat,
     }
 
 
-FIXED_KEYS = ["slot_card", "slot_tool", "slot_feat", "hand", "discards", "globals", "stadium", "source"]
+FIXED_KEYS = ["slot_card", "slot_tool", "slot_feat", "hand", "discards", "globals", "stadium", "source",
+              "unseen", "opp_known_hand", "opp_seen"]
+MEMORY_KEYS = ["unseen", "opp_known_hand", "opp_seen"]  # the "what a real player keeps track of" inputs
 OPTION_KEYS = ["opt_kind", "opt_card", "opt_target", "opt_feat"]
 
 
