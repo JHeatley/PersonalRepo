@@ -1,6 +1,6 @@
 """Hand-written Pokemon Abilities and attacks (the ones the text templates can't express)."""
 from .registry import attack, ability, passive
-from ..carddb import (GRASS, PSYCHIC, FIGHTING, DARKNESS, METAL, DRAGON, COLORLESS)
+from ..carddb import (GRASS, FIRE, PSYCHIC, FIGHTING, DARKNESS, METAL, DRAGON, COLORLESS)
 
 
 def _run(r):
@@ -494,3 +494,25 @@ def _(g, p, mon):
     frm.energy.remove(e)
     to.energy.append(e)
     p.used.add(("solar_in", to.uid, len(p.used)))
+
+
+def _memory_helix(g, src, mon):
+    """Mew ex can use the attacks of any of your Benched Pokemon (paying with its own Energy)."""
+    if src is not mon or not g.is_active(mon):
+        return []
+    p = g.players[mon.owner]
+    return [(b.card, atk) for b in p.bench for atk in b.card.attacks]
+
+
+passive("Mew ex", "Memory Helix", extra_attacks=_memory_helix)
+
+
+def _fiery_flapping_ok(g, p, mon):
+    names = {m.name for m in p.in_play()}
+    return "Articuno" in names and "Zapdos" in names and _has_basic(p, FIRE)
+
+
+@ability("Moltres", "Fiery Flapping", can_use=_fiery_flapping_ok)
+def _(g, p, mon):
+    e = next(c for c in p.hand if c.basic_energy and c.energy_type == FIRE)
+    yield from g.attach_energy(p, e, mon, p.hand)

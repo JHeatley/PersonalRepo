@@ -2,7 +2,7 @@ import random
 
 import pytest
 
-from tcg.carddb import BY_PRINT, BASIC_ENERGY, FIGHTING, GRASS, PSYCHIC, DARKNESS, COLORLESS, TYPE, card
+from tcg.carddb import BY_PRINT, BASIC_ENERGY, FIGHTING, GRASS, PSYCHIC, DARKNESS, COLORLESS, FIRE, METAL, TYPE, card
 from tcg.deckio import load_deck, deck_names, parse_deck
 from tcg.engine import Game, AttackCtx, can_pay
 from tcg import effects
@@ -221,3 +221,50 @@ def test_bugs_cannon_scales_with_grass_energy_and_hits_crustle():
     g.attacking = ctx
     drive(effects.attack_impl(p.active.card, atk)(g, ctx))
     assert o.active.damage == 60
+
+
+def _use_attack(g, p, card, name):
+    atk = next(a for a in card.attacks if a.name == name)
+    drive(g._attack(p, card, atk.index))
+
+
+def test_mew_ex_uses_benched_pokemons_attacks():
+    g = fresh()
+    me, opp = g.current, 1 - g.current
+    g.turn = 3
+    lucario = pr("MEG", 77)
+    p = place(g, me, pr("30C", 66), bench=[lucario], active_energy=energy(FIGHTING, 2))   # Mew ex
+    o = place(g, opp, pr("MEG", 104))                     # Mega Kangaskhan ex: 300 HP, weak to Fighting
+    names = {(o_.card.name, o_.label) for o_ in g.main_options(p) if o_.kind == "attack"}
+    # Lucario's attacks are offered (paid with Mew's Fighting Energy); Mew's own needs Psychic
+    assert ("Mega Lucario ex", "Mega Brave") in names and ("Mew ex", "Teleportation Burst") not in names
+    _use_attack(g, p, lucario, "Mega Brave")
+    # Mew is the attacker, so Weakness checks Mew's type (Psychic): 270, not 540
+    assert o.active.damage == 270
+
+
+def test_jirachi_ex_wish_granter_draws_to_seven():
+    g = fresh()
+    me = g.current
+    p = place(g, me, pr("30C", 102), active_energy=energy(METAL, 1))
+    p.hand = p.hand[:2]
+    _use_attack(g, p, p.active.card, "Wish Granter")
+    assert len(p.hand) == 7
+
+
+def test_dudunsparce_ex_counts_opposing_ex():
+    g = fresh()
+    me, opp = g.current, 1 - g.current
+    p = place(g, me, pr("JTG", 121), active_energy=energy(METAL, 1))
+    o = place(g, opp, pr("SFA", 38), bench=[pr("SSP", 76), pr("JTG", 56), pr("TWM", 128)])  # 3 ex + Dreepy
+    _use_attack(g, p, p.active.card, "Tenacious Tail")
+    assert o.active.damage == 180
+
+
+def test_moltres_fighting_wings_bonus_against_ex():
+    g = fresh()
+    me, opp = g.current, 1 - g.current
+    p = place(g, me, pr("PFL", 14), active_energy=energy(FIRE, 1))
+    o = place(g, opp, pr("SSP", 76))
+    _use_attack(g, p, p.active.card, "Fighting Wings")
+    assert o.active.damage == 110

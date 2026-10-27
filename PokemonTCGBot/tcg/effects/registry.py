@@ -27,6 +27,7 @@ applies. Hook names and signatures:
     evolve_same_turn(g, src, mon, card) -> bool
     attack_twice(g, src, mon) -> bool
     basic_energy_units(g, src, mon, energy_card, n) -> n
+    extra_attacks(g, src, mon) -> [(card, attack)]   attacks mon may use besides its own
 Special energy may also set can_attach(g, mon) -> bool and discard_at_end_of_turn=True.
 """
 

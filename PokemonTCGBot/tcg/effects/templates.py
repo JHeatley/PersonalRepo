@@ -157,6 +157,11 @@ def _(m, atk):
     return _set_or_add(m, lambda g, ctx: len(ctx.player.bench) + len(ctx.opponent.bench), atk)
 
 
+@clause(r"This attack does (\d+) (more )?damage for each of your opponent's Pokémon ex in play\.")
+def _(m, atk):
+    return _set_or_add(m, lambda g, ctx: sum(_is_ex(x) for x in ctx.opponent.in_play()), atk)
+
+
 @clause(r"This attack does (\d+) (more )?damage for each of your Pokémon in play\.")
 def _(m, atk):
     return _set_or_add(m, lambda g, ctx: len(ctx.player.in_play()), atk)
@@ -473,6 +478,12 @@ def _(m, atk):
 def _(m, atk):
     n = int(m.group(2) or 1)
     return "post", lambda g, ctx: g.draw(ctx.player, n)
+
+
+@clause(r"Draw cards until you have (\d+) cards in your hand\.")
+def _(m, atk):
+    n = int(m.group(1))
+    return "post", lambda g, ctx: g.draw(ctx.player, n - len(ctx.player.hand))
 
 
 @clause(r"You may draw cards until you have (\d+) cards in your hand\.")
