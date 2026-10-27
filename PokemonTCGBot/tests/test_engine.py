@@ -209,3 +209,15 @@ def test_random_games_conserve_cards():
             total += sum(len(m.cards) + len(m.energy) + (m.tool is not None) for m in p.in_play())
             total += g.stadium is not None and g.stadium_owner == p.idx
             assert total == 60
+
+
+def test_bugs_cannon_scales_with_grass_energy_and_hits_crustle():
+    g = fresh()
+    me, opp = g.current, 1 - g.current
+    p = place(g, me, pr("PFL", 8), active_energy=energy(GRASS, 3))   # Genesect, not an ex
+    o = place(g, opp, pr("DRI", 12))                                  # Crustle blocks damage from ex only
+    atk = p.active.card.attacks[0]
+    ctx = AttackCtx(g, p, p.active, atk)
+    g.attacking = ctx
+    drive(effects.attack_impl(p.active.card, atk)(g, ctx))
+    assert o.active.damage == 60
