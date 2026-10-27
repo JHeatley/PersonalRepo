@@ -14,7 +14,7 @@ pip install -r requirements.txt
 ## Quick start
 
 ```
-python play.py                                 # play the included trained bot (models/bot_40k.pt)
+python play.py                                 # play the included trained bot (models/bot_53k.pt)
 python train.py --games 300000                 # train your own by self-play (hours)
 python play.py                                 # now plays your checkpoints/best.pt instead
 python play.py --watch                         # watch the bot play itself
@@ -54,12 +54,13 @@ special Energy and Abilities.
 all Pokémon and every attack without text, plus each card below), and
 `python tools/coverage.py decks` lists anything a deck still needs.
 
-**Decks (`decks/`).** Sixteen meta archetypes, every card fully implemented:
+**Decks (`decks/`).** Seventeen meta archetypes, every card fully implemented:
 Dragapult (three builds), basic box, Slowking, N's Zoroark, Festival Lead,
 Alakazam, Hydrapple, Hide 'n' Sneak, Mega Lopunny, Crustle, Mega Excadrill,
-Mega Lucario, Mega Sharpedo and Team Rocket's Honchkrow. The core cards come
-from the Limitless TEF–30C core lists; the remaining slots are flex picks,
-marked in each file's header comment. To use your exact list, paste the
+Mega Lucario, Mega Sharpedo, Team Rocket's Honchkrow and Mega Venusaur ex.
+Mega Venusaur is a complete list; for the others the core cards come from the
+Limitless TEF–30C core lists and the remaining slots are flex picks, marked
+in each file's header comment. To use your exact list, paste the
 TCG Live / Limitless export into a new `.txt` file in `decks/`. Any card
 without an implementation shows up in `tools/coverage.py decks`.
 
@@ -74,11 +75,12 @@ is +1 for a win and −1 for a loss, plus a small bonus per prize card swing.
 
 ## Included model
 
-`models/bot_40k.pt` comes from a 40,000-game self-play run on all 16 decks
-(about 70 minutes on 4 CPU cores); this snapshot is from game 28,050. Over
-1,000 games against the rule-based bot it won 73.9% (738-2-260), playing
-its top-rated move each time. It's a starting point: continue training from it with
-`python train.py --resume models/bot_40k.pt --games 300000`.
+`models/bot_53k.pt` has trained for 53,295 self-play games on the 16
+original decks (Mega Venusaur ex was added afterwards). Over 1,000 games it
+beats the earlier 40k-game model 58.5% of the time (584-2-414) and the
+rule-based bot 74.7% (746-2-252), both sides always playing their top-rated
+move. It's a starting point: continue training from it with
+`python train.py --resume models/bot_53k.pt --games 300000`.
 
 ## Training tips
 
