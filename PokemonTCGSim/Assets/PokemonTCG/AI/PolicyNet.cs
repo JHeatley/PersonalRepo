@@ -178,6 +178,34 @@ namespace PokemonTCG.AI
         public long GamesTrained;
         /// <summary>Optimizer steps taken in this app (0 = still exactly as loaded or fresh).</summary>
         public long Steps { get { return Interlocked.Read(ref steps); } }
+        private long skippedSteps;
+
+        /// <summary>Learning steps skipped because their gradients weren't finite numbers.</summary>
+        public long SkippedSteps { get { return Interlocked.Read(ref skippedSteps); } }
+
+        /// <summary>True when every weight is a finite number (a network with NaN in it is never saved or loaded).</summary>
+        public bool AllFinite()
+        {
+            rw.EnterReadLock();
+            try
+            {
+                foreach (var p in parameters)
+                    foreach (float v in p.Data)
+                        if (float.IsNaN(v) || float.IsInfinity(v)) return false;
+                lock (cardLock)
+                {
+                    foreach (var r in cardRows)
+                        foreach (float v in r)
+                            if (float.IsNaN(v) || float.IsInfinity(v)) return false;
+                }
+                return true;
+            }
+            finally
+            {
+                rw.ExitReadLock();
+            }
+        }
+
         /// <summary>Running average of the training loss shown on the Train screen.</summary>
         public double AverageLoss;
         /// <summary>Where the starting weights came from ("Python bot, 126,225 games"), or "" for a fresh network.</summary>
@@ -557,7 +585,7 @@ namespace PokemonTCG.AI
                 dy = 1f;
                 return;
             }
-            if (x <= -GeluRange)
+            if (!(x > -GeluRange)) // also NaN, so a bad number can never read outside the table
             {
                 y = 0f;
                 dy = 0f;
@@ -1258,6 +1286,12 @@ namespace PokemonTCG.AI
             foreach (var a in g.G) foreach (float v in a) norm += (double)v * v * scale * scale;
             foreach (var d in rowGrads.Values) foreach (float v in d) norm += (double)v * v * scale * scale;
             norm = Math.Sqrt(norm);
+            if (double.IsNaN(norm) || double.IsInfinity(norm))
+            {
+                // A step this broken would ruin every weight: skip it.
+                Interlocked.Increment(ref skippedSteps);
+                return;
+            }
             if (norm > MaxGradNorm) scale *= (float)(MaxGradNorm / (norm + 1e-6));
 
             rw.EnterWriteLock();
@@ -1428,6 +1462,9 @@ namespace PokemonTCG.AI
             {
             }
             catch (ArgumentException)
+            {
+            }
+            catch (InvalidDataException)
             {
             }
             return false;
@@ -1614,9 +1651,11 @@ namespace PokemonTCG.AI
             return Encoding.UTF8.GetString(r.ReadBytes(n));
         }
 
+        /// <summary>A weight read from a file; a NaN or infinity means the file is damaged and isn't loaded.</summary>
         private static float Clean(float v)
         {
-            return float.IsNaN(v) || float.IsInfinity(v) ? 0f : v;
+            if (float.IsNaN(v) || float.IsInfinity(v)) throw new InvalidDataException("the network holds a value that isn't a number");
+            return v;
         }
 
         /// <summary>A copy of this network (for the opponent pool and "undo").</summary>

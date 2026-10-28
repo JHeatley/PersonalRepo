@@ -409,10 +409,14 @@ namespace PokemonTCG.AI
                     }
                 }
             };
+            long skippedBefore = brain.Policy.SkippedSteps;
             while (!cancel && Volatile.Read(ref played) < Games)
             {
                 var round = trainer.Round();
                 brain.IncrementCounters(round.Games, 0, 0);
+                long skipped = brain.Policy.SkippedSteps - skippedBefore;
+                if (skipped > 0)
+                    lock (gate) status.LastError = skipped + " learning step" + (skipped == 1 ? " was" : "s were") + " skipped (numbers out of range); the network is unharmed.";
                 lock (gate)
                 {
                     if (block != null) block.Decisions += round.Decisions;

@@ -808,11 +808,14 @@ namespace PokemonTCG.AI
                 using (var writer = new StreamWriter(temp, false, new UTF8Encoding(false), 1 << 16)) WriteTo(writer);
                 if (File.Exists(FilePath)) File.Delete(FilePath);
                 File.Move(temp, FilePath);
-                // The Neural AI's network, in its own file next to the brain's.
+                // The Neural AI's network, in its own file next to the brain's (never a damaged one: the last good file stays).
                 string neural = NeuralPath(FilePath);
-                File.WriteAllBytes(neural + ".tmp", Policy.ToBytes());
-                if (File.Exists(neural)) File.Delete(neural);
-                File.Move(neural + ".tmp", neural);
+                if (Policy.AllFinite())
+                {
+                    File.WriteAllBytes(neural + ".tmp", Policy.ToBytes());
+                    if (File.Exists(neural)) File.Delete(neural);
+                    File.Move(neural + ".tmp", neural);
+                }
             }
         }
 
