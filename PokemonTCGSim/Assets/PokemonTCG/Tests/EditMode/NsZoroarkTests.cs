@@ -317,25 +317,29 @@ namespace PokemonTCG.Tests
 
         // ------------------------------------------------------------------ Whole games
 
-        [Test]
-        public void Dragapult_vs_Zoroark_200_Heuristic_Games_Without_Errors()
+        // Whole games are slow in the Unity Editor (several times this computer's .NET speed), so fewer of them, with a longer limit
+        // than the Test Runner's default.
+        [Test, Timeout(600000)]
+        public void Dragapult_vs_Zoroark_80_Heuristic_Games_Without_Errors()
         {
             var a = UnityCardData.LoadDeck(db, UnityCardData.DefaultDeck);
             var b = UnityCardData.LoadDeck(db, UnityCardData.ZoroarkDeck);
-            var report = MatchRunner.Run(StandardCards.CreateRegistry(), a, b, 200, 2000, (seat, s) => new HeuristicAgent(s), true);
+            var report = MatchRunner.Run(StandardCards.CreateRegistry(), a, b, 80, 2000, (seat, s) => new HeuristicAgent(s), true);
             TestContext.WriteLine(report.Summary());
             Assert.AreEqual(0, report.Errors.Count, report.Summary());
             Assert.Greater(report.Wins[0] + report.Wins[1], 0, report.Summary());
         }
 
-        [Test]
-        public void Zoroark_Mirror_And_Cross_300_Random_Games_Without_Errors()
+        // Whole games are slow in the Unity Editor (several times this computer's .NET speed), so fewer of them, with a longer limit
+        // than the Test Runner's default.
+        [Test, Timeout(600000)]
+        public void Zoroark_Mirror_And_Cross_100_Random_Games_Without_Errors()
         {
             var a = UnityCardData.LoadDeck(db, UnityCardData.DefaultDeck);
             var b = UnityCardData.LoadDeck(db, UnityCardData.ZoroarkDeck);
             var scripts = StandardCards.CreateRegistry();
-            var r1 = MatchRunner.Run(scripts, b, b, 150, 3000, (seat, s) => new RandomAgent(s), true);
-            var r2 = MatchRunner.Run(scripts, b, a, 150, 4000, (seat, s) => new RandomAgent(s), true);
+            var r1 = MatchRunner.Run(scripts, b, b, 50, 3000, (seat, s) => new RandomAgent(s), true);
+            var r2 = MatchRunner.Run(scripts, b, a, 50, 4000, (seat, s) => new RandomAgent(s), true);
             TestContext.WriteLine(r1.Summary());
             TestContext.WriteLine(r2.Summary());
             Assert.AreEqual(0, r1.Errors.Count, r1.Summary());

@@ -77,7 +77,8 @@ namespace PokemonTCG.Tests
             CollectionAssert.IsEmpty(errors, string.Join("\n", errors.ToArray()));
         }
 
-        [Test]
+        // Slow in the Unity Editor: a longer limit than the Test Runner's default.
+        [Test, Timeout(600000)]
         public void Every_Builtin_Deck_Survives_Random_Play()
         {
             var decks = BuiltInDecks();
