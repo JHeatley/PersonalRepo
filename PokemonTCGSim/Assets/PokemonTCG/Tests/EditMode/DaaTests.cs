@@ -630,6 +630,22 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
+        public void Big_Parasol_Keeps_Hack_Off_From_Discarding_While_Active()
+        {
+            // Your ruling: in the Active Spot, Big Parasol prevents all effects of the opponent's attacks, Hack Off's discards included.
+            var e = Scenario(new ScriptedAgent().Then("Attack: Hack Off"), new ScriptedAgent());
+            var scizor = e.ScenarioActive(0, C(ScizorV));
+            Attach(e, scizor, Metal, 1);
+            var tauros = e.ScenarioActive(1, C(Tauros));
+            e.ScenarioAttachTool(tauros, C(BigParasol));
+            Attach(e, tauros, PowerfulColorless, 1);
+            e.ScenarioSetTurn(0, 3);
+            Step(e);
+            Assert.AreEqual(1, tauros.Tools.Count, "Big Parasol stays");
+            Assert.AreEqual(1, tauros.Energy.Count, "the Special Energy stays");
+        }
+
+        [Test]
         public void Sturdy_Leaves_Aggron_At_10_HP()
         {
             var e = Scenario(new ScriptedAgent().Then("Attack: Heavy Rock Artillery"), new ScriptedAgent());
