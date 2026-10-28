@@ -114,7 +114,11 @@ namespace PokemonTCG.AI
 
         private sealed class Similar
         {
+            /// <summary>How much the deck counts: its likeness, times how well the AI does with it (Strength).</summary>
             public double Weight;
+            public double Likeness;
+            /// <summary>The Neural AI's win rate with the deck in training, or -1 when it hasn't played it enough.</summary>
+            public double AiWinRate = -1;
             public Profile Profile;
             public string Name;
         }
@@ -567,10 +571,30 @@ namespace PokemonTCG.AI
             foreach (var lib in library)
             {
                 double sim = Likeness(prof, lib.Profile);
-                if (sim >= SimilarAt && sim < 0.999) list.Add(new Similar { Weight = sim, Profile = lib.Profile, Name = lib.Name });
+                if (sim < SimilarAt || sim >= 0.999) continue;
+                double winRate;
+                double strength = Strength(lib.Name, out winRate);
+                list.Add(new Similar { Weight = sim * strength, Likeness = sim, AiWinRate = winRate, Profile = lib.Profile, Name = lib.Name });
             }
             list.Sort((x, y) => y.Weight.CompareTo(x.Weight));
             return list;
+        }
+
+        /// <summary>Games the AI needs with a library deck before how it does with it changes how much the deck counts.</summary>
+        public const int StrengthGames = 200;
+
+        /// <summary>
+        /// How much a library deck counts as an example, from how the AI does with it in training: 0.5 (it never wins) to 1.5 (it
+        /// always wins), 1 until it has played the deck enough. As the AI masters the archetypes, the lists that win count more.
+        /// </summary>
+        private double Strength(string deckName, out double winRate)
+        {
+            winRate = -1;
+            if (brain == null) return 1.0;
+            var skill = brain.SkillOf(deckName);
+            if (skill.Games < StrengthGames) return 1.0;
+            winRate = skill.WinRate;
+            return 0.5 + winRate;
         }
 
         /// <summary>Cards in common over cards in either, by copies (1 = the same list).</summary>
@@ -1316,7 +1340,9 @@ namespace PokemonTCG.AI
             notes.Add("Energy: " + prof.Energy + (energy.Count > 0 ? " (" + string.Join(", ", energy.ToArray()) + ")" : "")
                       + (prof.Main != null && prof.MainCost > 0 ? "; the main attack costs " + prof.MainCost + "." : "."));
             if (similar.Count > 0)
-                notes.Add("Similar decks in your library: " + string.Join(", ", similar.Take(4).Select(s => s.Name + " (" + Pct(s.Weight) + " alike)").ToArray()) + ".");
+                notes.Add("Similar decks in your library: " + string.Join(", ", similar.Take(4).Select(s => s.Name + " (" + Pct(s.Likeness) + " alike"
+                                                                                                          + (s.AiWinRate >= 0 ? ", the AI wins " + Pct(s.AiWinRate) + " with it" : "") + ")").ToArray())
+                          + (similar.Any(s => s.AiWinRate >= 0) ? "; the ones the AI wins more with count more." : "."));
             else
                 notes.Add(library.Count > 0
                     ? "No similar deck in your library, so suggestions come from the cards' text and what the " + library.Count + " library decks play most."
@@ -1325,7 +1351,24 @@ namespace PokemonTCG.AI
             {
                 var record = brain.RecordOf(deckName);
                 if (record.Games > 0)
-                    notes.Add("The learning AI has played this deck " + record.Games + " times: " + record.Wins + " wins, " + record.Losses + " losses.");
+                    notes.Add("The learning AI has played this deck " + record.Games.ToString("N0", CultureInfo.InvariantCulture) + " times: "
+                              + record.Wins.ToString("N0", CultureInfo.InvariantCulture) + " wins, " + record.Losses.ToString("N0", CultureInfo.InvariantCulture) + " losses.");
+                var skill = brain.SkillOf(deckName);
+                if (skill.Decisions > 0)
+                    notes.Add("Neural AI training with this deck: " + skill.Games.ToString("N0", CultureInfo.InvariantCulture) + " games, won " + Pct(skill.WinRate)
+                              + "; " + skill.Level + " (uncertainty " + skill.Uncertainty.ToString("0.00", CultureInfo.InvariantCulture)
+                              + ": about 0.6 is a deck it plays confidently, 0.9 one it's still working out).");
+                var lifts = brain.CardResultsOf(deckName ?? "").Where(r => r.HasLift(LearningBrain.LiftGames) && prof.Names.ContainsKey(r.Card)).ToList();
+                if (lifts.Count > 0)
+                {
+                    var helps = lifts.Where(r => r.Lift >= 0.03).OrderByDescending(r => r.Lift).Take(3).ToList();
+                    var hurts = lifts.Where(r => r.Lift <= -0.03).OrderBy(r => r.Lift).Take(3).ToList();
+                    Func<CardResult, string> say = r => r.Card + " (" + (r.Lift >= 0 ? "+" : "−") + Math.Abs(r.Lift * 100).ToString("0", CultureInfo.InvariantCulture) + ")";
+                    if (helps.Count > 0 || hurts.Count > 0)
+                        notes.Add("In its training games this deck wins more often when it draws " + (helps.Count > 0 ? string.Join(", ", helps.Select(say).ToArray()) : "nothing in particular")
+                                  + (hurts.Count > 0 ? ", and less often when it draws " + string.Join(", ", hurts.Select(say).ToArray()) : "")
+                                  + " (points of win rate, drawn vs not drawn).");
+                }
                 var rated = new List<KeyValuePair<string, CardOpinion>>();
                 foreach (var name in prof.Names.Keys)
                 {
@@ -1432,7 +1475,9 @@ namespace PokemonTCG.AI
                 int have = card.IsPokemon ? h.Profile.Count(id) : h.Profile.NameCount(card.Name);
                 double together = 0;
                 foreach (var o in hits) together += Likeness(h.Profile, o.Profile);
-                double score = have * 100 + together;
+                // The list the AI wins most with is the better starting point (once it has played it enough).
+                double winRate;
+                double score = have * 100 + together + 60 * (Strength(h.Name, out winRate) - 1);
                 if (score > seedScore)
                 {
                     seedScore = score;

@@ -302,6 +302,255 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
+        public void Neural_Training_Games_Teach_The_Deck_Advisor()
+        {
+            var brain = new LearningBrain();
+            brain.Policy.Reset();
+            brain.Policy.GamesTrained = 1;
+            var decks = ThreeDecks();
+            new TrainingSession(StandardCards.CreateRegistry(), brain, "All decks", decks[0].Value, "All decks", decks[0].Value, 12, 0, 7171)
+            {
+                Style = AiStyle.Neural,
+                DeckPool = decks
+            }.RunBlocking();
+
+            var skills = brain.DeckSkills();
+            Assert.Greater(skills.Count, 1);
+            Assert.GreaterOrEqual(skills.Sum(k => k.Games), 12, "every game, both sides in self-play");
+            foreach (var k in skills)
+            {
+                Assert.IsTrue(decks.Any(d => d.Key == k.Deck), k.Deck);
+                Assert.Greater(k.Decisions, 0);
+                Assert.That(k.Uncertainty, Is.GreaterThan(0).And.LessThan(5));
+                Assert.AreNotEqual("not played yet", k.Level);
+            }
+            var cards = brain.CardResultsOf(skills[0].Deck);
+            Assert.Greater(cards.Count, 5);
+            Assert.IsTrue(cards.All(r => r.Games == skills[0].Games && r.Drawn <= r.Games && r.Wins <= r.Games && r.DrawnWins <= r.Drawn));
+            Assert.IsTrue(cards.Any(r => r.Drawn > 0) && cards.Any(r => r.Played > 0));
+            Assert.IsFalse(cards.Any(r => r.Card.EndsWith(" Energy") && decks.First(d => d.Key == skills[0].Deck).Value.Any(c => c.Name == r.Card && c.IsBasicEnergy)),
+                "Basic Energy isn't rated");
+
+            // Kept in the brain's file, and gone after a reset.
+            var copy = new LearningBrain();
+            copy.LoadText(brain.Serialize());
+            Assert.AreEqual(skills.Sum(k => k.Games), copy.DeckSkills().Sum(k => k.Games));
+            Assert.AreEqual(skills[0].Uncertainty, copy.SkillOf(skills[0].Deck).Uncertainty, 1e-6);
+            Assert.AreEqual(cards.Sum(r => r.Drawn), copy.CardResultsOf(skills[0].Deck).Sum(r => r.Drawn));
+            brain.Reset();
+            Assert.AreEqual(0, brain.DeckSkills().Count);
+            Assert.AreEqual(0, brain.CardResultsOf(null).Count);
+        }
+
+        [Test]
+        public void The_Deck_Advisor_Rates_Cards_By_How_Often_The_Deck_Wins_When_They_Show_Up()
+        {
+            var brain = new LearningBrain();
+            var dragapult = Dragapult();
+            var trainers = dragapult.Where(c => c.IsTrainer).Select(c => c.Name).Distinct().ToList();
+            string good = trainers[0], bad = trainers[1];
+            // A variant of the Dragapult list (similar, not the same), trained 300 games: it wins much more often when it draws
+            // the first card, and less often when it draws the second.
+            var variant = dragapult.Take(58).Concat(dragapult.Where(c => c.IsBasicEnergy).Take(2)).ToList();
+            for (int i = 0; i < 300; i++)
+            {
+                bool drewGood = i % 2 == 0, drewBad = i % 3 == 0;
+                bool won = drewBad ? i % 4 == 0 : drewGood ? i % 5 != 0 : i % 10 < 4;
+                var drawn = new HashSet<string>();
+                if (drewGood) drawn.Add(good);
+                if (drewBad) drawn.Add(bad);
+                brain.RecordDeckGame("My Dragapult", variant, drawn, drawn, won ? 1 : -1, 80, 80 * 0.6);
+                brain.RecordDeckGame("Dragapult", dragapult, new HashSet<string>(), new HashSet<string>(), i % 5 < 3 ? 1 : -1, 80, 80 * 0.7);
+            }
+            var results = brain.CardResultsOf("My Dragapult");
+            Assert.Greater(results.Single(r => r.Card == good).Lift, 0.2);
+            Assert.Less(results.Single(r => r.Card == bad).Lift, -0.1);
+            var opinions = brain.CardOpinions("My Dragapult", null);
+            Assert.Greater(opinions[good].Value, 0.3);
+            Assert.Less(opinions[bad].Value, -0.2);
+            Assert.AreEqual("well learned", brain.SkillOf("My Dragapult").Level);
+
+            var library = new List<AdvisorDeck> { new AdvisorDeck("Dragapult", dragapult), new AdvisorDeck("Zoroark", Zoroark()) };
+            var advice = new DeckAdvisor(db, DeckFormat.Standard, library, brain).SuggestChanges("My Dragapult", variant, 4);
+            string notes = string.Join("\n", advice.Notes.ToArray());
+            StringAssert.Contains("Neural AI training with this deck: 300 games", notes);
+            StringAssert.Contains("wins more often when it draws " + good, notes);
+            StringAssert.Contains("less often when it draws " + bad, notes);
+            StringAssert.Contains("the AI wins 60% with it", notes, "the similar library deck it has trained with enough");
+        }
+
+        private PolicyTrainer SmallTrainer(PolicyNet net)
+        {
+            var decks = new List<KeyValuePair<string, List<CardDef>>>
+            {
+                new KeyValuePair<string, List<CardDef>>("Dragapult", Dragapult()),
+                new KeyValuePair<string, List<CardDef>>("Zoroark", Zoroark())
+            };
+            return new PolicyTrainer(net, StandardCards.CreateRegistry(), decks, 12) { GamesPerRound = 4, Threads = 2, Minibatch = 256 };
+        }
+
+        [Test]
+        public void Without_A_GPU_Learner_A_Round_Learns_On_The_CPU()
+        {
+            var net = new PolicyNet();
+            var trainer = SmallTrainer(net);
+            // Nothing listens on this port.
+            var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
+            listener.Start();
+            int port = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
+            listener.Stop();
+            trainer.Gpu = new GpuLearner("127.0.0.1", port);
+            var round = trainer.Round();
+            trainer.Dispose();
+            Assert.AreEqual(0, round.Errors);
+            StringAssert.Contains("GPU learner", round.LastError);
+            StringAssert.Contains("learned on the CPU", round.LastError);
+            Assert.AreEqual("", round.LearnedOn);
+            Assert.Greater(net.Steps, 0, "it learned anyway");
+        }
+
+        [Test]
+        public void A_Round_Can_Learn_On_The_GPU_Learner()
+        {
+            var net = new PolicyNet();
+            // Stands in for the learner's new weights: a network that took a round of learning (different numbers, same shapes).
+            var learned = new PolicyNet();
+            var other = SmallTrainer(learned);
+            other.Round();
+            other.Dispose();
+            Assert.AreNotEqual(Dense(net), Dense(learned));
+            var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
+            listener.Start();
+            int port = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
+            int decisions = -1;
+            string kind = null;
+            // A stand-in for learner.py: reads one TRN1 message and answers with stats and the "learned" weights.
+            var fake = new System.Threading.Thread(() =>
+            {
+                using (var client = listener.AcceptTcpClient())
+                using (var stream = client.GetStream())
+                {
+                    var r = new System.IO.BinaryReader(stream);
+                    kind = System.Text.Encoding.ASCII.GetString(r.ReadBytes(4));
+                    long size = r.ReadInt64();
+                    var body = new System.IO.BinaryReader(new System.IO.MemoryStream(r.ReadBytes((int)size)));
+                    Assert.AreEqual(GpuLearner.Version, body.ReadInt32());
+                    body.ReadBytes(3 * 4 + 6 * 8); // epochs, minibatch, seed and the PPO settings
+                    int count = body.ReadInt32();
+                    for (int k = 0; k < count; k++)
+                    {
+                        GpuLearner.ReadString(body);
+                        int nd = body.ReadInt32();
+                        int n = 1;
+                        for (int d = 0; d < nd; d++) n *= body.ReadInt32();
+                        body.ReadBytes(4 * n);
+                    }
+                    int rows = body.ReadInt32();
+                    body.ReadBytes(rows * (PolicyNet.CardDim + PolicyNet.StaticSize) * 4);
+                    decisions = body.ReadInt32();
+                    var reply = new System.IO.MemoryStream();
+                    using (var w = new System.IO.BinaryWriter(reply, System.Text.Encoding.UTF8, true))
+                    {
+                        w.Write(-0.01);
+                        w.Write(0.2);
+                        w.Write(0.9);
+                        w.Write(0.1);
+                        w.Write(3);
+                        w.Write(0);
+                        w.Write(0.05);
+                        GpuLearner.WriteString(w, "fake GPU");
+                        learned.WriteLearnerWeights(w, false);
+                    }
+                    var head = new System.IO.BinaryWriter(stream);
+                    head.Write(System.Text.Encoding.ASCII.GetBytes("RES1"));
+                    head.Write(reply.Length);
+                    head.Write(reply.ToArray());
+                    head.Flush();
+                }
+            });
+            fake.Start();
+            var trainer = SmallTrainer(net);
+            trainer.Gpu = new GpuLearner("127.0.0.1", port);
+            var round = trainer.Round();
+            fake.Join(30000);
+            listener.Stop();
+            trainer.Dispose();
+            Assert.AreEqual("TRN1", kind);
+            Assert.Greater(decisions, 0, "the round's decisions were sent");
+            Assert.AreEqual("fake GPU", round.LearnedOn, round.LastError);
+            Assert.AreEqual(3, net.Steps, "the learner's steps count as the network's");
+            Assert.AreEqual(0.2, round.ValueLoss, 1e-9);
+            Assert.AreEqual(Dense(learned), Dense(net), "the weights are the learner's now");
+        }
+
+        /// <summary>The network's tensors (not the card table) as the GPU learner sees them, as text to compare.</summary>
+        private static string Dense(PolicyNet net)
+        {
+            var ms = new System.IO.MemoryStream();
+            using (var w = new System.IO.BinaryWriter(ms, System.Text.Encoding.UTF8, true)) net.WriteLearnerWeights(w, false);
+            ms.Position = 0;
+            var r = new System.IO.BinaryReader(ms);
+            int count = r.ReadInt32();
+            for (int k = 0; k < count; k++)
+            {
+                GpuLearner.ReadString(r);
+                int nd = r.ReadInt32();
+                int n = 1;
+                for (int d = 0; d < nd; d++) n *= r.ReadInt32();
+                r.ReadBytes(4 * n);
+            }
+            return Convert.ToBase64String(ms.ToArray(), 0, (int)ms.Position);
+        }
+
+        [Test]
+        public void Games_Per_Second_Keeps_Training_To_The_Rate_Chosen()
+        {
+            var pace = new GamePace(40);
+            int started = 0;
+            var clock = System.Diagnostics.Stopwatch.StartNew();
+            var threads = Enumerable.Range(0, 4).Select(_ => new System.Threading.Thread(() =>
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    pace.Wait(null);
+                    System.Threading.Interlocked.Increment(ref started);
+                }
+            })).ToList();
+            threads.ForEach(t => t.Start());
+            threads.ForEach(t => t.Join());
+            // 40 games at 40 a second: the first starts at once, the last a little under a second later, whatever the threads.
+            Assert.AreEqual(40, started);
+            Assert.That(clock.Elapsed.TotalSeconds, Is.GreaterThan(0.9).And.LessThan(1.6));
+
+            // A pause (learning) isn't made up afterwards with a burst.
+            System.Threading.Thread.Sleep(500);
+            clock.Restart();
+            for (int i = 0; i < 10; i++) pace.Wait(null);
+            Assert.Greater(clock.Elapsed.TotalSeconds, 0.2);
+
+            clock.Restart();
+            var none = new GamePace(0);
+            for (int i = 0; i < 1000; i++) none.Wait(null);
+            Assert.Less(clock.Elapsed.TotalSeconds, 0.5, "no limit: no waiting");
+        }
+
+        [Test]
+        public void GPU_Learner_Addresses_Are_Read()
+        {
+            string host;
+            int port;
+            Assert.IsTrue(GpuLearner.TryParse("127.0.0.1:5577", out host, out port));
+            Assert.AreEqual("127.0.0.1", host);
+            Assert.AreEqual(5577, port);
+            Assert.IsTrue(GpuLearner.TryParse("6000", out host, out port));
+            Assert.AreEqual(6000, port);
+            Assert.IsTrue(GpuLearner.TryParse(" pc-in-the-den:5578 ", out host, out port));
+            Assert.AreEqual("pc-in-the-den", host);
+            Assert.IsFalse(GpuLearner.TryParse("127.0.0.1:port", out host, out port));
+            Assert.IsFalse(GpuLearner.TryParse("", out host, out port));
+        }
+
+        [Test]
         public void Skipping_CPU_Threads_Leaves_Every_Other_Thread()
         {
             CollectionAssert.AreEqual(new[] { 2, 3 }, CpuThreads.Parse("2, 3"));

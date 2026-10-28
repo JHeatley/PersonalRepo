@@ -32,6 +32,8 @@ games. Ctrl+C stops it after the current round.
 | `--eval-games N` | 200 | games per report against the classic bot |
 | `--sequence-penalty X` | 0.02 | reward taken off per sequencing mistake |
 | `--games-per-round N` | 128 | games between learning steps |
+| `--gpu 127.0.0.1:5577` | | learn on the graphics card: start `../GpuLearner/learner.py` first (see its README) |
+| `--games-per-second N` | | play at most N games a second (room to spare for the CPU) |
 | `--skip-cpu 2,3` | | keep off these CPU threads (a faulty core; Windows only; train and eval) |
 
 ## eval
@@ -44,3 +46,14 @@ with `--vs FILE`, half the games on each seat, random decks.
 The sim keeps the Neural AI's network next to the AI's file (the Save Folders screen
 shows where): `<AI file>.neural`. Copy `out/policy.neural` over it while the sim is
 closed. Training on the Train screen continues from there.
+
+## background
+
+What the app's **Train in the background (fastest)** button runs: a training session on the AI's own brain file, as
+the Train screen would run it. The app writes a job folder (`job.txt` with the settings, `decks/` with the decklists),
+then this keeps `progress.txt` up to date, stops when a file named `stop` appears there, and saves the brain (the
+network, matchups, deck mastery, card results and the session's record) for the app to reload.
+
+    sim-train background --job <folder> [--root <PokemonTCGSim folder>] [--skip-cpu 2,3]
+
+A ready-built Windows copy is in `../Tools/sim-train/` (see its README for rebuilding it).

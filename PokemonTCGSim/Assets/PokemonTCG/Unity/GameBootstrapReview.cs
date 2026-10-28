@@ -241,17 +241,20 @@ namespace PokemonTCG.Presentation
 
             GUILayout.Space(6);
             GUILayout.Label(ReviewItem.Habits, ui.Title);
-            if (habits.Count == 0) GUILayout.Label("Nothing stood out: you attached Energy, played your Supporters and kept a Bench.", reviewSmall);
+            if (habits.Count == 0) GUILayout.Label("Nothing stood out: the " + r.Judge + " agreed with your plays, or rated them about as well as its own.", reviewSmall);
             foreach (var item in habits) DrawReviewItem(ui, item, actions);
 
             GUILayout.Space(8);
-            GUILayout.Label("How this was worked out: the AI looked at " + r.DecisionsCompared + " of your decisions and would have done something else in " + r.Differences
+            GUILayout.Label("How this was worked out: the " + r.Judge + " looked at " + r.DecisionsCompared + " of your decisions and would have done something else in " + r.Differences
+                            + (r.Judge == "Neural AI" ? " (it only counts a play when it clearly prefers another; it gets sharper as you train it)" : "")
                             + ". It replayed the " + r.Simulated + " most important ones many times each, from the exact position, with the cards you couldn't see (your deck and Prize cards, "
                             + "your opponent's hand and deck) shuffled each time, and the same luck for both plays. The percentages are estimates (about ±10 points). "
+                            + "\"" + ReviewItem.Habits + "\" sorts every play it would have made differently into habits and keeps your history of each across your "
+                            + r.HabitReviews + " reviewed game" + (r.HabitReviews == 1 ? "" : "s") + ", so it can tell you what keeps coming up and what you're improving at. "
                             + (r.Items.Any(i => i.CanGiveFeedback)
                                 ? "If you think a suggestion is wrong, press \"I disagree\" under it: the AI learns your play for spots like that."
                                 : "The \"Makes sense\" and \"I disagree\" buttons come with the plays in the first section, and there were none this game. "
-                                  + "The notes under \"" + ReviewItem.Habits + "\" are general checks, so they don't have them."), reviewSmall);
+                                  + "The notes under \"" + ReviewItem.Habits + "\" are about your patterns, so they don't have them."), reviewSmall);
         }
 
         private void DrawReviewItem(UiStyles ui, ReviewItem item, List<Action> actions)

@@ -96,6 +96,17 @@ namespace PokemonTCG.AI
         public int PrizeCount = 6;
 
         /// <summary>
+        /// Neural AI training: games played at once (0: half the CPU's threads) and the rest after each learning step, as a share
+        /// of the time it took (the Train screen's Speed: Gentle 0.25, Fast none).
+        /// </summary>
+        public int NeuralThreads;
+        public double NeuralRest = 0.25;
+        /// <summary>Training plays at most this many games a second (0: as fast as it can).</summary>
+        public double GamesPerSecond;
+        /// <summary>Neural AI training learns on the GPU learner at this address ("127.0.0.1:5577"; null or "": on the CPU).</summary>
+        public string GpuAddress;
+
+        /// <summary>
         /// The decks a random side picks from, a new one every game (set before Start). With RandomA and RandomB both on (the
         /// default) it's all decks against all decks, as the Python bot trains, and DeckA and DeckB are only labels; with one of
         /// them off, that side keeps its deck every game against a random one (focused practice for that deck).
@@ -267,8 +278,10 @@ namespace PokemonTCG.AI
                 if ((Style.HasValue ? Style.Value : brain.Style) == AiStyle.Neural && brain.Policy.Trained) TrainNeural();
                 else
                 {
+                    var pace = new GamePace(GamesPerSecond);
                     for (int g = 0; g < Games && !cancel; g++)
                     {
+                        pace.Wait(() => cancel);
                         var gameStart = DateTime.UtcNow;
                         PlayTrainingGame(g);
                         if (SaveEvery > 0 && (g + 1) % SaveEvery == 0) SafeSave();
@@ -438,11 +451,15 @@ namespace PokemonTCG.AI
                 // Leave two cores for the app itself (the screen and the garbage collector), so it stays responsive.
                 // Half the cores, a short rest after each learning step and the memory tidied between phases: a long session in the
                 // app shouldn't push the PC as hard as a stress test does. (The command-line trainer uses every core.)
-                Threads = Math.Max(1, Environment.ProcessorCount / 2),
-                RestShare = 0.25,
+                Threads = NeuralThreads > 0 ? NeuralThreads : Math.Max(1, Environment.ProcessorCount / 2),
+                RestShare = Math.Max(0, NeuralRest),
                 CollectGarbage = true,
                 GameBudget = Games
             };
+            string gpuHost;
+            int gpuPort;
+            if (!string.IsNullOrEmpty(GpuAddress) && GpuLearner.TryParse(GpuAddress, out gpuHost, out gpuPort)) trainer.Gpu = new GpuLearner(gpuHost, gpuPort);
+            if (GamesPerSecond > 0) trainer.Pace = new GamePace(GamesPerSecond);
             int played = 0;
             trainer.ShouldStop = () => cancel || Volatile.Read(ref played) >= Games;
             trainer.Abort = () => cancel; // Stop: leave the games in progress and don't learn from the unfinished batch
@@ -490,6 +507,9 @@ namespace PokemonTCG.AI
                     // seats (self-play). The names are trimmed: a mirror's second deck has a space added to tell them apart.
                     brain.RecordMatchup(game.LearnerDeck.Trim(), game.OpponentDeck.Trim(), game.Outcome);
                     if (game.SelfPlay) brain.RecordMatchup(game.OpponentDeck.Trim(), game.LearnerDeck.Trim(), -game.Outcome);
+                    // For the deck advisor: which cards showed up in wins and losses, and how sure it was with each deck.
+                    foreach (var seat in game.Seats)
+                        brain.RecordDeckGame(seat.Deck, seat.Cards, seat.Drawn, seat.Played, seat.Outcome, seat.Decisions, seat.Surprise);
                 }
             };
             try
@@ -535,12 +555,15 @@ namespace PokemonTCG.AI
                 if (recentMistakes >= 0)
                     progress += " · sequencing mistakes per game " + recentMistakes.ToString("0.0", CultureInfo.InvariantCulture)
                                 + " (first round " + firstMistakes.ToString("0.0", CultureInfo.InvariantCulture) + "; lower is better)";
+                if (round.LearnedOn.Length > 0) progress += " · learning on the GPU (" + round.LearnedOn + ")";
                 if (checks.Count > 0) progress += " · vs the classic bot: " + string.Join(" → ", checks.ToArray()) + " games";
                 else if (EvalGames == 0) progress += " · tick \"Measure it against the classic bot\" to see it checked as it trains";
                 SetPhase(progress);
                 long skipped = brain.Policy.SkippedSteps - skippedBefore;
                 if (skipped > 0)
                     lock (gate) status.LastError = skipped + " learning step" + (skipped == 1 ? " was" : "s were") + " skipped (numbers out of range); the network is unharmed.";
+                if (!string.IsNullOrEmpty(round.LastError) && round.LastError.StartsWith("GPU learner", StringComparison.Ordinal))
+                    lock (gate) status.LastError = round.LastError;
                 SafeSave();
                 if (round.Games == 0) break;
             }

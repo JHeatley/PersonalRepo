@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using PokemonTCG.AI;
 using PokemonTCG.Cards;
 using PokemonTCG.Core;
@@ -15,7 +16,17 @@ using PokemonTCG.Core;
 /// </summary>
 public static class Program
 {
-    static readonly string Root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+    /// <summary>The PokemonTCGSim folder (its Assets hold the card data): --root, or found upward from this program's folder.</summary>
+    static string Root = FindRoot();
+
+    static string FindRoot()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        for (var d = dir; d != null; d = d.Parent)
+            if (Directory.Exists(Path.Combine(d.FullName, "Assets", "PokemonTCG", "Resources", "CardData"))) return d.FullName;
+        return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+    }
+
     static string Resources => Path.Combine(Root, "Assets", "PokemonTCG", "Resources");
     static string DefaultOut => Path.Combine(Root, "Headless", "out", "policy.neural");
 
@@ -28,6 +39,7 @@ public static class Program
             return 0;
         }
         var opts = Options(args.Skip(1).ToArray());
+        if (opts.TryGetValue("root", out var root)) Root = Path.GetFullPath(root);
         if (opts.TryGetValue("skip-cpu", out var skipCpu)) Console.WriteLine(CpuThreads.Apply(CpuThreads.Parse(skipCpu)));
         try
         {
@@ -35,6 +47,7 @@ public static class Program
             {
                 case "train": return Train(opts);
                 case "eval": return Eval(opts);
+                case "background": return Background(opts);
                 default:
                     Console.WriteLine("Unknown command " + args[0] + " (train or eval; see README.md)");
                     return 1;
@@ -147,6 +160,14 @@ public static class Program
             Minibatch = Int(o, "minibatch", 1024)
         };
         net.LearningRate = Dbl(o, "lr", 2e-4);
+        if (o.TryGetValue("gpu", out var gpu))
+        {
+            if (!GpuLearner.TryParse(gpu == "true" ? GpuLearner.DefaultAddress : gpu, out var gpuHost, out var gpuPort))
+                throw new ArgumentException("--gpu takes host:port, like " + GpuLearner.DefaultAddress);
+            trainer.Gpu = new GpuLearner(gpuHost, gpuPort);
+            Console.WriteLine($"learning on the GPU learner at {gpuHost}:{gpuPort} (start ../GpuLearner/learner.py first)");
+        }
+        if (o.ContainsKey("games-per-second")) trainer.Pace = new GamePace(Dbl(o, "games-per-second", 0));
         int games = Int(o, "games", 10000);
         int reportEvery = Int(o, "report-every", 5000);
         int evalGames = Int(o, "eval-games", 200);
@@ -168,7 +189,8 @@ public static class Program
             done += r.Games;
             Console.WriteLine($"games {done,8:N0} | {r.Decisions / Math.Max(1, r.Games),4} decisions/game | seq mistakes/game {r.Mistakes / (double)Math.Max(1, r.Games),4:F1}"
                               + $" | vs pool/classic {(r.VsPool > 0 ? (r.PoolWins / (double)r.VsPool).ToString("F2") : " -  ")} | pi {r.PolicyLoss:+0.000;-0.000} v {r.ValueLoss:F3}"
-                              + $" H {r.Entropy:F2} clip {r.ClipFraction:F2}" + (r.Errors > 0 ? $" | {r.Errors} errors: {r.LastError}" : "")
+                              + $" H {r.Entropy:F2} clip {r.ClipFraction:F2}" + (r.Errors > 0 || (r.LastError ?? "").StartsWith("GPU") ? $" | {r.Errors} errors: {r.LastError}" : "")
+                              + (r.LearnedOn.Length > 0 ? $" | learned on {r.LearnedOn} in {r.LearnSeconds:F1}s" : $" | learned in {r.LearnSeconds:F1}s")
                               + $" | {done / clock.Elapsed.TotalSeconds:F1} games/s");
             Save(net, outPath);
             if (done >= nextReport || done >= games || stop)
@@ -183,6 +205,120 @@ public static class Program
         }
         Console.WriteLine($"saved {outPath} ({net.GamesTrained:N0} games of training in all). Copy it next to your AI's file as <AI file>.neural to use it in the sim.");
         return 0;
+    }
+
+    // ------------------------------------------------------------------ Training for the app, in the background
+
+    /// <summary>
+    /// The app's "Train in the background": a training session on the AI's own brain file, as the Train screen would run it,
+    /// but here (faster, and the app stays light). The app writes a job folder: job.txt (key=value lines: brain, games, measure,
+    /// style, deck.N names with decks/N.txt lists, pool, a, b, randomA, randomB, threads, rest, gpu, rate, prizes, seed) and the
+    /// decklists. This keeps progress.txt up to date, stops when a file named "stop" appears, and saves the brain (the
+    /// network, the matchups, how well it knows each deck, the card results and the session's record) for the app to reload.
+    /// </summary>
+    static int Background(Dictionary<string, string> o)
+    {
+        string jobDir = Get(o, "job", null) ?? throw new ArgumentException("background needs --job <folder>");
+        var job = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var line in File.ReadAllLines(Path.Combine(jobDir, "job.txt")))
+        {
+            int eq = line.IndexOf('=');
+            if (eq > 0) job[line.Substring(0, eq).Trim()] = line.Substring(eq + 1).Trim();
+        }
+        string J(string key, string fallback = "") => job.TryGetValue(key, out var v) ? v : fallback;
+        int JI(string key, int fallback) => int.TryParse(J(key), NumberStyles.Integer, CultureInfo.InvariantCulture, out var v) ? v : fallback;
+        double JD(string key, double fallback) => double.TryParse(J(key), NumberStyles.Float, CultureInfo.InvariantCulture, out var v) ? v : fallback;
+
+        string progressPath = Path.Combine(jobDir, "progress.txt");
+        string stopPath = Path.Combine(jobDir, "stop");
+        void Progress(TrainingStatus st, string note)
+        {
+            var lines = new List<string>
+            {
+                "pid=" + Environment.ProcessId, "phase=" + Clean(st?.Phase ?? note), "done=" + (st?.Done ?? 0), "games=" + (st?.Games ?? 0),
+                "winsA=" + (st?.WinsA ?? 0), "winsB=" + (st?.WinsB ?? 0), "draws=" + (st?.Draws ?? 0), "errors=" + (st?.Errors ?? 0),
+                "evalDone=" + (st?.EvalDone ?? 0), "evalTotal=" + (st?.EvalTotal ?? 0),
+                "scoreBefore=" + (st?.ScoreBefore ?? -1).ToString("R", CultureInfo.InvariantCulture),
+                "scoreAfter=" + (st?.ScoreAfter ?? -1).ToString("R", CultureInfo.InvariantCulture),
+                "seconds=" + (st?.Seconds ?? 0).ToString("0.0", CultureInfo.InvariantCulture),
+                "gamesPerSecond=" + (st?.GamesPerSecond ?? 0).ToString("0.00", CultureInfo.InvariantCulture),
+                "running=" + (st != null && st.Running ? 1 : 0), "finished=" + (st != null && st.Finished ? 1 : 0),
+                "cancelled=" + (st != null && st.Cancelled ? 1 : 0), "lastError=" + Clean(st?.LastError ?? ""), "note=" + Clean(note ?? "")
+            };
+            try
+            {
+                File.WriteAllLines(progressPath + ".tmp", lines);
+                File.Copy(progressPath + ".tmp", progressPath, true);
+            }
+            catch (IOException)
+            {
+                // The app was reading it: the next update gets through.
+            }
+        }
+        static string Clean(string s) => (s ?? "").Replace('\r', ' ').Replace('\n', ' ');
+
+        try
+        {
+            if (File.Exists(stopPath)) File.Delete(stopPath);
+            Progress(null, "Loading the cards and the AI");
+            var db = LoadCards();
+            var policyStart = Path.Combine(Resources, "AI", "policy_start.bytes");
+            if (File.Exists(policyStart)) LearningBrain.PolicyStart = File.ReadAllBytes(policyStart);
+            var decks = new List<KeyValuePair<string, List<CardDef>>>();
+            var byIndex = new Dictionary<int, KeyValuePair<string, List<CardDef>>>();
+            foreach (var kv in job.Where(k => k.Key.StartsWith("deck.", StringComparison.OrdinalIgnoreCase)).OrderBy(k => k.Key, StringComparer.Ordinal))
+            {
+                if (!int.TryParse(kv.Key.Substring(5), out int index)) continue;
+                var errors = new List<string>();
+                var cards = Decklist.Expand(Decklist.Parse(File.ReadAllText(Path.Combine(jobDir, "decks", index + ".txt")), db, errors));
+                if (cards.Count == 0) continue;
+                byIndex[index] = new KeyValuePair<string, List<CardDef>>(kv.Value, cards);
+            }
+            foreach (var part in J("pool").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                if (int.TryParse(part, out int i) && byIndex.TryGetValue(i, out var d)) decks.Add(d);
+            bool randomA = J("randomA") == "1", randomB = J("randomB") == "1";
+            byIndex.TryGetValue(JI("a", -1), out var deckA);
+            byIndex.TryGetValue(JI("b", -1), out var deckB);
+            if ((randomA || randomB) && decks.Count == 0) throw new ArgumentException("no legal decks to pick random ones from");
+            if (!randomA && deckA.Value == null || !randomB && deckB.Value == null) throw new ArgumentException("a deck couldn't be read");
+            if (deckA.Value == null) deckA = new KeyValuePair<string, List<CardDef>>("Random deck", decks[0].Value);
+            if (deckB.Value == null) deckB = new KeyValuePair<string, List<CardDef>>("Random deck", decks[0].Value);
+
+            var brain = LearningBrain.Load(J("brain"));
+            var style = J("style", "neural").ToLowerInvariant();
+            var session = new TrainingSession(StandardCards.CreateRegistry(), brain, deckA.Key, deckA.Value, deckB.Key, deckB.Value,
+                JI("games", 1000), JI("measure", 0), JI("seed", Environment.TickCount & 0x0FFFFFFF) | 1)
+            {
+                Style = style == "learning" ? AiStyle.Learning : style == "hybrid" ? AiStyle.Hybrid : AiStyle.Neural,
+                DeckPool = randomA || randomB ? decks : null,
+                RandomA = randomA,
+                RandomB = randomB,
+                NeuralThreads = JI("threads", 0),
+                NeuralRest = JD("rest", 0),
+                GpuAddress = J("gpu", null),
+                GamesPerSecond = JD("rate", 0),
+                PrizeCount = JI("prizes", 6)
+            };
+            Console.WriteLine($"background training: {session.MatchLabel}, {session.Games:N0} games as the {session.StyleLabel}; brain {brain.FilePath}");
+            session.Start();
+            while (session.Running || !session.Finished)
+            {
+                Thread.Sleep(1000);
+                if (File.Exists(stopPath)) session.Cancel();
+                Progress(session.Status(), "");
+            }
+            session.Join(60000);
+            var final = session.Status();
+            Progress(final, final.Cancelled ? "Stopped: what it learned is saved" : "Done: what it learned is saved");
+            Console.WriteLine($"done: {final.Done:N0} games in {final.Seconds / 60:0.0} minutes" + (string.IsNullOrEmpty(final.LastError) ? "" : "; " + final.LastError));
+            return 0;
+        }
+        catch (Exception e)
+        {
+            Progress(new TrainingStatus { Finished = true, LastError = e.GetType().Name + ": " + e.Message, Phase = "Couldn't train" }, "");
+            Console.WriteLine(e);
+            return 1;
+        }
     }
 
     static int Eval(Dictionary<string, string> o)

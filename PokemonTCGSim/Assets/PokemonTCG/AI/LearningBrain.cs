@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using PokemonTCG.Core;
 
 namespace PokemonTCG.AI
 {
@@ -36,6 +37,79 @@ namespace PokemonTCG.AI
         public double Baseline;
         /// <summary>Running average of the Prize swing over two turns.</summary>
         public double ShortBaseline;
+    }
+
+    /// <summary>
+    /// What the Neural AI's training games say about one card in one deck, for deck building: the games the deck was played
+    /// with it, the games the card was in hand at some point ("drawn") and the games it was played, each with the wins.
+    /// Lift compares the win rate when it was drawn with the win rate when it wasn't: a card that helps the deck wins more
+    /// often when it shows up (the measure deck builders use; cards played only when behind can still look worse than they are).
+    /// </summary>
+    public sealed class CardResult
+    {
+        public string Deck = "";
+        public string Card = "";
+        public int Games, Wins;
+        public int Drawn, DrawnWins;
+        public int Played, PlayedWins;
+
+        public int NotDrawn { get { return Games - Drawn; } }
+        public double DrawnWinRate { get { return Drawn == 0 ? 0 : DrawnWins / (double)Drawn; } }
+        public double NotDrawnWinRate { get { return NotDrawn <= 0 ? 0 : (Wins - DrawnWins) / (double)NotDrawn; } }
+        /// <summary>Win rate when drawn minus when not drawn (-1..1).</summary>
+        public double Lift { get { return DrawnWinRate - NotDrawnWinRate; } }
+        /// <summary>Enough games both ways for Lift to mean something.</summary>
+        public bool HasLift(int atLeast) { return Drawn >= atLeast && NotDrawn >= atLeast; }
+    }
+
+    /// <summary>
+    /// One of your play habits the Areas of Improvement review keeps track of across your games: a kind of play where the AI
+    /// would do something else (attacking before attaching Energy, picking one card over another...).
+    /// </summary>
+    public sealed class PlayHabit
+    {
+        public string Key = "";
+        public string Title = "";
+        /// <summary>Reviewed games it came up in, and how many times in all.</summary>
+        public int Games, Times;
+        /// <summary>Sum over the times of how much it seemed to matter (0..1 each: a measured loss of chance to win, or how sure the AI was).</summary>
+        public double Strength;
+        /// <summary>How often it comes up lately: an average over about the last 6 reviewed games (0..1), before and after this game.</summary>
+        public double Recent, RecentBefore;
+        /// <summary>Review number it last came up in.</summary>
+        public int LastReview;
+
+        public double AverageStrength { get { return Times == 0 ? 0 : Strength / Times; } }
+    }
+
+    /// <summary>A habit as it came up in one game (what GameAnalyzer hands to LearningBrain.RecordHabits).</summary>
+    public sealed class HabitInGame
+    {
+        public string Key = "";
+        public string Title = "";
+        public int Times;
+        public double Strength;
+    }
+
+    /// <summary>How well the Neural AI knows a deck from its training games: games and results, and how unsure it is lately.</summary>
+    public sealed class DeckSkill
+    {
+        public string Deck = "";
+        public int Games, Wins, Losses;
+        public long Decisions;
+        /// <summary>
+        /// Recent average of how unlikely its own picks were to it (-log p per decision, over about the last 50 games): about
+        /// 0.6 is a deck it plays confidently, 0.9 and up one it's still working out.
+        /// </summary>
+        public double Uncertainty;
+
+        public double WinRate { get { return Games == 0 ? 0 : Wins / (double)Games; } }
+
+        /// <summary>"well learned", "learning" or "still new to it", from the uncertainty.</summary>
+        public string Level
+        {
+            get { return Decisions == 0 ? "not played yet" : Uncertainty <= 0.68 ? "well learned" : Uncertainty <= 0.82 ? "learning" : "still new to it"; }
+        }
     }
 
     /// <summary>
@@ -94,6 +168,11 @@ namespace PokemonTCG.AI
         private readonly Dictionary<string, Weight> weights = new Dictionary<string, Weight>(StringComparer.Ordinal);
         private readonly Dictionary<string, MatchupStats> matchups = new Dictionary<string, MatchupStats>(StringComparer.Ordinal);
         private readonly List<SessionRecord> history = new List<SessionRecord>();
+        private readonly Dictionary<string, CardResult> cardResults = new Dictionary<string, CardResult>(StringComparer.Ordinal);
+        private readonly Dictionary<string, DeckSkill> deckSkills = new Dictionary<string, DeckSkill>(StringComparer.Ordinal);
+        private readonly Dictionary<string, PlayHabit> habits = new Dictionary<string, PlayHabit>(StringComparer.Ordinal);
+        /// <summary>Your games the Areas of Improvement review has gone through (the habits' denominator).</summary>
+        public int HabitReviews { get; private set; }
 
         /// <summary>Largest weight of one feature.</summary>
         public const double MaxWeight = 3.0;
@@ -453,6 +532,194 @@ namespace PokemonTCG.AI
             }
         }
 
+        // ------------------------------------------------------------------ Deck building: what training says about decks and cards
+
+        private CardResult CardResultFor(string deck, string card)
+        {
+            string key = deck + "\u0001" + card;
+            CardResult r;
+            if (!cardResults.TryGetValue(key, out r))
+            {
+                r = new CardResult { Deck = deck, Card = card };
+                cardResults[key] = r;
+            }
+            return r;
+        }
+
+        private DeckSkill SkillFor(string deck)
+        {
+            DeckSkill s;
+            if (!deckSkills.TryGetValue(deck, out s))
+            {
+                s = new DeckSkill { Deck = deck };
+                deckSkills[deck] = s;
+            }
+            return s;
+        }
+
+        /// <summary>
+        /// One side of a Neural AI training game: the deck, its cards (Basic Energy left out), the cards it drew and played, how
+        /// it ended (1 won, -1 lost, 0 draw) and its decisions with their total surprise (-log p).
+        /// </summary>
+        public void RecordDeckGame(string deck, IEnumerable<CardDef> cards, ICollection<string> drawn, ICollection<string> played, int outcome,
+            int decisions, double surprise)
+        {
+            if (string.IsNullOrEmpty(deck) || cards == null) return;
+            var names = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var c in cards)
+                if (c != null && !c.IsBasicEnergy) names.Add(c.Name);
+            bool won = outcome > 0;
+            lock (sync)
+            {
+                foreach (var name in names)
+                {
+                    var r = CardResultFor(deck, name);
+                    r.Games++;
+                    if (won) r.Wins++;
+                    if (drawn != null && drawn.Contains(name))
+                    {
+                        r.Drawn++;
+                        if (won) r.DrawnWins++;
+                    }
+                    if (played != null && played.Contains(name))
+                    {
+                        r.Played++;
+                        if (won) r.PlayedWins++;
+                    }
+                }
+                var s = SkillFor(deck);
+                s.Games++;
+                if (won) s.Wins++;
+                else if (outcome < 0) s.Losses++;
+                if (decisions > 0)
+                {
+                    double avg = surprise / decisions;
+                    s.Uncertainty = s.Decisions == 0 ? avg : s.Uncertainty + Math.Max(0.02, 1.0 / s.Games) * (avg - s.Uncertainty);
+                    s.Decisions += decisions;
+                }
+            }
+        }
+
+        /// <summary>The card results for a deck, or for every deck added together (deck null), most games first.</summary>
+        public List<CardResult> CardResultsOf(string deck)
+        {
+            lock (sync)
+            {
+                if (deck != null)
+                    return cardResults.Values.Where(r => r.Deck == deck).Select(Copy).OrderByDescending(r => r.Games).ToList();
+                var all = new Dictionary<string, CardResult>(StringComparer.Ordinal);
+                foreach (var r in cardResults.Values)
+                {
+                    CardResult t;
+                    if (!all.TryGetValue(r.Card, out t))
+                    {
+                        t = new CardResult { Deck = "", Card = r.Card };
+                        all[r.Card] = t;
+                    }
+                    t.Games += r.Games;
+                    t.Wins += r.Wins;
+                    t.Drawn += r.Drawn;
+                    t.DrawnWins += r.DrawnWins;
+                    t.Played += r.Played;
+                    t.PlayedWins += r.PlayedWins;
+                }
+                return all.Values.OrderByDescending(r => r.Games).ToList();
+            }
+        }
+
+        private static CardResult Copy(CardResult r)
+        {
+            return new CardResult
+            {
+                Deck = r.Deck, Card = r.Card, Games = r.Games, Wins = r.Wins, Drawn = r.Drawn, DrawnWins = r.DrawnWins, Played = r.Played,
+                PlayedWins = r.PlayedWins
+            };
+        }
+
+        /// <summary>How well the Neural AI knows a deck (an empty record if it hasn't trained with it).</summary>
+        public DeckSkill SkillOf(string deck)
+        {
+            lock (sync)
+            {
+                DeckSkill s;
+                if (deck == null || !deckSkills.TryGetValue(deck, out s)) return new DeckSkill { Deck = deck ?? "" };
+                return new DeckSkill { Deck = s.Deck, Games = s.Games, Wins = s.Wins, Losses = s.Losses, Decisions = s.Decisions, Uncertainty = s.Uncertainty };
+            }
+        }
+
+        /// <summary>Every deck the Neural AI has trained with, most games first.</summary>
+        public List<DeckSkill> DeckSkills()
+        {
+            lock (sync)
+                return deckSkills.Values.Select(s => new DeckSkill { Deck = s.Deck, Games = s.Games, Wins = s.Wins, Losses = s.Losses, Decisions = s.Decisions, Uncertainty = s.Uncertainty })
+                    .OrderByDescending(s => s.Games).ToList();
+        }
+
+        // ------------------------------------------------------------------ Your habits (the Areas of Improvement review)
+
+        /// <summary>How fast "lately" forgets: each review counts this much of the recent rate.</summary>
+        public const double HabitRecency = 0.15;
+
+        /// <summary>
+        /// Adds one reviewed game's habits to your profile and returns them with their history (games, times, how often lately,
+        /// before and after this game). Habits that didn't come up this game become a little rarer "lately".
+        /// </summary>
+        public List<PlayHabit> RecordHabits(IList<HabitInGame> found)
+        {
+            lock (sync)
+            {
+                HabitReviews++;
+                var now = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var h in found ?? new List<HabitInGame>())
+                    if (h != null && !string.IsNullOrEmpty(h.Key) && h.Times > 0) now.Add(h.Key);
+                foreach (var h in habits.Values)
+                {
+                    h.RecentBefore = h.Recent;
+                    if (!now.Contains(h.Key)) h.Recent *= 1 - HabitRecency;
+                }
+                var result = new List<PlayHabit>();
+                foreach (var f in found ?? new List<HabitInGame>())
+                {
+                    if (f == null || !now.Contains(f.Key)) continue;
+                    PlayHabit h;
+                    if (!habits.TryGetValue(f.Key, out h))
+                    {
+                        h = new PlayHabit { Key = f.Key };
+                        habits[f.Key] = h;
+                    }
+                    if (!string.IsNullOrEmpty(f.Title)) h.Title = f.Title;
+                    if (h.LastReview != HabitReviews)
+                    {
+                        h.Games++;
+                        h.Recent = h.Recent * (1 - HabitRecency) + HabitRecency;
+                        h.LastReview = HabitReviews;
+                    }
+                    h.Times += f.Times;
+                    h.Strength += Math.Max(0, Math.Min(1, f.Strength)) * f.Times;
+                    result.Add(CopyHabit(h));
+                }
+                return result;
+            }
+        }
+
+        /// <summary>Your habits, most common lately first.</summary>
+        public List<PlayHabit> Habits()
+        {
+            lock (sync) return habits.Values.Select(CopyHabit).OrderByDescending(h => h.Recent).ThenByDescending(h => h.Games).ToList();
+        }
+
+        private static PlayHabit CopyHabit(PlayHabit h)
+        {
+            return new PlayHabit
+            {
+                Key = h.Key, Title = h.Title, Games = h.Games, Times = h.Times, Strength = h.Strength, Recent = h.Recent, RecentBefore = h.RecentBefore,
+                LastReview = h.LastReview
+            };
+        }
+
+        /// <summary>Games a card's lift needs both ways (drawn and not drawn) before the advisor uses it.</summary>
+        public const int LiftGames = 25;
+
         public List<MatchupStats> Matchups()
         {
             lock (sync)
@@ -568,7 +835,31 @@ namespace PokemonTCG.AI
                 if (kv.Value[1] <= 0) continue;
                 result[kv.Key] = new CardOpinion { Card = kv.Key, Value = kv.Value[0] / kv.Value[1], Updates = (int)Math.Min(int.MaxValue, kv.Value[2]) };
             }
+            // The Neural AI's training games: how much more often the deck wins when the card shows up (its lift). This deck's
+            // games count fully; every deck's together, at half weight, for cards this deck hasn't played enough with.
+            var mine = string.IsNullOrEmpty(deck) ? new List<CardResult>() : CardResultsOf(deck).Where(r => r.HasLift(LiftGames)).ToList();
+            var seen = new HashSet<string>(mine.Select(r => r.Card), StringComparer.Ordinal);
+            foreach (var r in mine) MergeLift(result, r, 1.0);
+            foreach (var r in CardResultsOf(null))
+                if (!seen.Contains(r.Card) && r.HasLift(LiftGames)) MergeLift(result, r, string.IsNullOrEmpty(deck) ? 1.0 : 0.5);
             return result;
+        }
+
+        /// <summary>Adds a card's lift to its opinion (scaled to the feature weights' range, weighted by its games).</summary>
+        private static void MergeLift(Dictionary<string, CardOpinion> opinions, CardResult r, double weight)
+        {
+            double value = Clamp(3.0 * r.Lift, -1, 1);
+            int updates = (int)(Math.Min(r.Drawn, r.NotDrawn) * weight);
+            if (updates <= 0) return;
+            CardOpinion op;
+            if (!opinions.TryGetValue(r.Card, out op))
+            {
+                opinions[r.Card] = new CardOpinion { Card = r.Card, Value = value, Updates = updates };
+                return;
+            }
+            long total = (long)op.Updates + updates;
+            op.Value = (op.Value * op.Updates + value * updates) / total;
+            op.Updates = (int)Math.Min(int.MaxValue, total);
         }
 
         /// <summary>How a deck has done in the brain's games, all opponents together (v75): games, wins, losses.</summary>
@@ -616,6 +907,10 @@ namespace PokemonTCG.AI
                 weights.Clear();
                 matchups.Clear();
                 history.Clear();
+                cardResults.Clear();
+                deckSkills.Clear();
+                habits.Clear();
+                HabitReviews = 0;
                 GamesTrained = 0;
                 GamesVsYou = 0;
                 YourDecisionsStudied = 0;
@@ -674,6 +969,22 @@ namespace PokemonTCG.AI
                     sb.Append("m\t").Append(m.Games).Append('\t').Append(m.Wins).Append('\t').Append(m.Losses).Append('\t')
                       .Append(D(m.Baseline)).Append('\t').Append(D(m.ShortBaseline)).Append('\t').Append(Clean(m.Deck)).Append('\t').Append(Clean(m.Opponent)).Append('\n');
                 }
+                foreach (var r in cardResults.Values.OrderBy(x => x.Deck, StringComparer.Ordinal).ThenBy(x => x.Card, StringComparer.Ordinal))
+                {
+                    sb.Append("k\t").Append(r.Games).Append('\t').Append(r.Wins).Append('\t').Append(r.Drawn).Append('\t').Append(r.DrawnWins).Append('\t')
+                      .Append(r.Played).Append('\t').Append(r.PlayedWins).Append('\t').Append(Clean(r.Deck)).Append('\t').Append(Clean(r.Card)).Append('\n');
+                }
+                foreach (var k in deckSkills.Values.OrderBy(x => x.Deck, StringComparer.Ordinal))
+                {
+                    sb.Append("q\t").Append(k.Games).Append('\t').Append(k.Wins).Append('\t').Append(k.Losses).Append('\t').Append(k.Decisions).Append('\t')
+                      .Append(D(k.Uncertainty)).Append('\t').Append(Clean(k.Deck)).Append('\n');
+                }
+                if (HabitReviews > 0) sb.Append("hr\t").Append(HabitReviews).Append('\n');
+                foreach (var h in habits.Values.OrderBy(x => x.Key, StringComparer.Ordinal))
+                {
+                    sb.Append("h\t").Append(h.Games).Append('\t').Append(h.Times).Append('\t').Append(D(h.Strength)).Append('\t').Append(D(h.Recent)).Append('\t')
+                      .Append(h.LastReview).Append('\t').Append(Clean(h.Key)).Append('\t').Append(Clean(h.Title)).Append('\n');
+                }
                 foreach (var s in history)
                 {
                     sb.Append("s\t").Append(s.Games).Append('\t').Append(s.WinsA).Append('\t').Append(s.WinsB).Append('\t')
@@ -723,6 +1034,10 @@ namespace PokemonTCG.AI
                 weights.Clear();
                 matchups.Clear();
                 history.Clear();
+                cardResults.Clear();
+                deckSkills.Clear();
+                habits.Clear();
+                HabitReviews = 0;
                 GamesTrained = GamesVsYou = YourDecisionsStudied = FeedbackGiven = 0;
                 LogsStudied = LogDecisionsStudied = 0;
                 Net.Reset();
@@ -772,6 +1087,42 @@ namespace PokemonTCG.AI
                             case "n":
                                 if (p.Length >= 2) Net.FromBase64(p[1]);
                                 break;
+                            case "hr":
+                                if (p.Length >= 2) HabitReviews = I(p[1]);
+                                break;
+                            case "h":
+                                if (p.Length >= 8)
+                                {
+                                    habits[p[6]] = new PlayHabit
+                                    {
+                                        Games = I(p[1]), Times = I(p[2]), Strength = Dp(p[3]), Recent = Dp(p[4]), RecentBefore = Dp(p[4]),
+                                        LastReview = I(p[5]), Key = p[6], Title = p[7]
+                                    };
+                                }
+                                break;
+                            case "k":
+                                if (p.Length >= 9)
+                                {
+                                    var r = CardResultFor(p[7], p[8]);
+                                    r.Games = I(p[1]);
+                                    r.Wins = I(p[2]);
+                                    r.Drawn = I(p[3]);
+                                    r.DrawnWins = I(p[4]);
+                                    r.Played = I(p[5]);
+                                    r.PlayedWins = I(p[6]);
+                                }
+                                break;
+                            case "q":
+                                if (p.Length >= 7)
+                                {
+                                    var k = SkillFor(p[6]);
+                                    k.Games = I(p[1]);
+                                    k.Wins = I(p[2]);
+                                    k.Losses = I(p[3]);
+                                    k.Decisions = long.Parse(p[4], CultureInfo.InvariantCulture);
+                                    k.Uncertainty = Dp(p[5]);
+                                }
+                                break;
                             case "p":
                                 if (p.Length >= 2) Policy.FromBytes(Convert.FromBase64String(p[1].Trim()));
                                 break;
@@ -810,9 +1161,15 @@ namespace PokemonTCG.AI
         }
 
         /// <summary>Writes the brain to FilePath (through a temporary file, so a crash can't leave half a brain).</summary>
+        /// <summary>
+        /// Saving is paused: another program is training this brain's file (the app's "Train in the background"), and the app
+        /// reloads the file when it's done rather than writing over it.
+        /// </summary>
+        public bool SavesPaused;
+
         public void Save()
         {
-            if (string.IsNullOrEmpty(FilePath)) return;
+            if (string.IsNullOrEmpty(FilePath) || SavesPaused) return;
             // v134.4: streamed to the file, not built as one big string first (that string and its copies were large enough
             // to set off long garbage collections, which freeze the whole app). Saves take turns.
             lock (fileLock)

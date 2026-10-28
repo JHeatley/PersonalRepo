@@ -33,9 +33,14 @@ namespace PokemonTCG.Presentation
         private const string PrefTrainGames = "PokemonTCG.TrainGames";
         private const string PrefTrainAll = "PokemonTCG.TrainAllDecks";
         private const string PrefTrainRandomA = "PokemonTCG.TrainRandomA";
+        /// <summary>Speed for Neural AI training: Gentle (half the threads, rests) or Fast (every usable thread but two, no rests).</summary>
+        private const string PrefTrainFast = "PokemonTCG.TrainFast";
+        /// <summary>Neural AI training learns on the GPU learner (GpuLearner/learner.py), and where it listens.</summary>
+        private const string PrefTrainGpu = "PokemonTCG.TrainGpu";
+        private const string PrefTrainGpuAddress = "PokemonTCG.TrainGpuAddress";
         private const string PrefTrainRandomB = "PokemonTCG.TrainRandomB";
         /// <summary>The most games one session can be set to play (typed in).</summary>
-        private const int MaxTrainGames = 1000000;
+        private const int MaxTrainGames = 5000000;
         /// <summary>Keep the app off some CPU threads (a faulty core), and which ones (CpuThreads).</summary>
         private const string PrefSkipCpu = "PokemonTCG.SkipCpuThreads";
         private const string PrefSkipCpuList = "PokemonTCG.SkipCpuThreadList";
@@ -62,6 +67,12 @@ namespace PokemonTCG.Presentation
         /// side's deck; both random is all decks against all decks.
         /// </summary>
         private bool trainRandomA, trainRandomB;
+        private bool trainFast;
+        private bool trainGpu;
+        /// <summary>Games a second at most, as typed ("" or 0: as fast as it can).</summary>
+        private string trainRateText = "";
+        private const string PrefTrainRate = "PokemonTCG.TrainGamesPerSecond";
+        private string trainGpuAddress = GpuLearner.DefaultAddress;
         private bool TrainAll { get { return trainRandomA && trainRandomB; } }
         private bool TrainFocus { get { return trainRandomA != trainRandomB; } }
         /// <summary>The deck that plays every game in focus mode (index into decks), or -1.</summary>
@@ -70,7 +81,7 @@ namespace PokemonTCG.Presentation
         private AiStyle trainStyle = AiStyle.Hybrid;
         private bool confirmReset;
         private bool sessionUndone;
-        private Vector2 trainScrollA, trainScrollB, trainScrollInfo, trainScrollMatchups, trainScrollLessons;
+        private Vector2 trainScrollA, trainScrollB, trainScrollInfo, trainScrollMatchups, trainScrollLessons, trainScrollDecks;
         private GUIStyle listRowStyle;
         private float listRowHeight = 20f;
         private float nextBrainRefresh;
@@ -104,9 +115,16 @@ namespace PokemonTCG.Presentation
             public string NetOrigin;
             public AiStyle Style;
             public List<MatchupStats> Matchups = new List<MatchupStats>();
+            public List<DeckSkill> Decks = new List<DeckSkill>();
             public List<KeyValuePair<string, double>> Lessons = new List<KeyValuePair<string, double>>();
             public List<SessionRecord> History = new List<SessionRecord>();
             private string[] lessonText;
+
+            public string DeckRow(int k)
+            {
+                var d = Decks[k];
+                return "   " + d.Deck + ":  " + d.Level + " (uncertainty " + d.Uncertainty.ToString("0.00") + ") · " + d.Games.ToString("N0") + " games, won " + Pct(d.Wins, Math.Max(1, d.Games));
+            }
 
             public string MatchupRow(int k)
             {
@@ -293,7 +311,11 @@ namespace PokemonTCG.Presentation
             string yourDeck = deckNames[seat] ?? "";
             string theirDeck = deckNames[1 - seat] ?? "";
             var b = brain;
-            var a = new GameAnalyzer(StandardCards.CreateRegistry(), b, decisions, events, seat, yourDeck, theirDeck, state, engine.PrizeCount, engine.Rules);
+            var a = new GameAnalyzer(StandardCards.CreateRegistry(), b, decisions, events, seat, yourDeck, theirDeck, state, engine.PrizeCount, engine.Rules)
+            {
+                YourDeckList = engine.StartingDeck(seat) != null ? engine.StartingDeck(seat).ToList() : null,
+                TheirDeckList = engine.StartingDeck(1 - seat) != null ? engine.StartingDeck(1 - seat).ToList() : null
+            };
             StartReview(a, yourDeck, theirDeck);
             BeginRatedGame(state, seat, yourDeck, theirDeck); // v157: after StartReview (it rates any earlier game left waiting)
             learnStatus = b != null && bot != null ? "The AI is learning from this game..." : null;
@@ -337,6 +359,10 @@ namespace PokemonTCG.Presentation
             trainGamesText = trainGames.ToString("N0");
             bool all = PlayerPrefs.GetInt(PrefTrainAll, 0) == 1; // the earlier All decks switch
             trainRandomA = PlayerPrefs.GetInt(PrefTrainRandomA, all ? 1 : 0) == 1;
+            trainFast = PlayerPrefs.GetInt(PrefTrainFast, 0) == 1;
+            trainGpu = PlayerPrefs.GetInt(PrefTrainGpu, 0) == 1;
+            trainRateText = PlayerPrefs.GetString(PrefTrainRate, "") ?? "";
+            trainGpuAddress = PlayerPrefs.GetString(PrefTrainGpuAddress, GpuLearner.DefaultAddress) ?? GpuLearner.DefaultAddress;
             trainRandomB = PlayerPrefs.GetInt(PrefTrainRandomB, all ? 1 : 0) == 1;
             confirmReset = false;
             nextBrainRefresh = 0f;
@@ -347,6 +373,7 @@ namespace PokemonTCG.Presentation
         private void UpdateTraining()
         {
             if (training != null) trainView = training.Status();
+            UpdateBackgroundTraining();
             if (mode == Mode.Train && brain != null && Time.unscaledTime >= nextBrainRefresh)
             {
                 nextBrainRefresh = Time.unscaledTime + 1f;
@@ -364,6 +391,7 @@ namespace PokemonTCG.Presentation
                     NetOrigin = brain.Policy.Origin,
                     Style = brain.Style,
                     Matchups = brain.Matchups(),
+                    Decks = brain.DeckSkills(),
                     Lessons = brain.StrongestLessons(0, 5), // all of them; the Train screen shows them in a scrolling list
                     History = brain.History()
                 };
@@ -392,6 +420,36 @@ namespace PokemonTCG.Presentation
             return list;
         }
 
+        /// <summary>Fast speed's games at once: the CPU threads the app may use (without the ones it's told to skip), less two for the screen.</summary>
+        private int FastThreads
+        {
+            get
+            {
+                int usable = Environment.ProcessorCount;
+                if (skipCpu && CpuThreads.Supported) usable -= CpuThreads.Parse(skipCpuText).Count(n => n < Environment.ProcessorCount);
+                return Math.Max(1, usable - 2);
+            }
+        }
+
+        private void ApplyTrainSpeed(TrainingSession session)
+        {
+            session.NeuralThreads = trainFast ? FastThreads : 0;
+            session.NeuralRest = trainFast ? 0 : 0.25;
+            session.GpuAddress = trainGpu ? trainGpuAddress : null;
+            session.GamesPerSecond = TrainRate;
+        }
+
+        /// <summary>The typed games-a-second limit (0: none).</summary>
+        private double TrainRate
+        {
+            get
+            {
+                double r;
+                return double.TryParse((trainRateText ?? "").Trim().Replace(',', '.'), System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture, out r) && r > 0 ? Math.Min(r, 1000) : 0;
+            }
+        }
+
         private void SetTrainRandom(bool a, bool b)
         {
             trainRandomA = a;
@@ -407,7 +465,7 @@ namespace PokemonTCG.Presentation
             PlayerPrefs.SetInt(PrefTrainGames, trainGames);
         }
 
-        /// <summary>The number typed in the games box (commas and spaces allowed); up to 1,000,000.</summary>
+        /// <summary>The number typed in the games box (commas and spaces allowed); up to 5,000,000.</summary>
         private void TypeTrainGames(string text)
         {
             trainGamesText = text ?? "";
@@ -481,6 +539,7 @@ namespace PokemonTCG.Presentation
                 training.PrizeCount = poolFormat.PrizeCount;
                 sessionUndone = false;
                 trainMessage = null;
+                ApplyTrainSpeed(training);
                 training.Start();
                 trainView = training.Status();
                 return;
@@ -505,6 +564,7 @@ namespace PokemonTCG.Presentation
             training.PrizeCount = trainFormat.PrizeCount;
             sessionUndone = false;
             trainMessage = null;
+            ApplyTrainSpeed(training);
             training.Start();
             trainView = training.Status();
         }
@@ -594,7 +654,7 @@ namespace PokemonTCG.Presentation
             GUILayout.BeginHorizontal();
             GUILayout.Label("Or type any number:", GUILayout.Width(140));
             string newGamesText = GUILayout.TextField(trainGamesText, GUILayout.Width(110));
-            GUILayout.Label("  " + trainGames.ToString("N0") + " games (up to 1,000,000)", Hint(ui));
+            GUILayout.Label("  " + trainGames.ToString("N0") + " games (up to 5,000,000)", Hint(ui));
             GUILayout.EndHorizontal();
             if (newGamesText != trainGamesText) actions.Add(() => TypeTrainGames(newGamesText));
             if (TrainAll)
@@ -622,6 +682,46 @@ namespace PokemonTCG.Presentation
                     PlayerPrefs.SetInt(PrefTrainStyle, (int)trainStyle);
                 });
             GUILayout.Label(TrainStyleHint(trainStyle), Hint(ui));
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Speed", GUILayout.Width(60));
+            int speed = GUILayout.Toolbar(trainFast ? 1 : 0, new[] { "Gentle", "Fast" });
+            GUILayout.EndHorizontal();
+            if ((speed == 1) != trainFast)
+                actions.Add(() =>
+                {
+                    trainFast = speed == 1;
+                    PlayerPrefs.SetInt(PrefTrainFast, trainFast ? 1 : 0);
+                });
+            GUILayout.Label(trainFast
+                ? "Fast (Neural AI training): " + FastThreads + " games at once and no rests, about 1.5 to 2 times Gentle's speed. It works the CPU hard: keep \"Don't use CPU threads\" on while your CPU has a faulty core."
+                : "Gentle (Neural AI training): half the CPU's threads, with a short rest after each learning step: cooler and quieter.", Hint(ui));
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Games per second", GUILayout.Width(120));
+            string newRate = GUILayout.TextField(trainRateText, GUILayout.Width(60));
+            GUILayout.Label(TrainRate > 0 ? "  at most " + TrainRate.ToString("0.#") + " a second" : "  blank: as fast as it can", Hint(ui));
+            GUILayout.EndHorizontal();
+            if (newRate != trainRateText)
+                actions.Add(() =>
+                {
+                    trainRateText = newRate;
+                    PlayerPrefs.SetString(PrefTrainRate, trainRateText ?? "");
+                });
+            GUILayout.BeginHorizontal();
+            bool newGpu = GUILayout.Toggle(trainGpu, " Learn on the GPU at");
+            string newGpuAddress = GUILayout.TextField(trainGpuAddress, GUILayout.Width(130));
+            GUILayout.EndHorizontal();
+            if (newGpu != trainGpu || newGpuAddress != trainGpuAddress)
+                actions.Add(() =>
+                {
+                    trainGpu = newGpu;
+                    trainGpuAddress = newGpuAddress;
+                    PlayerPrefs.SetInt(PrefTrainGpu, trainGpu ? 1 : 0);
+                    PlayerPrefs.SetString(PrefTrainGpuAddress, trainGpuAddress ?? "");
+                });
+            if (trainGpu)
+                GUILayout.Label("Neural AI training plays its games here and learns on the graphics card: start PokemonTCGSim/GpuLearner/learner.py first "
+                                + "(see its README). Learning is most of the training time, so this is about 2 to 3 times as fast and keeps that work off the CPU. "
+                                + "If the learner isn't running, it learns on the CPU and says so.", Hint(ui));
             GUI.enabled = true;
             if (CpuThreads.Supported)
             {
@@ -636,7 +736,8 @@ namespace PokemonTCG.Presentation
             }
             GUILayout.Space(6);
             GUILayout.BeginHorizontal();
-            GUI.enabled = !running && TrainDecksReady && brain != null;
+            bool background = BackgroundRunning;
+            GUI.enabled = !running && !background && TrainDecksReady && brain != null;
             if (GUILayout.Button("Start training", GUILayout.Height(32))) actions.Add(StartTraining);
             GUI.enabled = running;
             if (GUILayout.Button("Stop", GUILayout.Height(32), GUILayout.Width(80))) actions.Add(() => training.Cancel());
@@ -645,6 +746,7 @@ namespace PokemonTCG.Presentation
             GUI.enabled = true;
             if (GUILayout.Button("Back to menu", GUILayout.Height(32), GUILayout.Width(120))) actions.Add(() => { RefreshDecks(); mode = Mode.Menu; });
             GUILayout.EndHorizontal();
+            DrawBackgroundTraining(ui, actions, running);
             if (running && PowerSaver.Active) GUILayout.Label("Battery saver on: training plays half the time and rests the other half.", Hint(ui));
             if (!TrainDecksReady && TrainAll)
                 GUILayout.Label("There are no legal decks to train with.", ui.Error);
@@ -806,6 +908,13 @@ namespace PokemonTCG.Presentation
                             + " (Train as, above).", ui.Label);
             // Each list scrolls on its own (scroll with the mouse over it, or drag its scroll bar) and holds everything.
             float listMax = Mathf.Clamp(UiScale.Height * 0.3f, 150f, 360f);
+            if (b.Decks.Count > 0)
+            {
+                GUILayout.Label("How well the Neural AI knows each deck it has trained with, most games first (about 0.6 = plays it confidently, 0.9 = still "
+                                + "working it out; the deck advisor counts the decks it wins more with more) · " + b.Decks.Count.ToString("N0")
+                                + (b.Decks.Count == 1 ? " deck" : " decks"), Hint(ui));
+                trainScrollDecks = DrawScrollList(ui, trainScrollDecks, b.Decks.Count, listMax, b.DeckRow);
+            }
             if (b.Matchups.Count > 0)
             {
                 GUILayout.Label("Matchups it has played, most games first (that deck's win rate) · " + b.Matchups.Count.ToString("N0")
