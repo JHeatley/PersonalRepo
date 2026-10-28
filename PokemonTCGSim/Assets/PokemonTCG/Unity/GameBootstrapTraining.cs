@@ -716,7 +716,9 @@ namespace PokemonTCG.Presentation
                             + b.LogDecisions.ToString("N0") + " decisions) · " + b.Weights.ToString("N0") + " things learned.", ui.Label);
             GUILayout.Label("Neural network: " + (string.IsNullOrEmpty(b.NetOrigin) ? "" : "started from the " + b.NetOrigin + " · ")
                             + (b.NetSteps > 0
-                                ? b.NetSteps.ToString("N0") + " learning steps here · loss " + b.NetLoss.ToString("0.00") + " (lower is better)"
+                                ? b.NetSteps.ToString("N0") + " learning steps here · loss " + b.NetLoss.ToString("0.00")
+                                  + " (how far off its guesses of who wins were, lately: not a score, since its opponent is itself and gets better too; "
+                                  + "a sudden jump to several times its usual size means something went wrong)"
                                 : "no learning steps here yet (Train as Neural AI to train it)")
                             + " · your opponent plays as " + StyleName(b.Style) + " (the Opponent switch on the menu); training plays as " + StyleName(trainStyle)
                             + " (Train as, above).", ui.Label);
