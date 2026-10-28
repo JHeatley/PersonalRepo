@@ -542,6 +542,136 @@ namespace PokemonTCG.Tests
             StringAssert.Contains("the AI wins 60% with it", notes, "the similar library deck it has trained with enough");
         }
 
+        /// <summary>
+        /// A stand-in for learner.py choosing moves: answers SETW and CARD with OKW1 and INF1 with option scores that prefer the last
+        /// option, and refuses TRN1 (so the round learns on the CPU). Records the kinds of message it got.
+        /// </summary>
+        private sealed class FakeMoveLearner
+        {
+            public readonly List<string> Kinds = new List<string>();
+            public int Port;
+            private readonly System.Net.Sockets.TcpListener listener;
+            private readonly bool fail;
+
+            public FakeMoveLearner(bool fail)
+            {
+                this.fail = fail;
+                listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
+                listener.Start();
+                Port = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
+                new System.Threading.Thread(Serve) { IsBackground = true }.Start();
+            }
+
+            private void Serve()
+            {
+                try
+                {
+                    using (var client = listener.AcceptTcpClient())
+                    using (var stream = client.GetStream())
+                    {
+                        var r = new System.IO.BinaryReader(stream);
+                        var w = new System.IO.BinaryWriter(stream);
+                        while (true)
+                        {
+                            string kind = System.Text.Encoding.ASCII.GetString(r.ReadBytes(4));
+                            if (kind.Length < 4) return;
+                            var body = new System.IO.BinaryReader(new System.IO.MemoryStream(r.ReadBytes((int)r.ReadInt64())));
+                            lock (Kinds) Kinds.Add(kind);
+                            var reply = new System.IO.MemoryStream();
+                            string answer;
+                            using (var o = new System.IO.BinaryWriter(reply, System.Text.Encoding.UTF8, true))
+                            {
+                                if (fail || kind == "TRN1")
+                                {
+                                    answer = "ERR1";
+                                    GpuLearner.WriteString(o, "not this time");
+                                }
+                                else if (kind == "INF1")
+                                {
+                                    answer = "OUT1";
+                                    body.ReadInt32(); // version
+                                    int n = body.ReadInt32(), slots = body.ReadInt32(), slotFeat = body.ReadInt32(), glob = body.ReadInt32(),
+                                        turn = body.ReadInt32(), optFeat = body.ReadInt32(), bags = body.ReadInt32();
+                                    body.ReadBytes(4 * n * slots * 2 + 4 * n * slots * slotFeat);
+                                    for (int b = 0; b < bags; b++)
+                                    {
+                                        long sum = 0;
+                                        for (int i = 0; i < n; i++) sum += body.ReadInt32();
+                                        body.ReadBytes((int)(4 * sum));
+                                    }
+                                    body.ReadBytes(4 * n * 2 + 4 * n * glob + 4 * n * turn);
+                                    var counts = new int[n];
+                                    for (int i = 0; i < n; i++) counts[i] = body.ReadInt32();
+                                    for (int i = 0; i < n; i++)
+                                    {
+                                        for (int k = 0; k < counts[i]; k++) o.Write(k == counts[i] - 1 ? 5f : 0f);
+                                        o.Write(0.25f);
+                                    }
+                                }
+                                else answer = "OKW1";
+                            }
+                            var head = new byte[12];
+                            System.Text.Encoding.ASCII.GetBytes(answer, 0, 4, head, 0);
+                            BitConverter.GetBytes(reply.Length).CopyTo(head, 4);
+                            w.Write(head);
+                            w.Write(reply.ToArray());
+                            w.Flush();
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    // the trainer went away
+                }
+                finally
+                {
+                    listener.Stop();
+                }
+            }
+        }
+
+        [Test]
+        public void Moves_Can_Be_Chosen_On_The_GPU_Learner_With_Many_Games_At_Once()
+        {
+            var fake = new FakeMoveLearner(false);
+            var net = new PolicyNet();
+            var trainer = SmallTrainer(net);
+            trainer.GamesPerRound = 8;
+            trainer.Gpu = new GpuLearner("127.0.0.1", fake.Port);
+            trainer.GpuMoves = true;
+            var round = trainer.Round();
+            Assert.AreEqual(0, round.Errors, round.LastError);
+            Assert.AreEqual(8, round.Games);
+            Assert.AreEqual(8, round.GamesAtOnce, "4 games per thread at once (all 8 of this round)");
+            Assert.Greater(round.GpuDecisions, 0, "the learner chose moves");
+            Assert.Greater(trainer.Moves.Batches, 0);
+            Assert.Less(trainer.Moves.Batches, round.GpuDecisions, "several decisions in a batch");
+            List<string> kinds;
+            lock (fake.Kinds) kinds = new List<string>(fake.Kinds);
+            Assert.AreEqual("SETW", kinds[0], "the network goes to the learner first");
+            Assert.Contains("INF1", kinds);
+            Assert.AreEqual(1, kinds.Count(k => k == "SETW"), "then only new cards (CARD), until the weights change");
+            Assert.AreEqual("TRN1", kinds.Last(), "and the round's learning (refused here, so it learned on the CPU)");
+            Assert.Greater(net.Steps, 0);
+            trainer.Dispose();
+        }
+
+        [Test]
+        public void When_The_GPU_Learner_Cant_Choose_Moves_The_Games_Go_On_On_The_CPU()
+        {
+            var fake = new FakeMoveLearner(true);
+            var net = new PolicyNet();
+            var trainer = SmallTrainer(net);
+            trainer.Gpu = new GpuLearner("127.0.0.1", fake.Port);
+            trainer.GpuMoves = true;
+            var round = trainer.Round();
+            Assert.AreEqual(0, round.Errors, round.LastError);
+            Assert.AreEqual(4, round.Games, "the games finished anyway");
+            StringAssert.Contains("GPU learner", round.LastError);
+            Assert.Greater(net.Steps, 0, "and it learned on the CPU");
+            trainer.Dispose();
+        }
+
         private PolicyTrainer SmallTrainer(PolicyNet net)
         {
             var decks = new List<KeyValuePair<string, List<CardDef>>>

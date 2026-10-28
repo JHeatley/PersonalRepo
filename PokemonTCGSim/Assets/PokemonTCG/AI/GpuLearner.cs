@@ -42,6 +42,13 @@ namespace PokemonTCG.AI
         /// <summary>Where the learner last learned ("" until it has).</summary>
         public string Device { get; private set; }
 
+        /// <summary>
+        /// The network the learner holds, as far as this side knows (for choosing moves there, GpuMoves): the weights' revision
+        /// and the card rows it has. -1: unknown, so the weights are sent before the next moves.
+        /// </summary>
+        private int learnerRevision = -1, learnerRows;
+        private readonly object exchangeGate = new object();
+
         public bool Connected { get { return client != null && client.Connected; } }
 
         public GpuLearner(string host, int port)
@@ -117,6 +124,7 @@ namespace PokemonTCG.AI
             if (!Connected) Connect(3000);
             bool withTargets = false;
             if (targets != null) foreach (var t in targets) if (t != null) withTargets = true;
+            int sentRows;
             var body = new MemoryStream();
             using (var w = new BinaryWriter(body, Encoding.UTF8, true))
             {
@@ -131,7 +139,7 @@ namespace PokemonTCG.AI
                 w.Write(net.LearningRate);
                 w.Write(net.MaxGradNorm);
                 if (withTargets) w.Write(distillCoef);
-                net.WriteLearnerWeights(w, true);
+                sentRows = net.WriteLearnerWeights(w, true);
                 WriteSamples(w, inputs, actions, logp, adv, ret);
                 if (withTargets)
                 {
@@ -155,6 +163,9 @@ namespace PokemonTCG.AI
                 net.ReadLearnerWeights(r, result.Batches);
                 if (withTargets) result.DistillLoss = r.ReadDouble(); // after the weights
                 Device = result.Device;
+                // The learner keeps the weights it just sent back, so it can choose moves with them straight away.
+                learnerRevision = net.WeightsRevision;
+                learnerRows = sentRows;
                 return result;
             }
         }
@@ -189,6 +200,11 @@ namespace PokemonTCG.AI
 
         private byte[] Exchange(string kind, MemoryStream body, string expect)
         {
+            lock (exchangeGate) return ExchangeLocked(kind, body, expect);
+        }
+
+        private byte[] ExchangeLocked(string kind, MemoryStream body, string expect)
+        {
             try
             {
                 var head = new byte[12];
@@ -214,6 +230,7 @@ namespace PokemonTCG.AI
             catch (IOException)
             {
                 Disconnect();
+                learnerRevision = -1; // a new connection may be a restarted learner
                 throw;
             }
             catch (SocketException e)
@@ -237,6 +254,71 @@ namespace PokemonTCG.AI
                 if (n <= 0) throw new IOException("the GPU learner closed the connection");
                 got += n;
             }
+        }
+
+        /// <summary>
+        /// Choosing moves on the GPU (GpuMoves): the network's option scores and value for a batch of decisions, worked out by the
+        /// learner with the network it holds. Its copy is brought up to date first: all the weights when they changed here (SETW),
+        /// or just the cards met since (CARD). Throws IOException when the learner can't be reached or answers with an error.
+        /// </summary>
+        public float[][] Infer(PolicyNet net, IList<PolicyInput> inputs, out float[] values)
+        {
+            lock (exchangeGate)
+            {
+                if (!Connected) Connect(3000);
+                int revision = net.WeightsRevision;
+                if (revision != learnerRevision || net.CardRows < learnerRows)
+                {
+                    var weights = new MemoryStream();
+                    int rows;
+                    using (var w = new BinaryWriter(weights, Encoding.UTF8, true))
+                    {
+                        w.Write(Version);
+                        rows = net.WriteLearnerWeights(w, true);
+                    }
+                    ExchangeLocked("SETW", weights, "OKW1");
+                    learnerRevision = revision;
+                    learnerRows = rows;
+                }
+                else if (net.CardRows > learnerRows)
+                {
+                    var cards = new MemoryStream();
+                    int rows;
+                    using (var w = new BinaryWriter(cards, Encoding.UTF8, true))
+                    {
+                        w.Write(Version);
+                        rows = net.WriteNewCardRows(w, learnerRows);
+                    }
+                    ExchangeLocked("CARD", cards, "OKW1");
+                    learnerRows = rows;
+                }
+                var body = new MemoryStream();
+                using (var w = new BinaryWriter(body, Encoding.UTF8, true))
+                {
+                    w.Write(Version);
+                    var none = new int[inputs.Count];
+                    var zeros = new float[inputs.Count];
+                    WriteSamples(w, inputs, none, zeros, zeros, zeros);
+                }
+                var reply = ExchangeLocked("INF1", body, "OUT1");
+                return ReadOutputs(reply, inputs, out values);
+            }
+        }
+
+        private static float[][] ReadOutputs(byte[] reply, IList<PolicyInput> inputs, out float[] values)
+        {
+            var logits = new float[inputs.Count][];
+            values = new float[inputs.Count];
+            using (var r = new BinaryReader(new MemoryStream(reply)))
+            {
+                for (int i = 0; i < inputs.Count; i++)
+                {
+                    logits[i] = new float[inputs[i].Count];
+                    for (int k = 0; k < logits[i].Length; k++) logits[i][k] = r.ReadSingle();
+                    values[i] = r.ReadSingle();
+                }
+            }
+            return logits;
         }
 
         /// <summary>The decisions, column by column (see learner.py's "samples").</summary>

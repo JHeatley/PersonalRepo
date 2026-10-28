@@ -110,6 +110,8 @@ namespace PokemonTCG.AI
         /// ahead before some of its decisions and learns to match what it found (PolicyTrainer.SearchShare). 0: off.
         /// </summary>
         public double LearnFromLookAhead;
+        /// <summary>Choose moves on the GPU learner too (needs GpuAddress): many games at once, the network run there in batches.</summary>
+        public bool GpuMoves;
 
         /// <summary>
         /// The decks a random side picks from, a new one every game (set before Start). With RandomA and RandomB both on (the
@@ -480,6 +482,7 @@ namespace PokemonTCG.AI
             if (!string.IsNullOrEmpty(GpuAddress) && GpuLearner.TryParse(GpuAddress, out gpuHost, out gpuPort)) trainer.Gpu = new GpuLearner(gpuHost, gpuPort);
             if (GamesPerSecond > 0) trainer.Pace = new GamePace(GamesPerSecond);
             trainer.SearchShare = Math.Max(0, Math.Min(1, LearnFromLookAhead));
+            trainer.GpuMoves = GpuMoves && trainer.Gpu != null;
             int played = 0;
             trainer.ShouldStop = () => cancel || Volatile.Read(ref played) >= Games;
             trainer.Abort = () => cancel; // Stop: leave the games in progress and don't learn from the unfinished batch
@@ -584,6 +587,9 @@ namespace PokemonTCG.AI
                     progress += " · sequencing mistakes per game " + recentMistakes.ToString("0.0", CultureInfo.InvariantCulture)
                                 + " (first round " + firstMistakes.ToString("0.0", CultureInfo.InvariantCulture) + "; lower is better)";
                 if (round.LearnedOn.Length > 0) progress += " · learning on the GPU (" + round.LearnedOn + ")";
+                if (round.GpuDecisions > 0)
+                    progress += " · " + round.GamesAtOnce + " games at once, their moves chosen on the GPU ("
+                                + round.GpuDecisions.ToString("N0", CultureInfo.InvariantCulture) + " this round)";
                 if (round.Searched > 0)
                     progress += " · learned from " + round.Searched + " look-ahead decisions this round (how far it was from them: "
                                 + round.DistillLoss.ToString("0.00", CultureInfo.InvariantCulture) + ", lower is closer)";

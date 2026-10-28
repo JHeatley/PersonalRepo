@@ -159,7 +159,8 @@ public static class Program
             FocusDeck = o.TryGetValue("focus-deck", out var focus) ? focus : null,
             Minibatch = Int(o, "minibatch", 1024),
             SearchShare = Dbl(o, "search-share", 0),
-            SearchDecisions = Dbl(o, "search-decisions", 0.3)
+            SearchDecisions = Dbl(o, "search-decisions", 0.3),
+            GameThreads = Int(o, "game-threads", 0)
         };
         net.LearningRate = Dbl(o, "lr", 2e-4);
         if (o.TryGetValue("gpu", out var gpu))
@@ -167,7 +168,9 @@ public static class Program
             if (!GpuLearner.TryParse(gpu == "true" ? GpuLearner.DefaultAddress : gpu, out var gpuHost, out var gpuPort))
                 throw new ArgumentException("--gpu takes host:port, like " + GpuLearner.DefaultAddress);
             trainer.Gpu = new GpuLearner(gpuHost, gpuPort);
-            Console.WriteLine($"learning on the GPU learner at {gpuHost}:{gpuPort} (start ../GpuLearner/learner.py first)");
+            trainer.GpuMoves = o.ContainsKey("gpu-moves");
+            Console.WriteLine($"learning on the GPU learner at {gpuHost}:{gpuPort} (start ../GpuLearner/learner.py first)"
+                              + (trainer.GpuMoves ? "; choosing moves there too, many games at once" : ""));
         }
         if (o.ContainsKey("games-per-second")) trainer.Pace = new GamePace(Dbl(o, "games-per-second", 0));
         int games = Int(o, "games", 10000);
@@ -192,6 +195,7 @@ public static class Program
             Console.WriteLine($"games {done,8:N0} | {r.Decisions / Math.Max(1, r.Games),4} decisions/game | seq mistakes/game {r.Mistakes / (double)Math.Max(1, r.Games),4:F1}"
                               + $" | vs pool/classic {(r.VsPool > 0 ? (r.PoolWins / (double)r.VsPool).ToString("F2") : " -  ")} | pi {r.PolicyLoss:+0.000;-0.000} v {r.ValueLoss:F3}"
                               + $" H {r.Entropy:F2} clip {r.ClipFraction:F2}" + (r.Searched > 0 ? $" | look-ahead {r.Searched} decisions, match {r.DistillLoss:F2}" : "") + (r.Errors > 0 || (r.LastError ?? "").StartsWith("GPU") ? $" | {r.Errors} errors: {r.LastError}" : "")
+                              + (r.GpuDecisions > 0 ? $" | {r.GamesAtOnce} games at once, {r.GpuDecisions:N0} moves on the GPU" : "")
                               + (r.LearnedOn.Length > 0 ? $" | learned on {r.LearnedOn} in {r.LearnSeconds:F1}s" : $" | learned in {r.LearnSeconds:F1}s")
                               + $" | {done / clock.Elapsed.TotalSeconds:F1} games/s");
             Save(net, outPath);
@@ -301,6 +305,7 @@ public static class Program
                 NeuralThreads = JI("threads", 0),
                 NeuralRest = JD("rest", 0),
                 GpuAddress = J("gpu", null),
+                GpuMoves = J("gpumoves") == "1",
                 GamesPerSecond = JD("rate", 0),
                 PrizeCount = JI("prizes", 6),
                 ChampionDecks = championDecks.Count > 0 ? championDecks : null,

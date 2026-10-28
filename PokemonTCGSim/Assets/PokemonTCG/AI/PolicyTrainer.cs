@@ -24,6 +24,9 @@ namespace PokemonTCG.AI
         public double CollectSeconds, LearnSeconds;
         /// <summary>Where it learned: the GPU learner's device (e.g. "cuda:0 (NVIDIA GeForce RTX 2060)"), or "" for this computer's CPU.</summary>
         public string LearnedOn = "";
+        /// <summary>Decisions whose move the GPU learner chose (choosing moves on the GPU), and the games played at once.</summary>
+        public long GpuDecisions;
+        public int GamesAtOnce;
     }
 
     /// <summary>One side the network played and learned from in a training game (for deck building: LearningBrain.RecordDeckGame).</summary>
@@ -87,6 +90,18 @@ namespace PokemonTCG.AI
         public double SearchDecisions = 0.3;
         public double DistillCoef = 1.0;
         public SearchSettings TrainingSearch = SearchSettings.Training();
+        /// <summary>
+        /// Choose moves on the GPU learner too (expert roadmap step 3; needs Gpu): the network's seats ask it in batches instead of
+        /// running the network here, and GameThreads games run at once so there's a batch to send.
+        /// </summary>
+        public bool GpuMoves;
+        /// <summary>Games played at once while choosing moves on the GPU (0: 4 per thread of Threads, at most 96).</summary>
+        public int GameThreads;
+        private GpuMoves moves;
+        private Workers gamePool;
+
+        /// <summary>The GPU move-choosing of this trainer (its counts and last problem), or null.</summary>
+        public GpuMoves Moves { get { return moves; } }
         public int PoolSize = 8;
         public int SnapshotEvery = 10;
         /// <summary>Games played at once (one thread each), and threads for the learning step.</summary>
@@ -148,8 +163,23 @@ namespace PokemonTCG.AI
             PolicyNet[] poolNow;
             lock (pool) poolNow = pool.ToArray();
             int threads = Math.Max(1, Math.Min(Math.Min(WorkThrottle.Threads(Threads), Pool.Count), GamesPerRound));
+            var players = Pool;
+            if (GpuMoves && Gpu != null)
+            {
+                // Many games at once: while some wait for the GPU, the others play.
+                if (moves == null) moves = new GpuMoves(Net, Gpu);
+                int want = GameThreads > 0 ? GameThreads : Math.Min(96, 4 * Math.Max(1, Threads));
+                if (gamePool == null || gamePool.Count != want)
+                {
+                    if (gamePool != null) gamePool.Dispose();
+                    gamePool = new Workers(want);
+                }
+                players = gamePool;
+                threads = Math.Max(1, Math.Min(Math.Min(want, 4 * WorkThrottle.Threads(Threads)), GamesPerRound));
+            }
+            long gpuDecisionsBefore = moves != null ? Interlocked.Read(ref moves.Decisions) : 0;
             Log("[PokemonTCG] Neural AI round " + (rounds + 1) + ": playing " + GamesPerRound + " games on " + threads + " threads...");
-            Pool.Run(t =>
+            players.Run(t =>
             {
                 if (t >= threads) return;
                 {
@@ -178,6 +208,12 @@ namespace PokemonTCG.AI
                 }
             });
             round.CollectSeconds = clock.Elapsed.TotalSeconds;
+            round.GamesAtOnce = threads;
+            if (moves != null && players != Pool)
+            {
+                round.GpuDecisions = Interlocked.Read(ref moves.Decisions) - gpuDecisionsBefore;
+                if (moves.LastError != null) round.LastError = moves.LastError;
+            }
             if (Aborted) return round;
             if (CollectGarbage) GC.Collect();
             clock.Restart();
@@ -250,13 +286,16 @@ namespace PokemonTCG.AI
             if (mode == 0) other = otherLearner = new PolicyAgent(Net, seed + 2, 1 - seat, theirs.Value) { Greedy = false, Record = true, Abort = Abort };
             else if (mode == 1) other = new PolicyAgent(poolNow[rng.Next(poolNow.Length)], seed + 2, 1 - seat, theirs.Value) { Greedy = false, Abort = Abort };
             else other = new HeuristicAgent(seed + 2);
+            var gpuMoves = moves != null && GpuMoves && Gpu != null ? moves : null;
+            learner.Moves = gpuMoves;
+            if (otherLearner != null) otherLearner.Moves = gpuMoves;
             // Training from the look-ahead: in some games the network's seats look ahead before some of their decisions.
             if (SearchShare > 0 && rng.Next(1000000) < (int)(SearchShare * 1000000))
             {
                 foreach (var a in new[] { learner, otherLearner })
                 {
                     if (a == null) continue;
-                    var search = new PolicySearch(Net, TrainingSearch) { PrizeReward = PrizeReward };
+                    var search = new PolicySearch(Net, TrainingSearch) { PrizeReward = PrizeReward, Moves = gpuMoves };
                     foreach (var d in decks) search.KnownDecks.Add(d.Value);
                     a.Search = search;
                     a.LearnFromSearch = SearchDecisions;
@@ -489,6 +528,10 @@ namespace PokemonTCG.AI
         {
             if (pool2 != null) pool2.Dispose();
             pool2 = null;
+            if (gamePool != null) gamePool.Dispose();
+            gamePool = null;
+            if (moves != null) moves.Dispose();
+            moves = null;
             if (Gpu != null) Gpu.Dispose();
         }
 

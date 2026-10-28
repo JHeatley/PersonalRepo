@@ -28,6 +28,11 @@ samples: int32 N, slots, slot features, global features, turn features, option f
          [N*slots], slot tools [N*slots]; f32 slot features; per bag: int32 lengths[N], int32 ids[sum]; int32 stadium[N],
          source[N]; f32 globals, turn features; int32 option counts[N]; int32 kinds, cards, targets [sum]; f32 option
          features; int32 actions[N]; f32 old log-probabilities[N], advantages[N], returns[N]
+Choosing moves here (the sim's "choose moves on the GPU too"): the learner keeps the network between messages.
+  SETW (sim -> here): int32 version, weights                  ->  OKW1 (empty): the network to choose moves with
+  CARD (sim -> here): int32 version, int32 first row, int32 rows, f32 learned rows, f32 printed stats  ->  OKW1: new cards
+  INF1 (sim -> here): int32 version, samples                  ->  OUT1: per sample its option logits then its value
+  After TRN1 the learner keeps the weights it sent back, so moves are chosen with them without another SETW.
 Version 2 (training from the look-ahead: some decisions carry the look-ahead's improved choice): TRN1 adds f64
          distillation weight after max grad norm, the samples end with f32 has-target[N] and f32 targets[sum of option
          counts], and RES1 ends with f64 distillation loss. Those decisions learn to match their target (cross-entropy)
@@ -278,6 +283,7 @@ class Learner:
         self.model = None
         self.opt = None
         self.lr = None
+        self.inferred = 0
 
     def _sync(self, tensors, learned, static, lr):
         """Puts the sim's current weights into the model, keeping the optimizer's state from round to round."""
@@ -405,6 +411,48 @@ class Learner:
               + ")", flush=True)
         return b"RES1", out.getvalue()
 
+    def set_weights(self, r):
+        tensors, learned, static = read_weights(r)
+        self._sync(tensors, learned, static, self.lr or 2e-4)
+        return b"OKW1", b""
+
+    def add_cards(self, r):
+        if self.model is None:
+            raise ValueError("cards came before the network: send SETW first")
+        first, rows = r.i32(), r.i32()
+        learned = r.floats(rows * CARD_DIM).reshape(rows, CARD_DIM)
+        static = r.floats(rows * STATIC_SIZE).reshape(rows, STATIC_SIZE)
+        total = first + rows
+        if self.model.cards.ids.weight.shape[0] < total:
+            # _grow starts the table empty (training refills it); keep the rows already here
+            old_ids = self.model.cards.ids.weight.detach().clone()
+            old_static = self.model.cards.static.clone()
+            self._grow(total)
+            with torch.no_grad():
+                self.model.cards.ids.weight[:old_ids.shape[0]].copy_(old_ids)
+                self.model.cards.static[:old_static.shape[0]].copy_(old_static)
+        with torch.no_grad():
+            self.model.cards.ids.weight[first:total].copy_(torch.from_numpy(learned))
+            self.model.cards.static[first:total].copy_(torch.from_numpy(static))
+        return b"OKW1", b""
+
+    def infer(self, r):
+        """Moves for a batch of decisions from the sim's games, with the network this learner holds."""
+        if self.model is None:
+            raise ValueError("moves asked for before the network: send SETW first")
+        s = read_samples(r)
+        self.model.eval()
+        with torch.no_grad():
+            logits, value = self.model(batch(s, np.arange(s["n"]), self.device))
+        logits, value = logits.float().cpu().numpy(), value.float().cpu().numpy()
+        self.inferred += s["n"]
+        out = io.BytesIO()
+        counts = s["counts"]
+        for i in range(s["n"]):
+            out.write(logits[i, :counts[i]].astype("<f4").tobytes())
+            out.write(value[i:i + 1].astype("<f4").tobytes())
+        return b"OUT1", out.getvalue()
+
     def forward(self, r):
         tensors, learned, static = read_weights(r)
         s = read_samples(r)
@@ -454,6 +502,15 @@ def serve(learner, host, port):
                         raise ValueError("the sim and this learner are different versions: update both")
                     if kind == b"TRN1":
                         reply = learner.train(r, version)
+                        if learner.inferred:
+                            print(f"   (and chose {learner.inferred:,} moves for the sim's games since the last round)", flush=True)
+                            learner.inferred = 0
+                    elif kind == b"SETW":
+                        reply = learner.set_weights(r)
+                    elif kind == b"CARD":
+                        reply = learner.add_cards(r)
+                    elif kind == b"INF1":
+                        reply = learner.infer(r)
                     elif kind == b"FWD1":
                         reply = learner.forward(r)
                     else:

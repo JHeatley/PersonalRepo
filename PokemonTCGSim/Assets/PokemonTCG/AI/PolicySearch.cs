@@ -74,6 +74,8 @@ namespace PokemonTCG.AI
         public List<List<CardDef>> KnownDecks = new List<List<CardDef>>();
         /// <summary>Prize-card reward of the network's training (the value it learned includes it), see PolicyTrainer.PrizeReward.</summary>
         public double PrizeReward = 0.05;
+        /// <summary>The play-outs choose their moves on the GPU (GpuMoves) when set.</summary>
+        public GpuMoves Moves;
 
         /// <summary>Counts: decisions looked at, moves changed from the network's own, play-outs run and failed.</summary>
         public int Searches, Changed, Playouts, Failed;
@@ -327,9 +329,9 @@ namespace PokemonTCG.AI
             List<CardDef> theirDeck;
             var s = Guess(setup, seed, out theirDeck);
             s.Rng = new Rng(seed ^ 0x51ED);
-            var mine = new PolicyAgent(Net, seed * 2 + 1, seat, setup.MyDeck) { Greedy = true };
+            var mine = new PolicyAgent(Net, seed * 2 + 1, seat, setup.MyDeck) { Greedy = true, Moves = Moves };
             mine.Memory.CopyFrom(setup.Memory);
-            var theirs = new PolicyAgent(Net, seed * 2 + 2, 1 - seat, theirDeck) { Greedy = true };
+            var theirs = new PolicyAgent(Net, seed * 2 + 2, 1 - seat, theirDeck) { Greedy = true, Moves = Moves };
             theirs.Memory.Turn = setup.Root.TurnNumber;
             var me = new SearchSeat(mine, move, setup.StopTurn);
             var engine = new GameEngine(setup.Scripts, seat == 0 ? (IPlayerAgent)me : theirs, seat == 0 ? (IPlayerAgent)theirs : me);

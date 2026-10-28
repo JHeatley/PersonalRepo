@@ -45,6 +45,13 @@ overall and keeps the heaviest maths off the CPU.
 If the learner isn't running or stops, the sim learns that round on the CPU, says why, and tries the GPU again a
 few rounds later; nothing is lost. Stop the learner with Ctrl+C when you're done.
 
+**Choose moves on the GPU too** (the Train screen's box under "Learn on the GPU at", `--gpu-moves` for the
+command-line trainer): running the network for each move is about half of a training game's work on the CPU. With this
+on, about 4 games per thread play at once, and the learner chooses all their moves together on the graphics card, so the
+CPU only runs the games. The learner keeps the network between messages; the sim sends it again only when it changed.
+It needs this version of `learner.py`; if the learner can't choose moves, the games choose them on the CPU and the GPU
+is tried again 30 seconds later.
+
 **Learn from look-ahead** (the Train screen's setting, `--search-share` for the command-line trainer) needs this
 version of `learner.py`: those rounds also send the look-ahead's choices, which the learner trains the network to match.
 An older learner.py says "different versions" and the sim learns those rounds on the CPU.
