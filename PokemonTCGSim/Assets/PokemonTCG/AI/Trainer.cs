@@ -211,12 +211,16 @@ namespace PokemonTCG.AI
                 }
 
                 SetPhase("Training the " + StyleLabel + ": " + DeckA + " vs " + DeckB);
-                for (int g = 0; g < Games && !cancel; g++)
+                if ((Style.HasValue ? Style.Value : brain.Style) == AiStyle.Neural && brain.Policy.Trained) TrainNeural();
+                else
                 {
-                    var gameStart = DateTime.UtcNow;
-                    PlayTrainingGame(g);
-                    if (SaveEvery > 0 && (g + 1) % SaveEvery == 0) SafeSave();
-                    WorkThrottle.Rest(DateTime.UtcNow - gameStart, () => cancel); // v120: the battery saver
+                    for (int g = 0; g < Games && !cancel; g++)
+                    {
+                        var gameStart = DateTime.UtcNow;
+                        PlayTrainingGame(g);
+                        if (SaveEvery > 0 && (g + 1) % SaveEvery == 0) SafeSave();
+                        WorkThrottle.Rest(DateTime.UtcNow - gameStart, () => cancel); // v120: the battery saver
+                    }
                 }
                 CloseBlock();
 
@@ -343,6 +347,77 @@ namespace PokemonTCG.AI
                     status.Blocks.Add(block);
                     block = null;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Neural AI training: the policy network plays deck A against deck B by self-play (and now and then against its earlier
+        /// versions and the classic bot) and learns by PPO after every round of games, like the Python bot.
+        /// </summary>
+        private void TrainNeural()
+        {
+            var decks = new List<KeyValuePair<string, List<CardDef>>>
+            {
+                new KeyValuePair<string, List<CardDef>>(DeckA, cardsA),
+                new KeyValuePair<string, List<CardDef>>(DeckB == DeckA ? DeckB + " " : DeckB, cardsB)
+            };
+            var trainer = new PolicyTrainer(brain.Policy, scripts, decks, seedBase)
+            {
+                Matchup = true,
+                Rules = Rules ?? GameRules.Default,
+                PrizeCount = PrizeCount,
+                GamesPerRound = Math.Max(8, Math.Min(64, Games)),
+                GameBudget = Games
+            };
+            int played = 0;
+            trainer.ShouldStop = () => cancel || Volatile.Read(ref played) >= Games;
+            trainer.GameFinished = game =>
+            {
+                int g = Interlocked.Increment(ref played) - 1;
+                lock (gate)
+                {
+                    EnsureBlock(g);
+                    status.Done = g + 1;
+                    trainingDone = g + 1;
+                    if (game.Error != null)
+                    {
+                        status.Errors++;
+                        status.LastError = game.Error;
+                        block.Errors++;
+                    }
+                    else if (game.WinnerDeck == DeckA)
+                    {
+                        status.WinsA++;
+                        block.WinsA++;
+                    }
+                    else if (game.WinnerDeck == "")
+                    {
+                        status.Draws++;
+                        block.Draws++;
+                    }
+                    else
+                    {
+                        status.WinsB++;
+                        block.WinsB++;
+                    }
+                    if (game.Error == null) block.TotalTurns += game.Turns;
+                    if (g + 1 == block.To)
+                    {
+                        status.Blocks.Add(block);
+                        block = null;
+                    }
+                }
+            };
+            while (!cancel && Volatile.Read(ref played) < Games)
+            {
+                var round = trainer.Round();
+                brain.IncrementCounters(round.Games, 0, 0);
+                lock (gate)
+                {
+                    if (block != null) block.Decisions += round.Decisions;
+                }
+                SafeSave();
+                if (round.Games == 0) break;
             }
         }
 

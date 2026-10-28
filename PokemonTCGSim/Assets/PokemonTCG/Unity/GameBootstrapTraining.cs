@@ -79,6 +79,7 @@ namespace PokemonTCG.Presentation
             public int LogDecisions;
             public long NetSteps;
             public double NetLoss;
+            public string NetOrigin;
             public AiStyle Style;
             public List<MatchupStats> Matchups = new List<MatchupStats>();
             public List<KeyValuePair<string, double>> Lessons = new List<KeyValuePair<string, double>>();
@@ -115,6 +116,7 @@ namespace PokemonTCG.Presentation
             opponentStyle = (AiStyle)Mathf.Clamp(PlayerPrefs.GetInt(PrefOpponentStyle, (int)AiStyle.Hybrid), 0, 2);
             try
             {
+                UnityCardData.LoadPolicyStart();
                 brain = LearningBrain.Load(BrainPath);
             }
             catch (Exception e)
@@ -177,9 +179,9 @@ namespace PokemonTCG.Presentation
             string how = style == AiStyle.Learning
                 ? "The training games are played with the feature weights only."
                 : style == AiStyle.Neural
-                    ? "The training games are played with the neural network only (untrained, it plays like the classic bot)."
+                    ? "The training games are played with the neural network only, and the network learns from them by PPO self-play (it starts from the Python bot's training)."
                     : "The training games are played with the weights and the network added together.";
-            return how + " Either way both the weights and the network learn from every game, and the measuring games play the same way. "
+            return how + (style == AiStyle.Neural ? "" : " The feature weights learn from every game.") + " The measuring games play the same way. "
                    + "Your opponent's style is the Opponent switch on the menu.";
         }
 
@@ -204,8 +206,9 @@ namespace PokemonTCG.Presentation
             string line = StyleName(opponentStyle) + ": trained on " + brain.GamesTrained.ToString("N0") + " games, learned from " + brain.GamesVsYou + " of yours";
             if (opponentStyle != AiStyle.Learning)
             {
-                long steps = brain.Net.Updates;
-                line += steps > 0 ? ", " + steps.ToString("N0") + " network steps" : " (the network hasn't learned anything yet)";
+                long steps = brain.Policy.Steps;
+                string origin = brain.Policy.Origin;
+                line += ", network " + (string.IsNullOrEmpty(origin) ? "" : "from the " + origin + ", ") + steps.ToString("N0") + " learning steps here";
             }
             line += ".";
             var st = trainView;
@@ -290,8 +293,9 @@ namespace PokemonTCG.Presentation
                     Feedback = brain.FeedbackGiven,
                     LogsStudied = brain.LogsStudied,
                     LogDecisions = brain.LogDecisionsStudied,
-                    NetSteps = brain.Net.Updates,
-                    NetLoss = brain.Net.AverageLoss,
+                    NetSteps = brain.Policy.Steps,
+                    NetLoss = brain.Policy.AverageLoss,
+                    NetOrigin = brain.Policy.Origin,
                     Style = brain.Style,
                     Matchups = brain.Matchups(),
                     Lessons = brain.StrongestLessons(0, 5), // all of them; the Train screen shows them in a scrolling list
@@ -567,9 +571,10 @@ namespace PokemonTCG.Presentation
             GUILayout.Label("Trained on " + b.GamesTrained.ToString("N0") + " games · learned from " + b.GamesVsYou + " of your games (" + b.DecisionsStudied.ToString("N0")
                             + " of your decisions studied) · " + b.Feedback + " answers on Areas of Improvement · " + b.LogsStudied.ToString("N0") + " game logs studied ("
                             + b.LogDecisions.ToString("N0") + " decisions) · " + b.Weights.ToString("N0") + " things learned.", ui.Label);
-            GUILayout.Label("Neural network: " + (b.NetSteps > 0
-                                ? b.NetSteps.ToString("N0") + " learning steps · surprise " + b.NetLoss.ToString("0.00") + " (how unexpected the plays it learns from still are; lower is better)"
-                                : "hasn't learned anything yet (it learns from the same games as the rest of the AI)")
+            GUILayout.Label("Neural network: " + (string.IsNullOrEmpty(b.NetOrigin) ? "" : "started from the " + b.NetOrigin + " · ")
+                            + (b.NetSteps > 0
+                                ? b.NetSteps.ToString("N0") + " learning steps here · loss " + b.NetLoss.ToString("0.00") + " (lower is better)"
+                                : "no learning steps here yet (Train as Neural AI to train it)")
                             + " · your opponent plays as " + StyleName(b.Style) + " (the Opponent switch on the menu); training plays as " + StyleName(trainStyle)
                             + " (Train as, above).", ui.Label);
             // Each list scrolls on its own (scroll with the mouse over it, or drag its scroll bar) and holds everything.

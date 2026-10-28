@@ -37,6 +37,18 @@ namespace PokemonTCG.Presentation
             return db;
         }
 
+        /// <summary>
+        /// Hands the Neural AI its starting network (Resources/AI/policy_start.bytes, exported from the Python bot) before any
+        /// brain is loaded. Safe to call more than once.
+        /// </summary>
+        public static void LoadPolicyStart()
+        {
+            if (PokemonTCG.AI.LearningBrain.PolicyStart != null) return;
+            var asset = Resources.Load<TextAsset>("AI/policy_start");
+            if (asset != null) PokemonTCG.AI.LearningBrain.PolicyStart = asset.bytes;
+            else Debug.LogWarning("[PokemonTCG] Resources/AI/policy_start.bytes is missing: the Neural AI starts from a fresh network.");
+        }
+
         public static List<CardDef> LoadDeck(CardDatabase db, string resourcePath)
         {
             var asset = Resources.Load<TextAsset>(resourcePath);

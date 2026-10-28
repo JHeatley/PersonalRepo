@@ -110,8 +110,40 @@ namespace PokemonTCG.AI
         /// <summary>Share of each decision's credit that comes from the Prize swing over the next two turns instead of the game result.</summary>
         public double PrizeShare = 0.4;
 
-        /// <summary>The neural network that learns alongside the feature weights (v74).</summary>
+        /// <summary>The small network that learns alongside the feature weights (v74).</summary>
         public readonly NeuralNet Net = new NeuralNet();
+        /// <summary>
+        /// The Neural AI: the policy/value network ported from the Python bot (PolicyNet). It starts from PolicyStart (the Python
+        /// bot's trained weights) and trains by PPO in Neural AI training sessions. Saved next to the brain's file (FilePath + ".neural").
+        /// </summary>
+        public readonly PolicyNet Policy = new PolicyNet();
+        /// <summary>
+        /// The network the Neural AI starts from and goes back to when the AI is reset: Resources/AI/policy_start.bytes, exported
+        /// from the Python bot by PokemonTCGBot/tools/export_to_sim.py. Set once at startup; nothing ever writes to it.
+        /// </summary>
+        public static byte[] PolicyStart;
+
+        public LearningBrain()
+        {
+            ResetPolicy();
+        }
+
+        /// <summary>The Neural AI back to where it started (the Python bot's weights, or a fresh network without them).</summary>
+        public void ResetPolicy()
+        {
+            var start = PolicyStart;
+            if (start == null || !Policy.FromBytes(start)) Policy.Reset();
+        }
+
+        /// <summary>
+        /// The Neural AI copies your choices (one learning step for the whole game). picks: each decision as the network saw it
+        /// and the option you took; strength: how much to trust them (more when you won).
+        /// </summary>
+        public void ImitatePolicy(List<KeyValuePair<PolicyInput, int>> picks, double strength)
+        {
+            if (picks == null || picks.Count == 0 || strength <= 0) return;
+            Policy.Imitate(picks, (float)(NeuralImitationRate * strength));
+        }
         /// <summary>How agents playing with this brain choose (the Opponent switch). Not saved with the brain; the menu sets it.</summary>
         public volatile AiStyle Style = AiStyle.Hybrid;
         /// <summary>The network learns from decisions where the agent simply took its best guess at this share of their credit.</summary>
@@ -577,6 +609,7 @@ namespace PokemonTCG.AI
                 LogDecisionsStudied = 0;
             }
             Net.Reset();
+            ResetPolicy();
         }
 
         // ------------------------------------------------------------------ Saving
@@ -596,6 +629,10 @@ namespace PokemonTCG.AI
             using (var w = new StringWriter(CultureInfo.InvariantCulture))
             {
                 WriteTo(w);
+                // The Neural AI's network too (for "Undo this session"); the brain's file keeps it in its own file instead.
+                w.Write("p\t");
+                w.Write(Convert.ToBase64String(Policy.ToBytes()));
+                w.Write('\n');
                 return w.ToString();
             }
         }
@@ -720,6 +757,9 @@ namespace PokemonTCG.AI
                             case "n":
                                 if (p.Length >= 2) Net.FromBase64(p[1]);
                                 break;
+                            case "p":
+                                if (p.Length >= 2) Policy.FromBytes(Convert.FromBase64String(p[1].Trim()));
+                                break;
                             case "s":
                                 if (p.Length >= 10)
                                 {
@@ -749,6 +789,8 @@ namespace PokemonTCG.AI
             var brain = new LearningBrain();
             brain.FilePath = path;
             if (!string.IsNullOrEmpty(path) && File.Exists(path)) brain.LoadText(File.ReadAllText(path, Encoding.UTF8));
+            string neural = NeuralPath(path);
+            if (neural != null && File.Exists(neural)) brain.Policy.FromBytes(File.ReadAllBytes(neural));
             return brain;
         }
 
@@ -766,7 +808,18 @@ namespace PokemonTCG.AI
                 using (var writer = new StreamWriter(temp, false, new UTF8Encoding(false), 1 << 16)) WriteTo(writer);
                 if (File.Exists(FilePath)) File.Delete(FilePath);
                 File.Move(temp, FilePath);
+                // The Neural AI's network, in its own file next to the brain's.
+                string neural = NeuralPath(FilePath);
+                File.WriteAllBytes(neural + ".tmp", Policy.ToBytes());
+                if (File.Exists(neural)) File.Delete(neural);
+                File.Move(neural + ".tmp", neural);
             }
+        }
+
+        /// <summary>The file holding the Neural AI's network for the brain saved at path.</summary>
+        public static string NeuralPath(string path)
+        {
+            return string.IsNullOrEmpty(path) ? null : path + ".neural";
         }
 
         private readonly object fileLock = new object();

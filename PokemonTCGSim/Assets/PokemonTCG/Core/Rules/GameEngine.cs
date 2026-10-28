@@ -83,6 +83,9 @@ namespace PokemonTCG.Core
             Scripts = scripts;
             agents[0] = agent0;
             agents[1] = agent1;
+            // Agents that keep track of the game (the Neural AI's memory) watch its public events.
+            if (agent0 is IGameObserver watcher0) AddObserver(watcher0);
+            if (agent1 is IGameObserver watcher1 && !ReferenceEquals(agent1, agent0)) AddObserver(watcher1);
         }
 
         public void AddObserver(IGameObserver observer)
@@ -138,8 +141,18 @@ namespace PokemonTCG.Core
 
         // ------------------------------------------------------------------ Running a game
 
+        /// <summary>The 60 cards each player started with (a player knows their own decklist).</summary>
+        public IList<CardDef> StartingDeck(int player)
+        {
+            return player >= 0 && player < 2 ? startingDecks[player] : null;
+        }
+
+        private readonly IList<CardDef>[] startingDecks = new IList<CardDef>[2];
+
         public GameResult Run(IList<CardDef> deck0, IList<CardDef> deck1, int seed)
         {
+            startingDecks[0] = deck0;
+            startingDecks[1] = deck1;
             try
             {
                 Setup(deck0, deck1, seed);

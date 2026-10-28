@@ -56,6 +56,7 @@ namespace PokemonTCG.EditorTools
             var b = decks.FirstOrDefault(d => d.Key.Contains("Zoroark"));
             if (a.Value == null) a = decks[0];
             if (b.Value == null || b.Key == a.Key) b = decks.First(d => d.Key != a.Key);
+            PokemonTCG.Presentation.UnityCardData.LoadPolicyStart();
             var brain = LearningBrain.Load(PokemonTCG.Presentation.SavePaths.BrainPath); // the folder chosen on the Save Folders screen
             var session = new TrainingSession(StandardCards.CreateRegistry(), brain, a.Key, a.Value, b.Key, b.Value, 1000, 200, Environment.TickCount & 0x0FFFFFFF);
             session.Start();
