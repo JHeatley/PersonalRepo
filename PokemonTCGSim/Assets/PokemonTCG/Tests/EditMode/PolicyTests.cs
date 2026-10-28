@@ -277,5 +277,18 @@ namespace PokemonTCG.Tests
             Assert.Greater(net.Steps, 0);
             Assert.IsFalse(double.IsNaN(second.PolicyLoss) || double.IsNaN(second.ValueLoss));
         }
+
+        [Test]
+        public void Skipping_CPU_Threads_Leaves_Every_Other_Thread()
+        {
+            CollectionAssert.AreEqual(new[] { 2, 3 }, CpuThreads.Parse("2, 3"));
+            CollectionAssert.AreEqual(new[] { 2, 3, 7 }, CpuThreads.Parse(" 7 3,2 ;3 x -1 64"));
+            Assert.AreEqual(0, CpuThreads.Parse("").Count);
+            Assert.AreEqual(0xFFF3UL, CpuThreads.Mask(0xFFFFUL, CpuThreads.Parse("2,3")), "16 threads without 2 and 3");
+            Assert.AreEqual(0xFFFFUL, CpuThreads.Mask(0xFFFFUL, CpuThreads.Parse("")));
+            Assert.AreEqual(0xFFUL, CpuThreads.Mask(0xFFUL, CpuThreads.Parse("20")), "a thread the PC doesn't have changes nothing");
+            Assert.AreEqual(0UL, CpuThreads.Mask(0x3UL, CpuThreads.Parse("0 1")), "skipping every thread leaves none (Apply refuses it)");
+            if (!CpuThreads.Supported) StringAssert.Contains("Windows", CpuThreads.Apply(CpuThreads.Parse("2,3")));
+        }
     }
 }

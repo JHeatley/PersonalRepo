@@ -30,6 +30,9 @@ namespace PokemonTCG.Presentation
         private const string PrefTrainStyle = "PokemonTCG.TrainStyle";
         private const string PrefTrainA = "PokemonTCG.TrainDeckA";
         private const string PrefTrainB = "PokemonTCG.TrainDeckB";
+        /// <summary>Keep the app off some CPU threads (a faulty core), and which ones (CpuThreads).</summary>
+        private const string PrefSkipCpu = "PokemonTCG.SkipCpuThreads";
+        private const string PrefSkipCpuList = "PokemonTCG.SkipCpuThreadList";
         private static readonly int[] TrainCounts = { 100, 500, 1000, 5000, 10000, 15000, 20000, 25000 };
         private static readonly string[] TrainCountLabels = { "100", "500", "1,000", "5,000", "10,000", "15,000", "20,000", "25,000" };
         /// <summary>The game counts sit in rows of this many buttons (8 in one row don't fit the column; v56).</summary>
@@ -59,6 +62,9 @@ namespace PokemonTCG.Presentation
         private Texture2D chartBar, chartLine, chartBack;
         private GUIStyle chartLabel;
         private string trainMessage;
+        private bool skipCpu;
+        private string skipCpuText = "2, 3";
+        private string skipCpuMessage;
 
         // The game being played
         private LearningAgent learningBot;
@@ -140,6 +146,29 @@ namespace PokemonTCG.Presentation
                 try { b.Save(); }
                 catch (Exception e) { learnStatus = "Couldn't save the AI: " + e.Message; }
             });
+        }
+
+        /// <summary>At start: keeps the app off the CPU threads chosen on the Train screen, if that's on.</summary>
+        private void LoadSkipCpu()
+        {
+            skipCpu = PlayerPrefs.GetInt(PrefSkipCpu, 0) == 1;
+            skipCpuText = PlayerPrefs.GetString(PrefSkipCpuList, "2, 3") ?? "";
+            if (skipCpu && CpuThreads.Supported) ApplySkipCpu();
+        }
+
+        private void SetSkipCpu(bool on, string text)
+        {
+            bool was = skipCpu;
+            skipCpu = on;
+            skipCpuText = text ?? "";
+            PlayerPrefs.SetInt(PrefSkipCpu, on ? 1 : 0);
+            PlayerPrefs.SetString(PrefSkipCpuList, skipCpuText);
+            if (on || was) ApplySkipCpu();
+        }
+
+        private void ApplySkipCpu()
+        {
+            skipCpuMessage = CpuThreads.Apply(skipCpu ? CpuThreads.Parse(skipCpuText) : new List<int>());
         }
 
         private void SetOpponentLearning(bool on)
@@ -430,6 +459,17 @@ namespace PokemonTCG.Presentation
                 });
             GUILayout.Label(TrainStyleHint(trainStyle), Hint(ui));
             GUI.enabled = true;
+            if (CpuThreads.Supported)
+            {
+                GUILayout.BeginHorizontal();
+                bool newSkip = GUILayout.Toggle(skipCpu, " Don't use CPU threads");
+                string newSkipText = GUILayout.TextField(skipCpuText, GUILayout.Width(90));
+                GUILayout.EndHorizontal();
+                if (newSkip != skipCpu || newSkipText != skipCpuText) actions.Add(() => SetSkipCpu(newSkip, newSkipText));
+                GUILayout.Label((skipCpu && skipCpuMessage != null ? skipCpuMessage + " " : "")
+                                + "For a faulty CPU core: the whole app stays off these threads, numbered as in Task Manager's Set affinity "
+                                + "(CPU 0, 1, 2...) and OCCT's logical cores.", Hint(ui));
+            }
             GUILayout.Space(6);
             GUILayout.BeginHorizontal();
             GUI.enabled = !running && TrainDecksReady && brain != null;
