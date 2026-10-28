@@ -1,0 +1,2516 @@
+{
+ "format": "Fates Collide (FCO, 2016): cards not already in the pool. No regulation mark: Expanded.",
+ "cards": [
+  {
+   "set": "FCO",
+   "number": "1",
+   "name": "Shuckle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Hide a Berry",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw 2 cards. Then, put a card from your hand on the bottom of your deck."
+    },
+    {
+     "name": "Wrap",
+     "cost": "CC",
+     "damage": 30,
+     "text": "Flip a coin. On heads, your opponent's Active Pokémon becomes Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "2",
+   "name": "Burmy",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Hang Down",
+     "cost": "C",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "3",
+   "name": "Wormadam",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Burmy",
+   "hp": 120,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Solar Ray",
+     "cost": "G",
+     "damage": 20,
+     "text": "Heal 20 damage from each of your Pokémon."
+    },
+    {
+     "name": "Leaf Cutter",
+     "cost": "GCC",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 30 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "4",
+   "name": "Mothim",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Burmy",
+   "hp": 90,
+   "type": "Grass",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 0,
+   "abilities": [
+    {
+     "name": "Wormadam First",
+     "text": "As often as you like during your turn (before your attack), you may move 1 damage counter from 1 of your Wormadam to another of your Pokémon."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Gust",
+     "cost": "CCC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "5",
+   "name": "Snivy",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Blot",
+     "cost": "G",
+     "damage": 10,
+     "text": "Heal 10 damage from this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "6",
+   "name": "Servine",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Snivy",
+   "hp": 70,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Serpentine Strangle",
+     "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you may flip a coin. On heads, your opponent's Active Pokémon becomes Paralyzed."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Vine Whip",
+     "cost": "G",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "7",
+   "name": "Serperior",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Servine",
+   "hp": 140,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Coil",
+     "cost": "C",
+     "damage": 40,
+     "text": "During your next turn, this Pokémon's attacks do 60 more damage to your opponent's Active Pokémon (before Weakness and Resistance)."
+    },
+    {
+     "name": "Slashing Strike",
+     "cost": "G",
+     "damage": 80,
+     "text": "This Pokémon can't use Slashing Strike during your next turn."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "8",
+   "name": "Deerling",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Find a Friend",
+     "cost": "C",
+     "damage": 0,
+     "text": "Look through your deck for a Pokémon, show it to your opponent, and put it into your hand. Shuffle your deck afterward."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "9",
+   "name": "Moltres",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 120,
+   "type": "Fire",
+   "weakness": "Water",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Combustion",
+     "cost": "R",
+     "damage": 20
+    },
+    {
+     "name": "Flying Flare",
+     "cost": "RRCC",
+     "damage": 80,
+     "damageSuffix": "+",
+     "text": "You may do 40 more damage. If you do, this Pokémon does 20 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "10",
+   "name": "Fennekin",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Will-O-Wisp",
+     "cost": "R",
+     "damage": 10
+    },
+    {
+     "name": "Tail Whip",
+     "cost": "CC",
+     "damage": 0,
+     "text": "Flip a coin. On heads, the Defending Pokémon can't attack during your opponent's next turn."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "11",
+   "name": "Fennekin",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Invite Out",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. On heads, switch 1 of your opponent's Benched Pokémon with their Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "12",
+   "name": "Braixen",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Fennekin",
+   "hp": 80,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Destructive Flame",
+     "cost": "R",
+     "damage": 20,
+     "text": "Flip a coin. On heads, discard an Energy attached to your opponent's Active Pokémon."
+    },
+    {
+     "name": "Crackling Ribbon",
+     "cost": "CC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "13",
+   "name": "Delphox",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Braixen",
+   "hp": 140,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Flickering Flames",
+     "cost": "R",
+     "damage": 40,
+     "text": "Your opponent's Active Pokémon becomes Asleep."
+    },
+    {
+     "name": "Psystorm",
+     "cost": "CCC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "This attack does 20 damage times the amount of Energy attached to all Pokémon in play."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "14",
+   "name": "Delphox BREAK",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "BREAK",
+   "text": "BREAK Evolution rule: this Pokémon keeps the attacks, Abilities, Weakness, Resistance, and Retreat Cost of its previous Evolution.",
+   "stage": "Stage1",
+   "evolvesFrom": "Delphox",
+   "hp": 180,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Flare Witch",
+     "text": "Once during your turn (before your attack), you may look through your deck for a Fire Energy card and attach it to 1 of your Pokémon. Shuffle your deck afterward."
+    }
+   ],
+   "attacks": []
+  },
+  {
+   "set": "FCO",
+   "number": "15",
+   "name": "Seel",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Water",
+   "weakness": "Metal",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Icy Snow",
+     "cost": "W",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "16",
+   "name": "Dewgong",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Seel",
+   "hp": 120,
+   "type": "Water",
+   "weakness": "Metal",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Freezing Breath",
+     "cost": "W",
+     "damage": 20,
+     "text": "Flip a coin. On heads, your opponent's Active Pokémon becomes Paralyzed. On tails, your opponent's Active Pokémon becomes Asleep."
+    },
+    {
+     "name": "Aurora Beam",
+     "cost": "WCCC",
+     "damage": 100
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "17",
+   "name": "Omanyte",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Restored",
+   "evolvesFrom": "Helix Fossil Omanyte",
+   "hp": 80,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Water Gun",
+     "cost": "W",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "18",
+   "name": "Omastar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Omanyte",
+   "hp": 120,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Restoring Beam",
+     "text": "Once during your turn (before your attack), you may look through your deck for a Restored Pokémon and put it onto your Bench. Shuffle your deck afterward."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Spinning Attack",
+     "cost": "WC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "19",
+   "name": "Omastar BREAK",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "BREAK",
+   "text": "BREAK Evolution rule: this Pokémon keeps the attacks, Abilities, Weakness, Resistance, and Retreat Cost of its previous Evolution.",
+   "stage": "Stage1",
+   "evolvesFrom": "Omastar",
+   "hp": 140,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Dangerous Tentacle",
+     "text": "Once during your turn (before your attack), you may switch 1 of your opponent's Benched Pokémon-EX with their Active Pokémon."
+    }
+   ],
+   "attacks": []
+  },
+  {
+   "set": "FCO",
+   "number": "20",
+   "name": "Glaceon-EX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "EX",
+   "text": "Pokémon-EX rule: when a Pokémon-EX has been Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Basic",
+   "hp": 170,
+   "type": "Water",
+   "weakness": "Metal",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Second Bite",
+     "cost": "WC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Does 10 more damage for each damage counter on your opponent's Active Pokémon."
+    },
+    {
+     "name": "Crystal Ray",
+     "cost": "WCC",
+     "damage": 70,
+     "text": "Prevent all damage done to this Pokémon by attacks from your opponent's Evolution Pokémon during their next turn."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "21",
+   "name": "White Kyurem",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 130,
+   "type": "Water",
+   "weakness": "Metal",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Burning Icicles",
+     "cost": "WC",
+     "damage": 40,
+     "text": "If this Pokémon has any Fire Energy attached to it, this attack does 20 damage to 2 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Blizzard Burn",
+     "cost": "WWC",
+     "damage": 130,
+     "text": "This Pokémon can't attack during your next turn."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "22",
+   "name": "Binacle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Swing Around",
+     "cost": "WC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip 2 coins. Does 20 more damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "23",
+   "name": "Barbaracle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Binacle",
+   "hp": 100,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Hand Block",
+     "text": "If you have a Stadium card in play, your opponent can't attach any Special Energy cards from their hand to their Pokémon."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Claw Slash",
+     "cost": "WWC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "24",
+   "name": "Rotom",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Energy Extract",
+     "cost": "L",
+     "damage": 0,
+     "text": "Look through your deck for a basic Energy card and attach it to this Pokémon. Shuffle your deck afterward."
+    },
+    {
+     "name": "Plasmagic",
+     "cost": "CC",
+     "damage": 0,
+     "text": "Move 2 damage counters from each of your Pokémon to your opponent's Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "25",
+   "name": "Alakazam-EX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "EX",
+   "text": "Pokémon-EX rule: when a Pokémon-EX has been Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Basic",
+   "hp": 160,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Kinesis",
+     "text": "When you play M Alakazam-EX from your hand to evolve this Pokémon, before it evolves, you may put 2 damage counters on your opponent's Active Pokémon and 3 damage counters on 1 of your opponent's Benched Pokémon."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Suppression",
+     "cost": "PC",
+     "damage": 0,
+     "text": "Put 3 damage counters on each of your opponent's Pokémon that has any Energy attached to it."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "26",
+   "name": "M Alakazam-EX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "M EX",
+   "text": "Mega Evolution rule: when 1 of your Pokémon becomes a M Pokémon-EX, your turn ends. Pokémon-EX rule: when a Pokémon-EX has been Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Stage1",
+   "evolvesFrom": "Alakazam-EX",
+   "hp": 210,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Zen Force",
+     "cost": "PC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Does 30 more damage for each damage counter on your opponent's Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "27",
+   "name": "Koffing",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Division",
+     "cost": "P",
+     "damage": 0,
+     "text": "Look through your deck for up to 2 Koffing and put them onto your Bench. Shuffle your deck afterward."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "28",
+   "name": "Weezing",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Koffing",
+   "hp": 110,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Balloon Bomb",
+     "cost": "CC",
+     "damage": 0,
+     "text": "Flip 2 coins. For each heads, discard 2 cards from the top of your opponent's deck."
+    },
+    {
+     "name": "Thick Liquid",
+     "cost": "PCC",
+     "damage": 80,
+     "text": "Both Active Pokémon become Confused and Poisoned."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "29",
+   "name": "Mew",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 0,
+   "abilities": [
+    {
+     "name": "Memories of Dawn",
+     "text": "This Pokémon can use the attacks of any of your Basic Pokémon in play. (You still need the necessary Energy to use each attack.)"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Encounter",
+     "cost": "C",
+     "damage": 0,
+     "text": "Look through your deck for a Pokémon, show it to your opponent, and put it into your hand. Shuffle your deck afterward."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "30",
+   "name": "Spoink",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Rocket Jump",
+     "cost": "P",
+     "damage": 30,
+     "text": "Flip a coin. On tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "31",
+   "name": "Grumpig",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Spoink",
+   "hp": 100,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Head Walking",
+     "cost": "P",
+     "damage": 0,
+     "text": "Put a Basic Pokémon from your opponent's discard pile onto their Bench. Then, put 3 damage counters on that Pokémon."
+    },
+    {
+     "name": "Knock Back",
+     "cost": "PP",
+     "damage": 50,
+     "text": "Your opponent switches their Active Pokémon with 1 of their Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "32",
+   "name": "Gothita",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Psybeam",
+     "cost": "CC",
+     "damage": 20,
+     "text": "Your opponent's Active Pokémon becomes Confused."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "33",
+   "name": "Solosis",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 30,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Mini Link",
+     "cost": "PC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "If Solosis is on your Bench, it does 30 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "34",
+   "name": "Duosion",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Solosis",
+   "hp": 60,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Double Link",
+     "cost": "PC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "If Solosis is on your Bench, it does 30 more damage. If Duosion is on your Bench, it does 60 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "35",
+   "name": "Reuniclus",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Duosion",
+   "hp": 90,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Link Fusion",
+     "cost": "PC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "If Solosis is on your Bench, it does 30 more damage. If Duosion is on your Bench, it does 60 more damage. If Reuniclus is on your Bench, it does 90 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "36",
+   "name": "Diglett",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Ram",
+     "cost": "F",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "37",
+   "name": "Marowak",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Cubone",
+   "hp": 100,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Bodyguard",
+     "text": "Prevent all effects of attacks done to you or your hand by your opponent's Pokémon. Remove any existing effects."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Bonemerang",
+     "cost": "FC",
+     "damage": 60,
+     "damageSuffix": "x",
+     "text": "Flip 2 coins. This attack does 60 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "38",
+   "name": "Kabuto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Restored",
+   "evolvesFrom": "Dome Fossil Kabuto",
+   "hp": 80,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Mud Shot",
+     "cost": "F",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "39",
+   "name": "Kabutops",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Kabuto",
+   "hp": 150,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Cling",
+     "cost": "CC",
+     "damage": 50,
+     "text": "Heal from this Pokémon the same amount of damage you did to your opponent's Active Pokémon."
+    },
+    {
+     "name": "X-Scissor",
+     "cost": "FCC",
+     "damage": 80,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 60 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "40",
+   "name": "Larvitar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Reckless Charge",
+     "cost": "C",
+     "damage": 20,
+     "text": "This Pokémon does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "41",
+   "name": "Larvitar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Mountain Munch",
+     "cost": "C",
+     "damage": 0,
+     "text": "Discard the top card of your opponent's deck."
+    },
+    {
+     "name": "Corkscrew Punch",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "42",
+   "name": "Pupitar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Larvitar",
+   "hp": 80,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Thrash",
+     "cost": "C",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 20 more damage. On tails, this Pokémon does 20 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "43",
+   "name": "Regirock-EX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "EX",
+   "text": "Pokémon-EX rule: when a Pokémon-EX has been Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Basic",
+   "hp": 180,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Regi Power",
+     "text": "Your Fighting Pokémon's attacks (excluding Regirock-EX) do 10 more damage to your opponent's Active Pokémon (before Weakness and Resistance)."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Bedrock Press",
+     "cost": "FFF",
+     "damage": 100,
+     "text": "During your opponent's next turn, any damage done to this Pokémon by attacks is reduced by 20 (after Weakness and Resistance)."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "44",
+   "name": "Wormadam",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Burmy",
+   "hp": 110,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Sand Spray",
+     "cost": "F",
+     "damage": 30
+    },
+    {
+     "name": "Twin Bursts",
+     "cost": "CCC",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "If Mothim is on your Bench, it does 60 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "45",
+   "name": "Riolu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Double Smash",
+     "cost": "C",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Flip 2 coins. Does 10 damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "46",
+   "name": "Riolu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Smash Punch",
+     "cost": "F",
+     "damage": 30,
+     "text": "Flip a coin. On tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "47",
+   "name": "Lucario",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Riolu",
+   "hp": 110,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Beatdown",
+     "cost": "F",
+     "damage": 40
+    },
+    {
+     "name": "Magnum Kick",
+     "cost": "FCC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "48",
+   "name": "Hawlucha",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fighting",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Backflip",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw a card."
+    },
+    {
+     "name": "Wicked Jab",
+     "cost": "FC",
+     "damage": 30,
+     "text": "Flip a coin. On heads, your opponent's Active Pokémon becomes Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "49",
+   "name": "Carbink",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Energy Keeper",
+     "text": "Basic Energy attached to your Basic Pokémon can't be discarded by effects of your opponent's attacks, Abilities, or Trainer cards."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Stone Edge",
+     "cost": "FFC",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 30 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "50",
+   "name": "Carbink",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Safeguard",
+     "text": "Prevent all effects of attacks, including damage, done to this Pokémon by your opponent's Pokémon-EX."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Power Gem",
+     "cost": "FC",
+     "damage": 40
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "51",
+   "name": "Carbink BREAK",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "BREAK",
+   "text": "BREAK Evolution rule: this Pokémon keeps the attacks, Abilities, Weakness, Resistance, and Retreat Cost of its previous Evolution.",
+   "stage": "Stage1",
+   "evolvesFrom": "Carbink",
+   "hp": 110,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Diamond Gift",
+     "cost": "F",
+     "damage": 20,
+     "text": "Attach 2 Energy cards from your discard pile to 1 of your Fighting Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "52",
+   "name": "Zygarde",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Lookout",
+     "cost": "F",
+     "damage": 0,
+     "text": "Switch 1 of your opponent's Benched Pokémon with their Active Pokémon."
+    },
+    {
+     "name": "Aura Break",
+     "cost": "FCC",
+     "damage": 70,
+     "text": "If the Defending Pokémon is a Darkness or Fairy Pokémon, it can't attack during your opponent's next turn."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "53",
+   "name": "Zygarde",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 120,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Rumble",
+     "cost": "FC",
+     "damage": 30,
+     "text": "The Defending Pokémon can't retreat during your opponent's next turn."
+    },
+    {
+     "name": "Geostrike",
+     "cost": "FFC",
+     "damage": 120,
+     "text": "Does 10 damage to each of your Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "54",
+   "name": "Zygarde-EX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "EX",
+   "text": "Pokémon-EX rule: when a Pokémon-EX has been Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Basic",
+   "hp": 190,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Land's Pulse",
+     "cost": "F",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "If there is any Stadium card in play, it does 20 more damage."
+    },
+    {
+     "name": "Cell Storm",
+     "cost": "FC",
+     "damage": 60,
+     "text": "Heal 30 damage from this Pokémon."
+    },
+    {
+     "name": "Land's Wrath",
+     "cost": "FFC",
+     "damage": 100
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "55",
+   "name": "Umbreon-EX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "EX",
+   "text": "Pokémon-EX rule: when a Pokémon-EX has been Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Basic",
+   "hp": 170,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Veil of Darkness",
+     "cost": "C",
+     "damage": 20,
+     "text": "Discard as many cards as you like from your hand. Then, draw that many cards."
+    },
+    {
+     "name": "Endgame",
+     "cost": "DCC",
+     "damage": 70,
+     "text": "If your opponent's Mega Evolution Pokémon is Knocked Out by damage from this attack, take 2 more Prize cards."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "56",
+   "name": "Tyranitar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Pupitar",
+   "hp": 160,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 4,
+   "abilities": [
+    {
+     "name": "Raging Roar",
+     "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you may attach 1 Darkness Energy card from your discard pile to this Pokémon for each Prize card your opponent has taken."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Dark Mountain",
+     "cost": "DDDDD",
+     "damage": 150,
+     "damageSuffix": "+",
+     "text": "Discard the top 2 cards of your deck. Does 50 more damage for each Supporter card discarded in this way."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "57",
+   "name": "Vullaby",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Darkness",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Leer",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. On heads, your opponent's Active Pokémon becomes Paralyzed."
+    },
+    {
+     "name": "Cutting Wind",
+     "cost": "DCC",
+     "damage": 40
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "58",
+   "name": "Mandibuzz",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Vullaby",
+   "hp": 110,
+   "type": "Darkness",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bone Drop",
+     "cost": "C",
+     "damage": 0,
+     "text": "Does 60 damage to 1 of your opponent's Pokémon that has an Ability. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Cutting Wind",
+     "cost": "DCC",
+     "damage": 80
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "59",
+   "name": "Wormadam",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Burmy",
+   "hp": 100,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Strike Back",
+     "cost": "M",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "This attack does 20 damage times the number of damage counters on this Pokémon."
+    },
+    {
+     "name": "Iron Head",
+     "cost": "MCC",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "Flip a coin until you get tails. Does 20 more damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "60",
+   "name": "Bronzor",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Iron Defense",
+     "cost": "M",
+     "damage": 0,
+     "text": "Flip a coin. On heads, prevent all effects of attacks, including damage, done to this Pokémon during your opponent's next turn."
+    },
+    {
+     "name": "Hammer In",
+     "cost": "MC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "61",
+   "name": "Bronzong",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Bronzor",
+   "hp": 100,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Metal Fortress",
+     "text": "Prevent all effects of your opponent's attacks, including damage, done to your Benched Pokémon."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Guard Press",
+     "cost": "MCC",
+     "damage": 60,
+     "text": "During your opponent's next turn, any damage done to this Pokémon by attacks is reduced by 20 (after Weakness and Resistance)."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "62",
+   "name": "Bronzong BREAK",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "BREAK",
+   "text": "BREAK Evolution rule: this Pokémon keeps the attacks, Abilities, Weakness, Resistance, and Retreat Cost of its previous Evolution.",
+   "stage": "Stage1",
+   "evolvesFrom": "Bronzong",
+   "hp": 130,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Metal Rain",
+     "cost": "MC",
+     "damage": 0,
+     "text": "Discard as many Metal Energy attached to this Pokémon as you like. For each Energy card discarded in this way, choose 1 of your opponent's Pokémon and do 30 damage to it. Don't apply Weakness and Resistance. (You may choose the same Pokémon more than once.)"
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "63",
+   "name": "Lucario",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Riolu",
+   "hp": 110,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Vacuum Wave",
+     "cost": "M",
+     "damage": 50,
+     "text": "This attack's damage isn't affected by Weakness or Resistance."
+    },
+    {
+     "name": "Fight Alone",
+     "cost": "MC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "If you have fewer Pokémon in play than your opponent, it does 60 more damage for each Pokémon fewer you have in play."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "64",
+   "name": "Genesect-EX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "EX",
+   "text": "Pokémon-EX rule: when a Pokémon-EX has been Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Basic",
+   "hp": 180,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Drive Change",
+     "text": "Once during your turn (before your attack), you may put a Pokémon Tool card attached to this Pokémon into your hand."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Rapid Blaster",
+     "cost": "MMM",
+     "damage": 100,
+     "damageSuffix": "+",
+     "text": "Discard as many Metal Energy attached to this Pokémon as you like. Does 20 more damage for each Energy card discarded in this way."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "65",
+   "name": "Jigglypuff",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fairy",
+   "weakness": "Metal",
+   "resistance": "Darkness",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Pound",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Rollout",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "66",
+   "name": "Wigglytuff",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Jigglypuff",
+   "hp": 100,
+   "type": "Fairy",
+   "weakness": "Metal",
+   "resistance": "Darkness",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Expand",
+     "cost": "CC",
+     "damage": 30,
+     "text": "During your opponent's next turn, any damage done to this Pokémon by attacks is reduced by 30 (after Weakness and Resistance)."
+    },
+    {
+     "name": "Double Slap",
+     "cost": "CCC",
+     "damage": 60,
+     "damageSuffix": "x",
+     "text": "Flip 2 coins. Does 60 damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "67",
+   "name": "Mr. Mime",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Fairy",
+   "weakness": "Metal",
+   "resistance": "Darkness",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Mimic",
+     "cost": "Y",
+     "damage": 0,
+     "text": "Shuffle your hand into your deck. Then, draw a number of cards equal to the number of cards in your opponent's hand."
+    },
+    {
+     "name": "Juggling",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Flip 4 coins. Does 20 damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "68",
+   "name": "Snubbull",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fairy",
+   "weakness": "Metal",
+   "resistance": "Darkness",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Ruckus",
+     "cost": "YC",
+     "damage": 50,
+     "text": "Flip a coin. On tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "69",
+   "name": "M Altaria-EX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "M EX",
+   "text": "Mega Evolution rule: when 1 of your Pokémon becomes a M Pokémon-EX, your turn ends. Pokémon-EX rule: when a Pokémon-EX has been Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Stage1",
+   "evolvesFrom": "Altaria-EX",
+   "hp": 220,
+   "type": "Fairy",
+   "weakness": "Metal",
+   "resistance": "Darkness",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Mist Purge",
+     "cost": "YCC",
+     "damage": 100,
+     "damageSuffix": "+",
+     "text": "If this Pokémon has any Special Energy attached to it, it does 30 more damage and heal 30 damage from each of your Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "70",
+   "name": "Cottonee",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fairy",
+   "weakness": "Metal",
+   "resistance": "Darkness",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Fairy Wind",
+     "cost": "C",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "71",
+   "name": "Whimsicott",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Cottonee",
+   "hp": 90,
+   "type": "Fairy",
+   "weakness": "Metal",
+   "resistance": "Darkness",
+   "resistanceAmount": 20,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Light Steps",
+     "cost": "Y",
+     "damage": 40,
+     "text": "Move an Energy from this Pokémon to 1 of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "72",
+   "name": "Diancie-EX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "EX",
+   "text": "Pokémon-EX rule: when a Pokémon-EX has been Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Basic",
+   "hp": 150,
+   "type": "Fairy",
+   "weakness": "Metal",
+   "resistance": "Darkness",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Sparkle Veil",
+     "text": "As long as this Pokémon is your Active Pokémon, any damage done to your Pokémon by an opponent's attack is reduced by 30 (after Weakness and Resistance)."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Wonder Stage",
+     "cost": "YCC",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "If there is any Stadium card in play, it does 50 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "73",
+   "name": "Kingdra-EX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "EX",
+   "text": "Pokémon-EX rule: when a Pokémon-EX has been Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Basic",
+   "hp": 170,
+   "type": "Dragon",
+   "weakness": "Fairy",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Big Storm",
+     "cost": "C",
+     "damage": 20,
+     "text": "Discard any Stadium card in play."
+    },
+    {
+     "name": "Dragon Trail",
+     "cost": "WCCC",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "Does 30 more damage for each basic Lightning Energy attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "74",
+   "name": "Meowth",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Turmoil Strike",
+     "cost": "CC",
+     "damage": 0,
+     "text": "Does 50 damage to 1 of your opponent's Pokémon that has any damage counters on it. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "75",
+   "name": "Kangaskhan",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 120,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Tiny Punch",
+     "cost": "CC",
+     "damage": 40
+    },
+    {
+     "name": "Mega Punch",
+     "cost": "CCCC",
+     "damage": 100
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "76",
+   "name": "Aerodactyl",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Restored",
+   "evolvesFrom": "Old Amber Aerodactyl",
+   "hp": 120,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "C",
+     "damage": 30
+    },
+    {
+     "name": "Jet Draft",
+     "cost": "CC",
+     "damage": 120,
+     "text": "Discard a Special Energy attached to your opponent's Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "77",
+   "name": "Snorlax",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 140,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Toss and Turn",
+     "cost": "CCC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "This attack can be used even if this Pokémon is Asleep. If it is, it does 90 more damage."
+    },
+    {
+     "name": "Swallow",
+     "cost": "CCCC",
+     "damage": 50,
+     "text": "Heal from this Pokémon the same amount of damage you did to your opponent's Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "78",
+   "name": "Lugia",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 120,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Pressure",
+     "text": "As long as this Pokémon is your Active Pokémon, any damage done by attacks from your opponent's Active Pokémon is reduced by 20 (before Weakness and Resistance)."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Intensifying Burn",
+     "cost": "CCC",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "If your opponent's Active Pokémon is a Pokémon-EX, it does 60 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "79",
+   "name": "Lugia BREAK",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "BREAK",
+   "text": "BREAK Evolution rule: this Pokémon keeps the attacks, Abilities, Weakness, Resistance, and Retreat Cost of its previous Evolution.",
+   "stage": "Stage1",
+   "evolvesFrom": "Lugia",
+   "hp": 150,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Flash of Destruction",
+     "cost": "CCCC",
+     "damage": 150,
+     "text": "Discard 2 Energy attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "80",
+   "name": "Whismur",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Pound",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Round",
+     "cost": "CC",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "This attack does 10 damage times the number of your Pokémon that have the Round attack."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "81",
+   "name": "Loudred",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Whismur",
+   "hp": 90,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Smash Kick",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Stomp",
+     "cost": "CCC",
+     "damage": 40,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 40 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "82",
+   "name": "Exploud",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Loudred",
+   "hp": 140,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Ambush",
+     "cost": "CCC",
+     "damage": 80,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 40 more damage."
+    },
+    {
+     "name": "Cacophony",
+     "cost": "CCC",
+     "damage": 0,
+     "text": "At the end of your opponent's next turn, discard the Defending Pokémon and all cards attached to it."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "83",
+   "name": "Altaria-EX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "EX",
+   "text": "Pokémon-EX rule: when a Pokémon-EX has been Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Basic",
+   "hp": 170,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Powerful Gain",
+     "cost": "CC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "If this Pokémon was healed during this turn, it does 60 more damage and heal 30 damage from this Pokémon."
+    },
+    {
+     "name": "Shining Wind",
+     "cost": "CCC",
+     "damage": 80,
+     "text": "During your opponent's next turn, this Pokémon has no Weakness."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "84",
+   "name": "Audino-EX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "EX",
+   "text": "Pokémon-EX rule: when a Pokémon-EX has been Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Basic",
+   "hp": 180,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Drain Slap",
+     "cost": "C",
+     "damage": 20,
+     "text": "Heal 20 damage from this Pokémon."
+    },
+    {
+     "name": "Do the Wave",
+     "cost": "CCC",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "Does 10 more damage for each of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "85",
+   "name": "M Audino-EX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "M EX",
+   "text": "Mega Evolution rule: when 1 of your Pokémon becomes a M Pokémon-EX, your turn ends. Pokémon-EX rule: when a Pokémon-EX has been Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Stage1",
+   "evolvesFrom": "Audino-EX",
+   "hp": 220,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Magical Symphony",
+     "cost": "CCC",
+     "damage": 110,
+     "text": "If you played a Supporter card from your hand during this turn, this attack does 50 damage to 1 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "86",
+   "name": "Minccino",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Cleaning Up",
+     "cost": "C",
+     "damage": 0,
+     "text": "Discard a Pokémon Tool card attached to 1 of your opponent's Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "87",
+   "name": "Minccino",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Tail Smack",
+     "cost": "C",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "88",
+   "name": "Cinccino",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Minccino",
+   "hp": 90,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Covet",
+     "cost": "C",
+     "damage": 0,
+     "text": "Your opponent reveals their hand. Choose a card you find there and put it on the bottom of your opponent's deck."
+    },
+    {
+     "name": "Last Resort",
+     "cost": "C",
+     "damage": 60,
+     "text": "Flip a coin. On tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "89",
+   "name": "Cinccino",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Minccino",
+   "hp": 90,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sweeping Cure",
+     "cost": "C",
+     "damage": 0,
+     "text": "Heal 90 damage from 1 of your Benched Pokémon."
+    },
+    {
+     "name": "Knock Away",
+     "cost": "CC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 30 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "90",
+   "name": "Alakazam Spirit Link",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Tool",
+   "text": "Your turn doesn't end if the Pokémon this card is attached to becomes M Alakazam-EX."
+  },
+  {
+   "set": "FCO",
+   "number": "91",
+   "name": "Altaria Spirit Link",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Tool",
+   "text": "Your turn doesn't end if the Pokémon this card is attached to becomes M Altaria-EX."
+  },
+  {
+   "set": "FCO",
+   "number": "92",
+   "name": "Audino Spirit Link",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Tool",
+   "text": "Your turn doesn't end if the Pokémon this card is attached to becomes M Audino-EX."
+  },
+  {
+   "set": "FCO",
+   "number": "93",
+   "name": "Bent Spoon",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Tool",
+   "text": "Prevent all effects of your opponent's attacks, except damage, done to the Pokémon this card is attached to. (Existing effects are not removed.)"
+  },
+  {
+   "set": "FCO",
+   "number": "94",
+   "name": "Chaos Tower",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Stadium",
+   "text": "Choose which way this card faces before you play it. One half: this ↓ player's Pokémon can't be Confused or Poisoned (if those Pokémon are already Confused or Poisoned, remove those Special Conditions). Other half: this ↓ player's Pokémon can't be Asleep or Paralyzed (if those Pokémon are already Asleep or Paralyzed, remove those Special Conditions)."
+  },
+  {
+   "set": "FCO",
+   "number": "96",
+   "name": "Dome Fossil Kabuto",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Item",
+   "text": "Look at the bottom 7 cards of your deck. You may reveal a Kabuto you find there and put it onto your Bench. Shuffle the other cards back into your deck."
+  },
+  {
+   "set": "FCO",
+   "number": "97",
+   "name": "Energy Pouch",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Tool",
+   "text": "If the Pokémon this card is attached to is Knocked Out by damage from an opponent's attack, put all basic Energy attached to that Pokémon into your hand."
+  },
+  {
+   "set": "FCO",
+   "number": "98",
+   "name": "Energy Reset",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Item",
+   "text": "Put as many Energy attached to your Pokémon as you like into your hand."
+  },
+  {
+   "set": "FCO",
+   "number": "99",
+   "name": "Fairy Drop",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Item",
+   "text": "Heal 50 damage from 1 of your Pokémon that has any Fairy Energy attached to it."
+  },
+  {
+   "set": "FCO",
+   "number": "100",
+   "name": "Fairy Garden",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Stadium",
+   "text": "Each Pokémon that has any Fairy Energy attached to it (yours and your opponent's) has no Retreat Cost."
+  },
+  {
+   "set": "FCO",
+   "number": "101",
+   "name": "Fossil Excavation Kit",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Item",
+   "text": "Put 2 in any combination of Helix Fossil Omanyte, Dome Fossil Kabuto, or Old Amber Aerodactyl cards from your discard pile into your hand."
+  },
+  {
+   "set": "FCO",
+   "number": "102",
+   "name": "Helix Fossil Omanyte",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Item",
+   "text": "Look at the bottom 7 cards of your deck. You may reveal an Omanyte you find there and put it onto your Bench. Shuffle the other cards back into your deck."
+  },
+  {
+   "set": "FCO",
+   "number": "103",
+   "name": "Lass's Special",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Supporter",
+   "text": "Draw a card for each of your opponent's Benched Basic Pokémon."
+  },
+  {
+   "set": "FCO",
+   "number": "104",
+   "name": "Mega Catcher",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Item",
+   "text": "Switch 1 of your opponent's Benched Mega Evolution Pokémon with their Active Pokémon."
+  },
+  {
+   "set": "FCO",
+   "number": "106",
+   "name": "Old Amber Aerodactyl",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Item",
+   "text": "Look at the bottom 7 cards of your deck. You may reveal an Aerodactyl you find there and put it onto your Bench. Shuffle the other cards back into your deck."
+  },
+  {
+   "set": "FCO",
+   "number": "108",
+   "name": "Power Memory",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Tool",
+   "text": "The Zygarde-EX this card is attached to can also use the attack on this card. (You still need the necessary Energy to use this attack.)",
+   "attacks": [
+    {
+     "name": "All Cells Burn",
+     "cost": "FFC",
+     "damage": 200,
+     "text": "Discard 3 Energy attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FCO",
+   "number": "109",
+   "name": "Random Receiver",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Item",
+   "text": "Reveal cards from the top of your deck until you reveal a Supporter card. Put it into your hand. Shuffle the other cards back into your deck."
+  },
+  {
+   "set": "FCO",
+   "number": "110",
+   "name": "Scorched Earth",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Stadium",
+   "text": "Once during each player's turn, that player may discard a Fire or Fighting Energy card from their hand. If they do, they draw 2 cards."
+  },
+  {
+   "set": "FCO",
+   "number": "112",
+   "name": "Team Rocket's Handiwork",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Supporter",
+   "text": "Flip 2 coins. For each heads, discard 2 cards from the top of your opponent's deck."
+  },
+  {
+   "set": "FCO",
+   "number": "115",
+   "name": "Strong Energy",
+   "kind": "Energy",
+   "regulationMark": "",
+   "basicEnergy": false,
+   "provides": "Colorless",
+   "text": "This card can only be attached to Fighting Pokémon. This card provides Fighting Energy only while this card is attached to a Fighting Pokémon. The attacks of the Fighting Pokémon this card is attached to do 20 more damage to your opponent's Active Pokémon (before Weakness and Resistance). (If this card is attached to anything other than a Fighting Pokémon, discard this card.)"
+  }
+ ]
+}

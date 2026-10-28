@@ -1,0 +1,770 @@
+{
+ "format": "Kalos Starter Set (KSS, 2013): cards not already in the pool. No regulation mark: Expanded.",
+ "cards": [
+  {
+   "set": "KSS",
+   "number": "1",
+   "name": "Weedle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "String Shot",
+     "cost": "G",
+     "damage": 10,
+     "text": "Flip a coin. On heads, your opponent's Active Pokémon becomes Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "2",
+   "name": "Pansage",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Collect",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw a card."
+    },
+    {
+     "name": "Fury Swipes",
+     "cost": "CC",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Flip 3 coins. Does 10 damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "3",
+   "name": "Chespin",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Vine Whip",
+     "cost": "G",
+     "damage": 10
+    },
+    {
+     "name": "Seed Bomb",
+     "cost": "GC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "4",
+   "name": "Quilladin",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Chespin",
+   "hp": 90,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Leech Seed",
+     "cost": "GC",
+     "damage": 20,
+     "text": "Heal 10 damage from this Pokémon."
+    },
+    {
+     "name": "Needle Arm",
+     "cost": "GCC",
+     "damage": 50
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "5",
+   "name": "Chesnaught",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Quilladin",
+   "hp": 150,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Needle Arm",
+     "cost": "GCC",
+     "damage": 50
+    },
+    {
+     "name": "Tumbling Attack",
+     "cost": "GGCC",
+     "damage": 80,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 40 more damage."
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "6",
+   "name": "Slugma",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Combustion",
+     "cost": "RC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "7",
+   "name": "Pansear",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Collect",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw a card."
+    },
+    {
+     "name": "Fury Swipes",
+     "cost": "CC",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Flip 3 coins. Does 10 damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "8",
+   "name": "Fennekin",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Scratch",
+     "cost": "R",
+     "damage": 10
+    },
+    {
+     "name": "Live Coal",
+     "cost": "RC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "9",
+   "name": "Braixen",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Fennekin",
+   "hp": 80,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Firebreathing",
+     "cost": "RC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 20 more damage."
+    },
+    {
+     "name": "Flame Tail",
+     "cost": "RCC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "10",
+   "name": "Delphox",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Braixen",
+   "hp": 140,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Will-O-Wisp",
+     "cost": "RC",
+     "damage": 30
+    },
+    {
+     "name": "Fire Blast",
+     "cost": "RCCC",
+     "damage": 120,
+     "text": "Discard an Energy attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "11",
+   "name": "Panpour",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Collect",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw a card."
+    },
+    {
+     "name": "Fury Swipes",
+     "cost": "CC",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Flip 3 coins. Does 10 damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "12",
+   "name": "Froakie",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Pound",
+     "cost": "W",
+     "damage": 10
+    },
+    {
+     "name": "Water Drip",
+     "cost": "WC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "13",
+   "name": "Frogadier",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Froakie",
+   "hp": 80,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Water Drip",
+     "cost": "W",
+     "damage": 20
+    },
+    {
+     "name": "Aqua Wave",
+     "cost": "WWC",
+     "damage": 40,
+     "damageSuffix": "+",
+     "text": "Flip 2 coins. Does 20 more damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "14",
+   "name": "Greninja",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Frogadier",
+   "hp": 140,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Mat Block",
+     "cost": "W",
+     "damage": 40,
+     "text": "Flip a coin. On heads, discard an Energy attached to your opponent's Active Pokémon."
+    },
+    {
+     "name": "Aqua Edge",
+     "cost": "WWC",
+     "damage": 80
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "15",
+   "name": "Clauncher",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Water Gun",
+     "cost": "WC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "16",
+   "name": "Poochyena",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "DC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "17",
+   "name": "Mightyena",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Poochyena",
+   "hp": 90,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Hard Bite",
+     "cost": "DC",
+     "damage": 40,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "18",
+   "name": "Inkay",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Peck",
+     "cost": "D",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "19",
+   "name": "Pawniard",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Pierce",
+     "cost": "M",
+     "damage": 10
+    },
+    {
+     "name": "Cut",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "20",
+   "name": "Bisharp",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Pawniard",
+   "hp": 90,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Wicked Jab",
+     "cost": "M",
+     "damage": 20,
+     "text": "Flip a coin. On heads, your opponent's Active Pokémon becomes Paralyzed."
+    },
+    {
+     "name": "Metal Claw",
+     "cost": "MCC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "21",
+   "name": "Honedge",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Continuous Slash",
+     "cost": "MC",
+     "damage": 30,
+     "damageSuffix": "x",
+     "text": "Flip a coin until you get tails. Does 30 damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "22",
+   "name": "Snubbull",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fairy",
+   "weakness": "Metal",
+   "resistance": "Darkness",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Headbutt",
+     "cost": "YC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "23",
+   "name": "Granbull",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Snubbull",
+   "hp": 100,
+   "type": "Fairy",
+   "weakness": "Metal",
+   "resistance": "Darkness",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Headbutt",
+     "cost": "YC",
+     "damage": 30
+    },
+    {
+     "name": "Double Stomp",
+     "cost": "YCC",
+     "damage": 50,
+     "damageSuffix": "+",
+     "text": "Flip 2 coins. Does 20 more damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "24",
+   "name": "Swirlix",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fairy",
+   "weakness": "Metal",
+   "resistance": "Darkness",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Draining Kiss",
+     "cost": "Y",
+     "damage": 10,
+     "text": "Heal 10 damage from this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "25",
+   "name": "Farfetch'd",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Slash",
+     "cost": "C",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "26",
+   "name": "Snorlax",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 120,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Rock Smash",
+     "cost": "CCC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 30 more damage."
+    },
+    {
+     "name": "Strength",
+     "cost": "CCCC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "27",
+   "name": "Miltank",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Sitdown Splash",
+     "cost": "CCC",
+     "damage": 50,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "28",
+   "name": "Skitty",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Jump On",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "29",
+   "name": "Bidoof",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Rollout",
+     "cost": "CCC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "30",
+   "name": "Bunnelby",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Tackle",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "KSS",
+   "number": "31",
+   "name": "Fletchling",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Razor Wind",
+     "cost": "C",
+     "damage": 20,
+     "text": "Flip a coin. On tails, this attack does nothing."
+    }
+   ]
+  }
+ ]
+}

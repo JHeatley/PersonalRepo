@@ -1,0 +1,191 @@
+{
+ "format": "Japanese Storm Emeralda (M6, the Japanese Delta Reign; v154): cards not yet in English, names and attack names translated from Japanese until the English cards are out. Regulation mark J = Standard.",
+ "cards": [
+  {
+   "set": "M6",
+   "number": "29",
+   "name": "Drowzee",
+   "kind": "Pokemon",
+   "regulationMark": "J",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Slap",
+     "cost": "P",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "M6",
+   "number": "31",
+   "name": "Giratina",
+   "kind": "Pokemon",
+   "regulationMark": "J",
+   "text": "",
+   "stage": "Basic",
+   "hp": 130,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Chaos Crawler",
+     "cost": "PPC",
+     "damage": 120,
+     "text": "During your opponent's next turn, this Pokémon takes no damage from attacks. If any of your Pokémon used Chaos Crawler during your last turn, this attack can't be used."
+    }
+   ]
+  },
+  {
+   "set": "M6",
+   "number": "32",
+   "name": "Golett",
+   "kind": "Pokemon",
+   "regulationMark": "J",
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Punch",
+     "cost": "PP",
+     "damage": 50
+    }
+   ]
+  },
+  {
+   "set": "M6",
+   "number": "47",
+   "name": "Inkay",
+   "kind": "Pokemon",
+   "regulationMark": "J",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Knock Off",
+     "cost": "D",
+     "damage": 10,
+     "text": "Discard a random card from your opponent's hand."
+    }
+   ]
+  },
+  {
+   "set": "M6",
+   "number": "60",
+   "name": "Fletchling",
+   "kind": "Pokemon",
+   "regulationMark": "J",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Ambush",
+     "cost": "C",
+     "damage": 30,
+     "text": "Flip a coin. If tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "M6",
+   "number": "61",
+   "name": "Fletchinder",
+   "kind": "Pokemon",
+   "regulationMark": "J",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Fletchling",
+   "hp": 80,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Clutch",
+     "cost": "CC",
+     "damage": 40,
+     "text": "During your opponent's next turn, the Defending Pokémon can't retreat."
+    }
+   ]
+  },
+  {
+   "set": "M6",
+   "number": "62",
+   "name": "Talonflame ex",
+   "kind": "Pokemon",
+   "regulationMark": "J",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Fletchinder",
+   "hp": 280,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 0,
+   "ex": true,
+   "abilities": [
+    {
+     "name": "Excite Dive",
+     "text": "Once during your turn, if this card is in your hand and you have a Colorless Mega Evolution Pokémon ex in play, you may put this card onto your Bench."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Talon Hunt",
+     "cost": "CC",
+     "damage": 150,
+     "text": "You may search your deck for up to 2 cards and put them into your hand. Then, shuffle your deck."
+    }
+   ]
+  },
+  {
+   "set": "M6",
+   "number": "63",
+   "name": "Delicious Rice Ball",
+   "kind": "Trainer",
+   "regulationMark": "J",
+   "trainerType": "Item",
+   "text": "Heal 30 damage from your Active Pokémon. This card heals 30 more damage for each Delicious Rice Ball in your discard pile (not counting this card)."
+  },
+  {
+   "set": "M6",
+   "number": "66",
+   "name": "Mega Rayquaza Cap",
+   "kind": "Trainer",
+   "regulationMark": "J",
+   "trainerType": "Tool",
+   "attacks": [
+    {
+     "name": "Delta Gift",
+     "cost": "C",
+     "damage": 0,
+     "text": "For each of your Pokémon that has a Mega Rayquaza Cap attached, search your deck for a Basic Energy card and attach it to that Pokémon. Then, shuffle your deck."
+    }
+   ],
+   "text": "The Pokémon this card is attached to can use the attack on this card. (You still need the necessary Energy to use this attack.)"
+  }
+ ]
+}

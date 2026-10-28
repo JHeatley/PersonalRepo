@@ -1,0 +1,3648 @@
+{
+ "format": "Team Up (TEU, 2019): cards not already in the pool. No regulation mark: Expanded.",
+ "cards": [
+  {
+   "set": "TEU",
+   "number": "1",
+   "name": "Celebi & Venusaur-GX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "TAG TEAM",
+   "text": "TAG TEAM rule: when your TAG TEAM is Knocked Out, your opponent takes 3 Prize cards.",
+   "stage": "Basic",
+   "hp": 270,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Pollen Hazard",
+     "cost": "GCC",
+     "damage": 50,
+     "text": "Your opponent's Active Pokémon becomes Burned, Confused, and Poisoned."
+    },
+    {
+     "name": "Solar Beam",
+     "cost": "GGCC",
+     "damage": 150
+    },
+    {
+     "name": "Evergreen-GX",
+     "cost": "GGCC",
+     "damage": 180,
+     "text": "Heal all damage from this Pokémon. If this Pokémon has at least 1 extra Grass Energy attached to it (in addition to this attack's cost), shuffle all cards from your discard pile into your deck. (Only 1 GX attack per game.)"
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "2",
+   "name": "Weedle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Tangle Drag",
+     "cost": "G",
+     "damage": 0,
+     "text": "Switch 1 of your opponent's Benched Pokémon with their Active Pokémon."
+    },
+    {
+     "name": "Bug Bite",
+     "cost": "G",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "3",
+   "name": "Weedle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Reckless Charge",
+     "cost": "C",
+     "damage": 20,
+     "text": "This Pokémon also does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "4",
+   "name": "Kakuna",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Weedle",
+   "hp": 80,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Grass Cushion",
+     "text": "If this Pokémon has any Grass Energy attached to it, it takes 30 less damage from attacks (after Weakness and Resistance)."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Bug Bite",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "5",
+   "name": "Beedrill",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Kakuna",
+   "hp": 130,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Destiny Stinger",
+     "cost": "G",
+     "damage": 0,
+     "text": "You can use this attack only if this Pokémon has any damage counters on it. Both Active Pokémon are Knocked Out."
+    },
+    {
+     "name": "Reckless Charge",
+     "cost": "CC",
+     "damage": 90,
+     "text": "This Pokémon also does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "7",
+   "name": "Parasect",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Paras",
+   "hp": 100,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Panic Spores",
+     "text": "Put 2 damage counters on your opponent's Confused Pokémon between turns."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Mysterious Powder",
+     "cost": "GC",
+     "damage": 30,
+     "text": "Flip a coin. On heads, the opponent's Active Pokémon becomes Confused."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "8",
+   "name": "Exeggcute",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bullet Seed",
+     "cost": "G",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Flip 4 coins. Does 10 damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "9",
+   "name": "Pinsir",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 120,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Grip and Squeeze",
+     "cost": "CC",
+     "damage": 30,
+     "text": "The Defending Pokémon can't retreat during the opponent's next turn."
+    },
+    {
+     "name": "Guillotine Hug",
+     "cost": "GCC",
+     "damage": 0,
+     "text": "Flip 2 coins. If both are heads, the opponent's Active Pokémon is Knocked Out."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "10",
+   "name": "Shaymin ◇",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "Prism Star",
+   "text": "Prism Star rule: only 1 card with this name in a deck. If it would go to the discard pile, put it in the Lost Zone instead.",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Flower Storm",
+     "cost": "GG",
+     "damage": 30,
+     "damageSuffix": "x",
+     "text": "Does 30 damage for each basic Energy attached to all of your Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "11",
+   "name": "Charmander",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Scratch",
+     "cost": "R",
+     "damage": 10
+    },
+    {
+     "name": "Reprisal",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Does 20 damage for each damage counter on this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "12",
+   "name": "Charmander",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Ember",
+     "cost": "R",
+     "damage": 30,
+     "text": "Discard an Energy from this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "13",
+   "name": "Charmeleon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Charmander",
+   "hp": 90,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Fire Fang",
+     "cost": "RR",
+     "damage": 30,
+     "text": "The opponent's Active Pokémon becomes Burned."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "14",
+   "name": "Charizard",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Charmeleon",
+   "hp": 150,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Roaring Resolve",
+     "text": "Once during your turn (before your attack), you may put 2 damage counters on this Pokémon. If you do, look through your deck for up to 2 Fire Energy cards and attach them to this Pokémon. Shuffle your deck."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Continuous Blaze Ball",
+     "cost": "RR",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Discard all Fire Energy from this Pokémon. Does 50 more damage for each card you discarded in this way."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "15",
+   "name": "Vulpix",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Tail Whip",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. On heads, the Defending Pokémon can't attack during the opponent's next turn."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "16",
+   "name": "Ninetales",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Vulpix",
+   "hp": 100,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Nine Temptations",
+     "text": "Once during your turn (before your attack), you may discard 2 Fire Energy cards from your hand. If you do, switch 1 of your opponent's Benched Pokémon with their Active Pokémon."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Flame Tail",
+     "cost": "RCC",
+     "damage": 90
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "17",
+   "name": "Ponyta",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Live Coal",
+     "cost": "R",
+     "damage": 10
+    },
+    {
+     "name": "Stomp",
+     "cost": "RR",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 30 more damage."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "18",
+   "name": "Rapidash",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Ponyta",
+   "hp": 100,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Searing Flame",
+     "cost": "R",
+     "damage": 20,
+     "text": "The opponent's Active Pokémon becomes Burned."
+    },
+    {
+     "name": "Agility",
+     "cost": "RR",
+     "damage": 60,
+     "text": "Flip a coin. On heads, prevent all effects of attacks, including damage, done to this Pokémon during the opponent's next turn."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "19",
+   "name": "Moltres",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 120,
+   "type": "Fire",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Top Burner",
+     "cost": "R",
+     "damage": 0,
+     "text": "Discard all Fire Energy from this Pokémon. Then, discard the top card of your opponent's deck for each Energy you discarded in this way."
+    },
+    {
+     "name": "Fire Spin",
+     "cost": "RRRC",
+     "damage": 180,
+     "text": "Discard 3 Energy from this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "20",
+   "name": "Litten",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Fasten Claws",
+     "cost": "C",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 10 more damage."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "21",
+   "name": "Torracat",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Litten",
+   "hp": 90,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Roar",
+     "cost": "C",
+     "damage": 0,
+     "text": "The opponent switches their Active Pokémon with 1 of their Benched Pokémon."
+    },
+    {
+     "name": "Claw Slash",
+     "cost": "CCC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "22",
+   "name": "Squirtle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Floating Shell",
+     "text": "If you have a Stadium card in play, this Pokémon has no Retreat Cost."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Water Gun",
+     "cost": "WC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "23",
+   "name": "Squirtle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Tackle",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Rain Splash",
+     "cost": "WC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "24",
+   "name": "Wartortle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Squirtle",
+   "hp": 90,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Tackle",
+     "cost": "CC",
+     "damage": 30
+    },
+    {
+     "name": "Waterfall",
+     "cost": "WWC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "25",
+   "name": "Blastoise",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Wartortle",
+   "hp": 160,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Powerful Squall",
+     "text": "Once during your turn (before your attack), you may look at the top 6 cards of your deck and attach any number of Water Energy cards you find there to your Pokémon in any way you like. Shuffle the other cards back into your deck."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Hydro Tackle",
+     "cost": "WWW",
+     "damage": 150,
+     "text": "This Pokémon also does 30 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "26",
+   "name": "Psyduck",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Headache",
+     "cost": "C",
+     "damage": 10,
+     "text": "Flip a coin. On heads, your opponent can't play any Trainer cards from their hand during their next turn."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "27",
+   "name": "Golduck",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Psyduck",
+   "hp": 110,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Amnesia",
+     "cost": "W",
+     "damage": 20,
+     "text": "Choose 1 of your opponent's Active Pokémon's attacks. That Pokémon can't use that attack during your opponent's next turn."
+    },
+    {
+     "name": "Swim",
+     "cost": "CCC",
+     "damage": 90,
+     "text": "If any of your opponent's Pokémon have any Water Energy attached to them, you may do 90 damage to 1 of your opponent's Benched Pokémon instead of their Active Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "29",
+   "name": "Magikarp",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 30,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Enter the Dragon",
+     "cost": "W",
+     "damage": 0,
+     "text": "Flip a coin. On heads, put a card that evolves from this Pokémon from your discard pile onto this Pokémon to evolve it."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "30",
+   "name": "Gyarados",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Magikarp",
+   "hp": 150,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Distilled Blast",
+     "cost": "W",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Reveal the top 7 cards of your deck. Does 30 more damage for each Water Energy card you find there. Then, shuffle those Energy cards back into your deck and discard the other cards."
+    },
+    {
+     "name": "Hyper Beam",
+     "cost": "WWW",
+     "damage": 100,
+     "text": "Discard an Energy from the opponent's Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "31",
+   "name": "Lapras",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 130,
+   "type": "Water",
+   "weakness": "Metal",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Confuse Ray",
+     "cost": "W",
+     "damage": 0,
+     "text": "The opponent's Active Pokémon becomes Confused."
+    },
+    {
+     "name": "Hydro Pump",
+     "cost": "C",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Does 30 more damage for each Water Energy attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "32",
+   "name": "Articuno",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 110,
+   "type": "Water",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Blizzard Veil",
+     "text": "As long as this Pokémon is your Active Pokémon, whenever your opponent plays a Supporter card from their hand, prevent all effects of that card done to your Benched Water Pokémon."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Cold Cyclone",
+     "cost": "WW",
+     "damage": 70,
+     "text": "Move 2 Water Energy from this Pokémon to 1 of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "34",
+   "name": "Alolan Geodude",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Self-Destruct",
+     "cost": "LC",
+     "damage": 60,
+     "text": "This Pokémon does 60 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "35",
+   "name": "Alolan Geodude",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Charge",
+     "cost": "",
+     "damage": 0,
+     "text": "Look through your deck for up to 2 Lightning Energy cards, attach them to this Pokémon, then shuffle."
+    },
+    {
+     "name": "Smash Bomb",
+     "cost": "LCC",
+     "damage": 50,
+     "text": "Flip a coin. On tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "36",
+   "name": "Alolan Graveler",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Alolan Geodude",
+   "hp": 100,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Rollout",
+     "cost": "",
+     "damage": 30
+    },
+    {
+     "name": "Electroslug",
+     "cost": "LCCC",
+     "damage": 100
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "37",
+   "name": "Alolan Golem",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Alolan Graveler",
+   "hp": 180,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Electromagnetic Bomb",
+     "cost": "",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Move any number of Lightning Energy from your Benched Pokémon to this Pokémon. Does 20 damage for each Energy you moved in this way."
+    },
+    {
+     "name": "Super Zap Cannon",
+     "cost": "LCCCC",
+     "damage": 190,
+     "text": "Discard 2 Energy from this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "38",
+   "name": "Voltorb",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Tackle",
+     "cost": "C",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "39",
+   "name": "Electrode",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Voltorb",
+   "hp": 90,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Electro Shaker",
+     "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you may move any number of Lightning Energy from your Pokémon to your other Pokémon in any way you like."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Speed Ball",
+     "cost": "LC",
+     "damage": 50
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "40",
+   "name": "Zapdos",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 110,
+   "type": "Lightning",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Thunderous Assault",
+     "cost": "L",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "If this Pokémon was on the Bench and became your Active Pokémon this turn, it does 70 more damage. This attack's damage isn't affected by Weakness."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "41",
+   "name": "Mareep",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Shock Bolt",
+     "cost": "L",
+     "damage": 30,
+     "text": "Discard all Lightning Energy from this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "42",
+   "name": "Flaaffy",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Mareep",
+   "hp": 90,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Electric Punch",
+     "cost": "L",
+     "damage": 30
+    },
+    {
+     "name": "Shock Bolt",
+     "cost": "LL",
+     "damage": 60,
+     "text": "Discard all Lightning Energy from this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "43",
+   "name": "Ampharos-GX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "GX",
+   "text": "Pokémon-GX rule: when your Pokémon-GX is Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Stage2",
+   "evolvesFrom": "Flaaffy",
+   "hp": 240,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Power Recharge",
+     "cost": "L",
+     "damage": 30,
+     "text": "Put all Electropower cards from your discard pile into your hand."
+    },
+    {
+     "name": "Impact Bolt",
+     "cost": "LL",
+     "damage": 150,
+     "text": "Discard all Lightning Energy from this Pokémon."
+    },
+    {
+     "name": "Electrical-GX",
+     "cost": "L",
+     "damage": 0,
+     "text": "Look through your deck for up to 7 Pokémon, show them to your opponent, and put them into your hand. Shuffle your deck. (Only 1 GX attack per game.)"
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "44",
+   "name": "Blitzle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Delivery Dash",
+     "cost": "L",
+     "damage": 0,
+     "text": "Look through your deck for up to 2 Electropower cards, show them to your opponent, and put them into your hand. Shuffle your deck."
+    },
+    {
+     "name": "Zap Kick",
+     "cost": "LC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "45",
+   "name": "Zebstrika",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Blitzle",
+   "hp": 120,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Raid",
+     "cost": "LC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "If this Pokémon evolved from Blitzle during this turn, it does 90 more damage."
+    },
+    {
+     "name": "Mach Bolt",
+     "cost": "LLC",
+     "damage": 100
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "46",
+   "name": "Emolga",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 0,
+   "abilities": [
+    {
+     "name": "Nuzzly Gathering",
+     "text": "Once during your turn (before your attack), you may look through your deck for a Pokémon that has the Nuzzle attack, show it to your opponent, and put it into your hand. Shuffle your deck."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Nuzzle",
+     "cost": "L",
+     "damage": 0,
+     "text": "Flip a coin. On heads, your opponent's Active Pokémon becomes Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "47",
+   "name": "Joltik",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Leech Life",
+     "cost": "L",
+     "damage": 10,
+     "text": "Heal from this Pokémon the same amount of damage you did to your opponent's Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "48",
+   "name": "Galvantula",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Joltik",
+   "hp": 90,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Unnerve",
+     "text": "Whenever your opponent plays an Item or Supporter card from their hand, prevent all effects of that card done to this Pokémon."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Spider Thread",
+     "cost": "L",
+     "damage": 40,
+     "text": "Put a card from your discard pile into your hand."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "49",
+   "name": "Helioptile",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Pound",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Static Shock",
+     "cost": "LCC",
+     "damage": 40
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "50",
+   "name": "Heliolisk",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Helioptile",
+   "hp": 100,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Random Spark",
+     "cost": "L",
+     "damage": 30,
+     "text": "Does 30 damage to 1 of your opponent's Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Volt Switch",
+     "cost": "LCC",
+     "damage": 90,
+     "text": "Switch this Pokémon with 1 of your Benched Lightning Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "51",
+   "name": "Tapu Koko ◇",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "Prism Star",
+   "text": "Prism Star rule: only 1 card with this name in a deck. If it would go to the discard pile, put it in the Lost Zone instead.",
+   "stage": "Basic",
+   "hp": 130,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Dance of the Ancients",
+     "text": "Once during your turn (before your attack), if this Pokémon is on your Bench, you may choose 2 of your Benched Pokémon and attach a Lightning Energy card from your discard pile to each of them. If you do, discard all cards attached to this Pokémon and put it in the Lost Zone."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Mach Bolt",
+     "cost": "LLC",
+     "damage": 120
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "52",
+   "name": "Zeraora",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 120,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Slash",
+     "cost": "C",
+     "damage": 20
+    },
+    {
+     "name": "Wild Charge",
+     "cost": "LLC",
+     "damage": 120,
+     "text": "This Pokémon does 20 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "53",
+   "name": "Gengar & Mimikyu-GX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "TAG TEAM",
+   "text": "TAG TEAM rule: when your TAG TEAM is Knocked Out, your opponent takes 3 Prize cards.",
+   "stage": "Basic",
+   "hp": 240,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Poltergeist",
+     "cost": "PP",
+     "damage": 50,
+     "damageSuffix": "x",
+     "text": "Your opponent reveals their hand. Does 50 damage for each Trainer card you find there."
+    },
+    {
+     "name": "Horror House-GX",
+     "cost": "P",
+     "damage": 0,
+     "text": "Your opponent can't play any cards from their hand during their next turn. If this Pokémon has at least 1 extra Psychic Energy attached to it (in addition to this attack's cost), each player draws cards until they have 7 cards in their hand. (Only 1 GX attack per game.)"
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "54",
+   "name": "Nidoran♀",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Call for Family",
+     "cost": "C",
+     "damage": 0,
+     "text": "Look through your deck for a Basic Pokémon and put it onto your Bench. Shuffle your deck."
+    },
+    {
+     "name": "Scratch",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "55",
+   "name": "Nidorina",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Nidoran♀",
+   "hp": 90,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Family Rescue",
+     "cost": "C",
+     "damage": 0,
+     "text": "Shuffle 5 Psychic Pokémon from your discard pile into your deck."
+    },
+    {
+     "name": "Bite",
+     "cost": "CC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "56",
+   "name": "Nidoqueen",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Nidorina",
+   "hp": 160,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Queen's Call",
+     "text": "Once during your turn (before your attack), you may look through your deck for a Pokémon that isn't a Pokémon-GX or Pokémon-EX, show it to your opponent, and put it into your hand. Shuffle your deck."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Power Lariat",
+     "cost": "CCC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Does 50 more damage for each Evolution Pokémon on your Bench."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "57",
+   "name": "Nidoran♂",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Peck",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Horn Attack",
+     "cost": "PC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "58",
+   "name": "Nidorino",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Nidoran♂",
+   "hp": 90,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Peck",
+     "cost": "C",
+     "damage": 20
+    },
+    {
+     "name": "Horn Drill",
+     "cost": "PCC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "59",
+   "name": "Nidoking",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Nidorino",
+   "hp": 160,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Drag Off",
+     "cost": "CC",
+     "damage": 0,
+     "text": "Switch 1 of your opponent's Benched Pokémon with their Active Pokémon. This attack does 50 damage to the new Active Pokémon."
+    },
+    {
+     "name": "King's Drum",
+     "cost": "PCC",
+     "damage": 100,
+     "damageSuffix": "+",
+     "text": "If Nidoqueen is on your Bench, it does 100 more damage."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "60",
+   "name": "Tentacool",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Wrap",
+     "cost": "C",
+     "damage": 10,
+     "text": "Flip a coin. On heads, your opponent's Active Pokémon becomes Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "61",
+   "name": "Tentacruel",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Tentacool",
+   "hp": 100,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Void Tentacles",
+     "cost": "C",
+     "damage": 0,
+     "text": "Your opponent's Active Pokémon becomes Confused and Poisoned."
+    },
+    {
+     "name": "Paranormal",
+     "cost": "PCC",
+     "damage": 70,
+     "text": "During your opponent's next turn, prevent all damage done to this Pokémon by attacks from Ultra Beasts."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "62",
+   "name": "Grimer",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Pound",
+     "cost": "C",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "63",
+   "name": "Muk",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Grimer",
+   "hp": 130,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 4,
+   "abilities": [
+    {
+     "name": "Poison Sacs",
+     "text": "Your opponent's Pokémon stay Poisoned when they evolve or devolve."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Toxic Secretion",
+     "cost": "P",
+     "damage": 40,
+     "text": "Your opponent's Active Pokémon becomes Poisoned. Put 2 damage counters instead of 1 on that Pokémon between turns."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "64",
+   "name": "Alolan Marowak",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Cubone",
+   "hp": 120,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Limbo Limbo",
+     "cost": "",
+     "damage": 0,
+     "text": "Look through your deck for up to 2 basic Energy cards and attach them to your Pokémon in any way you like. Shuffle your deck."
+    },
+    {
+     "name": "Alolan Club",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Does 20 damage for each of your Pokémon in play that has \"Alolan\" in its name."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "65",
+   "name": "Starmie",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Staryu",
+   "hp": 80,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Strange Wave",
+     "cost": "C",
+     "damage": 40,
+     "text": "Look through your deck for up to 3 in any combination of Water and Psychic Energy cards and attach them to 1 of your Benched Pokémon. Shuffle your deck."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "66",
+   "name": "Mr. Mime",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Scoop-Up Block",
+     "text": "Your opponent's Pokémon that have any damage counters on them, and any cards attached to those Pokémon, can't be put into your opponent's hand."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Psy Bolt",
+     "cost": "CC",
+     "damage": 20,
+     "text": "Flip a coin. On heads, your opponent's Active Pokémon becomes Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "67",
+   "name": "Mr. Mime-GX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "GX",
+   "text": "Pokémon-GX rule: when your Pokémon-GX is Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Basic",
+   "hp": 150,
+   "type": "Psychic",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Magic Odds",
+     "text": "Prevent all damage done to this Pokémon by your opponent's attacks if that damage is exactly 10, 30, 50, 70, 90, 110, 130, 150, 170, 190, 210, 230, or 250."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Breakdown",
+     "cost": "PC",
+     "damage": 0,
+     "text": "For each card in your opponent's hand, put 1 damage counter on their Active Pokémon."
+    },
+    {
+     "name": "Life Trick-GX",
+     "cost": "C",
+     "damage": 0,
+     "text": "Heal all damage from this Pokémon. (Only 1 GX attack per game.)"
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "68",
+   "name": "Jynx",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Dazzle Dance",
+     "cost": "C",
+     "damage": 0,
+     "text": "Your opponent's Active Pokémon becomes Confused."
+    },
+    {
+     "name": "Mysterious Dance",
+     "cost": "PC",
+     "damage": 0,
+     "text": "For each of your opponent's Benched Pokémon, put 1 damage counter on your opponent's Pokémon in any way you like."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "69",
+   "name": "Cosmog",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Cosmic Guard",
+     "text": "As long as this Pokémon is on your Bench, prevent all damage done to it by attacks (yours and your opponent's)."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Mumble",
+     "cost": "C",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "70",
+   "name": "Cosmoem",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Cosmog",
+   "hp": 100,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Nap",
+     "cost": "C",
+     "damage": 0,
+     "text": "Heal 20 damage from this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "71",
+   "name": "Mankey",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Scout",
+     "cost": "C",
+     "damage": 0,
+     "text": "Your opponent reveals their hand."
+    },
+    {
+     "name": "Low Kick",
+     "cost": "FC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "72",
+   "name": "Primeape",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Mankey",
+   "hp": 90,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Low Kick",
+     "cost": "F",
+     "damage": 30
+    },
+    {
+     "name": "Wreck",
+     "cost": "FCC",
+     "damage": 80,
+     "damageSuffix": "+",
+     "text": "If there is any Stadium card in play, it does 80 more damage. Then, discard that Stadium card."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "73",
+   "name": "Hitmonlee",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Special Combo",
+     "cost": "F",
+     "damage": 0,
+     "text": "You can use this attack only if your Hitmonchan used Hit and Run during your last turn. This attack does 90 damage to 1 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Mega Kick",
+     "cost": "FFC",
+     "damage": 90
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "74",
+   "name": "Hitmonchan",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Hit and Run",
+     "cost": "F",
+     "damage": 30,
+     "text": "Switch this Pokémon with 1 of your Benched Pokémon."
+    },
+    {
+     "name": "Magnum Punch",
+     "cost": "FCC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "75",
+   "name": "Omanyte",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Unidentified Fossil",
+   "hp": 90,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Tickle",
+     "cost": "C",
+     "damage": 30,
+     "text": "Flip a coin. On heads, your opponent's Active Pokémon becomes Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "76",
+   "name": "Omastar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Omanyte",
+   "hp": 130,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Fossil Bind",
+     "text": "As long as you have fewer Pokémon in play than your opponent, they can't play any Item cards from their hand."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "FC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "77",
+   "name": "Kabuto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Unidentified Fossil",
+   "hp": 90,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Ramming Shell",
+     "cost": "F",
+     "damage": 40,
+     "text": "During your opponent's next turn, this Pokémon takes 20 less damage from attacks (after Weakness and Resistance)."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "78",
+   "name": "Kabutops",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Kabuto",
+   "hp": 140,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Fossilized Memories",
+     "text": "As long as this Pokémon is your Active Pokémon, your opponent can't play any Supporter cards from their hand."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Rock Slide",
+     "cost": "FCC",
+     "damage": 80,
+     "text": "This attack also does 20 damage to 2 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "79",
+   "name": "Larvitar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Chip Away",
+     "cost": "CC",
+     "damage": 30,
+     "text": "This attack's damage isn't affected by any effects on your opponent's Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "80",
+   "name": "Pupitar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Larvitar",
+   "hp": 80,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Payback",
+     "cost": "CC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "If your opponent has exactly 1 Prize card remaining, it does 90 more damage."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "81",
+   "name": "Pancham",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Arm Thrust",
+     "cost": "CC",
+     "damage": 40,
+     "text": "Flip a coin. On heads, discard an Energy from your opponent's Active Pokémon. On tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "83",
+   "name": "Alolan Grimer",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Chemical Breath",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Does 50 more damage for each Special Condition affecting your opponent's Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "84",
+   "name": "Alolan Muk",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Alolan Grimer",
+   "hp": 120,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Adventurous Appetite",
+     "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you may look at the top 6 cards of your opponent's deck and discard any number of Item cards you find there. Your opponent shuffles the other cards back into their deck."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Gunk Shot",
+     "cost": "DCC",
+     "damage": 80,
+     "text": "Your opponent's Active Pokémon becomes Poisoned."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "85",
+   "name": "Tyranitar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Pupitar",
+   "hp": 170,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Spinning Tail",
+     "cost": "DCC",
+     "damage": 0,
+     "text": "This attack does 30 damage to each of your opponent's Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Bite Off",
+     "cost": "DCCC",
+     "damage": 130,
+     "damageSuffix": "+",
+     "text": "If your opponent's Active Pokémon is a Pokémon-GX or Pokémon-EX, it does 100 more damage."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "86",
+   "name": "Poochyena",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Howl in the Dark",
+     "cost": "C",
+     "damage": 0,
+     "text": "Look through your deck for up to 2 Darkness Pokémon, show them to your opponent, and put them into your hand. Shuffle your deck."
+    },
+    {
+     "name": "Bite",
+     "cost": "D",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "87",
+   "name": "Mightyena",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Poochyena",
+   "hp": 100,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "D",
+     "damage": 30
+    },
+    {
+     "name": "Dark Fang",
+     "cost": "CC",
+     "damage": 50,
+     "text": "Discard a random card from your opponent's hand."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "88",
+   "name": "Absol",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Dark Ambition",
+     "text": "If your opponent's Active Pokémon is a Basic Pokémon, its Retreat Cost is Colorless more."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Shadow Seeker",
+     "cost": "DCC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Does 30 more damage for each Colorless in your opponent's Active Pokémon's Retreat Cost."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "89",
+   "name": "Spiritomb",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Darkness",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Spirit Compressor",
+     "cost": "C",
+     "damage": 0,
+     "text": "Look through your deck for up to 4 Pokémon and discard them. Shuffle your deck."
+    },
+    {
+     "name": "Spooky Shot",
+     "cost": "C",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "90",
+   "name": "Zorua",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Hide in Shadows",
+     "cost": "D",
+     "damage": 0,
+     "text": "Switch this Pokémon with 1 of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "91",
+   "name": "Zoroark",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Zorua",
+   "hp": 110,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Taunt",
+     "cost": "D",
+     "damage": 0,
+     "text": "Switch 1 of your opponent's Benched Pokémon with their Active Pokémon."
+    },
+    {
+     "name": "Night Punishment",
+     "cost": "DCC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Does 20 damage for each Pokémon in your discard pile. You can't do more than 200 damage in this way."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "92",
+   "name": "Vullaby",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Darkness",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Collect",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw a card."
+    },
+    {
+     "name": "Corkscrew Punch",
+     "cost": "D",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "93",
+   "name": "Mandibuzz",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Vullaby",
+   "hp": 120,
+   "type": "Darkness",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Trash Crash",
+     "cost": "D",
+     "damage": 0,
+     "text": "Discard an Item card from your hand. If you do, this attack does 60 damage to 1 of your opponent's Pokémon. This damage isn't affected by Weakness or Resistance."
+    },
+    {
+     "name": "Brave Bird",
+     "cost": "DCC",
+     "damage": 120,
+     "text": "This Pokémon does 30 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "94",
+   "name": "Pangoro",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Pancham",
+   "hp": 140,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Tighten Up",
+     "cost": "DCC",
+     "damage": 60,
+     "text": "Your opponent discards 2 cards from their hand."
+    },
+    {
+     "name": "Tantrum",
+     "cost": "DDCC",
+     "damage": 170,
+     "text": "This Pokémon becomes Confused."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "95",
+   "name": "Yveltal",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 110,
+   "type": "Darkness",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Derail",
+     "cost": "D",
+     "damage": 30,
+     "text": "Discard a Special Energy from your opponent's Active Pokémon."
+    },
+    {
+     "name": "Clutch",
+     "cost": "DD",
+     "damage": 60,
+     "text": "The Defending Pokémon can't retreat during your opponent's next turn."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "96",
+   "name": "Hoopa-GX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "GX",
+   "text": "Pokémon-GX rule: when your Pokémon-GX is Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Basic",
+   "hp": 190,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Rogue Ring",
+     "cost": "D",
+     "damage": 0,
+     "text": "Look through your deck for up to 2 cards and put them into your hand. Shuffle your deck."
+    },
+    {
+     "name": "Dark Strike",
+     "cost": "DDD",
+     "damage": 160,
+     "text": "This Pokémon can't use Dark Strike during your next turn."
+    },
+    {
+     "name": "Devilish Hands-GX",
+     "cost": "DDD",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon-GX or Pokémon-EX 6 times (you can choose the same Pokémon more than once). For each time you chose a Pokémon, do 30 damage to it. This damage isn't affected by Weakness or Resistance. (Only 1 GX attack per game.)"
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "97",
+   "name": "Incineroar-GX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "GX",
+   "text": "Pokémon-GX rule: when your Pokémon-GX is Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Stage2",
+   "evolvesFrom": "Torracat",
+   "hp": 250,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Scar Charge",
+     "text": "Once during your turn (before your attack), you may put 3 damage counters on this Pokémon. If you do, look through your deck for up to 3 Darkness Energy cards and attach them to this Pokémon. Shuffle your deck."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Crushing Punch",
+     "cost": "CCC",
+     "damage": 130,
+     "text": "Discard a Special Energy from your opponent's Active Pokémon."
+    },
+    {
+     "name": "Darkest Tornado-GX",
+     "cost": "CCC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Does 50 more damage for each damage counter on this Pokémon. (Only 1 GX attack per game.)"
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "98",
+   "name": "Skarmory",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 110,
+   "type": "Metal",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Calm Strike",
+     "cost": "MC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "If you have used your GX attack, it does 70 more damage."
+    },
+    {
+     "name": "Steel Wing",
+     "cost": "MMC",
+     "damage": 90,
+     "text": "During your opponent's next turn, this Pokémon takes 30 less damage from attacks (after Weakness and Resistance)."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "99",
+   "name": "Jirachi",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Stellar Wish",
+     "text": "Once during your turn (before your attack), if this Pokémon is your Active Pokémon, you may look at the top 5 cards of your deck, reveal a Trainer card you find there, and put it into your hand. Then, shuffle the other cards back into your deck, and this Pokémon becomes Asleep."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Slap",
+     "cost": "MC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "100",
+   "name": "Bronzor",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Evolutionary Advantage",
+     "text": "If you go second, this Pokémon can evolve during your first turn."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Tackle",
+     "cost": "MC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "101",
+   "name": "Bronzong",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Bronzor",
+   "hp": 130,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Heatproof",
+     "text": "Prevent all damage done to this Pokémon by attacks from your opponent's Fire Pokémon."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Shady Stamp",
+     "cost": "MCC",
+     "damage": 70,
+     "text": "Your opponent's Active Pokémon becomes Confused."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "102",
+   "name": "Ferroseed",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Continuous Tumble",
+     "cost": "M",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Flip a coin until you get tails. Does 20 damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "103",
+   "name": "Ferrothorn",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Ferroseed",
+   "hp": 120,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Guard Press",
+     "cost": "M",
+     "damage": 20,
+     "text": "During your opponent's next turn, this Pokémon takes 20 less damage from attacks (after Weakness and Resistance)."
+    },
+    {
+     "name": "Thorn Pod Throw",
+     "cost": "CCC",
+     "damage": 80,
+     "text": "This attack does 20 damage times the amount of Metal Energy attached to this Pokémon to 1 of your opponent's Benched Pokémon. You can't do more than 100 damage to a Benched Pokémon in this way. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "104",
+   "name": "Pawniard",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Rigidify",
+     "cost": "M",
+     "damage": 0,
+     "text": "During your opponent's next turn, this Pokémon takes 30 less damage from attacks (after Weakness and Resistance)."
+    },
+    {
+     "name": "Scratch",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "105",
+   "name": "Bisharp",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Pawniard",
+   "hp": 110,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Single Lunge",
+     "cost": "M",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "If this Pokémon has no damage counters on it, it does 90 more damage."
+    },
+    {
+     "name": "Power Edge",
+     "cost": "MCC",
+     "damage": 90
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "106",
+   "name": "Cobalion-GX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "GX",
+   "text": "Pokémon-GX rule: when your Pokémon-GX is Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Basic",
+   "hp": 170,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Metal Symbol",
+     "text": "Each of your Pokémon that has any Metal Energy attached to it can't be affected by any Special Conditions. Remove any Special Conditions affecting those Pokémon."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Dueling Saber",
+     "cost": "MM",
+     "damage": 50,
+     "damageSuffix": "+",
+     "text": "If there is any Stadium card in play, it does 60 more damage."
+    },
+    {
+     "name": "Iron Rule-GX",
+     "cost": "C",
+     "damage": 0,
+     "text": "During your opponent's next turn, their Pokémon can't attack. (This includes Pokémon that come into play on that turn.) (Only 1 GX attack per game.)"
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "107",
+   "name": "Honedge",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Cut Down",
+     "cost": "M",
+     "damage": 0,
+     "text": "Flip a coin. On heads, discard an Energy from your opponent's Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "108",
+   "name": "Doublade",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Honedge",
+   "hp": 90,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Tool Drop",
+     "cost": "CC",
+     "damage": 30,
+     "damageSuffix": "x",
+     "text": "Does 30 damage for each Pokémon Tool card attached to all Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "109",
+   "name": "Aegislash",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Doublade",
+   "hp": 140,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Royal Guard",
+     "text": "This Pokémon takes 40 less damage from attacks (after Weakness and Resistance)."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Shield Bash",
+     "cost": "MCC",
+     "damage": 100,
+     "text": "This attack's damage isn't affected by any effects on your opponent's Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "110",
+   "name": "Klefki",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Key of Secrets",
+     "text": "Each of your Metal Pokémon's Resistance is now -40."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Ram",
+     "cost": "MC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "111",
+   "name": "Alolan Ninetales",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Alolan Vulpix",
+   "hp": 110,
+   "type": "Fairy",
+   "weakness": "Metal",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Luminous Barrier",
+     "text": "Prevent all effects of attacks, including damage, done to this Pokémon by your opponent's Pokémon-GX or Pokémon-EX."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Aurora Beam",
+     "cost": "YCC",
+     "damage": 80
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "112",
+   "name": "Mimikyu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fairy",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Filch",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw 2 cards."
+    },
+    {
+     "name": "Copycat",
+     "cost": "YC",
+     "damage": 0,
+     "text": "If your opponent's Pokémon used an attack that isn't a GX attack during their last turn, use it as this attack."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "113",
+   "name": "Latias & Latios-GX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "TAG TEAM",
+   "text": "TAG TEAM rule: when your TAG TEAM is Knocked Out, your opponent takes 3 Prize cards.",
+   "stage": "Basic",
+   "hp": 250,
+   "type": "Dragon",
+   "weakness": "Fairy",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Buster Purge",
+     "cost": "WPPC",
+     "damage": 240,
+     "text": "Discard 3 Energy from this Pokémon."
+    },
+    {
+     "name": "Aero Unit-GX",
+     "cost": "P",
+     "damage": 0,
+     "text": "Attach 5 basic Energy cards from your discard pile to your Pokémon in any way you like. If this Pokémon has at least 1 extra Energy attached to it (in addition to this attack's cost), prevent all effects of attacks, including damage, done to it during your opponent's next turn. (Only 1 GX attack per game.)"
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "114",
+   "name": "Alolan Exeggutor",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Exeggcute",
+   "hp": 160,
+   "type": "Dragon",
+   "weakness": "Fairy",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Tropical Shake",
+     "cost": "G",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Does 20 more damage for each type of basic Energy card in your discard pile. You can't add more than 100 damage in this way."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "115",
+   "name": "Alolan Exeggutor",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Exeggcute",
+   "hp": 160,
+   "type": "Dragon",
+   "weakness": "Fairy",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Paradise Draw",
+     "cost": "",
+     "damage": 0,
+     "text": "You may discard any number of cards from your hand. Then, draw cards until you have 6 cards in your hand."
+    },
+    {
+     "name": "Egg Splat",
+     "cost": "GC",
+     "damage": 60,
+     "damageSuffix": "x",
+     "text": "Discard any number of Exeggcute from your hand. Does 60 damage for each card you discarded in this way."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "116",
+   "name": "Dratini",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Dragon",
+   "weakness": "Fairy",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Dragon Rage",
+     "cost": "L",
+     "damage": 60,
+     "text": "Flip 2 coins. If either of them is tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "117",
+   "name": "Dratini",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Dragon",
+   "weakness": "Fairy",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Defensive Scales",
+     "text": "Prevent all effects of your opponent's attacks, except damage, done to this Pokémon."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Rain Splash",
+     "cost": "W",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "119",
+   "name": "Dragonite",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Dragonair",
+   "hp": 160,
+   "type": "Dragon",
+   "weakness": "Fairy",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Fast Call",
+     "text": "Once during your turn (before your attack), you may look through your deck for a Supporter card, show it to your opponent, and put it into your hand. Shuffle your deck."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Dragon Claw",
+     "cost": "WLC",
+     "damage": 120
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "120",
+   "name": "Eevee & Snorlax-GX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "TAG TEAM",
+   "text": "TAG TEAM rule: when your TAG TEAM is Knocked Out, your opponent takes 3 Prize cards.",
+   "stage": "Basic",
+   "hp": 270,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Cheer Up",
+     "cost": "C",
+     "damage": 0,
+     "text": "Attach an Energy card from your hand to 1 of your Pokémon."
+    },
+    {
+     "name": "Dump Truck Press",
+     "cost": "CCCC",
+     "damage": 120,
+     "damageSuffix": "+",
+     "text": "If your opponent's Active Pokémon is an Evolution Pokémon, it does 120 more damage."
+    },
+    {
+     "name": "Megaton Friends-GX",
+     "cost": "CCCC",
+     "damage": 210,
+     "text": "If this Pokémon has at least 1 extra Energy attached to it (in addition to this attack's cost), draw cards until you have 10 cards in your hand. (Only 1 GX attack per game.)"
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "121",
+   "name": "Pidgey",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Collect",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw a card."
+    },
+    {
+     "name": "Gust",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "122",
+   "name": "Pidgey",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Quick Attack",
+     "cost": "C",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 10 more damage."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "123",
+   "name": "Pidgeotto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Pidgey",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Air Mail",
+     "text": "Once during your turn (before your attack), you may look at the top 2 cards of your deck and put 1 of them into your hand. Put the other card on the bottom of your deck."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Gust",
+     "cost": "CC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "124",
+   "name": "Pidgeot",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Pidgeotto",
+   "hp": 130,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Whirlwind",
+     "cost": "CC",
+     "damage": 60,
+     "text": "Your opponent switches their Active Pokémon with 1 of their Benched Pokémon."
+    },
+    {
+     "name": "Spin Storm",
+     "cost": "CCC",
+     "damage": 0,
+     "text": "Your opponent puts their Active Pokémon and all cards attached to it into their hand."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "125",
+   "name": "Meowth",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Scratch",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Bite",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "126",
+   "name": "Persian",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Meowth",
+   "hp": 100,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Make 'Em Pay",
+     "cost": "C",
+     "damage": 20,
+     "text": "If your opponent has 4 or more cards in their hand, they reveal their hand. Discard cards you find there until your opponent has exactly 4 cards in their hand."
+    },
+    {
+     "name": "Sharp Claws",
+     "cost": "CC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 60 more damage."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "127",
+   "name": "Farfetch'd",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Collect",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw 2 cards."
+    },
+    {
+     "name": "Tool Buster",
+     "cost": "C",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Before doing damage, discard all Pokémon Tool cards from your opponent's Active Pokémon. If you discarded a Pokémon Tool card in this way, it does 70 more damage."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "128",
+   "name": "Kangaskhan",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 130,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Fast Evolution",
+     "cost": "C",
+     "damage": 0,
+     "text": "Look through your deck for up to 2 Evolution Pokémon, show them to your opponent, and put them into your hand. Shuffle your deck."
+    },
+    {
+     "name": "Mega Punch",
+     "cost": "CCC",
+     "damage": 80
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "129",
+   "name": "Tauros",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 130,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Raging Herd",
+     "cost": "CC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Does 10 more damage for each damage counter on all of your Tauros and Tauros-GX."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "130",
+   "name": "Aerodactyl",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Unidentified Fossil",
+   "hp": 130,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Supersonic",
+     "cost": "C",
+     "damage": 0,
+     "text": "Your opponent's Active Pokémon becomes Confused."
+    },
+    {
+     "name": "Fossil Fangs",
+     "cost": "CCC",
+     "damage": 90,
+     "damageSuffix": "+",
+     "text": "If you don't have any Pokémon-GX or Pokémon-EX on your Bench, it does 90 more damage."
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "131",
+   "name": "Lugia",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 130,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Power Charger",
+     "cost": "C",
+     "damage": 30,
+     "text": "Look through your deck for a basic Energy card and attach it to this Pokémon. Shuffle your deck."
+    },
+    {
+     "name": "Blasting Wind",
+     "cost": "CCCC",
+     "damage": 110
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "132",
+   "name": "Zangoose",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Head Hunt",
+     "cost": "C",
+     "damage": 0,
+     "text": "Look at the top 6 cards of your deck, reveal any number of Pokémon you find there, and put them into your hand. Discard the other cards."
+    },
+    {
+     "name": "Slash",
+     "cost": "CC",
+     "damage": 40
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "134",
+   "name": "Black Market ◇",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Stadium",
+   "text": "When a Darkness Pokémon (yours or your opponent's) that has any Darkness Energy attached to it is Knocked Out by damage from an opponent's attack, that player takes 1 fewer Prize card. Whenever any player plays an Item or Supporter card from their hand, prevent all effects of that card done to this Stadium card. Prism Star rule: only 1 card with this name in a deck. If it would go to the discard pile, put it in the Lost Zone instead."
+  },
+  {
+   "set": "TEU",
+   "number": "136",
+   "name": "Buff Padding",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Tool",
+   "text": "If the Pokémon this card is attached to has a Retreat Cost of exactly 4, it gets +50 HP."
+  },
+  {
+   "set": "TEU",
+   "number": "137",
+   "name": "Dana",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Supporter",
+   "text": "You can play this card only if your opponent's Active Pokémon is a Stage 2 Pokémon. Look through your deck for up to 2 cards and put them into your hand. Shuffle your deck."
+  },
+  {
+   "set": "TEU",
+   "number": "138",
+   "name": "Dangerous Drill",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Item",
+   "text": "You can play this card only if you discard a Darkness Pokémon from your hand. Discard a Pokémon Tool or Special Energy card from 1 of your opponent's Pokémon, or discard any Stadium card in play."
+  },
+  {
+   "set": "TEU",
+   "number": "139",
+   "name": "Electrocharger",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Item",
+   "text": "Flip 2 coins. For each heads, shuffle an Electropower card from your discard pile into your deck."
+  },
+  {
+   "set": "TEU",
+   "number": "141",
+   "name": "Evelyn",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Supporter",
+   "text": "You can play this card only if your opponent's Active Pokémon is a Stage 1 Pokémon. Draw 4 cards."
+  },
+  {
+   "set": "TEU",
+   "number": "142",
+   "name": "Fairy Charm UB",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Tool",
+   "text": "Prevent all damage done to the Fairy Pokémon this card is attached to by attacks from your opponent's Ultra Beast Pokémon-GX and Ultra Beast Pokémon-EX."
+  },
+  {
+   "set": "TEU",
+   "number": "143",
+   "name": "Grass Memory",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Tool",
+   "text": "The Silvally-GX this card is attached to is a Grass Pokémon."
+  },
+  {
+   "set": "TEU",
+   "number": "144",
+   "name": "Ingo & Emmet",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Supporter",
+   "text": "Look at the top card of your deck, and then choose 1: - Discard your hand and draw 5 cards. - Discard your hand and draw 5 cards from the bottom of your deck."
+  },
+  {
+   "set": "TEU",
+   "number": "145",
+   "name": "Jasmine",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Supporter",
+   "text": "Look through your deck for a Metal Pokémon, show it to your opponent, and put it into your hand. If you go second and it's your first turn, search for 5 Metal Pokémon instead of 1. Shuffle your deck."
+  },
+  {
+   "set": "TEU",
+   "number": "146",
+   "name": "Judge Whistle",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Item",
+   "text": "Choose 1: - Draw a card. - Put a Judge card from your discard pile into your hand."
+  },
+  {
+   "set": "TEU",
+   "number": "147",
+   "name": "Lavender Town",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Stadium",
+   "text": "Once during each player's turn, that player may have their opponent reveal their hand."
+  },
+  {
+   "set": "TEU",
+   "number": "148",
+   "name": "Metal Goggles",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Tool",
+   "text": "The Metal Pokémon this card is attached to takes 30 less damage from your opponent's attacks (after Weakness and Resistance), and your opponent's attacks and Abilities can't put damage counters on it."
+  },
+  {
+   "set": "TEU",
+   "number": "149",
+   "name": "Morgan",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Supporter",
+   "text": "You can play this card only if you discard Dana, Evelyn, and Nita from your hand. Look at the top 12 cards of your deck and attach any number of Energy cards you find there to your Pokémon in any way you like. Shuffle the other cards back into your deck."
+  },
+  {
+   "set": "TEU",
+   "number": "150",
+   "name": "Nanu",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Supporter",
+   "text": "Choose a Basic Darkness Pokémon in your discard pile. Switch it with 1 of your Pokémon in play. Any attached cards, damage counters, Special Conditions, turns in play, and any other effects remain on the new Pokémon."
+  },
+  {
+   "set": "TEU",
+   "number": "151",
+   "name": "Nita",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Supporter",
+   "text": "You can play this card only if your opponent's Active Pokémon is a Basic Pokémon. Put an Energy from your opponent's Active Pokémon on top of their deck."
+  },
+  {
+   "set": "TEU",
+   "number": "152",
+   "name": "Pokémon Communication",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Item",
+   "text": "Reveal a Pokémon from your hand and put it into your deck. If you do, look through your deck for a Pokémon, show it to your opponent, and put it into your hand. Shuffle your deck."
+  },
+  {
+   "set": "TEU",
+   "number": "153",
+   "name": "Return Label",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Item",
+   "text": "Put a card from your opponent's discard pile on the bottom of their deck."
+  },
+  {
+   "set": "TEU",
+   "number": "157",
+   "name": "Water Memory",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Tool",
+   "text": "The Silvally-GX this card is attached to is a Water Pokémon."
+  },
+  {
+   "set": "TEU",
+   "number": "160",
+   "name": "Magikarp & Wailord-GX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "TAG TEAM",
+   "text": "TAG TEAM rule: when your TAG TEAM is Knocked Out, your opponent takes 3 Prize cards.",
+   "stage": "Basic",
+   "hp": 300,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Super Splash",
+     "cost": "WWWWW",
+     "damage": 180
+    },
+    {
+     "name": "Towering Splash-GX",
+     "cost": "W",
+     "damage": 10,
+     "text": "If this Pokémon has at least 7 extra Water Energy attached to it (in addition to this attack's cost), this attack does 100 damage to each of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.) (Only 1 GX attack per game.)"
+    }
+   ]
+  },
+  {
+   "set": "TEU",
+   "number": "158",
+   "name": "Wondrous Labyrinth ◇",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Stadium",
+   "text": "The attacks of non-Fairy Pokémon (yours and your opponent's) cost Colorless more. Whenever any player plays an Item or Supporter card from their hand, prevent all effects of that card done to this Stadium card. Prism Star rule: only 1 card with this name in a deck. If it would go to the discard pile, put it in the Lost Zone instead."
+  }
+ ]
+}

@@ -1,0 +1,494 @@
+{
+ "format": "POP Series 1 (P1, 2004): cards not already in the pool. Unlimited only.",
+ "cards": [
+  {
+   "set": "P1",
+   "number": "1",
+   "name": "Blaziken",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Combusken",
+   "hp": 110,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Fire Punch",
+     "cost": "RC",
+     "damage": 40
+    },
+    {
+     "name": "Double Kick",
+     "cost": "CCC",
+     "damage": 50,
+     "damageSuffix": "x",
+     "text": "Flip 2 coins. This attack does 50 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "P1",
+   "number": "2",
+   "name": "Metagross",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Metang",
+   "hp": 100,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "resistanceAmount": 30,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Metal Claw",
+     "cost": "MC",
+     "damage": 30
+    },
+    {
+     "name": "Hyper Beam",
+     "cost": "CCCC",
+     "damage": 50,
+     "text": "Flip a coin. If heads, discard 1 Energy attached to the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "P1",
+   "number": "3",
+   "name": "Rayquaza",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Colorless",
+   "weakness": "Colorless",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Fly",
+     "cost": "C",
+     "damage": 10,
+     "text": "Flip a coin. If tails, this attack does nothing. If heads, prevent all effects of an attack, including damage, done to this Pokémon during your opponent's next turn."
+    },
+    {
+     "name": "Dragon Claw",
+     "cost": "RL",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "P1",
+   "number": "4",
+   "name": "Sceptile",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Grovyle",
+   "hp": 100,
+   "type": "Grass",
+   "weakness": "Fire",
+   "resistance": "Water",
+   "resistanceAmount": 30,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Cling",
+     "cost": "G",
+     "damage": 20,
+     "text": "After your attack, remove from this Pokémon the number of damage counters equal to the damage you did to the Defending Pokémon. If this Pokémon has fewer damage counters than that, remove all of them."
+    },
+    {
+     "name": "Leaf Blade",
+     "cost": "GGC",
+     "damage": 40,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 40 damage plus 30 more damage."
+    }
+   ]
+  },
+  {
+   "set": "P1",
+   "number": "5",
+   "name": "Swampert",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Marshtomp",
+   "hp": 100,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Bubble",
+     "cost": "W",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    },
+    {
+     "name": "Mud Splash",
+     "cost": "WWC",
+     "damage": 50,
+     "text": "If your opponent has any Benched Pokémon, choose 1 of them and flip a coin. If heads, this attack does 20 damage to that Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "P1",
+   "number": "6",
+   "name": "Beautifly",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Silcoon",
+   "hp": 100,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Blot",
+     "cost": "GC",
+     "damage": 30,
+     "text": "Remove 1 damage counter from this Pokémon."
+    },
+    {
+     "name": "Whirlwind",
+     "cost": "CCC",
+     "damage": 40,
+     "text": "Your opponent switches the Defending Pokémon with 1 of their Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "P1",
+   "number": "7",
+   "name": "Masquerain",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Surskit",
+   "hp": 70,
+   "type": "Grass",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Quick Attack",
+     "cost": "C",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 damage plus 20 more damage."
+    },
+    {
+     "name": "Gust",
+     "cost": "GCC",
+     "damage": 50
+    }
+   ]
+  },
+  {
+   "set": "P1",
+   "number": "8",
+   "name": "Murkrow",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Insomnia",
+     "text": "This Pokémon can't be Asleep.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Feint Attack",
+     "cost": "CC",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon. This attack does 20 damage to that Pokémon. This attack's damage isn't affected by Weakness, Resistance, Poké-Powers, Poké-Bodies, or any other effects on that Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "P1",
+   "number": "9",
+   "name": "Pupitar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Larvitar",
+   "hp": 70,
+   "type": "Fighting",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Rock Smash",
+     "cost": "FC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 20 damage plus 10 more damage."
+    }
+   ]
+  },
+  {
+   "set": "P1",
+   "number": "10",
+   "name": "Torkoal",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Fighting",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Amnesia",
+     "cost": "C",
+     "damage": 0,
+     "text": "Choose 1 of the Defending Pokémon's attacks. That Pokémon can't use that attack during your opponent's next turn."
+    },
+    {
+     "name": "Body Slam",
+     "cost": "FC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "P1",
+   "number": "11",
+   "name": "Larvitar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Fighting",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sand Attack",
+     "cost": "F",
+     "damage": 10,
+     "text": "If the Pokémon tries to attack during your opponent's next turn, your opponent flips a coin. If tails, that attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "P1",
+   "number": "12",
+   "name": "Minun",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Thunder Wave",
+     "cost": "L",
+     "damage": 10,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    },
+    {
+     "name": "Spark",
+     "cost": "CC",
+     "damage": 10,
+     "text": "Choose 2 of your opponent's Benched Pokémon. This attack does 10 damage to each of those Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "P1",
+   "number": "13",
+   "name": "Plusle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Quick Attack",
+     "cost": "C",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 damage plus 10 more damage."
+    },
+    {
+     "name": "Agility",
+     "cost": "LC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, prevent all effects of an attack, including damage, done to this Pokémon during your opponent's next turn."
+    }
+   ]
+  },
+  {
+   "set": "P1",
+   "number": "14",
+   "name": "Surskit",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bubble",
+     "cost": "W",
+     "damage": 10,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "P1",
+   "number": "15",
+   "name": "Swellow",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Taillow",
+   "hp": 70,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Focus Energy",
+     "cost": "C",
+     "damage": 0,
+     "text": "During your next turn, base damage of this Pokémon's Agility is 70 instead of 30."
+    },
+    {
+     "name": "Agility",
+     "cost": "CC",
+     "damage": 30,
+     "text": "Flip a coin. If heads, prevent all effects of an attack, including damage, done to this Pokémon during your opponent's next turn."
+    }
+   ]
+  },
+  {
+   "set": "P1",
+   "number": "16",
+   "name": "Armaldo ex",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "mechanic": "Pokémon-ex",
+   "stage": "Stage2",
+   "evolvesFrom": "Anorith",
+   "hp": 160,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "weakness2": "Water",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Twin-blade",
+     "cost": "FC",
+     "damage": 0,
+     "text": "Does 30 damage to each Defending Pokémon."
+    },
+    {
+     "name": "Supersonic Claws",
+     "cost": "FFCCC",
+     "damage": 80,
+     "text": "This attack's damage is not affected by Resistance."
+    }
+   ]
+  },
+  {
+   "set": "P1",
+   "number": "17",
+   "name": "Tyranitar ex",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "mechanic": "Pokémon-ex",
+   "stage": "Stage2",
+   "evolvesFrom": "Pupitar",
+   "hp": 150,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "weakness2": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 30,
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Scratch",
+     "cost": "C",
+     "damage": 20
+    },
+    {
+     "name": "Critical Crush",
+     "cost": "FFCC",
+     "damage": 80,
+     "text": "Discard 2 Basic Energy cards attached to this Pokémon or this attack does nothing."
+    }
+   ]
+  }
+ ]
+}

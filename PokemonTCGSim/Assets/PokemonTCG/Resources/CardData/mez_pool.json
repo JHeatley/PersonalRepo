@@ -1,0 +1,60 @@
+{
+ "format": "Japanese ex Starter Set Zorua & Zoroark ex (MEZ; v154): cards not yet in English, names and attack names translated from Japanese until the English cards are out. Regulation mark J = Standard.",
+ "cards": [
+  {
+   "set": "MEZ",
+   "number": "3",
+   "name": "Darkrai",
+   "kind": "Pokemon",
+   "regulationMark": "J",
+   "text": "",
+   "stage": "Basic",
+   "hp": 120,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Shadow Cloak",
+     "cost": "D",
+     "damage": 0,
+     "text": "Search your deck for up to 2 Basic Darkness Energy cards and attach them to this Pokémon. Then, shuffle your deck."
+    },
+    {
+     "name": "Dark Cutter",
+     "cost": "DDC",
+     "damage": 110
+    }
+   ]
+  },
+  {
+   "set": "MEZ",
+   "number": "7",
+   "name": "Zoroark ex",
+   "kind": "Pokemon",
+   "regulationMark": "J",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Zorua",
+   "hp": 270,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 2,
+   "ex": true,
+   "attacks": [
+    {
+     "name": "Riot Beat",
+     "cost": "D",
+     "damage": 20,
+     "text": "This attack does 20 damage for each of your Pokémon in play."
+    },
+    {
+     "name": "Slash Down",
+     "cost": "DCC",
+     "damage": 210,
+     "text": "During your next turn, this Pokémon can't use Slash Down."
+    }
+   ]
+  }
+ ]
+}

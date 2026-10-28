@@ -1,0 +1,2877 @@
+{
+ "format": "Gym Challenge (G2, 2000): cards not already in the pool. Unlimited only. 17-20 are the holo Blaine, Giovanni, Koga and Sabrina; 15, 69 and 93 are prints of Celebrations, 30th Celebration and Wizards promo cards; 127-132 are the basic Energy.",
+ "cards": [
+  {
+   "set": "G2",
+   "number": "1",
+   "name": "Blaine's Arcanine",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Blaine's Growlithe",
+   "hp": 90,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Heat Tackle",
+     "cost": "RCC",
+     "damage": 40,
+     "text": "This Pokémon does 10 damage to itself."
+    },
+    {
+     "name": "Firestorm",
+     "cost": "RRRR",
+     "damage": 120,
+     "text": "Discard 3 Fire Energy cards attached to this Pokémon in order to use this attack."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "2",
+   "name": "Blaine's Charizard",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage2",
+   "evolvesFrom": "Blaine's Charmeleon",
+   "hp": 100,
+   "type": "Fire",
+   "weakness": "Water",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Roaring Flames",
+     "cost": "R",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Discard all Fire Energy cards attached to this Pokémon. If all Energy cards attached to this Pokémon provide 2 Fire Energy, discard all of them. This attack does 20 damage plus 20 more damage for each Fire Energy discarded in this way."
+    },
+    {
+     "name": "Flame Jet",
+     "cost": "RR",
+     "damage": 0,
+     "text": "Flip a coin. If heads, choose 1 of your opponent's Pokémon. This attack does 40 damage to that Pokémon. Don't apply Weakness and Resistance for this attack. (Any other effects that would happen after applying Weakness and Resistance still happen.)"
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "3",
+   "name": "Brock's Ninetales",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Brock's Vulpix",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Shapeshift",
+     "text": "Once during your turn (before your attack), you may attach an Evolution card from your hand to this Pokémon. (This doesn't count as evolving this Pokémon.) Treat this Pokémon as if it were that Pokémon instead. It can't evolve, devolve, or use the Pokémon Power of that Pokémon. During your turn, you may discard the Evolution card attached to this Pokémon. This power can't be used if this Pokémon is Asleep, Confused, or Paralyzed. If this Pokémon becomes Asleep, Confused, or Paralyzed, discard all Evolution cards attached to it.",
+     "kind": "Pokémon Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Will-o'-the-wisp",
+     "cost": "RR",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "4",
+   "name": "Erika's Venusaur",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage2",
+   "evolvesFrom": "Erika's Ivysaur",
+   "hp": 90,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Growth",
+     "cost": "G",
+     "damage": 0,
+     "text": "Flip a coin. If heads, you may attach up to 2 Grass Energy cards from your hand to this Pokémon."
+    },
+    {
+     "name": "Wide Solarbeam",
+     "cost": "GGGG",
+     "damage": 20,
+     "text": "If your opponent has any Benched Pokémon, choose 2 of them (or 1 if they only have 1). This attack does 20 damage to each of them. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "5",
+   "name": "Giovanni's Gyarados",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Giovanni's Magikarp",
+   "hp": 90,
+   "type": "Water",
+   "weakness": "Grass",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Summon Storm",
+     "cost": "W",
+     "damage": 0,
+     "text": "Flip 2 coins. If both of them are heads, this attack does 20 damage to each other Pokémon (even your own). Don't apply Weakness and Resistance for this attack."
+    },
+    {
+     "name": "Dragon Tornado",
+     "cost": "WWCC",
+     "damage": 40,
+     "text": "Unless this attack Knocks Out the Defending Pokémon, choose 1 of your opponent's Benched Pokémon and switch it with the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "6",
+   "name": "Giovanni's Machamp",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage2",
+   "evolvesFrom": "Giovanni's Machoke",
+   "hp": 100,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Fortitude",
+     "text": "If this Pokémon would be Knocked Out by an opponent's attack, flip a coin. If heads, this Pokémon is not Knocked Out and its remaining HP become 10 instead. This power can't be used if this Pokémon is already Asleep, Confused, or Paralyzed.",
+     "kind": "Pokémon Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Hurricane Punch",
+     "cost": "FFFC",
+     "damage": 30,
+     "damageSuffix": "x",
+     "text": "Flip 4 coins. This attack does 30 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "7",
+   "name": "Giovanni's Nidoking",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage2",
+   "evolvesFrom": "Giovanni's Nidorino",
+   "hp": 120,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Intimidate",
+     "cost": "G",
+     "damage": 0,
+     "text": "If the Defending Pokémon's maximum HP is 50 or less, it can't attack this Pokémon during your opponent's next turn. (Benching or evolving either Pokémon ends this effect.)"
+    },
+    {
+     "name": "Tumbling Attack",
+     "cost": "GGGC",
+     "damage": 40,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 30 more damage."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "8",
+   "name": "Giovanni's Persian",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Giovanni's Meowth",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 30,
+   "retreat": 0,
+   "abilities": [
+    {
+     "name": "Call the Boss",
+     "text": "When you play this Pokémon from your hand, you may search your deck for the Trainer card named Giovanni, show it to your opponent, and put it into your hand. Shuffle your deck afterward.",
+     "kind": "Pokémon Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Ambush",
+     "cost": "CCC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "9",
+   "name": "Koga's Beedrill",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage2",
+   "evolvesFrom": "Koga's Kakuna",
+   "hp": 80,
+   "type": "Grass",
+   "weakness": "Fire",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Nerve Poison",
+     "cost": "GG",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed and Poisoned."
+    },
+    {
+     "name": "Hyper Needle",
+     "cost": "CCC",
+     "damage": 70,
+     "text": "Flip a coin. If tails, this attack does nothing. Either way, you can't use this attack again as long as this Pokémon stays in play (even putting this Pokémon on the Bench won't let you use it again)."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "10",
+   "name": "Koga's Ditto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Giant Growth",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. If heads, this Pokémon's maximum HP is now 80 and this Pokémon's Pound attack's base damage is 30 instead of 10. (Benching this Pokémon ends this effect.)"
+    },
+    {
+     "name": "Pound",
+     "cost": "C",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "11",
+   "name": "Lt. Surge's Raichu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Lt. Surge's Pikachu",
+   "hp": 80,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Kerzap",
+     "cost": "LL",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 20 damage plus 30 more damage to the Defending Pokémon and discard all Lightning Energy cards attached to this Pokémon. If tails, this attack does 20 damage."
+    },
+    {
+     "name": "Thundertackle",
+     "cost": "LLCC",
+     "damage": 40,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed. If tails, this Pokémon does 20 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "12",
+   "name": "Misty's Golduck",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Misty's Psyduck",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Electro Beam",
+     "cost": "WC",
+     "damage": 40,
+     "text": "Flip a coin. If tails, discard all Energy cards attached to this Pokémon."
+    },
+    {
+     "name": "Super Removal",
+     "cost": "PC",
+     "damage": 0,
+     "text": "Flip a coin. If heads, choose 1 Energy card attached to each of your opponent's Pokémon that has any Energy cards and discard those Energy cards."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "13",
+   "name": "Misty's Gyarados",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Misty's Magikarp",
+   "hp": 100,
+   "type": "Water",
+   "weakness": "Grass",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Rebellion",
+     "text": "Whenever this Pokémon attacks, flip 2 coins. If both of them are tails, that attack does nothing. Instead, shuffle this Pokémon and all cards attached to it into your deck. (This power works even if this Pokémon is Confused.)",
+     "kind": "Pokémon Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Tidal Wave",
+     "cost": "WWWW",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "14",
+   "name": "Rocket's Mewtwo",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Juxtapose",
+     "cost": "P",
+     "damage": 0,
+     "text": "Flip a coin. If heads, switch the number of damage counters on this Pokémon with the number of damage counters on the Defending Pokémon (even if it would Knock Out either Pokémon). (It's okay if 1 of the Pokémon has no damage counters on it.)"
+    },
+    {
+     "name": "Hypnoblast",
+     "cost": "PP",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Asleep."
+    },
+    {
+     "name": "Psyburn",
+     "cost": "PPPC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "16",
+   "name": "Sabrina's Alakazam",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage2",
+   "evolvesFrom": "Sabrina's Kadabra",
+   "hp": 80,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Psylink",
+     "text": "This Pokémon always has a copy of every attack your Psychic Pokémon in play have (including their Energy costs and anything else required in order to use those attacks, such as discarding Energy cards). This power can't be used if this Pokémon is Asleep, Confused, or Paralyzed.",
+     "kind": "Pokémon Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Mega Burn",
+     "cost": "PCCC",
+     "damage": 60,
+     "text": "You can't use this attack during your next turn."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "21",
+   "name": "Blaine's Ninetales",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Blaine's Vulpix",
+   "hp": 60,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Healing Fire",
+     "text": "Whenever you attach a Fire Energy card from your hand to this Pokémon, remove 1 damage counter from it, if it has any. This power stops working when this Pokémon is Asleep, Confused, or Paralyzed.",
+     "kind": "Pokémon Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Burn Up",
+     "cost": "RR",
+     "damage": 50,
+     "text": "Flip a coin. If tails, discard all Fire Energy cards attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "22",
+   "name": "Brock's Dugtrio",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Brock's Diglett",
+   "hp": 60,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "resistance": "Lightning",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Lie Low",
+     "cost": "F",
+     "damage": 0,
+     "text": "All damage done to this Pokémon during your opponent's next turn is reduced by 20 (after applying Weakness and Resistance)."
+    },
+    {
+     "name": "Earthdrill",
+     "cost": "FFC",
+     "damage": 60,
+     "text": "This attack can't be used unless this Pokémon used its Lie Low attack last turn."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "23",
+   "name": "Giovanni's Nidoqueen",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage2",
+   "evolvesFrom": "Giovanni's Nidorina",
+   "hp": 100,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Mega Kick",
+     "cost": "GGC",
+     "damage": 40
+    },
+    {
+     "name": "Love Lariat",
+     "cost": "GGCC",
+     "damage": 50,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 50 damage plus 50 more damage if you have at least 1 Giovanni's Nidoking on your Bench. If tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "24",
+   "name": "Giovanni's Pinsir",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Snapping Pincers",
+     "cost": "GC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 more damage."
+    },
+    {
+     "name": "Overhead Toss",
+     "cost": "GCC",
+     "damage": 40,
+     "text": "If you have any Benched Pokémon, flip a coin. If tails, choose 1 of your Benched Pokémon. This attack does 20 damage to that Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "25",
+   "name": "Koga's Arbok",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Koga's Ekans",
+   "hp": 90,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Poison Buildup",
+     "cost": "G",
+     "damage": 0,
+     "text": "This Pokémon is now Poisoned."
+    },
+    {
+     "name": "Poison Power",
+     "cost": "GG",
+     "damage": 20,
+     "text": "If this Pokémon is Poisoned, this attack's base damage is 40 instead of 20 and the Defending Pokémon is now Poisoned."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "26",
+   "name": "Koga's Muk",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Koga's Grimer",
+   "hp": 80,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Energy Drain",
+     "text": "If an opponent's attack does damage to this Pokémon (even if this Pokémon is Knocked Out), flip a coin. If heads and if it has any, choose 1 Energy card attached to the attacking Pokémon and discard it. This power can't be used if this Pokémon is already Asleep, Confused, or Paralyzed when your opponent attacks.",
+     "kind": "Pokémon Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Sludge Whirlpool",
+     "cost": "GGC",
+     "damage": 40
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "27",
+   "name": "Koga's Pidgeotto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Koga's Pidgey",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Quick Turn",
+     "cost": "CCC",
+     "damage": 30,
+     "damageSuffix": "x",
+     "text": "Flip 2 coins. This attack does 30 damage times the number of heads."
+    },
+    {
+     "name": "Aerial Maneuvers",
+     "cost": "CCCC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 damage plus 30 more damage, and, during your opponent's next turn, prevent all effects of attacks, including damage, done to this Pokémon. If tails, this attack does 10 damage."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "28",
+   "name": "Lt. Surge's Jolteon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Lt. Surge's Eevee",
+   "hp": 70,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "High Voltage",
+     "cost": "LC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, your opponent can't play Trainer cards during their next turn."
+    },
+    {
+     "name": "Thunder Flare",
+     "cost": "LLL",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Does 30 damage plus 10 damage times the number of damage counters on this Pokémon, then flip a coin. If tails, this Pokémon does 30 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "29",
+   "name": "Sabrina's Gengar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage2",
+   "evolvesFrom": "Sabrina's Haunter",
+   "hp": 90,
+   "type": "Psychic",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Dark Wave",
+     "cost": "PP",
+     "damage": 20,
+     "text": "All Pokémon Powers stop working until the end of your opponent's next turn."
+    },
+    {
+     "name": "Shadow Bind",
+     "cost": "PPP",
+     "damage": 40,
+     "text": "The Defending Pokémon can't retreat during your opponent's next turn."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "30",
+   "name": "Sabrina's Golduck",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Sabrina's Psyduck",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Damage Shift",
+     "cost": "PP",
+     "damage": 0,
+     "text": "Move 1 damage counter from each of your Pokémon that has any on it to the Defending Pokémon. (Don't apply Weakness and Resistance.)"
+    },
+    {
+     "name": "Water Spray",
+     "cost": "WCC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "31",
+   "name": "Blaine's Charmeleon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Blaine's Charmander",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Fire Claws",
+     "cost": "RR",
+     "damage": 30
+    },
+    {
+     "name": "Bonfire",
+     "cost": "RRR",
+     "damage": 0,
+     "text": "Flip 3 coins. For each heads, discard 1 Fire Energy card attached to this Pokémon. If you can't discard Energy cards, this attack does nothing. This attack does 10 damage times the number of heads to each of your opponent's Pokémon. Don't apply Weakness and Resistance for this attack. (Any other effects that would happen after applying Weakness and Resistance still happen.)"
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "32",
+   "name": "Blaine's Dodrio",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Blaine's Doduo",
+   "hp": 70,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Mega Peck",
+     "cost": "CC",
+     "damage": 50,
+     "text": "Flip a coin. If tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "33",
+   "name": "Blaine's Rapidash",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Blaine's Ponyta",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Fire Mane",
+     "cost": "R",
+     "damage": 20
+    },
+    {
+     "name": "Stamp",
+     "cost": "RCC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 30 damage plus 10 more damage (to the Defending Pokémon) and 10 damage to each of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.) If tails, this attack does 30 damage (to the Defending Pokémon)."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "34",
+   "name": "Brock's Graveler",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Brock's Geodude",
+   "hp": 70,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Tackle",
+     "cost": "CC",
+     "damage": 20
+    },
+    {
+     "name": "Detonate",
+     "cost": "FFF",
+     "damage": 50,
+     "text": "Does 10 damage to each Pokémon on each player's Bench. (No Weakness or Resistance for Benched Pokémon.) this Pokémon does 50 damage to itself. If there is a Stadium card in play, discard it."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "35",
+   "name": "Brock's Primeape",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Brock's Mankey",
+   "hp": 70,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Scram",
+     "text": "If this Pokémon ever has exactly 10 HP left, shuffle it and all cards attached to it into your deck. This power stops working while this Pokémon is Asleep, Confused, or Paralyzed.",
+     "kind": "Pokémon Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Mega Thrash",
+     "cost": "FFF",
+     "damage": 60,
+     "text": "This Pokémon does 20 damage to itself. If there is a Stadium card in play, discard it."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "36",
+   "name": "Brock's Sandslash",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Brock's Sandshrew",
+   "hp": 70,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "resistance": "Lightning",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Swift",
+     "cost": "FC",
+     "damage": 20,
+     "text": "This attack's damage isn't affected by Weakness, Resistance, Pokémon Powers, or any other effects on the Defending Pokémon."
+    },
+    {
+     "name": "Needle Ball",
+     "cost": "FF",
+     "damage": 30,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Poisoned."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "37",
+   "name": "Brock's Vulpix",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Hypnotic Gaze",
+     "cost": "C",
+     "damage": 0,
+     "text": "The Defending Pokémon is now Asleep."
+    },
+    {
+     "name": "Fire Ring",
+     "cost": "RR",
+     "damage": 20,
+     "text": "If your opponent has any Benched Pokémon, choose 1 of them and this attack does 10 damage to it. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "38",
+   "name": "Erika's Bellsprout",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Soak Up",
+     "text": "Once during your turn (before your attack), you may take up to 2 Grass Energy cards attached to your other Pokémon and attach them to this Pokémon. This power can't be used if this Pokémon is Asleep, Confused, or Paralyzed.",
+     "kind": "Pokémon Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Stretch Vine",
+     "cost": "G",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Benched Pokémon, and this attack does 10 damage to it. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "39",
+   "name": "Erika's Bulbasaur",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sleep Seed",
+     "cost": "G",
+     "damage": 10,
+     "text": "The Defending Pokémon is now Asleep."
+    },
+    {
+     "name": "Errand-Running",
+     "cost": "GG",
+     "damage": 0,
+     "text": "Flip a coin. If heads, search your deck for a Trainer card, show it to your opponent, and put it into your hand. Shuffle your deck afterward."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "40",
+   "name": "Erika's Clefairy",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Lunar Power",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. If heads, search your deck for a card that evolves from 1 of your Benched Pokémon and put that card on that Pokémon. (This counts as evolving that Pokémon.) Shuffle your deck afterward."
+    },
+    {
+     "name": "Moon Kick",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "41",
+   "name": "Erika's Ivysaur",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Erika's Bulbasaur",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Relaxing Scent",
+     "text": "As long as this Pokémon is your Active Pokémon, whenever an attack (even your own) does damage to any Pokémon (after applying Weakness and Resistance), that attack only does half the damage to that Pokémon (rounded up to the nearest 10). (Any other effects of attacks still happen.) This power stops working while this Pokémon is Asleep, Confused, or Paralyzed.",
+     "kind": "Pokémon Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Double Razor Leaf",
+     "cost": "GGG",
+     "damage": 40,
+     "damageSuffix": "x",
+     "text": "Flip 2 coins. This attack does 40 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "42",
+   "name": "Giovanni's Machoke",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Giovanni's Machop",
+   "hp": 80,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Risky Attack",
+     "cost": "F",
+     "damage": 60,
+     "text": "Flip a coin. If tails, this attack does no damage to the Defending Pokémon and this Pokémon does 100 damage to itself."
+    },
+    {
+     "name": "Headlock",
+     "cost": "FFC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 20 damage plus 20 more damage and the Defending Pokémon is now Paralyzed. If tails, this attack does 20 damage."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "43",
+   "name": "Giovanni's Meowth",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "False Charity",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. If heads, look at the top card of your opponent's deck. If it's a Trainer card, discard it. Otherwise, your opponent puts it into their hand."
+    },
+    {
+     "name": "Double Scratch",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Flip 2 coins. This attack does 20 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "44",
+   "name": "Giovanni's Nidorina",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Giovanni's Nidoran ♀",
+   "hp": 80,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Poison Sting Tackle",
+     "cost": "GC",
+     "damage": 30,
+     "text": "This Pokémon does 20 damage to itself. Flip a coin. If heads, the Defending Pokémon is now Poisoned."
+    },
+    {
+     "name": "Body Slam",
+     "cost": "GCC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "45",
+   "name": "Giovanni's Nidorino",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Giovanni's Nidoran ♂",
+   "hp": 70,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Rend",
+     "cost": "GCC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "If the Defending Pokémon has any damage counters on it, this attack does 20 damage plus 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "46",
+   "name": "Koga's Golbat",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Koga's Zubat",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "CC",
+     "damage": 20
+    },
+    {
+     "name": "Sonic Scream",
+     "cost": "GGG",
+     "damage": 30,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Confused."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "47",
+   "name": "Koga's Kakuna",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Koga's Weedle",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Emerge",
+     "text": "Once during your turn (before your attack), you may flip a coin. If heads, search your deck for an Evolution card named Koga's Beedrill and put it on this Pokémon. (This counts as evolving this Pokémon.) Shuffle your deck afterward. This power can't be used if this Pokémon is Asleep, Confused, or Paralyzed.",
+     "kind": "Pokémon Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Toxic Secretion",
+     "cost": "G",
+     "damage": 0,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Poisoned. It now takes 20 Poison damage instead of 10 after each player's turn (even if it was already Poisoned)."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "48",
+   "name": "Koga's Koffing",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Smokescreen",
+     "cost": "G",
+     "damage": 10,
+     "text": "If the Defending Pokémon tries to attack during your opponent's next turn, your opponent flips a coin. If tails, that attack does nothing."
+    },
+    {
+     "name": "Obscuring Gas",
+     "cost": "GC",
+     "damage": 30,
+     "text": "Flip a coin. If heads, after doing damage, shuffle this Pokémon and all cards attached to it into your deck."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "49",
+   "name": "Koga's Pidgey",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Messenger",
+     "cost": "C",
+     "damage": 0,
+     "text": "Put this Pokémon and all cards attached to it on top of your deck. Then search your deck for any Basic Pokémon or Evolution card not named this Pokémon. Show that card to your opponent, then put it into your hand. Shuffle your deck afterward."
+    },
+    {
+     "name": "Wing Attack",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "50",
+   "name": "Koga's Weezing",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Koga's Koffing",
+   "hp": 70,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Spontaneous Explosion",
+     "cost": "GG",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 damage plus 30 more damage and this Pokémon does 30 damage to itself. If tails, this attack does 10 damage."
+    },
+    {
+     "name": "Toxic Cloud",
+     "cost": "GGC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Poisoned. It now takes 20 Poison damage instead of 10 after each player's turn (even if it was already Poisoned)."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "51",
+   "name": "Lt. Surge's Eevee",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Surprise",
+     "cost": "C",
+     "damage": 0,
+     "text": "Look at a random card from your opponent's hand. Your opponent shuffles that card into their deck."
+    },
+    {
+     "name": "Scratch",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "52",
+   "name": "Lt. Surge's Electrode",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Lt. Surge's Voltorb",
+   "hp": 70,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Shock Blast",
+     "text": "If this Pokémon is your Active Pokémon and gets damaged (even if it's Knocked Out), flip a coin. If tails, this power does 20 damage to each Active Pokémon. This power works even if this Pokémon is already Asleep, Confused, or Paralyzed when it takes damage.",
+     "kind": "Pokémon Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Power Ball",
+     "cost": "LLC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Flip 3 coins. This attack does 30 damage plus 10 more damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "53",
+   "name": "Lt. Surge's Raticate",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Lt. Surge's Rattata",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Focus Energy",
+     "cost": "C",
+     "damage": 0,
+     "text": "During your next turn, this Pokémon's Double-edge attack's damage (base damage and damage to itself) is doubled."
+    },
+    {
+     "name": "Double-edge",
+     "cost": "CC",
+     "damage": 40,
+     "text": "This Pokémon does 20 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "54",
+   "name": "Misty's Dewgong",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Misty's Seel",
+   "hp": 80,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Ice Throw",
+     "cost": "WW",
+     "damage": 20,
+     "text": "If the Defending Pokémon is a Fighting Pokémon, this attack's base damage is doubled."
+    },
+    {
+     "name": "Take Down",
+     "cost": "WCCC",
+     "damage": 60,
+     "text": "This Pokémon does 20 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "55",
+   "name": "Sabrina's Haunter",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Sabrina's Gastly",
+   "hp": 70,
+   "type": "Psychic",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Nightmare",
+     "cost": "PP",
+     "damage": 20,
+     "text": "The Defending Pokémon is now Asleep."
+    },
+    {
+     "name": "Shadow Attack",
+     "cost": "PPP",
+     "damage": 0,
+     "text": "Flip a coin. If heads, and if your opponent has any Benched Pokémon, choose 1 of them and this attack does 30 damage to it. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "56",
+   "name": "Sabrina's Hypno",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Sabrina's Drowzee",
+   "hp": 70,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Invigorate",
+     "cost": "P",
+     "damage": 0,
+     "text": "Choose 1 Basic Pokémon in any player's discard pile and put it onto that player's Bench (you can't if that Bench is full). Put damage counters on it equal to half its HP, rounded down to the nearest 10."
+    },
+    {
+     "name": "Pendulum Curse",
+     "cost": "PP",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Flip a number of coins equal to the number of damage counters on the Defending Pokémon. This attack does 20 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "57",
+   "name": "Sabrina's Jynx",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Helping Hand",
+     "cost": "P",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon. Remove any number of damage counters from that Pokémon, then draw that many cards."
+    },
+    {
+     "name": "Hug",
+     "cost": "PC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon can't retreat during your opponent's next turn."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "58",
+   "name": "Sabrina's Kadabra",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Stage1",
+   "evolvesFrom": "Sabrina's Abra",
+   "hp": 70,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Life Drain",
+     "cost": "P",
+     "damage": 0,
+     "text": "Flip a coin. If heads, put a number of damage counters on the Defending Pokémon so that its remaining HP are 10."
+    },
+    {
+     "name": "Psyshot",
+     "cost": "PCC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "59",
+   "name": "Sabrina's Mr. Mime",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Magic Darts",
+     "cost": "PC",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon and flip 3 coins. This attack does 10 damage times the number of heads to that Pokémon. Don't apply Weakness and Resistance for this attack."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "60",
+   "name": "Blaine's Charmander",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Fire Tail Slap",
+     "cost": "R",
+     "damage": 20,
+     "text": "Use this attack only if there are any Fire Energy cards attached to this Pokémon. Flip a coin. If tails, discard 1 of those cards."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "61",
+   "name": "Blaine's Doduo",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Wild Kick",
+     "cost": "C",
+     "damage": 20,
+     "text": "Flip a coin. If tails, this attack does nothing."
+    },
+    {
+     "name": "Retaliate",
+     "cost": "CC",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Does 10 damage times the number of damage counters on this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "62",
+   "name": "Blaine's Growlithe",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Stoke",
+     "cost": "R",
+     "damage": 0,
+     "text": "Search your deck for a Fire Energy card and attach it to this Pokémon. Shuffle your deck afterward."
+    },
+    {
+     "name": "Body Slam",
+     "cost": "RCC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "63",
+   "name": "Blaine's Mankey",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Pranks",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. If heads, choose a card from your opponent's discard pile and put it on top of their deck."
+    },
+    {
+     "name": "Fury Swipes",
+     "cost": "F",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "64",
+   "name": "Blaine's Ponyta",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Hind Kick",
+     "cost": "CC",
+     "damage": 20,
+     "text": "If you have any Benched Pokémon, flip a coin. If heads, switch this Pokémon with 1 of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "65",
+   "name": "Blaine's Rhyhorn",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "resistance": "Lightning",
+   "resistanceAmount": 30,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Horn Charge",
+     "cost": "F",
+     "damage": 30,
+     "text": "Flip a coin. If tails, this attack does nothing."
+    },
+    {
+     "name": "Overrun",
+     "cost": "CCC",
+     "damage": 20,
+     "text": "Flip a coin. If heads and if your opponent has any Benched Pokémon, choose 1 of them and this attack does 20 damage to it. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "66",
+   "name": "Blaine's Vulpix",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Call Will-o'-the-wisp",
+     "cost": "R",
+     "damage": 0,
+     "text": "Flip 3 coins. For each heads, if you have a Fire Energy card in your discard pile, put it into your hand."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "67",
+   "name": "Brock's Diglett",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "resistance": "Lightning",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Surprise Attack",
+     "cost": "F",
+     "damage": 20,
+     "text": "Flip a coin. If tails, this attack does nothing."
+    },
+    {
+     "name": "Tremor",
+     "cost": "FC",
+     "damage": 40,
+     "text": "Does 10 damage to each of your own Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "68",
+   "name": "Brock's Geodude",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Rock Toss",
+     "cost": "F",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "70",
+   "name": "Erika's Oddish",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Strange Powder",
+     "cost": "G",
+     "damage": 10,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Confused; if tails, it is now Asleep."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "71",
+   "name": "Erika's Paras",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Irongrip",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Poison Spore",
+     "cost": "GG",
+     "damage": 0,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Poisoned and this attack does 10 damage to each of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "72",
+   "name": "Giovanni's Machop",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Chop",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Fury Punch",
+     "cost": "FF",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Flip a coin. If heads, this attack does 20 damage times the number of damage counters on this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "73",
+   "name": "Giovanni's Magikarp",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 30,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Ancestral Memory",
+     "cost": "W",
+     "damage": 40,
+     "text": "Flip a coin. If tails, this attack does nothing. Either way, you can't use this attack again as long as this Pokémon stays in play (even putting this Pokémon on the Bench won't let you use it again)."
+    },
+    {
+     "name": "Flail Around",
+     "cost": "WC",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "74",
+   "name": "Giovanni's Meowth",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 30,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Cat Fleas",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Confused."
+    },
+    {
+     "name": "Cat Kick",
+     "cost": "CCC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "75",
+   "name": "Giovanni's Nidoran ♀",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Horn Thrust",
+     "cost": "G",
+     "damage": 20,
+     "text": "Flip a coin. If tails, this attack does nothing."
+    },
+    {
+     "name": "Double-edge",
+     "cost": "CC",
+     "damage": 30,
+     "text": "This Pokémon does 20 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "76",
+   "name": "Giovanni's Nidoran ♂",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Double Kick",
+     "cost": "C",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Flip 2 coins. This attack does 10 damage times the number of heads."
+    },
+    {
+     "name": "Retaliation",
+     "cost": "G",
+     "damage": 30,
+     "text": "You can't use this attack unless this Pokémon has 2 or more damage counters on it."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "77",
+   "name": "Koga's Ekans",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Fast-Acting Poison",
+     "cost": "G",
+     "damage": 10,
+     "text": "Flip 2 coins. If both are heads, the Defending Pokémon is now Confused and Poisoned."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "78",
+   "name": "Koga's Grimer",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sludge Grip",
+     "cost": "G",
+     "damage": 0,
+     "text": "If your opponent has any Benched Pokémon, flip a coin. If heads, choose 1 of your opponent's Benched Pokémon and switch it with the Defending Pokémon. The new Defending Pokémon is now Poisoned."
+    },
+    {
+     "name": "Sludge Toss",
+     "cost": "GC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "79",
+   "name": "Koga's Koffing",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Smelly Gas",
+     "cost": "G",
+     "damage": 10,
+     "text": "Flip a coin. If heads, this attack does 10 damage to each Benched Pokémon (including your own). (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "80",
+   "name": "Koga's Pidgey",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Peck",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Sand-attack",
+     "cost": "CCC",
+     "damage": 20,
+     "text": "If the Defending Pokémon tries to attack during your opponent's next turn, your opponent flips a coin. If tails, that attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "81",
+   "name": "Koga's Tangela",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Sleep Powder",
+     "cost": "G",
+     "damage": 10,
+     "text": "The Defending Pokémon is now Asleep."
+    },
+    {
+     "name": "Grasping Vine",
+     "cost": "GC",
+     "damage": 0,
+     "text": "Flip a coin. If heads, draw 2 cards."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "82",
+   "name": "Koga's Weedle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sting",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Sharp Stinger",
+     "cost": "GC",
+     "damage": 10,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Poisoned; if tails, the Defending Pokémon is now Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "83",
+   "name": "Koga's Zubat",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Group Attack",
+     "cost": "GC",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Does 10 damage times the number of this Pokémons you have in play. Before doing damage, you may search your deck for any number of Basic Pokémon named this Pokémon and put them onto your Bench. (You can't get more cards with this attack than you have room on your Bench.) If you do, shuffle your deck afterward."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "84",
+   "name": "Lt. Surge's Pikachu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Quick Attack",
+     "cost": "CC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "85",
+   "name": "Lt. Surge's Rattata",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 30,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 30,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Focus Energy",
+     "cost": "C",
+     "damage": 0,
+     "text": "During your next turn, this Pokémon's Quick Attack's base damage is doubled."
+    },
+    {
+     "name": "Quick Attack",
+     "cost": "CC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "86",
+   "name": "Lt. Surge's Voltorb",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bouncing Ball",
+     "cost": "LC",
+     "damage": 30,
+     "text": "Flip a coin. If tails, this Pokémon does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "87",
+   "name": "Misty's Horsea",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Ink Spurt",
+     "cost": "WW",
+     "damage": 20,
+     "text": "Flip a coin. If heads, whenever the Defending Pokémon tries to attack, your opponent flips a coin. If tails, that attack does nothing. This effect lasts until the Defending Pokémon is Benched or evolves."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "88",
+   "name": "Misty's Magikarp",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 30,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Play Dead",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. If heads, during your opponent's next turn, prevent all effects of attacks, including damage, done to this Pokémon."
+    },
+    {
+     "name": "Leap",
+     "cost": "C",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "89",
+   "name": "Misty's Poliwag",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bubbles",
+     "cost": "W",
+     "damage": 20,
+     "text": "Flip a coin. If tails, you can't use this attack during your next turn."
+    },
+    {
+     "name": "Amnesia",
+     "cost": "WW",
+     "damage": 0,
+     "text": "Choose 1 of the Defending Pokémon's attacks. That Pokémon can't use that attack during your opponent's next turn."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "90",
+   "name": "Misty's Psyduck",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "ESP",
+     "cost": "P",
+     "damage": 0,
+     "text": "Flip 3 coins. If exactly 1 of them is heads, draw a card. If exactly 2 of them are heads, this attack does 20 damage. If all 3 are heads, choose 1 of the Defending Pokémon's attacks. This attack copies that attack, except for its Energy costs. (This Pokémon is still a Water Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "91",
+   "name": "Misty's Seel",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Frostbite",
+     "cost": "W",
+     "damage": 10,
+     "text": "The Defending Pokémon can't retreat during your opponent's next turn."
+    },
+    {
+     "name": "Mirage",
+     "cost": "WC",
+     "damage": 10,
+     "text": "If the Defending Pokémon tries to attack during your opponent's next turn, your opponent flips a coin. If tails, that attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "92",
+   "name": "Misty's Staryu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Star Boomerang",
+     "cost": "W",
+     "damage": 20,
+     "text": "Flip a coin. If heads, return this Pokémon and all cards attached to it to your hand. (Either way, this attack does its damage.)"
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "94",
+   "name": "Sabrina's Abra",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Psyscan",
+     "cost": "P",
+     "damage": 0,
+     "text": "Look at your opponent's hand."
+    },
+    {
+     "name": "Quick Attack",
+     "cost": "P",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "95",
+   "name": "Sabrina's Drowzee",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Energy Support",
+     "cost": "P",
+     "damage": 0,
+     "text": "Search your deck for a Psychic Energy card. Show that card to your opponent, then put it into your hand. Shuffle your deck afterward."
+    },
+    {
+     "name": "Mind Shock",
+     "cost": "PC",
+     "damage": 20,
+     "text": "Don't apply Weakness and Resistance for this attack. (Any other effects that would happen after applying Weakness and Resistance still happen.)"
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "96",
+   "name": "Sabrina's Gastly",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 30,
+   "type": "Psychic",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Lick",
+     "cost": "P",
+     "damage": 10,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    },
+    {
+     "name": "Fade Out",
+     "cost": "PP",
+     "damage": 30,
+     "text": "Return this Pokémon and all Energy cards attached to it to your hand. (Discard all other cards attached to this Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "97",
+   "name": "Sabrina's Gastly",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Psychic",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Gaseous Form",
+     "text": "This Pokémon gets +10 HP for each Psychic Energy card attached to it. This power works even if this Pokémon is Asleep, Confused, or Paralyzed.",
+     "kind": "Pokémon Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Suffocating Gas",
+     "cost": "PP",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "98",
+   "name": "Sabrina's Porygon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sharp Point",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Barrier Attack",
+     "cost": "CC",
+     "damage": 20,
+     "text": "All damage done by attacks to this Pokémon during your opponent's next turn is reduced by 10 (after applying Weakness and Resistance)."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "99",
+   "name": "Sabrina's Psyduck",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "unlimitedOnly": true,
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Scratch",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Random ESP",
+     "cost": "P",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Confused. If tails, this attack does no damage and this Pokémon is now Confused."
+    }
+   ]
+  },
+  {
+   "set": "G2",
+   "number": "100",
+   "name": "Blaine",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "This turn, instead of attaching 1 Energy card from your hand to 1 of your Pokémon, you may attach 2 Fire Energy cards from your hand to 1 of your Pokémon with Blaine in its name. (Playing more than 1 Blaine in a turn has no extra effect.)"
+  },
+  {
+   "set": "G2",
+   "number": "101",
+   "name": "Brock's Protection",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Attach this card to 1 of your Pokémon with Brock in its name. Your opponent's attacks and Trainer cards can't remove the Energy cards attached to that Pokémon. (The rest of the attack or Trainer card still happens.)"
+  },
+  {
+   "set": "G2",
+   "number": "102",
+   "name": "Chaos Gym",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Stadium",
+   "text": "Whenever a player plays a Trainer card other than a Stadium card, they flip a coin. If heads, the card works normally. If tails, they can't play it, and their opponent may use it instead (if they can do everything needed to play it, such as discarding cards). Either way, the card goes to its owner's discard pile."
+  },
+  {
+   "set": "G2",
+   "number": "103",
+   "name": "Erika's Kindness",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Remove 2 damage counters (or 1 if it has only 1) from each Pokémon in play, yours and your opponent's, that has damage counters on it."
+  },
+  {
+   "set": "G2",
+   "number": "104",
+   "name": "Giovanni",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Choose 1 of your Pokémon in play with Giovanni in its name. This turn, you may evolve that Pokémon even if you just played it or it was just evolved, or if it's your first turn. (This also applies to the Pokémon it evolves into.)"
+  },
+  {
+   "set": "G2",
+   "number": "105",
+   "name": "Giovanni's Last Resort",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Remove all damage counters from 1 of your Pokémon with Giovanni in its name. Then discard your hand."
+  },
+  {
+   "set": "G2",
+   "number": "106",
+   "name": "Koga",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "This turn, whenever 1 of your Pokémon with Koga in its name attacks and does damage to the Defending Pokémon, the Defending Pokémon is now Poisoned (after the damage)."
+  },
+  {
+   "set": "G2",
+   "number": "107",
+   "name": "Lt. Surge's Secret Plan",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Put 1 card from your hand face down onto your Bench (not if your Bench is full). It's a Basic Pokémon while it's face down. Flip it over if either player needs to know what it is to use an attack, a Pokémon Power or a Trainer card, and when it uses an attack or Pokémon Power, evolves, retreats, is damaged by an attack or is otherwise affected by an attack. You may flip it over at any time during your turn. When it's flipped over, if it isn't a Basic Pokémon, discard it and all cards attached to it."
+  },
+  {
+   "set": "G2",
+   "number": "108",
+   "name": "Misty's Wish",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Look at 1 of your Prize cards. Ask your opponent whether you may switch it with a card from your hand. If they say yes and you have other cards in your hand, switch them. If they say no, put the Prize card back face down and draw a card."
+  },
+  {
+   "set": "G2",
+   "number": "109",
+   "name": "Resistance Gym",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Stadium",
+   "text": "Each Pokémon's Resistance is 20 less."
+  },
+  {
+   "set": "G2",
+   "number": "110",
+   "name": "Sabrina",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Move all Energy cards attached to 1 of your Pokémon with Sabrina in its name to another of your Pokémon with Sabrina in its name."
+  },
+  {
+   "set": "G2",
+   "number": "111",
+   "name": "Blaine's Quiz #2",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Put a card from your hand face down in front of you. Your opponent guesses whether it's an Energy card, a Trainer card or a Pokémon card. If they guess right, they draw 2 cards; if not, you draw 2 cards. Then put that card back into your hand."
+  },
+  {
+   "set": "G2",
+   "number": "112",
+   "name": "Blaine's Quiz #3",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Put a Basic Pokémon or Evolution card from your hand face down in front of you and tell your opponent the name of 1 of its attacks. Your opponent guesses the card's name. If they guess right, they draw 3 cards; if not, you draw 3 cards. Then put that card back into your hand."
+  },
+  {
+   "set": "G2",
+   "number": "113",
+   "name": "Cinnabar City Gym",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Stadium",
+   "text": "Whenever a Water Pokémon does damage to a Pokémon with Blaine in its name, ignore Weakness."
+  },
+  {
+   "set": "G2",
+   "number": "114",
+   "name": "Fuchsia City Gym",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Stadium",
+   "text": "Once during each player's turn (before attacking), that player may flip a coin. If heads, they may shuffle 1 of their Pokémon in play with Koga in its name, and all cards attached to it, into their deck."
+  },
+  {
+   "set": "G2",
+   "number": "115",
+   "name": "Koga's Ninja Trick",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Attach this card to your Active Pokémon with Koga in its name. If that Pokémon moves to your Bench, discard this card. When your opponent attacks, you may switch that Pokémon with 1 of your Benched Pokémon before the attack's damage and effects."
+  },
+  {
+   "set": "G2",
+   "number": "116",
+   "name": "Master Ball",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Look at the top 7 cards of your deck. You may show your opponent a Basic Pokémon or Evolution card from among them and put it into your hand. Put the other cards back and shuffle your deck."
+  },
+  {
+   "set": "G2",
+   "number": "117",
+   "name": "Max Revive",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Put a Pokémon card from your discard pile on top of your deck."
+  },
+  {
+   "set": "G2",
+   "number": "118",
+   "name": "Misty's Tears",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Discard 1 of the other cards from your hand to search your deck for up to 2 Water Energy cards, show them to your opponent and put them into your hand. Shuffle your deck afterward."
+  },
+  {
+   "set": "G2",
+   "number": "119",
+   "name": "Rocket's Minefield Gym",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Stadium",
+   "text": "Whenever a player puts a Basic Pokémon onto their Bench from their hand, they flip a coin. If tails, put 2 damage counters on that Pokémon."
+  },
+  {
+   "set": "G2",
+   "number": "120",
+   "name": "Rocket's Secret Experiment",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Flip a coin. If heads, search your deck for any card, put it into your hand and shuffle your deck. If tails, you can't play Trainer cards until the end of your next turn."
+  },
+  {
+   "set": "G2",
+   "number": "121",
+   "name": "Sabrina's Psychic Control",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Flip a coin. If heads, choose a Trainer card in your opponent's discard pile that isn't put into play (not a Stadium or Pokémon Tool) and use it as if you had played it from your hand. It stays in your opponent's discard pile."
+  },
+  {
+   "set": "G2",
+   "number": "122",
+   "name": "Saffron City Gym",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Stadium",
+   "text": "As often as they like during their turn (before attacking), each player may return a basic Energy card attached to 1 of their Pokémon with Sabrina in its name to their hand."
+  },
+  {
+   "set": "G2",
+   "number": "123",
+   "name": "Viridian City Gym",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Stadium",
+   "text": "Whenever a player evolves 1 of their Pokémon with Giovanni in its name, they remove 2 damage counters from it (or 1 if it has only 1)."
+  },
+  {
+   "set": "G2",
+   "number": "124",
+   "name": "Fervor",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Show your opponent the top 3 cards of your deck. Put any Fire Energy cards among them into your hand and discard the rest."
+  },
+  {
+   "set": "G2",
+   "number": "125",
+   "name": "Transparent Walls",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Until the end of your opponent's next turn, prevent all damage done by attacks to your Benched Pokémon. (Other effects of attacks still happen.)"
+  },
+  {
+   "set": "G2",
+   "number": "126",
+   "name": "Warp Point",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "If your opponent has any Benched Pokémon, they choose 1 of them and switch it with their Active Pokémon. Then, if you have any Benched Pokémon, choose 1 of them and switch it with your Active Pokémon."
+  }
+ ]
+}

@@ -1,0 +1,86 @@
+{
+ "format": "Flowing Fists (FLO; v155, name v157.1): the English set from Japan's Aura Seeker, revealed at Worlds 2026. The cards shown so far. Regulation mark J = Standard.",
+ "cards": [
+  {
+   "set": "FLO",
+   "number": "32",
+   "name": "Sigilyph ex",
+   "kind": "Pokemon",
+   "regulationMark": "J",
+   "text": "",
+   "stage": "Basic",
+   "hp": 210,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "ex": true,
+   "abilities": [
+    {
+     "name": "Mega Protection",
+     "text": "Prevent all damage done to this Pokémon by attacks from your opponent's Mega Evolution Pokémon ex."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Power Cyclone",
+     "cost": "CCC",
+     "damage": 140,
+     "text": "Move an Energy from this Pokémon to 1 of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FLO",
+   "number": "45",
+   "name": "Riolu",
+   "kind": "Pokemon",
+   "regulationMark": "J",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Rear Kick",
+     "cost": "CC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FLO",
+   "number": "58",
+   "name": "Mega Lucario Z ex",
+   "kind": "Pokemon",
+   "regulationMark": "J",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Riolu",
+   "hp": 330,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 2,
+   "ex": true,
+   "megaEx": true,
+   "abilities": [
+    {
+     "name": "Aura Seeker",
+     "text": "Once during your turn, if this Pokémon is in the Active Spot, you may use this Ability. Search your deck for a Supporter card, reveal it, and put it into your hand. Then, shuffle your deck."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Dancing Fist",
+     "cost": "MM",
+     "damage": 120,
+     "damageSuffix": "+",
+     "text": "If your opponent's Active Pokémon is a Pokémon ex, this attack does 120 more damage."
+    }
+   ]
+  }
+ ]
+}

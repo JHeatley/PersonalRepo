@@ -1,0 +1,5731 @@
+{
+ "format": "Fusion Strike (FST, 2021): cards not already in the pool. Regulation mark E: Expanded.",
+ "cards": [
+  {
+   "set": "FST",
+   "number": "1",
+   "name": "Caterpie",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Flock",
+     "cost": "C",
+     "damage": 0,
+     "text": "Look through your deck for a Caterpie and put it onto your Bench. Shuffle your deck."
+    },
+    {
+     "name": "Bug Bite",
+     "cost": "G",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "2",
+   "name": "Metapod",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Caterpie",
+   "hp": 80,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Exoskeleton",
+     "text": "This Pokémon takes 20 less damage from attacks (after Weakness and Resistance)."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Ram",
+     "cost": "G",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "3",
+   "name": "Butterfree",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Metapod",
+   "hp": 120,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Tricolored Scales",
+     "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you may make your opponent's Active Pokémon Burned, Confused, and Poisoned."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Gust",
+     "cost": "GC",
+     "damage": 90
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "4",
+   "name": "Shroomish",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Tackle",
+     "cost": "G",
+     "damage": 10
+    },
+    {
+     "name": "Seed Bomb",
+     "cost": "GC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "5",
+   "name": "Breloom",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Shroomish",
+   "hp": 120,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Headbutt",
+     "cost": "G",
+     "damage": 30
+    },
+    {
+     "name": "Impact Blow",
+     "cost": "GGC",
+     "damage": 150,
+     "text": "During your next turn, this Pokémon can't use Impact Blow."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "6",
+   "name": "Breloom V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 210,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Counter",
+     "cost": "GC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "If this Pokémon was damaged by an attack during your opponent's last turn, this attack does that much more damage."
+    },
+    {
+     "name": "Mach Cross",
+     "cost": "GGC",
+     "damage": 140
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "7",
+   "name": "Pansage",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Scratch",
+     "cost": "G",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "8",
+   "name": "Simisage",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Pansage",
+   "hp": 100,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Return",
+     "cost": "G",
+     "damage": 30,
+     "text": "You may draw cards until you have 6 cards in your hand."
+    },
+    {
+     "name": "Whip Smash",
+     "cost": "GC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "9",
+   "name": "Sewaddle",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Grass Munch",
+     "cost": "G",
+     "damage": 10,
+     "text": "Discard a Grass Energy from your opponent's Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "10",
+   "name": "Swadloon",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Sewaddle",
+   "hp": 80,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Trip Over",
+     "cost": "G",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 20 more damage."
+    },
+    {
+     "name": "Seed Bomb",
+     "cost": "GCC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "11",
+   "name": "Leavanny",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Swadloon",
+   "hp": 130,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Healing Circle",
+     "cost": "CC",
+     "damage": 0,
+     "text": "Heal all damage from each of your Benched Pokémon. If you healed any damage in this way, shuffle this Pokémon and all attached cards into your deck."
+    },
+    {
+     "name": "Razor Leaf",
+     "cost": "GCC",
+     "damage": 120
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "12",
+   "name": "Maractus",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 110,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Peck",
+     "cost": "G",
+     "damage": 20
+    },
+    {
+     "name": "Ditch and Shake",
+     "cost": "GC",
+     "damage": 50,
+     "damageSuffix": "x",
+     "text": "Discard any number of Pokémon Tool cards from your hand. Does 50 damage for each card you discarded in this way."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "13",
+   "name": "Shelmet",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Spit Beam",
+     "cost": "G",
+     "damage": 20
+    }
+   ],
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "14",
+   "name": "Accelgor",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Shelmet",
+   "hp": 90,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Ninja Tornado",
+     "cost": "GCC",
+     "damage": 120,
+     "text": "If this Pokémon moved from your Bench to the Active Spot this turn, this attack can be used for Grass."
+    }
+   ],
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "15",
+   "name": "Virizion",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 110,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bail Out",
+     "cost": "G",
+     "damage": 0,
+     "text": "Put up to 2 Pokémon from your discard pile into your hand."
+    },
+    {
+     "name": "Solar Beam",
+     "cost": "GCC",
+     "damage": 90
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "16",
+   "name": "Phantump",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Tackle",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Seed Bomb",
+     "cost": "GC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "17",
+   "name": "Trevenant",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Phantump",
+   "hp": 120,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Gentle Slap",
+     "cost": "GC",
+     "damage": 40
+    },
+    {
+     "name": "Wood Hammer",
+     "cost": "GCC",
+     "damage": 90
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "19",
+   "name": "Dewpider",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bug Bite",
+     "cost": "G",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "20",
+   "name": "Araquanid",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Dewpider",
+   "hp": 120,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Bug Bite",
+     "cost": "G",
+     "damage": 30
+    },
+    {
+     "name": "Bubble Launch",
+     "cost": "GCC",
+     "damage": 110,
+     "text": "Move an Energy from this Pokémon to 1 of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "21",
+   "name": "Tsareena V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 200,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Queen's Orders",
+     "cost": "GC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "You may discard any number of your Benched Pokémon. Does 40 more damage for each Benched Pokémon you discarded in this way."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "22",
+   "name": "Rillaboom V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 220,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Drain Punch",
+     "cost": "GCC",
+     "damage": 60,
+     "text": "Heal 30 damage from this Pokémon."
+    },
+    {
+     "name": "Drum Rush",
+     "cost": "GCCC",
+     "damage": 160
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "23",
+   "name": "Rillaboom VMAX",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Rillaboom V",
+   "mechanic": "VMAX",
+   "hp": 330,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "G-Max Drum Solo",
+     "cost": "GCCC",
+     "damage": 180,
+     "text": "Also does 40 damage to 2 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "24",
+   "name": "Gossifleur",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Leafage",
+     "cost": "C",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "25",
+   "name": "Eldegoss",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Gossifleur",
+   "hp": 90,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sunny Wind",
+     "cost": "C",
+     "damage": 50,
+     "text": "Heal 20 damage from this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "26",
+   "name": "Appletun V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 210,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Headbutt",
+     "cost": "G",
+     "damage": 30
+    },
+    {
+     "name": "Sweet Impact",
+     "cost": "GGC",
+     "damage": 100,
+     "text": "Heal 30 damage from this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "27",
+   "name": "Zarude",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 110,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Scratch",
+     "cost": "C",
+     "damage": 20
+    },
+    {
+     "name": "Wild Whip",
+     "cost": "GC",
+     "damage": 40,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 30 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "28",
+   "name": "Vulpix",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Live Coal",
+     "cost": "RC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "29",
+   "name": "Vulpix",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Smash Kick",
+     "cost": "C",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "30",
+   "name": "Ninetales",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Vulpix",
+   "hp": 110,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Supernatural Flames",
+     "cost": "RC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "31",
+   "name": "Ninetales",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Vulpix",
+   "hp": 120,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Byway of the Nine-Tailed Fox",
+     "text": "The Retreat Cost of each of your Pokémon that has any Fire Energy attached is 2 Colorless less."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Flame Tail",
+     "cost": "RC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "32",
+   "name": "Growlithe",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Warm Up",
+     "cost": "C",
+     "damage": 0,
+     "text": "Look through your deck for a Fire Energy card and attach it to 1 of your Pokémon. Shuffle your deck."
+    },
+    {
+     "name": "Combustion",
+     "cost": "RCC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "33",
+   "name": "Arcanine",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Growlithe",
+   "hp": 130,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Fire Claws",
+     "cost": "R",
+     "damage": 40
+    },
+    {
+     "name": "Heat Tackle",
+     "cost": "RRC",
+     "damage": 160,
+     "text": "This Pokémon also does 30 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "34",
+   "name": "Slugma",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Live Coal",
+     "cost": "R",
+     "damage": 10
+    },
+    {
+     "name": "Flare",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "35",
+   "name": "Magcargo",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Slugma",
+   "hp": 130,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Rock Throw",
+     "cost": "CC",
+     "damage": 40
+    },
+    {
+     "name": "Body Splash",
+     "cost": "RRC",
+     "damage": 150,
+     "text": "Flip 3 coins. For each tails, discard an Energy from this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "36",
+   "name": "Victini",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Fiery Cheering",
+     "cost": "C",
+     "damage": 0,
+     "text": "Attach a basic Energy card from your discard pile to 1 of your Benched Pokémon."
+    },
+    {
+     "name": "Flare",
+     "cost": "R",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "37",
+   "name": "Pansear",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Surprise Attack",
+     "cost": "R",
+     "damage": 30,
+     "text": "Flip a coin. On tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "38",
+   "name": "Simisear",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Pansear",
+   "hp": 100,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Light Punch",
+     "cost": "C",
+     "damage": 20
+    },
+    {
+     "name": "Fling Fire",
+     "cost": "R",
+     "damage": 60,
+     "damageSuffix": "x",
+     "text": "Discard up to 2 basic Energy cards from your hand. Does 60 damage for each card you discarded in this way."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "39",
+   "name": "Chandelure V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 200,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Confuse Ray",
+     "cost": "R",
+     "damage": 0,
+     "text": "Your opponent's Active Pokémon becomes Confused."
+    },
+    {
+     "name": "Poltergeist",
+     "cost": "RC",
+     "damage": 40,
+     "damageSuffix": "x",
+     "text": "Your opponent reveals their hand. Does 40 damage for each Trainer card you find there."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "40",
+   "name": "Chandelure VMAX",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Chandelure V",
+   "mechanic": "VMAX",
+   "hp": 320,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Cursed Shimmer",
+     "text": "As long as this Pokémon is in the Active Spot, your opponent can't play any Pokémon Tool cards from their hand."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Max Poltergeist",
+     "cost": "RC",
+     "damage": 70,
+     "damageSuffix": "x",
+     "text": "Your opponent reveals their hand. Does 70 damage for each Trainer card you find there."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "41",
+   "name": "Heatmor",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 110,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Flame Cloak",
+     "cost": "R",
+     "damage": 20,
+     "text": "Attach a Fire Energy card from your discard pile to this Pokémon."
+    },
+    {
+     "name": "Exciting Flame",
+     "cost": "RRC",
+     "damage": 90,
+     "text": "If this Pokémon has at least 3 extra Energy attached (in addition to this attack's cost), this attack also does 180 damage to 1 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "43",
+   "name": "Cinderace V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 220,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Blaze Kick",
+     "cost": "RRC",
+     "damage": 210,
+     "text": "Discard 2 Fire Energy from this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "44",
+   "name": "Cinderace V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 210,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Flare",
+     "cost": "CC",
+     "damage": 50
+    },
+    {
+     "name": "All-Out Shot",
+     "cost": "RCCC",
+     "damage": 210,
+     "text": "This Pokémon can't attack during your next turn."
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "45",
+   "name": "Cinderace VMAX",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Cinderace V",
+   "mechanic": "VMAX",
+   "hp": 320,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "G-Max Fireball",
+     "cost": "RCCC",
+     "damage": 230,
+     "text": "Your opponent's Active Pokémon becomes Burned. This Pokémon can't attack during your next turn."
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "46",
+   "name": "Sizzlipede",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Gnaw",
+     "cost": "R",
+     "damage": 10
+    },
+    {
+     "name": "Ember",
+     "cost": "RC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "47",
+   "name": "Sizzlipede",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Singe",
+     "cost": "R",
+     "damage": 0,
+     "text": "Your opponent's Active Pokémon becomes Burned."
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "48",
+   "name": "Centiskorch",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Sizzlipede",
+   "hp": 130,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Coil",
+     "cost": "RC",
+     "damage": 30,
+     "text": "During your next turn, this Pokémon's attacks do 90 more damage to your opponent's Active Pokémon (before Weakness and Resistance)."
+    },
+    {
+     "name": "Burning Train",
+     "cost": "RRC",
+     "damage": 120
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "49",
+   "name": "Centiskorch",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Sizzlipede",
+   "hp": 130,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Steady Firebreathing",
+     "cost": "R",
+     "damage": 30
+    },
+    {
+     "name": "Heat Blast",
+     "cost": "RRC",
+     "damage": 100
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "50",
+   "name": "Shellder",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Tongue Slap",
+     "cost": "W",
+     "damage": 10
+    },
+    {
+     "name": "Wave Splash",
+     "cost": "WC",
+     "damage": 20
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "51",
+   "name": "Cloyster",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Shellder",
+   "hp": 130,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Shell Armor",
+     "text": "This Pokémon takes 30 less damage from attacks (after Weakness and Resistance)."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Aqua Split",
+     "cost": "WC",
+     "damage": 60,
+     "text": "Also does 30 damage to 2 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "52",
+   "name": "Staryu",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Soak in Water",
+     "cost": "C",
+     "damage": 0,
+     "text": "Attach a Water Energy card from your hand to this Pokémon."
+    },
+    {
+     "name": "Spinning Attack",
+     "cost": "W",
+     "damage": 10
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "53",
+   "name": "Starmie",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Staryu",
+   "hp": 90,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Multishot Star",
+     "cost": "W",
+     "damage": 0,
+     "text": "Discard any amount of Water Energy from this Pokémon. Then, for each Energy card you discarded in this way, choose 1 of your opponent's Pokémon and do 30 damage to it. (You can choose the same Pokémon more than once.) This damage isn't affected by Weakness or Resistance."
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "54",
+   "name": "Lapras",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 120,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Icy Wind",
+     "cost": "C",
+     "damage": 0,
+     "text": "Your opponent's Active Pokémon becomes Asleep."
+    },
+    {
+     "name": "Splash Arch",
+     "cost": "WWC",
+     "damage": 0,
+     "text": "Put all Energy attached to this Pokémon into your hand. Does 100 damage to 1 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "55",
+   "name": "Totodile",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Rain Splash",
+     "cost": "W",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "56",
+   "name": "Croconaw",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Totodile",
+   "hp": 100,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Wave Splash",
+     "cost": "W",
+     "damage": 30
+    },
+    {
+     "name": "Surf",
+     "cost": "WCC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "57",
+   "name": "Feraligatr",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Croconaw",
+   "hp": 170,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Rowdy",
+     "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you must flip a coin. On heads, discard the top 5 cards of your opponent's deck. On tails, discard the top 5 cards of your deck."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Crunch",
+     "cost": "WWC",
+     "damage": 140,
+     "text": "Discard an Energy from your opponent's Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "58",
+   "name": "Marill",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Aqua Liner",
+     "cost": "W",
+     "damage": 0,
+     "text": "Does 20 damage to 1 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Let's All Rollout",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Does 20 damage for each of your Benched Pokémon that has the Let's All Rollout attack."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "59",
+   "name": "Azumarill",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Marill",
+   "hp": 120,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Dive and Rescue",
+     "cost": "W",
+     "damage": 0,
+     "text": "Put up to 3 in any combination of Pokémon and Supporter cards from your discard pile into your hand."
+    },
+    {
+     "name": "Surf",
+     "cost": "CCC",
+     "damage": 90
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "60",
+   "name": "Qwilfish",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Collect",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw a card."
+    },
+    {
+     "name": "Spike Sting",
+     "cost": "WC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "61",
+   "name": "Mantine",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 110,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bounce",
+     "cost": "W",
+     "damage": 20,
+     "text": "You may switch this Pokémon with 1 of your Benched Pokémon."
+    },
+    {
+     "name": "Wave Splash",
+     "cost": "CCC",
+     "damage": 80
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "62",
+   "name": "Mudkip",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Mud-Slap",
+     "cost": "CC",
+     "damage": 20
+    },
+    {
+     "name": "Playful Kick",
+     "cost": "WCC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "63",
+   "name": "Marshtomp",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Mudkip",
+   "hp": 90,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Mud-Slap",
+     "cost": "CC",
+     "damage": 30
+    },
+    {
+     "name": "Energy Loop",
+     "cost": "WCC",
+     "damage": 80,
+     "text": "Put an Energy attached to this Pokémon into your hand."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "64",
+   "name": "Swampert",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Marshtomp",
+   "hp": 170,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Muddy Maker",
+     "text": "Once during your turn, you may attach a Water Energy card or a Fighting Energy card from your hand to 1 of your Pokémon."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Earthquake",
+     "cost": "WCC",
+     "damage": 180,
+     "text": "Also does 20 damage to each of your Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "65",
+   "name": "Clamperl",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Bursting Bubble",
+     "cost": "C",
+     "damage": 10
+    }
+   ],
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "66",
+   "name": "Huntail",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Clamperl",
+   "hp": 110,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Single Strike Jammer",
+     "text": "Your opponent's Single Strike Pokémon's attacks cost Colorless more."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Cavernous Chomp",
+     "cost": "WCC",
+     "damage": 80
+    }
+   ],
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "67",
+   "name": "Gorebyss",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Clamperl",
+   "hp": 110,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Rapid Strike Canceler",
+     "text": "Your opponent's Rapid Strike Pokémon in play have no Abilities."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Draining Kiss",
+     "cost": "WC",
+     "damage": 50,
+     "text": "Heal 30 damage from this Pokémon."
+    }
+   ],
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "68",
+   "name": "Panpour",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Pry",
+     "cost": "W",
+     "damage": 10,
+     "text": "Your opponent reveals their hand."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "69",
+   "name": "Simipour",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Panpour",
+   "hp": 100,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Water Pulse",
+     "cost": "W",
+     "damage": 20,
+     "text": "Your opponent's Active Pokémon becomes Asleep."
+    },
+    {
+     "name": "Circus Soaking",
+     "cost": "CC",
+     "damage": 60,
+     "damageSuffix": "x",
+     "text": "Your opponent reveals their hand. Does 60 damage for each Supporter card you find there."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "70",
+   "name": "Basculin",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Swarm the Wound",
+     "cost": "WC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Does 10 more damage for each damage counter on your opponent's Active Pokémon."
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "71",
+   "name": "Galarian Darumaka",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Water",
+   "weakness": "Metal",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Reckless Charge",
+     "cost": "W",
+     "damage": 20,
+     "text": "Flip a coin. On tails, this Pokémon also does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "72",
+   "name": "Galarian Darmanitan",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Galarian Darumaka",
+   "hp": 130,
+   "type": "Water",
+   "weakness": "Metal",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Powder Snow",
+     "cost": "WC",
+     "damage": 30,
+     "text": "Your opponent's Active Pokémon becomes Asleep."
+    },
+    {
+     "name": "Daruma Headbutt",
+     "cost": "WWC",
+     "damage": 130,
+     "text": "If this Pokémon has any damage counters on it, this attack can be used for Water."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "73",
+   "name": "Greninja V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 210,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Water Drip",
+     "cost": "WC",
+     "damage": 40
+    },
+    {
+     "name": "Dancing Shuriken",
+     "cost": "WWC",
+     "damage": 80,
+     "damageSuffix": "x",
+     "text": "Flip 3 coins. Does 80 damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "74",
+   "name": "Clauncher",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Water Gun",
+     "cost": "W",
+     "damage": 10
+    },
+    {
+     "name": "Vise Grip",
+     "cost": "WC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "75",
+   "name": "Clawitzer",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Clauncher",
+   "hp": 110,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Snipe Shot",
+     "cost": "W",
+     "damage": 0,
+     "text": "Does 50 damage to 1 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Crabhammer",
+     "cost": "WWC",
+     "damage": 110
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "76",
+   "name": "Crabominable V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 220,
+   "type": "Water",
+   "weakness": "Metal",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Trigger Avalanche",
+     "cost": "W",
+     "damage": 0,
+     "text": "Discard the top 2 cards of your opponent's deck."
+    },
+    {
+     "name": "Destroyer Punch",
+     "cost": "WWC",
+     "damage": 90,
+     "damageSuffix": "+",
+     "text": "Does 60 more damage for each damage counter on your opponent's Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "77",
+   "name": "Pyukumuku",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Pitch a Pyukumuku",
+     "text": "Once during your turn, if this Pokémon is in your hand, you may reveal it and put it on the bottom of your deck. If you do, draw a card. You can't use more than 1 Pitch a Pyukumuku Ability each turn."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Knuckle Punch",
+     "cost": "WCC",
+     "damage": 50
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "78",
+   "name": "Inteleon V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 200,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Surf",
+     "cost": "WC",
+     "damage": 40
+    },
+    {
+     "name": "Aqua Bullet",
+     "cost": "WWC",
+     "damage": 120,
+     "text": "Also does 20 damage to 1 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "79",
+   "name": "Inteleon VMAX",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Inteleon V",
+   "mechanic": "VMAX",
+   "hp": 320,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Double Gunner",
+     "text": "You must discard a Water Energy card from your hand in order to use this Ability. Once during your turn, you may choose 2 of your opponent's Benched Pokémon and put 2 damage counters on each of them."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "G-Max Spiral",
+     "cost": "WC",
+     "damage": 70,
+     "damageSuffix": "+",
+     "text": "You may put an Energy attached to this Pokémon into your hand. If you do, it does 70 more damage."
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "80",
+   "name": "Chewtle",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "WC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "81",
+   "name": "Drednaw",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Chewtle",
+   "hp": 140,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Hard Bite",
+     "cost": "WCC",
+     "damage": 80,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 50 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "82",
+   "name": "Arrokuda",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Peck",
+     "cost": "W",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "83",
+   "name": "Barraskewda",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Arrokuda",
+   "hp": 120,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Pierce",
+     "cost": "W",
+     "damage": 50
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "84",
+   "name": "Snom",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Water",
+   "weakness": "Metal",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Find Ice",
+     "cost": "W",
+     "damage": 0,
+     "text": "Look through your deck for up to 2 Water Energy cards, show them to your opponent, and put them into your hand. Shuffle your deck."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "85",
+   "name": "Frosmoth",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Snom",
+   "hp": 90,
+   "type": "Water",
+   "weakness": "Metal",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Icy Wind",
+     "cost": "C",
+     "damage": 0,
+     "text": "Your opponent's Active Pokémon becomes Asleep."
+    },
+    {
+     "name": "Blizzard Loop",
+     "cost": "WWC",
+     "damage": 160,
+     "text": "Put all Energy attached to this Pokémon into your hand."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "86",
+   "name": "Pikachu V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 200,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Tail Whap",
+     "cost": "C",
+     "damage": 20
+    },
+    {
+     "name": "Thunderbolt",
+     "cost": "LCC",
+     "damage": 100
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "87",
+   "name": "Voltorb",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Single Shot Blast",
+     "cost": "C",
+     "damage": 30,
+     "text": "Flip a coin. On tails, this attack does nothing."
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "88",
+   "name": "Electrode",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Voltorb",
+   "hp": 90,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sonic Boom",
+     "cost": "C",
+     "damage": 40,
+     "text": "This attack's damage isn't affected by Weakness or Resistance."
+    },
+    {
+     "name": "Explosion",
+     "cost": "C",
+     "damage": 120,
+     "text": "This Pokémon also does 90 damage to itself."
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "89",
+   "name": "Plusle",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Spark Duo",
+     "cost": "C",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "If 1 of your Minun used an attack during your last turn, it does 100 more damage."
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "90",
+   "name": "Minun",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Call for Family",
+     "cost": "C",
+     "damage": 0,
+     "text": "Look through your deck for up to 2 Basic Pokémon and put them onto your Bench. Shuffle your deck."
+    },
+    {
+     "name": "Static Shock",
+     "cost": "L",
+     "damage": 20
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "91",
+   "name": "Shinx",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Gnaw",
+     "cost": "L",
+     "damage": 10
+    },
+    {
+     "name": "Electric Claws",
+     "cost": "LC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "92",
+   "name": "Luxio",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Shinx",
+   "hp": 90,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Electric Claws",
+     "cost": "LC",
+     "damage": 50
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "93",
+   "name": "Luxray",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Luxio",
+   "hp": 160,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Thunder Claws",
+     "cost": "LC",
+     "damage": 90
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "94",
+   "name": "Rotom",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Surprise Short",
+     "cost": "C",
+     "damage": 0,
+     "text": "Discard all Pokémon Tools from all of your opponent's Pokémon."
+    },
+    {
+     "name": "Static Shock",
+     "cost": "L",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "95",
+   "name": "Tynamo",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Thunder Wave",
+     "cost": "L",
+     "damage": 0,
+     "text": "Flip a coin. On heads, your opponent's Active Pokémon becomes Paralyzed."
+    },
+    {
+     "name": "Tackle",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "96",
+   "name": "Eelektrik",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Tynamo",
+   "hp": 90,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Lightning Ball",
+     "cost": "L",
+     "damage": 20
+    },
+    {
+     "name": "Thunder",
+     "cost": "LCC",
+     "damage": 80,
+     "text": "This Pokémon also does 20 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "97",
+   "name": "Eelektross",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Eelektrik",
+   "hp": 160,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Upper Shock",
+     "cost": "L",
+     "damage": 40,
+     "text": "If this Pokémon evolved from Eelektrik during this turn, your opponent's Active Pokémon becomes Paralyzed."
+    },
+    {
+     "name": "Wild Charge",
+     "cost": "LCC",
+     "damage": 160,
+     "text": "This Pokémon also does 30 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "98",
+   "name": "Helioptile",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Gnaw",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Electro Ball",
+     "cost": "LC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "99",
+   "name": "Heliolisk",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Helioptile",
+   "hp": 110,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Gnaw",
+     "cost": "C",
+     "damage": 20
+    },
+    {
+     "name": "Electrobullet",
+     "cost": "LC",
+     "damage": 60,
+     "text": "Also does 20 damage to 1 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "100",
+   "name": "Charjabug",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Grubbin",
+   "hp": 100,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Vise Grip",
+     "cost": "CC",
+     "damage": 30
+    },
+    {
+     "name": "Head Bolt",
+     "cost": "LCC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "101",
+   "name": "Vikavolt",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Charjabug",
+   "hp": 150,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "CCC",
+     "damage": 70
+    },
+    {
+     "name": "Electro Blaster",
+     "cost": "LLCC",
+     "damage": 0,
+     "text": "Discard 2 Lightning Energy from this Pokémon. Does 200 damage to 1 of your opponent's Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "103",
+   "name": "Boltund V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 200,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Smash Turn",
+     "cost": "L",
+     "damage": 30,
+     "text": "You may switch this Pokémon with 1 of your Benched Pokémon."
+    },
+    {
+     "name": "Electrobullet",
+     "cost": "LLC",
+     "damage": 120,
+     "text": "Also does 30 damage to 1 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "104",
+   "name": "Boltund VMAX",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Boltund V",
+   "mechanic": "VMAX",
+   "hp": 320,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Bolt Storm",
+     "cost": "LC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Does 30 more damage for each Lightning Energy attached to all of your Pokémon."
+    },
+    {
+     "name": "Max Bolt",
+     "cost": "LLC",
+     "damage": 230,
+     "text": "During your next turn, this Pokémon can't use Max Bolt."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "105",
+   "name": "Toxel",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Ram",
+     "cost": "L",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "106",
+   "name": "Toxel",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Growl",
+     "cost": "C",
+     "damage": 0,
+     "text": "During your opponent's next turn, the Defending Pokémon's attacks do 30 less damage (before Weakness and Resistance)."
+    },
+    {
+     "name": "Tiny Bolt",
+     "cost": "L",
+     "damage": 10
+    }
+   ],
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "107",
+   "name": "Toxtricity",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Toxel",
+   "hp": 130,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Punk Shock",
+     "cost": "LC",
+     "damage": 70,
+     "text": "You may choose to make your opponent's Active Pokémon Paralyzed. If you do, this Pokémon also does 70 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "109",
+   "name": "Morpeko",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Targeted Spark",
+     "cost": "LC",
+     "damage": 0,
+     "text": "Does 30 damage to 1 of your opponent's Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "110",
+   "name": "Jigglypuff",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Psychic",
+   "weakness": "Metal",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Pound",
+     "cost": "P",
+     "damage": 20
+    },
+    {
+     "name": "Let's All Rollout",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Does 20 damage for each of your Benched Pokémon that has the Let's All Rollout attack."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "111",
+   "name": "Wigglytuff",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Jigglypuff",
+   "hp": 120,
+   "type": "Psychic",
+   "weakness": "Metal",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Find Treasure",
+     "cost": "P",
+     "damage": 0,
+     "text": "Look through your deck for up to 2 cards and put them into your hand. Shuffle your deck."
+    },
+    {
+     "name": "Hyper Voice",
+     "cost": "PCC",
+     "damage": 90
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "112",
+   "name": "Jynx",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Double Draw",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw 2 cards."
+    },
+    {
+     "name": "Dazzle Dance",
+     "cost": "PC",
+     "damage": 30,
+     "text": "Your opponent's Active Pokémon becomes Confused."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "115",
+   "name": "Snubbull",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Psychic",
+   "weakness": "Metal",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Headbutt",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Bite",
+     "cost": "CCC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "116",
+   "name": "Granbull",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Snubbull",
+   "hp": 120,
+   "type": "Psychic",
+   "weakness": "Metal",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Dig Up",
+     "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you may put up to 2 Pokémon Tool cards from your discard pile into your hand."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "CCC",
+     "damage": 90
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "117",
+   "name": "Galarian Corsola",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Tackle",
+     "cost": "CC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "118",
+   "name": "Galarian Cursola",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Galarian Corsola",
+   "hp": 100,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Force Regeneration",
+     "cost": "P",
+     "damage": 0,
+     "text": "Put a Basic Pokémon V from your opponent's discard pile onto their Bench. If you do, put damage counters on that Pokémon until its remaining HP is 30."
+    },
+    {
+     "name": "Spooky Shot",
+     "cost": "PCC",
+     "damage": 80
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "119",
+   "name": "Mawile",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Psychic",
+   "weakness": "Metal",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Chomp Chomp Hold",
+     "cost": "P",
+     "damage": 30,
+     "text": "During your opponent's next turn, the Defending Pokémon's attacks cost Colorless more, and its Retreat Cost is Colorless more."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "121",
+   "name": "Munna",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Ram",
+     "cost": "C",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "122",
+   "name": "Musharna",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Munna",
+   "hp": 120,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Sleep Inducer",
+     "cost": "C",
+     "damage": 0,
+     "text": "Switch 1 of your opponent's Benched Pokémon with their Active Pokémon. The new Active Pokémon becomes Asleep."
+    },
+    {
+     "name": "Psychic",
+     "cost": "PC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Does 30 more damage for each Energy attached to your opponent's Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "123",
+   "name": "Sigilyph",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Psychic",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Joust",
+     "cost": "C",
+     "damage": 20,
+     "text": "Before doing damage, discard all Pokémon Tools from your opponent's Active Pokémon."
+    },
+    {
+     "name": "Reflect Energy",
+     "cost": "PC",
+     "damage": 60,
+     "text": "Move an Energy from this Pokémon to 1 of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "124",
+   "name": "Meloetta",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Melodious Echo",
+     "cost": "PC",
+     "damage": 70,
+     "damageSuffix": "x",
+     "text": "Does 70 damage for each Fusion Strike Energy attached to all of your Pokémon."
+    }
+   ],
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "125",
+   "name": "Sandygast",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Vibration",
+     "cost": "P",
+     "damage": 10
+    },
+    {
+     "name": "Spooky Shot",
+     "cost": "PP",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "126",
+   "name": "Palossand",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Sandygast",
+   "hp": 140,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Spooky Sand",
+     "cost": "PPC",
+     "damage": 120
+    },
+    {
+     "name": "Oppressing Sandstorm",
+     "cost": "PPPC",
+     "damage": 0,
+     "text": "If your opponent's Active Pokémon is a Basic Pokémon, it is Knocked Out."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "127",
+   "name": "Indeedee",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Call for Family",
+     "cost": "P",
+     "damage": 0,
+     "text": "Look through your deck for up to 2 Basic Pokémon and put them onto your Bench. Shuffle your deck."
+    },
+    {
+     "name": "Heart Sign",
+     "cost": "PCC",
+     "damage": 80
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "128",
+   "name": "Dreepy",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Infestation",
+     "cost": "P",
+     "damage": 10,
+     "text": "During your opponent's next turn, the Defending Pokémon can't retreat."
+    }
+   ],
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "129",
+   "name": "Drakloak",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Dreepy",
+   "hp": 90,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Spooky Shot",
+     "cost": "P",
+     "damage": 20
+    },
+    {
+     "name": "U-turn",
+     "cost": "PC",
+     "damage": 30,
+     "text": "Switch this Pokémon with 1 of your Benched Pokémon."
+    }
+   ],
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "130",
+   "name": "Dragapult",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Drakloak",
+   "hp": 150,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Fusion Strike Assault",
+     "cost": "P",
+     "damage": 30,
+     "damageSuffix": "x",
+     "text": "Does 30 damage for each of your Fusion Strike Pokémon in play."
+    },
+    {
+     "name": "Speed Attack",
+     "cost": "PC",
+     "damage": 120
+    }
+   ],
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "131",
+   "name": "Sandshrew",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Dig It Up",
+     "cost": "F",
+     "damage": 0,
+     "text": "Look at the top card of your deck. You may discard that card."
+    },
+    {
+     "name": "Let's All Rollout",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Does 20 damage for each of your Benched Pokémon that has the Let's All Rollout attack."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "132",
+   "name": "Sandslash",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Sandshrew",
+   "hp": 120,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Dig Uppercut",
+     "cost": "FC",
+     "damage": 60,
+     "text": "Put a card from your discard pile into your hand."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "133",
+   "name": "Mankey",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Scratch",
+     "cost": "F",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "134",
+   "name": "Primeape",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Mankey",
+   "hp": 100,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Gut Punch",
+     "cost": "F",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "If your opponent's Active Pokémon is a Pokémon V, it does 60 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "135",
+   "name": "Geodude",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Rollout",
+     "cost": "F",
+     "damage": 10
+    },
+    {
+     "name": "Light Punch",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "137",
+   "name": "Golem",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Graveler",
+   "hp": 180,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 4,
+   "abilities": [
+    {
+     "name": "Desperate Blast",
+     "text": "If this Pokémon is in the Active Spot and is Knocked Out by damage from an attack from your opponent's Pokémon, put 10 damage counters on the Attacking Pokémon."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Double-Edge",
+     "cost": "FCC",
+     "damage": 160,
+     "text": "This Pokémon also does 30 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "138",
+   "name": "Onix",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 110,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Guard Press",
+     "cost": "CC",
+     "damage": 30,
+     "text": "During your opponent's next turn, this Pokémon takes 30 less damage from attacks (after Weakness and Resistance)."
+    },
+    {
+     "name": "Rock Throw",
+     "cost": "FFC",
+     "damage": 90
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "139",
+   "name": "Steelix",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Onix",
+   "hp": 190,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Powerful Rage",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Does 20 damage for each damage counter on this Pokémon."
+    },
+    {
+     "name": "Earthquake",
+     "cost": "FFC",
+     "damage": 180,
+     "text": "Also does 30 damage to each of your Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "140",
+   "name": "Gligar",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Poison Sting",
+     "cost": "F",
+     "damage": 0,
+     "text": "Your opponent's Active Pokémon becomes Poisoned."
+    },
+    {
+     "name": "Pierce",
+     "cost": "FC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "141",
+   "name": "Gliscor",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Gligar",
+   "hp": 110,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Cut Down",
+     "cost": "FC",
+     "damage": 30,
+     "text": "Discard an Energy from your opponent's Active Pokémon."
+    },
+    {
+     "name": "Venomous Hit",
+     "cost": "FFC",
+     "damage": 100,
+     "text": "Your opponent's Active Pokémon becomes Poisoned."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "142",
+   "name": "Makuhita",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Lunge Out",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Hammer In",
+     "cost": "FCC",
+     "damage": 60
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "143",
+   "name": "Hariyama",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Makuhita",
+   "hp": 140,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 4,
+   "abilities": [
+    {
+     "name": "Guts",
+     "text": "If this Pokémon would be Knocked Out by damage from an attack, flip a coin. On heads, this Pokémon is not Knocked Out, and its remaining HP becomes 10."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Hammer In",
+     "cost": "FCC",
+     "damage": 100
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "145",
+   "name": "Claydol",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Baltoy",
+   "hp": 120,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Rapid Spin",
+     "cost": "CC",
+     "damage": 30,
+     "text": "Switch this Pokémon with 1 of your Benched Pokémon. If you do, your opponent switches their Active Pokémon with 1 of their Benched Pokémon."
+    },
+    {
+     "name": "Ancient Imprint",
+     "cost": "FF",
+     "damage": 0,
+     "text": "Put damage counters on your opponent's Active Pokémon until its remaining HP is 60."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "146",
+   "name": "Lucario V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 210,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Aura Sphere",
+     "cost": "FFC",
+     "damage": 120
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "147",
+   "name": "Drilbur",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Scratch",
+     "cost": "C",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "148",
+   "name": "Landorus",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 120,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Strafe",
+     "cost": "C",
+     "damage": 20,
+     "text": "You may switch this Pokémon with 1 of your Benched Pokémon."
+    },
+    {
+     "name": "Earthen Boom",
+     "cost": "FFC",
+     "damage": 120,
+     "text": "Move all Energy from this Pokémon to your Benched Pokémon in any way you like."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "149",
+   "name": "Pancham",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Raised Bad",
+     "cost": "C",
+     "damage": 0,
+     "text": "Look through your deck for up to 2 Darkness Energy cards and attach them to this Pokémon. Shuffle your deck."
+    },
+    {
+     "name": "Smash Kick",
+     "cost": "CCC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "150",
+   "name": "Stufful",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Beat",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Rollout",
+     "cost": "FC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "151",
+   "name": "Bewear",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Stufful",
+   "hp": 130,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Split Spiral Punch",
+     "cost": "FC",
+     "damage": 40,
+     "text": "Your opponent's Active Pokémon becomes Confused."
+    },
+    {
+     "name": "Strength",
+     "cost": "FFC",
+     "damage": 130
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "152",
+   "name": "Clobbopus",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Beat",
+     "cost": "F",
+     "damage": 10
+    },
+    {
+     "name": "Knuckle Punch",
+     "cost": "FC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "153",
+   "name": "Grapploct",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Clobbopus",
+   "hp": 130,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Lunge Out",
+     "cost": "FC",
+     "damage": 40
+    },
+    {
+     "name": "Magnum Punch",
+     "cost": "FCC",
+     "damage": 90
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "154",
+   "name": "Falinks",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Headbutt",
+     "cost": "F",
+     "damage": 30
+    },
+    {
+     "name": "Cliff Edge Formation",
+     "cost": "FCC",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "If your opponent has exactly 1 Prize card remaining, it does 160 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "155",
+   "name": "Falinks",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Invade",
+     "cost": "F",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "156",
+   "name": "Gengar V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 210,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Dark Slumber",
+     "cost": "DD",
+     "damage": 40,
+     "text": "Your opponent's Active Pokémon becomes Asleep."
+    },
+    {
+     "name": "Pain Explosion",
+     "cost": "DDD",
+     "damage": 190,
+     "text": "Put 3 damage counters on this Pokémon."
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "157",
+   "name": "Gengar VMAX",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Gengar V",
+   "mechanic": "VMAX",
+   "hp": 320,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Fear and Panic",
+     "cost": "DD",
+     "damage": 60,
+     "damageSuffix": "x",
+     "text": "Does 60 damage for each of your opponent's Pokémon V and Pokémon-GX in play."
+    },
+    {
+     "name": "G-Max Swallow Up",
+     "cost": "DDD",
+     "damage": 250,
+     "text": "This Pokémon can't attack during your next turn."
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "158",
+   "name": "Tyranitar V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 230,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Hammer In",
+     "cost": "DCC",
+     "damage": 80
+    },
+    {
+     "name": "Land Crush",
+     "cost": "DDDC",
+     "damage": 150
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "159",
+   "name": "Galarian Zigzagoon",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Lick",
+     "cost": "D",
+     "damage": 10,
+     "text": "Flip a coin. On heads, your opponent's Active Pokémon becomes Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "160",
+   "name": "Galarian Linoone",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Galarian Zigzagoon",
+   "hp": 90,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Rear Kick",
+     "cost": "D",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "161",
+   "name": "Galarian Obstagoon",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Galarian Linoone",
+   "hp": 170,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Silence",
+     "cost": "D",
+     "damage": 30,
+     "text": "Choose 1 of your opponent's Active Pokémon's attacks. During your opponent's next turn, that Pokémon can't use that attack."
+    },
+    {
+     "name": "Merciless Strike",
+     "cost": "D",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "If your opponent's Active Pokémon already has damage counters on it, it does 90 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "162",
+   "name": "Carvanha",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "C",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "163",
+   "name": "Sharpedo",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Carvanha",
+   "hp": 100,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sharp Fang",
+     "cost": "DC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "164",
+   "name": "Absol",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Drag Off",
+     "cost": "CC",
+     "damage": 0,
+     "text": "Switch 1 of your opponent's Benched Pokémon with their Active Pokémon. Does 30 damage to the new Active Pokémon."
+    },
+    {
+     "name": "Slash",
+     "cost": "DCC",
+     "damage": 80
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "165",
+   "name": "Croagunk",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Corkscrew Punch",
+     "cost": "D",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "166",
+   "name": "Toxicroak",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Croagunk",
+   "hp": 110,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Severe Poison",
+     "cost": "D",
+     "damage": 0,
+     "text": "Your opponent's Active Pokémon becomes Poisoned. During Pokémon Checkup, put 4 damage counters on that Pokémon instead of 1."
+    },
+    {
+     "name": "Magnum Punch",
+     "cost": "DCC",
+     "damage": 90
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "167",
+   "name": "Darkrai",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 110,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Dark Cutter",
+     "cost": "DCC",
+     "damage": 90
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "168",
+   "name": "Trubbish",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Call for Family",
+     "cost": "D",
+     "damage": 0,
+     "text": "Look through your deck for a Basic Pokémon and put it onto your Bench. Shuffle your deck."
+    },
+    {
+     "name": "Super Poison Breath",
+     "cost": "DC",
+     "damage": 20,
+     "text": "Your opponent's Active Pokémon becomes Poisoned."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "169",
+   "name": "Garbodor",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Trubbish",
+   "hp": 120,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Poison Gas",
+     "cost": "D",
+     "damage": 30,
+     "text": "Your opponent's Active Pokémon becomes Poisoned."
+    },
+    {
+     "name": "Sludge Whirlpool",
+     "cost": "DDC",
+     "damage": 130
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "170",
+   "name": "Zorua",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Ram",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Rear Kick",
+     "cost": "DC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "171",
+   "name": "Zoroark",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Zorua",
+   "hp": 120,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Double Claw",
+     "cost": "C",
+     "damage": 40,
+     "damageSuffix": "x",
+     "text": "Flip 2 coins. Does 40 damage for each heads."
+    },
+    {
+     "name": "Night Daze",
+     "cost": "DDC",
+     "damage": 100
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "172",
+   "name": "Vullaby",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Darkness",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Razor Wing",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Air Slash",
+     "cost": "DC",
+     "damage": 30,
+     "text": "Discard an Energy from this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "173",
+   "name": "Mandibuzz",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Vullaby",
+   "hp": 120,
+   "type": "Darkness",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Bone Block",
+     "cost": "D",
+     "damage": 20,
+     "text": "During your opponent's next turn, Pokémon can't be played from your opponent's hand to evolve the Defending Pokémon."
+    },
+    {
+     "name": "Dark Cutter",
+     "cost": "DC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "174",
+   "name": "Pangoro",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Pancham",
+   "hp": 140,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Knocking Hammer",
+     "cost": "DDC",
+     "damage": 90,
+     "text": "Discard the top card of your opponent's deck."
+    },
+    {
+     "name": "Shakedown",
+     "cost": "DDDC",
+     "damage": 150,
+     "text": "Discard a random card from your opponent's hand."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "175",
+   "name": "Yveltal",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 130,
+   "type": "Darkness",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Dark Cutter",
+     "cost": "DD",
+     "damage": 50
+    },
+    {
+     "name": "Single Strike Wings",
+     "cost": "DDD",
+     "damage": 110
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "176",
+   "name": "Impidimp",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Play Rough",
+     "cost": "D",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 30 more damage."
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "177",
+   "name": "Morgrem",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Impidimp",
+   "hp": 90,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "D",
+     "damage": 20
+    },
+    {
+     "name": "Crushing Blow",
+     "cost": "DD",
+     "damage": 40,
+     "text": "Flip a coin. On heads, discard an Energy from your opponent's Active Pokémon."
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "178",
+   "name": "Grimmsnarl",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Morgrem",
+   "hp": 170,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "D",
+     "damage": 60
+    },
+    {
+     "name": "Rear Attack",
+     "cost": "DD",
+     "damage": 100,
+     "damageSuffix": "+",
+     "text": "If you have 2 or fewer Benched Pokémon, it does 140 more damage."
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "179",
+   "name": "Morpeko",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Explosive Discontent",
+     "cost": "D",
+     "damage": 30,
+     "damageSuffix": "x",
+     "text": "Does 30 damage for each damage counter on this Pokémon."
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "180",
+   "name": "Galarian Meowth",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Growl",
+     "cost": "M",
+     "damage": 0,
+     "text": "During your opponent's next turn, the Defending Pokémon's attacks do 20 less damage (before Weakness and Resistance)."
+    },
+    {
+     "name": "Slash",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "181",
+   "name": "Galarian Perrserker",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Galarian Meowth",
+   "hp": 120,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Call to Muster",
+     "cost": "M",
+     "damage": 0,
+     "text": "Look through your deck for up to 2 basic Energy cards and attach them to your Pokémon in any way you like. Shuffle your deck."
+    },
+    {
+     "name": "Headbang",
+     "cost": "CCC",
+     "damage": 80
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "182",
+   "name": "Skarmory",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 120,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Steel Wing",
+     "cost": "CC",
+     "damage": 30,
+     "text": "During your opponent's next turn, this Pokémon takes 30 less damage from attacks (after Weakness and Resistance)."
+    },
+    {
+     "name": "Slicing Blade",
+     "cost": "MMC",
+     "damage": 110
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "183",
+   "name": "Excadrill",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Drilbur",
+   "hp": 130,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Metal Claw",
+     "cost": "MC",
+     "damage": 50
+    },
+    {
+     "name": "Rock Tomb",
+     "cost": "MMC",
+     "damage": 120,
+     "text": "During your opponent's next turn, the Defending Pokémon can't retreat."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "184",
+   "name": "Durant",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Adversity Jaws",
+     "cost": "CCC",
+     "damage": 70,
+     "text": "If your opponent's Active Pokémon is a Fire Pokémon, it becomes Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "185",
+   "name": "Genesect V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 190,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Fusion Strike System",
+     "text": "Once during your turn, you may draw cards until you have as many cards in your hand as you have Fusion Strike Pokémon in play."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Techno Blast",
+     "cost": "MMC",
+     "damage": 210,
+     "text": "This Pokémon can't attack during your next turn."
+    }
+   ],
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "186",
+   "name": "Klefki",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Unlock",
+     "cost": "C",
+     "damage": 10,
+     "text": "Draw 2 cards."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "187",
+   "name": "Togedemaru",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Let's All Rollout",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Does 20 damage for each of your Benched Pokémon that has the Let's All Rollout attack."
+    },
+    {
+     "name": "Rolling Attack",
+     "cost": "MCC",
+     "damage": 50
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "188",
+   "name": "Meltan",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Iron Intake",
+     "cost": "M",
+     "damage": 0,
+     "text": "Heal 30 damage from this Pokémon."
+    },
+    {
+     "name": "Headbutt",
+     "cost": "CC",
+     "damage": 20
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "189",
+   "name": "Melmetal",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Meltan",
+   "hp": 150,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Ingot Swing",
+     "cost": "MCC",
+     "damage": 80,
+     "text": "During your opponent's next turn, prevent all damage done to this Pokémon by attacks from Pokémon that have an Ability."
+    },
+    {
+     "name": "Blasting Hammer",
+     "cost": "MMCC",
+     "damage": 150,
+     "text": "Discard an Energy from this Pokémon."
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "190",
+   "name": "Corviknight",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Corvisquire",
+   "hp": 170,
+   "type": "Metal",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Steel Wing",
+     "cost": "M",
+     "damage": 50,
+     "text": "During your opponent's next turn, this Pokémon takes 30 less damage from attacks (after Weakness and Resistance)."
+    },
+    {
+     "name": "Power Cyclone",
+     "cost": "MCC",
+     "damage": 160,
+     "text": "Move an Energy from this Pokémon to 1 of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "191",
+   "name": "Cufant",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Rollout",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "High Horsepower",
+     "cost": "MCC",
+     "damage": 80,
+     "text": "This Pokémon also does 20 damage to itself."
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "192",
+   "name": "Copperajah",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Cufant",
+   "hp": 190,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Strength",
+     "cost": "MCC",
+     "damage": 90
+    },
+    {
+     "name": "High Horsepower",
+     "cost": "MCCC",
+     "damage": 160,
+     "text": "This Pokémon also does 30 damage to itself."
+    }
+   ],
+   "tags": [
+    "Single Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "194",
+   "name": "Latios",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 130,
+   "type": "Dragon",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Blue Assist",
+     "text": "Once during your turn, you may attach a Psychic Energy card from your hand to 1 of your Latias."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Luster Purge",
+     "cost": "WWPC",
+     "damage": 210,
+     "text": "Discard 2 Energy from this Pokémon."
+    }
+   ],
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "195",
+   "name": "Goomy",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Dragon",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Tackle",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Melt",
+     "cost": "WP",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "196",
+   "name": "Sliggoo",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Goomy",
+   "hp": 80,
+   "type": "Dragon",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Melt",
+     "cost": "C",
+     "damage": 20
+    },
+    {
+     "name": "Body Slam",
+     "cost": "WP",
+     "damage": 50,
+     "text": "Flip a coin. On heads, your opponent's Active Pokémon becomes Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "197",
+   "name": "Goodra",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Sliggoo",
+   "hp": 160,
+   "type": "Dragon",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Slimy Room",
+     "text": "As long as this Pokémon is in the Active Spot, whenever your opponent tries to attach an Energy card from their hand to a Pokémon, they must flip a coin. On tails, your opponent discards that Energy card instead of attaching it, and this doesn't use up their Energy attachment for the turn."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Buster Tail",
+     "cost": "WP",
+     "damage": 120
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "198",
+   "name": "Turtonator",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 130,
+   "type": "Dragon",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Shell Trap",
+     "cost": "RF",
+     "damage": 30,
+     "text": "During your opponent's next turn, if this Pokémon is damaged by an attack (even if it is Knocked Out), put 8 damage counters on the Attacking Pokémon."
+    },
+    {
+     "name": "Heat Crash",
+     "cost": "CCC",
+     "damage": 80
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "199",
+   "name": "Meowth",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Pay Day",
+     "cost": "C",
+     "damage": 10,
+     "text": "Draw a card."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "200",
+   "name": "Persian",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Meowth",
+   "hp": 110,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Pay Day",
+     "cost": "C",
+     "damage": 30,
+     "text": "Draw a card."
+    },
+    {
+     "name": "Bite",
+     "cost": "CC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "201",
+   "name": "Dodrio V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 200,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "No Reprieve",
+     "cost": "C",
+     "damage": 20,
+     "text": "During your next turn, this Pokémon's attacks do 80 more damage to your opponent's Active Pokémon (before Weakness and Resistance)."
+    },
+    {
+     "name": "Rampage Drill",
+     "cost": "CCC",
+     "damage": 160,
+     "text": "This Pokémon also does 30 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "202",
+   "name": "Chansey",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 110,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Drain Slap",
+     "cost": "CC",
+     "damage": 30,
+     "text": "Heal 30 damage from this Pokémon."
+    },
+    {
+     "name": "Gentle Slap",
+     "cost": "CCC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "203",
+   "name": "Blissey",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Chansey",
+   "hp": 130,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Expert in Roundness",
+     "text": "Prevent all damage done to each of your Pokémon that has the Let's All Rollout attack by attacks from your opponent's Pokémon VMAX."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Let's All Rollout",
+     "cost": "CCC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Does 20 damage for each of your Benched Pokémon that has the Let's All Rollout attack."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "204",
+   "name": "Kangaskhan",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 120,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Pound",
+     "cost": "C",
+     "damage": 30
+    },
+    {
+     "name": "Coordinated One-Two Punch",
+     "cost": "CCC",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 100 more damage."
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "205",
+   "name": "Eevee",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Continuous Steps",
+     "cost": "C",
+     "damage": 30,
+     "damageSuffix": "x",
+     "text": "Flip a coin until you get tails. Does 30 damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "208",
+   "name": "Stantler",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 110,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Rear Kick",
+     "cost": "C",
+     "damage": 20
+    },
+    {
+     "name": "Wild Dive",
+     "cost": "CC",
+     "damage": 30,
+     "damageSuffix": "x",
+     "text": "Does 30 damage for each Energy attached to your opponent's Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "209",
+   "name": "Smeargle",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sketching Trash",
+     "cost": "C",
+     "damage": 0,
+     "text": "Put up to 2 Fusion Strike Trainer cards from your discard pile into your hand."
+    },
+    {
+     "name": "Tail Whap",
+     "cost": "CCC",
+     "damage": 80
+    }
+   ],
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "210",
+   "name": "Skitty",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Whimsy Tackle",
+     "cost": "C",
+     "damage": 30,
+     "text": "Flip a coin. On tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "211",
+   "name": "Delcatty",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Skitty",
+   "hp": 100,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Willful Busybody",
+     "cost": "C",
+     "damage": 0,
+     "text": "Your opponent reveals their hand. Choose a card you find there and put it on the bottom of their deck."
+    },
+    {
+     "name": "Double Slap",
+     "cost": "CC",
+     "damage": 50,
+     "damageSuffix": "x",
+     "text": "Flip 2 coins. Does 50 damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "212",
+   "name": "Buneary",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Double Kick",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Flip 2 coins. Does 20 damage for each heads."
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "213",
+   "name": "Lopunny",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Buneary",
+   "hp": 110,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Hopping Shot",
+     "cost": "CC",
+     "damage": 70
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "214",
+   "name": "Bunnelby",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Find a Friend",
+     "cost": "C",
+     "damage": 0,
+     "text": "Look through your deck for a Pokémon, show it to your opponent, and put it into your hand. Shuffle your deck."
+    },
+    {
+     "name": "Take Down",
+     "cost": "CC",
+     "damage": 30,
+     "text": "This Pokémon also does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "215",
+   "name": "Diggersby",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Bunnelby",
+   "hp": 140,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Hammer In",
+     "cost": "CCC",
+     "damage": 80
+    },
+    {
+     "name": "Take Down",
+     "cost": "CCCC",
+     "damage": 150,
+     "text": "This Pokémon also does 30 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "216",
+   "name": "Hawlucha",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Flying Stomp",
+     "cost": "C",
+     "damage": 20,
+     "text": "Discard a Special Energy from your opponent's Active Pokémon."
+    }
+   ],
+   "tags": [
+    "Rapid Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "218",
+   "name": "Greedent VMAX",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Greedent V",
+   "mechanic": "VMAX",
+   "hp": 320,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Turn a Profit",
+     "cost": "CC",
+     "damage": 30,
+     "text": "If your opponent's Basic Pokémon is Knocked Out by damage from this attack, take 2 more Prize cards."
+    },
+    {
+     "name": "Max Gimme Gimme",
+     "cost": "CCC",
+     "damage": 160,
+     "text": "Draw 3 cards."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "219",
+   "name": "Rookidee",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Fury Attack",
+     "cost": "C",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Flip 3 coins. Does 10 damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "220",
+   "name": "Corvisquire",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Rookidee",
+   "hp": 80,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Fury Attack",
+     "cost": "CC",
+     "damage": 30,
+     "damageSuffix": "x",
+     "text": "Flip 3 coins. Does 30 damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "221",
+   "name": "Wooloo",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Derail",
+     "cost": "C",
+     "damage": 10,
+     "text": "Discard a Special Energy from your opponent's Active Pokémon."
+    },
+    {
+     "name": "Let's All Rollout",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Does 20 damage for each of your Benched Pokémon that has the Let's All Rollout attack."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "222",
+   "name": "Wooloo",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Knock Away",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, it does 40 more damage."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "223",
+   "name": "Dubwool",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Wooloo",
+   "hp": 130,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Bounce",
+     "cost": "C",
+     "damage": 30,
+     "text": "You may switch this Pokémon with 1 of your Benched Pokémon."
+    },
+    {
+     "name": "Rolling Tackle",
+     "cost": "CC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "225",
+   "name": "Battle VIP Pass",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Item",
+   "text": "You can use this card only during your first turn. Look through your deck for up to 2 Basic Pokémon and put them onto your Bench. Shuffle your deck."
+  },
+  {
+   "set": "FST",
+   "number": "226",
+   "name": "Bug Catcher",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Supporter",
+   "text": "Draw 2 cards. Flip a coin. On heads, draw 2 more cards."
+  },
+  {
+   "set": "FST",
+   "number": "227",
+   "name": "Chili & Cilan & Cress",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Supporter",
+   "text": "Look through your deck for up to 3 Fusion Strike Pokémon, show them to your opponent, and put them into your hand. Shuffle your deck.",
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "229",
+   "name": "Cram-o-matic",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Item",
+   "text": "You can use this card only if you discard another Item card from your hand. Flip a coin. On heads, look through your deck for a card and put it into your hand. Shuffle your deck."
+  },
+  {
+   "set": "FST",
+   "number": "230",
+   "name": "Cross Switcher",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Item",
+   "text": "You must play 2 Cross Switcher cards at once. (This effect works one time for 2 cards.) Switch 1 of your opponent's Benched Pokémon with their Active Pokémon. If you do, switch your Active Pokémon with 1 of your Benched Pokémon.",
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "231",
+   "name": "Crossceiver",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Item",
+   "text": "You must play 2 Crossceiver cards at once. (This effect works one time for 2 cards.) Put a Pokémon or a Supporter card from your discard pile into your hand.",
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "232",
+   "name": "Dancer",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Supporter",
+   "text": "Draw 2 cards. If you go second and it's your first turn, draw 3 more cards."
+  },
+  {
+   "set": "FST",
+   "number": "234",
+   "name": "Farewell Bell",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Tool",
+   "text": "If the Pokémon VMAX this card is attached to is Knocked Out by damage from an attack from your opponent's Pokémon, look through your deck for a card and put it into your hand. Shuffle your deck."
+  },
+  {
+   "set": "FST",
+   "number": "236",
+   "name": "Power Tablet",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Item",
+   "text": "During this turn, your Fusion Strike Pokémon's attacks do 30 more damage to your opponent's Active Pokémon (before Weakness and Resistance).",
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "237",
+   "name": "Quick Ball",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Item",
+   "text": "You can play this card only if you discard another card from your hand. Look through your deck for a Basic Pokémon, show it to your opponent, and put it into your hand. Shuffle your deck."
+  },
+  {
+   "set": "FST",
+   "number": "238",
+   "name": "Schoolboy",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Supporter",
+   "text": "Draw 2 cards. If your opponent has exactly 1, 3, or 5 Prize cards remaining, draw 2 more cards."
+  },
+  {
+   "set": "FST",
+   "number": "239",
+   "name": "Schoolgirl",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Supporter",
+   "text": "Draw 2 cards. If your opponent has exactly 2, 4, or 6 Prize cards remaining, draw 2 more cards."
+  },
+  {
+   "set": "FST",
+   "number": "240",
+   "name": "Shauna",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Supporter",
+   "text": "Shuffle your hand into your deck. Then, draw 5 cards."
+  },
+  {
+   "set": "FST",
+   "number": "241",
+   "name": "Sidney",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Supporter",
+   "text": "Your opponent reveals their hand. Discard up to 2 in any combination of Pokémon Tool cards, Special Energy cards, and Stadium cards from it."
+  },
+  {
+   "set": "FST",
+   "number": "242",
+   "name": "Skaters' Park",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Stadium",
+   "text": "Whenever either player's Active Pokémon retreats, put any basic Energy that would be discarded into their hand instead of the discard pile."
+  },
+  {
+   "set": "FST",
+   "number": "243",
+   "name": "Spongy Gloves",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Tool",
+   "text": "The attacks of the Pokémon this card is attached to do 30 more damage to your opponent's Active Water Pokémon (before Weakness and Resistance)."
+  },
+  {
+   "set": "FST",
+   "number": "244",
+   "name": "Fusion Strike Energy",
+   "kind": "Energy",
+   "regulationMark": "E",
+   "basicEnergy": false,
+   "provides": "Colorless",
+   "text": "This card can only be attached to a Fusion Strike Pokémon. If this card is attached to anything other than a Fusion Strike Pokémon, discard this card. As long as this card is attached to a Pokémon, it provides every type of Energy but provides only 1 Energy at a time. Prevent all effects of your opponent's Pokémon's Abilities done to the Pokémon this card is attached to.",
+   "tags": [
+    "Fusion Strike"
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "245",
+   "name": "Celebi V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 190,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Leaflet Dance",
+     "cost": "G",
+     "damage": 0,
+     "text": "Attach any number of Grass Energy cards from your hand to your Pokémon in any way you like."
+    },
+    {
+     "name": "Slash Back",
+     "cost": "GC",
+     "damage": 60,
+     "text": "Switch this Pokémon with 1 of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "252",
+   "name": "Sandaconda V",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Basic",
+   "mechanic": "V",
+   "hp": 220,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Wall of Sand",
+     "text": "This Pokémon takes 30 less damage from attacks (after Weakness and Resistance)."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Land Crush",
+     "cost": "FFC",
+     "damage": 140
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "270",
+   "name": "Espeon VMAX",
+   "kind": "Pokemon",
+   "regulationMark": "E",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Espeon V",
+   "mechanic": "VMAX",
+   "hp": 310,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Solar Revelation",
+     "text": "Prevent all effects of attacks from your opponent's Pokémon done to all of your Pokémon that have Energy attached. (Existing effects are not removed. Damage is not an effect.)"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Max Mindstorm",
+     "cost": "PCC",
+     "damage": 60,
+     "damageSuffix": "x",
+     "text": "Does 60 damage for each Energy attached to all of your opponent's Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "FST",
+   "number": "282",
+   "name": "Training Court",
+   "kind": "Trainer",
+   "regulationMark": "E",
+   "trainerType": "Stadium",
+   "text": "Once during each player's turn, that player may put a basic Energy card from their discard pile into their hand."
+  }
+ ]
+}

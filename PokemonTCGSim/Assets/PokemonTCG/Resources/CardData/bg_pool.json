@@ -1,0 +1,119 @@
+{
+ "format": "Best of Game (BG, 2002): cards not already in the pool. Unlimited only. Electabuzz, Hitmonchan, Professor Elm, Rocket's Mewtwo and Rocket's Hitmonchan are prints of pool cards.",
+ "cards": [
+  {
+   "set": "BG",
+   "number": "4",
+   "name": "Rocket's Scizor",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "resistanceAmount": 30,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Focus",
+     "cost": "C",
+     "damage": 0,
+     "text": "During your next turn, this Pokémon's Agility attack's base damage is doubled."
+    },
+    {
+     "name": "Agility",
+     "cost": "MCC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, during your opponent's next turn, prevent all effects of attacks, including damage, done to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "BG",
+   "number": "5",
+   "name": "Rocket's Sneasel",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Entrap",
+     "cost": "D",
+     "damage": 0,
+     "text": "The Defending Pokémon can't retreat during your opponent's next turn."
+    },
+    {
+     "name": "Continuous Scratch",
+     "cost": "CC",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Flip 4 coins. This attack does 10 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "BG",
+   "number": "6",
+   "name": "Dark Ivysaur",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Bulbasaur",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Vine Pull",
+     "text": "Once during your turn, when this Pokémon retreats, choose 1 of your opponent's Benched Pokémon and switch it with their Active Pokémon (a Poké-Body: your ruling).",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Fury Strikes",
+     "cost": "GG",
+     "damage": 0,
+     "text": "Your opponent puts 3 markers onto their Pokémon (divided as they choose; more than 1 marker can be put on the same Pokémon). Then, this attack does 10 damage to each Pokémon for each marker on it. Don't apply Weakness and Resistance. Remove the markers at the end of the turn."
+    }
+   ]
+  },
+  {
+   "set": "BG",
+   "number": "7",
+   "name": "Dark Venusaur",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Dark Ivysaur",
+   "hp": 70,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Horrid Pollen",
+     "cost": "GGG",
+     "damage": 30,
+     "text": "Flip 2 coins. If 1 is heads, the Defending Pokémon is now Asleep and Poisoned. If both are heads, the Defending Pokémon is now Confused and Poisoned. If both are tails, the Defending Pokémon is now Paralyzed and Poisoned."
+    }
+   ]
+  }
+ ]
+}

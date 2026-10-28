@@ -1,0 +1,1509 @@
+{
+ "format": "Prismatic Evolutions (PRE): cards not already in the pool. H and later = Standard; G = Expanded.",
+ "cards": [
+  {
+   "set": "PRE",
+   "number": "1",
+   "name": "Exeggcute",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Ram",
+     "cost": "GC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "2",
+   "name": "Exeggutor",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Exeggcute",
+   "hp": 140,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Mega Drain",
+     "cost": "GC",
+     "damage": 50,
+     "text": "This Pokémon heals 30 damage."
+    },
+    {
+     "name": "Solar Beam",
+     "cost": "GGC",
+     "damage": 130
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "3",
+   "name": "Pinsir",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 120,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Slash",
+     "cost": "GC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "6",
+   "name": "Leafeon ex",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "Tera: while on your Bench, prevent all damage done to it by attacks.",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 270,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "ex": true,
+   "tera": true,
+   "attacks": [
+    {
+     "name": "Verdant Storm",
+     "cost": "GC",
+     "damage": 60,
+     "damageSuffix": "x",
+     "text": "Does 60 damage for each Energy attached to all of your opponent's Pokémon."
+    },
+    {
+     "name": "Moss Agate",
+     "cost": "GRW",
+     "damage": 230,
+     "text": "Each of your Benched Pokémon heals 100 damage."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "13",
+   "name": "Flareon",
+   "kind": "Pokemon",
+   "regulationMark": "G",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 130,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Destructive Flame",
+     "cost": "R",
+     "damage": 30,
+     "text": "Flip a coin. On heads, discard 1 Energy from your opponent's Active Pokémon."
+    },
+    {
+     "name": "Fighting Blaze",
+     "cost": "RCC",
+     "damage": 90,
+     "damageSuffix": "+",
+     "text": "Does 90 more damage if your opponent's Active Pokémon is a Pokémon ex or Pokémon V."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "14",
+   "name": "Flareon ex",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "Tera: while on your Bench, prevent all damage done to it by attacks.",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 270,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "ex": true,
+   "tera": true,
+   "attacks": [
+    {
+     "name": "Burning Charge",
+     "cost": "RC",
+     "damage": 130,
+     "text": "Find up to 2 Basic Energy cards in your deck and attach them to 1 of your Pokémon. Shuffle your deck."
+    },
+    {
+     "name": "Carnelian",
+     "cost": "RWL",
+     "damage": 280,
+     "text": "This Pokémon can't attack during your next turn."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "15",
+   "name": "Litleo",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Combustion",
+     "cost": "R",
+     "damage": 10
+    },
+    {
+     "name": "Headbutt",
+     "cost": "RRC",
+     "damage": 50
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "16",
+   "name": "Pyroar",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Litleo",
+   "hp": 120,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Fire Mane",
+     "cost": "RC",
+     "damage": 50
+    },
+    {
+     "name": "Flame Tackle",
+     "cost": "RRC",
+     "damage": 160,
+     "text": "This Pokémon can't attack during your next turn."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "18",
+   "name": "Slowpoke",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Water Gun",
+     "cost": "W",
+     "damage": 10
+    },
+    {
+     "name": "Tail Whap",
+     "cost": "WC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "19",
+   "name": "Slowking",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Slowpoke",
+   "hp": 130,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Wash the Slate Clean",
+     "cost": "WCC",
+     "damage": 70,
+     "text": "You may put 2 Energy attached to your opponent's Active Pokémon into their hand."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "22",
+   "name": "Vaporeon",
+   "kind": "Pokemon",
+   "regulationMark": "G",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 130,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Spiral Drain",
+     "cost": "W",
+     "damage": 30,
+     "text": "This Pokémon heals 30 damage."
+    },
+    {
+     "name": "Fighting Whirlpool",
+     "cost": "WCC",
+     "damage": 90,
+     "damageSuffix": "+",
+     "text": "Does 90 more damage if your opponent's Active Pokémon is a Pokémon ex or Pokémon V."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "23",
+   "name": "Vaporeon ex",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "Tera: while on your Bench, prevent all damage done to it by attacks.",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 280,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "ex": true,
+   "tera": true,
+   "attacks": [
+    {
+     "name": "Severe Squall",
+     "cost": "WC",
+     "damage": 60,
+     "text": "Does 60 damage to each of your opponent's Pokémon ex. Weakness and Resistance don't apply."
+    },
+    {
+     "name": "Aquamarine",
+     "cost": "RWL",
+     "damage": 280,
+     "text": "This Pokémon can't attack during your next turn."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "24",
+   "name": "Suicune",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 120,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Overrun",
+     "cost": "CC",
+     "damage": 30,
+     "text": "Also does 30 damage to 1 of your opponent's Benched Pokémon (no Weakness or Resistance for Benched Pokémon)."
+    },
+    {
+     "name": "Aurora Beam",
+     "cost": "WWC",
+     "damage": 100
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "26",
+   "name": "Glaceon ex",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "Tera: while on your Bench, prevent all damage done to it by attacks.",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 270,
+   "type": "Water",
+   "weakness": "Metal",
+   "retreat": 1,
+   "ex": true,
+   "tera": true,
+   "attacks": [
+    {
+     "name": "Frost Bullet",
+     "cost": "WC",
+     "damage": 110,
+     "text": "Also does 30 damage to 1 of your opponent's Benched Pokémon (no Weakness or Resistance for Benched Pokémon)."
+    },
+    {
+     "name": "Euclase",
+     "cost": "GWD",
+     "damage": 0,
+     "text": "Knock Out 1 of your opponent's Pokémon that has exactly 6 damage counters on it."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "28",
+   "name": "Pikachu ex",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 190,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "ex": true,
+   "attacks": [
+    {
+     "name": "Tail Whap",
+     "cost": "C",
+     "damage": 30
+    },
+    {
+     "name": "Thunder",
+     "cost": "LLC",
+     "damage": 220,
+     "text": "This Pokémon also takes 30 damage itself."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "29",
+   "name": "Jolteon",
+   "kind": "Pokemon",
+   "regulationMark": "G",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 110,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Linear Attack",
+     "cost": "L",
+     "damage": 0,
+     "text": "Does 30 damage to 1 of your opponent's Pokémon (no Weakness or Resistance for Benched Pokémon)."
+    },
+    {
+     "name": "Fighting Lightning",
+     "cost": "LCC",
+     "damage": 90,
+     "damageSuffix": "+",
+     "text": "Does 90 more damage if your opponent's Active Pokémon is a Pokémon ex or Pokémon V."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "30",
+   "name": "Jolteon ex",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "Tera: while on your Bench, prevent all damage done to it by attacks.",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 260,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 0,
+   "ex": true,
+   "tera": true,
+   "attacks": [
+    {
+     "name": "Flashing Spear",
+     "cost": "LC",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "You may discard up to 2 Basic Energy from your Benched Pokémon. Does 90 more damage for each card discarded this way."
+    },
+    {
+     "name": "Dravite",
+     "cost": "RWL",
+     "damage": 280,
+     "text": "This Pokémon can't attack during your next turn."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "31",
+   "name": "Iron Hands ex",
+   "kind": "Pokemon",
+   "regulationMark": "G",
+   "text": "",
+   "stage": "Basic",
+   "hp": 230,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 4,
+   "ex": true,
+   "tags": [
+    "Future"
+   ],
+   "attacks": [
+    {
+     "name": "Arm Press",
+     "cost": "LLC",
+     "damage": 160
+    },
+    {
+     "name": "Amp You Very Much",
+     "cost": "LCCC",
+     "damage": 120,
+     "text": "If damage from this attack Knocks Out your opponent's Pokémon, take 1 more Prize card."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "33",
+   "name": "Espeon",
+   "kind": "Pokemon",
+   "regulationMark": "G",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 110,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Psychic Assault",
+     "cost": "P",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Does 10 more damage for each damage counter on your opponent's Active Pokémon."
+    },
+    {
+     "name": "Psy Bolt",
+     "cost": "PC",
+     "damage": 60,
+     "text": "Flip a coin. On heads, your opponent's Active Pokémon becomes Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "34",
+   "name": "Espeon ex",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "Tera: while on your Bench, prevent all damage done to it by attacks.",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 270,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "ex": true,
+   "tera": true,
+   "attacks": [
+    {
+     "name": "Psych Out",
+     "cost": "PCC",
+     "damage": 160,
+     "text": "Discard a random card from your opponent's hand."
+    },
+    {
+     "name": "Amazez",
+     "cost": "GPD",
+     "damage": 0,
+     "text": "Devolve each of your opponent's evolved Pokémon by shuffling its highest-Stage Evolution card into their deck."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "38",
+   "name": "Spritzee",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Psychic",
+   "weakness": "Metal",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Fairy Wind",
+     "cost": "P",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "39",
+   "name": "Aromatisse",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Spritzee",
+   "hp": 120,
+   "type": "Psychic",
+   "weakness": "Metal",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Perfume Press",
+     "cost": "PC",
+     "damage": 60,
+     "text": "Your opponent's Active Pokémon becomes Confused."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "40",
+   "name": "Sylveon",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 120,
+   "type": "Psychic",
+   "weakness": "Metal",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Safeguard",
+     "text": "Prevent all damage done to this Pokémon by attacks from your opponent's Pokémon ex."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Magical Shot",
+     "cost": "PCC",
+     "damage": 100
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "42",
+   "name": "Scream Tail",
+   "kind": "Pokemon",
+   "regulationMark": "G",
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "tags": [
+    "Ancient"
+   ],
+   "attacks": [
+    {
+     "name": "Slap",
+     "cost": "P",
+     "damage": 30
+    },
+    {
+     "name": "Roaring Scream",
+     "cost": "PC",
+     "damage": 0,
+     "text": "Does 20 damage to 1 of your opponent's Pokémon for each damage counter on this Pokémon (no Weakness or Resistance for Benched Pokémon)."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "47",
+   "name": "Larvitar",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Headbutt",
+     "cost": "C",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "48",
+   "name": "Pupitar",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Larvitar",
+   "hp": 90,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sand Spray",
+     "cost": "C",
+     "damage": 20
+    },
+    {
+     "name": "Hammer In",
+     "cost": "CCC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "49",
+   "name": "Groudon",
+   "kind": "Pokemon",
+   "regulationMark": "G",
+   "text": "",
+   "stage": "Basic",
+   "hp": 130,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Swelling Power",
+     "cost": "C",
+     "damage": 0,
+     "text": "Attach a Basic Fighting Energy card from your hand to 1 of your Pokémon."
+    },
+    {
+     "name": "Magma Purge",
+     "cost": "FFC",
+     "damage": 60,
+     "damageSuffix": "x",
+     "text": "Discard up to 4 Energy from your Pokémon. Does 60 damage for each card discarded this way."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "50",
+   "name": "Riolu",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Quick Attack",
+     "cost": "F",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. On heads, this attack does 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "51",
+   "name": "Lucario ex",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Riolu",
+   "hp": 260,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "ex": true,
+   "attacks": [
+    {
+     "name": "Aura Uppercut",
+     "cost": "F",
+     "damage": 50
+    },
+    {
+     "name": "Tornado Rush",
+     "cost": "FC",
+     "damage": 100,
+     "text": "During your next turn, this Pokémon's Tornado Rush does 100 more damage (before Weakness and Resistance)."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "52",
+   "name": "Hippopotas",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Tackle",
+     "cost": "CCC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "53",
+   "name": "Hippowdon",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Hippopotas",
+   "hp": 150,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Sand Spray",
+     "cost": "CCC",
+     "damage": 90
+    },
+    {
+     "name": "Land Crush",
+     "cost": "FCCC",
+     "damage": 140
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "56",
+   "name": "Sandy Shocks ex",
+   "kind": "Pokemon",
+   "regulationMark": "G",
+   "text": "",
+   "stage": "Basic",
+   "hp": 220,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 2,
+   "ex": true,
+   "tags": [
+    "Ancient"
+   ],
+   "abilities": [
+    {
+     "name": "Magnetic Absorption",
+     "text": "Once during your turn, if your opponent has 4 or fewer Prize cards left, you may attach a Basic Fighting Energy card from your discard pile to this Pokémon."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Earthen Spike",
+     "cost": "FFC",
+     "damage": 200,
+     "text": "This Pokémon can't attack during your next turn."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "59",
+   "name": "Umbreon",
+   "kind": "Pokemon",
+   "regulationMark": "G",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 110,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Feint Attack",
+     "cost": "D",
+     "damage": 0,
+     "text": "Does 50 damage to 1 of your opponent's Pokémon. Weakness, Resistance and effects on that Pokémon don't change this damage."
+    },
+    {
+     "name": "Pitch-Black Blade",
+     "cost": "DCC",
+     "damage": 140,
+     "text": "This Pokémon can't attack during your next turn."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "60",
+   "name": "Umbreon ex",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "Tera: while on your Bench, prevent all damage done to it by attacks.",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 280,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 2,
+   "ex": true,
+   "tera": true,
+   "attacks": [
+    {
+     "name": "Moon Mirage",
+     "cost": "DCC",
+     "damage": 160,
+     "text": "Your opponent's Active Pokémon becomes Confused."
+    },
+    {
+     "name": "Onyx",
+     "cost": "LPD",
+     "damage": 0,
+     "text": "Discard all Energy from this Pokémon, and take a Prize card."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "61",
+   "name": "Sneasel",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Claw Slash",
+     "cost": "D",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "62",
+   "name": "Houndour",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Playful Kick",
+     "cost": "D",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "63",
+   "name": "Houndoom",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Houndour",
+   "hp": 120,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Call to Muster",
+     "cost": "D",
+     "damage": 0,
+     "text": "Find up to 2 Basic Energy cards in your deck and attach them to your Pokémon in any way you like. Shuffle your deck."
+    },
+    {
+     "name": "Pitch-Black Fangs",
+     "cost": "DCC",
+     "damage": 100
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "64",
+   "name": "Tyranitar ex",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Pupitar",
+   "hp": 340,
+   "type": "Darkness",
+   "weakness": "Grass",
+   "retreat": 3,
+   "ex": true,
+   "attacks": [
+    {
+     "name": "Grind",
+     "cost": "C",
+     "damage": 50,
+     "damageSuffix": "x",
+     "text": "Does 50 damage for each Energy attached to this Pokémon."
+    },
+    {
+     "name": "Tyrannical Crush",
+     "cost": "DCC",
+     "damage": 150,
+     "text": "Discard a random card from your opponent's hand."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "66",
+   "name": "Bronzor",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Hammer In",
+     "cost": "MC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "67",
+   "name": "Bronzong",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Bronzor",
+   "hp": 130,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Protective Bell",
+     "text": "All of your Pokémon take 10 less damage from attacks of your opponent's Pokémon (after Weakness and Resistance)."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Heavy Impact",
+     "cost": "MC",
+     "damage": 50
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "68",
+   "name": "Heatran",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 130,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Wrack Down",
+     "cost": "MC",
+     "damage": 40
+    },
+    {
+     "name": "Iron Buster",
+     "cost": "MMC",
+     "damage": 130,
+     "text": "This Pokémon can't attack during your next turn."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "75",
+   "name": "Eevee ex",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "Tera: while on your Bench, prevent all damage done to it by attacks.",
+   "stage": "Basic",
+   "hp": 200,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "ex": true,
+   "tera": true,
+   "abilities": [
+    {
+     "name": "Rainbow DNA",
+     "text": "When you play a Pokémon ex that evolves from Eevee from your hand onto this Pokémon, it can evolve into it. (It still can't evolve on your first turn or the turn you play it.)"
+    }
+   ],
+   "attacks": []
+  },
+  {
+   "set": "PRE",
+   "number": "76",
+   "name": "Snorlax ex",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 260,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 4,
+   "ex": true,
+   "attacks": [
+    {
+     "name": "Strength",
+     "cost": "CCC",
+     "damage": 80
+    },
+    {
+     "name": "Toss-and-Turn Press",
+     "cost": "CCCC",
+     "damage": 120,
+     "damageSuffix": "x",
+     "text": "Flip 3 coins. Does 120 damage per heads."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "77",
+   "name": "Hoothoot",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Insomnia",
+     "text": "This Pokémon can't be Asleep."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Tackle",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "81",
+   "name": "Miltank",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 130,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Rollout",
+     "cost": "C",
+     "damage": 20
+    },
+    {
+     "name": "Moomoo Rolling",
+     "cost": "CC",
+     "damage": 100,
+     "text": "You can use this attack only if this Pokémon used Rollout during your last turn."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "82",
+   "name": "Lugia ex",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 220,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 2,
+   "ex": true,
+   "attacks": [
+    {
+     "name": "Hyper Whirlpool",
+     "cost": "CCC",
+     "damage": 140,
+     "text": "Flip coins until you get tails. Discard 1 Energy from your opponent's Active Pokémon for each heads."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "83",
+   "name": "Buneary",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Smash Kick",
+     "cost": "C",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "84",
+   "name": "Lopunny",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Buneary",
+   "hp": 90,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Rear Kick",
+     "cost": "CC",
+     "damage": 90
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "86",
+   "name": "Regigigas",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 160,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Jewel Breaker",
+     "cost": "CCCC",
+     "damage": 100,
+     "damageSuffix": "+",
+     "text": "Does 230 more damage if your opponent's Active Pokémon is a Tera Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "87",
+   "name": "Shaymin",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Reflect Energy",
+     "cost": "CC",
+     "damage": 60,
+     "text": "Move 1 Energy from this Pokémon to 1 of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "88",
+   "name": "Furfrou",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Fur Coat",
+     "text": "This Pokémon takes 20 less damage from attacks (after Weakness and Resistance)."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "CCC",
+     "damage": 80
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "89",
+   "name": "Hawlucha",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Rising Tackle",
+     "cost": "C",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Does 50 more damage if your opponent's Active Pokémon is a Pokémon ex."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "90",
+   "name": "Noibat",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Flap",
+     "cost": "C",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "91",
+   "name": "Noivern ex",
+   "kind": "Pokemon",
+   "regulationMark": "H",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Noibat",
+   "hp": 270,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "retreat": 1,
+   "ex": true,
+   "attacks": [
+    {
+     "name": "Strafe",
+     "cost": "C",
+     "damage": 50,
+     "text": "You may switch this Pokémon with 1 of your Benched Pokémon."
+    },
+    {
+     "name": "Sonic Blast",
+     "cost": "CCC",
+     "damage": 220,
+     "text": "This Pokémon also takes 30 damage itself."
+    }
+   ]
+  },
+  {
+   "set": "PRE",
+   "number": "93",
+   "name": "Amarys",
+   "kind": "Trainer",
+   "regulationMark": "H",
+   "trainerType": "Supporter",
+   "text": "Draw 4 cards. At the end of this turn, if you have 5 or more cards in your hand, discard your hand."
+  },
+  {
+   "set": "PRE",
+   "number": "106",
+   "name": "Earthen Vessel",
+   "kind": "Trainer",
+   "regulationMark": "G",
+   "trainerType": "Item",
+   "tags": [
+    "Ancient"
+   ],
+   "text": "You can play this card only if you discard another card from your hand. Find up to 2 Basic Energy cards in your deck, show them, and put them into your hand. Shuffle your deck."
+  },
+  {
+   "set": "PRE",
+   "number": "109",
+   "name": "Friends in Paldea",
+   "kind": "Trainer",
+   "regulationMark": "H",
+   "trainerType": "Supporter",
+   "text": "Draw 3 cards."
+  },
+  {
+   "set": "PRE",
+   "number": "111",
+   "name": "Haban Berry",
+   "kind": "Trainer",
+   "regulationMark": "H",
+   "trainerType": "Tool",
+   "text": "When an attack from your opponent's Dragon Pokémon damages the Pokémon holding this, it takes 60 less damage (after Weakness and Resistance); then discard this card."
+  },
+  {
+   "set": "PRE",
+   "number": "115",
+   "name": "Larry's Skill",
+   "kind": "Trainer",
+   "regulationMark": "H",
+   "trainerType": "Supporter",
+   "text": "Discard your hand. Find a Pokémon, a Supporter card and a Basic Energy card in your deck, show them, and put them into your hand. Shuffle your deck."
+  },
+  {
+   "set": "PRE",
+   "number": "116",
+   "name": "Max Rod",
+   "kind": "Trainer",
+   "regulationMark": "H",
+   "trainerType": "Item",
+   "aceSpec": true,
+   "text": "ACE SPEC. Put up to 5 cards from your discard pile, Pokémon and Basic Energy in any combination, into your hand."
+  },
+  {
+   "set": "PRE",
+   "number": "120",
+   "name": "Professor Sada's Vitality",
+   "kind": "Trainer",
+   "regulationMark": "G",
+   "trainerType": "Supporter",
+   "tags": [
+    "Ancient"
+   ],
+   "text": "Choose up to 2 of your Ancient Pokémon and attach a Basic Energy card from your discard pile to each of them. If you attached any, draw 3 cards."
+  },
+  {
+   "set": "PRE",
+   "number": "121",
+   "name": "Professor Turo's Scenario",
+   "kind": "Trainer",
+   "regulationMark": "G",
+   "trainerType": "Supporter",
+   "tags": [
+    "Future"
+   ],
+   "text": "Put 1 of your Pokémon in play into your hand. (Discard every card attached to it.)"
+  },
+  {
+   "set": "PRE",
+   "number": "122",
+   "name": "Professor's Research",
+   "kind": "Trainer",
+   "regulationMark": "G",
+   "trainerType": "Supporter",
+   "text": "Discard your hand and draw 7 cards."
+  },
+  {
+   "set": "PRE",
+   "number": "130",
+   "name": "Techno Radar",
+   "kind": "Trainer",
+   "regulationMark": "G",
+   "trainerType": "Item",
+   "tags": [
+    "Future"
+   ],
+   "text": "You can play this card only if you discard another card from your hand. Find up to 2 Future Pokémon in your deck, show them, and put them into your hand. Shuffle your deck."
+  },
+  {
+   "set": "PRE",
+   "number": "131",
+   "name": "Treasure Tracker",
+   "kind": "Trainer",
+   "regulationMark": "H",
+   "trainerType": "Item",
+   "aceSpec": true,
+   "text": "ACE SPEC. Find up to 5 Pokémon Tool cards in your deck, show them, and put them into your hand. Shuffle your deck."
+  }
+ ]
+}
