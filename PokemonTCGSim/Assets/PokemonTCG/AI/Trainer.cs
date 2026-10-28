@@ -96,6 +96,13 @@ namespace PokemonTCG.AI
         public int PrizeCount = 6;
 
         /// <summary>
+        /// Neural AI training: games played at once (0: half the CPU's threads) and the rest after each learning step, as a share
+        /// of the time it took (the Train screen's Speed: Gentle 0.25, Fast none).
+        /// </summary>
+        public int NeuralThreads;
+        public double NeuralRest = 0.25;
+
+        /// <summary>
         /// The decks a random side picks from, a new one every game (set before Start). With RandomA and RandomB both on (the
         /// default) it's all decks against all decks, as the Python bot trains, and DeckA and DeckB are only labels; with one of
         /// them off, that side keeps its deck every game against a random one (focused practice for that deck).
@@ -438,8 +445,8 @@ namespace PokemonTCG.AI
                 // Leave two cores for the app itself (the screen and the garbage collector), so it stays responsive.
                 // Half the cores, a short rest after each learning step and the memory tidied between phases: a long session in the
                 // app shouldn't push the PC as hard as a stress test does. (The command-line trainer uses every core.)
-                Threads = Math.Max(1, Environment.ProcessorCount / 2),
-                RestShare = 0.25,
+                Threads = NeuralThreads > 0 ? NeuralThreads : Math.Max(1, Environment.ProcessorCount / 2),
+                RestShare = Math.Max(0, NeuralRest),
                 CollectGarbage = true,
                 GameBudget = Games
             };

@@ -33,6 +33,8 @@ namespace PokemonTCG.Presentation
         private const string PrefTrainGames = "PokemonTCG.TrainGames";
         private const string PrefTrainAll = "PokemonTCG.TrainAllDecks";
         private const string PrefTrainRandomA = "PokemonTCG.TrainRandomA";
+        /// <summary>Speed for Neural AI training: Gentle (half the threads, rests) or Fast (every usable thread but two, no rests).</summary>
+        private const string PrefTrainFast = "PokemonTCG.TrainFast";
         private const string PrefTrainRandomB = "PokemonTCG.TrainRandomB";
         /// <summary>The most games one session can be set to play (typed in).</summary>
         private const int MaxTrainGames = 1000000;
@@ -62,6 +64,7 @@ namespace PokemonTCG.Presentation
         /// side's deck; both random is all decks against all decks.
         /// </summary>
         private bool trainRandomA, trainRandomB;
+        private bool trainFast;
         private bool TrainAll { get { return trainRandomA && trainRandomB; } }
         private bool TrainFocus { get { return trainRandomA != trainRandomB; } }
         /// <summary>The deck that plays every game in focus mode (index into decks), or -1.</summary>
@@ -348,6 +351,7 @@ namespace PokemonTCG.Presentation
             trainGamesText = trainGames.ToString("N0");
             bool all = PlayerPrefs.GetInt(PrefTrainAll, 0) == 1; // the earlier All decks switch
             trainRandomA = PlayerPrefs.GetInt(PrefTrainRandomA, all ? 1 : 0) == 1;
+            trainFast = PlayerPrefs.GetInt(PrefTrainFast, 0) == 1;
             trainRandomB = PlayerPrefs.GetInt(PrefTrainRandomB, all ? 1 : 0) == 1;
             confirmReset = false;
             nextBrainRefresh = 0f;
@@ -402,6 +406,23 @@ namespace PokemonTCG.Presentation
             for (int i = 0; i < decks.Count; i++)
                 if (deckProblems[i].Count == 0 && decks[i].FormatName.Equals(decks[focus].FormatName, StringComparison.OrdinalIgnoreCase)) list.Add(i);
             return list;
+        }
+
+        /// <summary>Fast speed's games at once: the CPU threads the app may use (without the ones it's told to skip), less two for the screen.</summary>
+        private int FastThreads
+        {
+            get
+            {
+                int usable = Environment.ProcessorCount;
+                if (skipCpu && CpuThreads.Supported) usable -= CpuThreads.Parse(skipCpuText).Count(n => n < Environment.ProcessorCount);
+                return Math.Max(1, usable - 2);
+            }
+        }
+
+        private void ApplyTrainSpeed(TrainingSession session)
+        {
+            session.NeuralThreads = trainFast ? FastThreads : 0;
+            session.NeuralRest = trainFast ? 0 : 0.25;
         }
 
         private void SetTrainRandom(bool a, bool b)
@@ -493,6 +514,7 @@ namespace PokemonTCG.Presentation
                 training.PrizeCount = poolFormat.PrizeCount;
                 sessionUndone = false;
                 trainMessage = null;
+                ApplyTrainSpeed(training);
                 training.Start();
                 trainView = training.Status();
                 return;
@@ -517,6 +539,7 @@ namespace PokemonTCG.Presentation
             training.PrizeCount = trainFormat.PrizeCount;
             sessionUndone = false;
             trainMessage = null;
+            ApplyTrainSpeed(training);
             training.Start();
             trainView = training.Status();
         }
@@ -634,6 +657,19 @@ namespace PokemonTCG.Presentation
                     PlayerPrefs.SetInt(PrefTrainStyle, (int)trainStyle);
                 });
             GUILayout.Label(TrainStyleHint(trainStyle), Hint(ui));
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Speed", GUILayout.Width(60));
+            int speed = GUILayout.Toolbar(trainFast ? 1 : 0, new[] { "Gentle", "Fast" });
+            GUILayout.EndHorizontal();
+            if ((speed == 1) != trainFast)
+                actions.Add(() =>
+                {
+                    trainFast = speed == 1;
+                    PlayerPrefs.SetInt(PrefTrainFast, trainFast ? 1 : 0);
+                });
+            GUILayout.Label(trainFast
+                ? "Fast (Neural AI training): " + FastThreads + " games at once and no rests, about 1.5 to 2 times Gentle's speed. It works the CPU hard: keep \"Don't use CPU threads\" on while your CPU has a faulty core."
+                : "Gentle (Neural AI training): half the CPU's threads, with a short rest after each learning step: cooler and quieter.", Hint(ui));
             GUI.enabled = true;
             if (CpuThreads.Supported)
             {
