@@ -1282,7 +1282,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Recover") return false;
                 var me = ctx.Pokemon;
                 if (me.Energy.Count == 0) return true;
-                var pick = me.Energy.Count == 1 ? me.Energy[0] : ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Recover: discard an Energy from this Pokémon")[0];
+                var pick = ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Recover: discard an Energy from this Pokémon")[0];
                 if (ctx.Engine.DiscardEnergy(me, pick)) ctx.Heal(me, me.DamageCounters * 10);
                 return true;
             }
@@ -1350,7 +1350,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.InPlay(me) || ctx.Me.Bench.Count == 0) return true;
                 foreach (var e in me.Energy.ToList())
                 {
-                    var target = ctx.Me.Bench.Count == 1 ? ctx.Me.Bench[0] : ctx.ChoosePokemon(ctx.MyBench(), "Night Cyclone: move " + e.Def.Name + " to which Benched Pokémon?");
+                    var target = ctx.ChoosePokemon(ctx.MyBench(), "Night Cyclone: move " + e.Def.Name + " to which Benched Pokémon?");
                     if (target != null) ctx.Engine.MoveEnergy(me, target, e);
                 }
                 return true;
@@ -1714,8 +1714,7 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 ctx.DamageDefending(atk.Damage);
                 if (!TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || !ctx.CanAffect(defending)) return true;
-                var pick = defending.Energy.Count == 1 ? defending.Energy[0]
-                    : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Lost Headbutt: put an Energy attached to your opponent's Active Pokémon in the Lost Zone")[0];
+                var pick = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Lost Headbutt: put an Energy attached to your opponent's Active Pokémon in the Lost Zone")[0];
                 EnergyToLostZone(ctx, defending, pick);
                 return true;
             }

@@ -204,7 +204,7 @@ namespace PokemonTCG.Cards
                 var held = me.Attached.ToList();
                 foreach (var card in held) labels.Add("Discard the attached " + card.Def.Name);
                 if (labels.Count == 0) return;
-                int pick = labels.Count == 1 ? 0 : ctx.ChooseOption(Power + ": choose 1", labels.ToArray());
+                int pick = ctx.ChooseOneOption(Power + ": choose 1", labels.ToArray());
                 if (pick < attach.Count)
                 {
                     var card = attach[pick];

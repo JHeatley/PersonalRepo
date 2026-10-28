@@ -425,7 +425,7 @@ namespace PokemonTCG.Cards
             {
                 var target = ctx.Opp.Active;
                 if (target == null || target.Energy.Count == 0) return;
-                var energy = target.Energy.Count == 1 ? target.Energy[0] : ctx.ChooseCards(target.Energy.ToList(), 1, 1, "Team Flare Grunt: discard which Energy from " + target.Name + "?")[0];
+                var energy = ctx.ChooseCards(target.Energy.ToList(), 1, 1, "Team Flare Grunt: discard which Energy from " + target.Name + "?")[0];
                 ctx.Engine.DiscardEnergy(target, energy);
             }
         }

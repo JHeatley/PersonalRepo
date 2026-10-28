@@ -209,8 +209,7 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 ctx.DamageDefending(atk.Damage);
                 if (!TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || ctx.Opp.Bench.Count == 0 || !ctx.CanAffect(defending)) return true;
-                var energy = defending.Energy.Count == 1 ? defending.Energy[0]
-                    : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Rushing Water: move which Energy from " + defending.Name + "?")[0];
+                var energy = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Rushing Water: move which Energy from " + defending.Name + "?")[0];
                 var bench = ctx.OpponentBench();
                 var dest = ctx.ChoosePokemon(bench, "Rushing Water: move it to which of your opponent's Benched Pokémon?");
                 if (dest != null) ctx.Engine.MoveEnergy(defending, dest, energy);

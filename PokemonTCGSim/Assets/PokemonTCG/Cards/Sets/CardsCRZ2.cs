@@ -284,7 +284,7 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var top = ctx.LookAtTop(2);
-                var keep = top.Count == 1 ? top : ctx.ChooseCards(top, 1, 1, "Flower Selecting: choose the card to put into your hand (the other goes to the Lost Zone)");
+                var keep = ctx.ChooseCards(top, 1, 1, "Flower Selecting: choose the card to put into your hand (the other goes to the Lost Zone)");
                 ctx.DeckToHand(keep);
                 foreach (var c in top)
                 {

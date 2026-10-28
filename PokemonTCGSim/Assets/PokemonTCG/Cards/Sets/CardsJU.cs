@@ -160,7 +160,7 @@ namespace PokemonTCG.Cards
             {
                 var choices = Choices(ctx);
                 if (choices.Count == 0) return;
-                int pick = choices.Count == 1 ? 0 : ctx.ChooseOption("Shift: change " + ctx.Pokemon.Name + " to which type?", choices.Select(t => t.ToString()).ToArray());
+                int pick = ctx.ChooseOneOption("Shift: change " + ctx.Pokemon.Name + " to which type?", choices.Select(t => t.ToString()).ToArray());
                 if (pick < 0 || pick >= choices.Count) return;
                 ctx.Pokemon.Markers[PokemonInPlay.ShiftTypeMarker] = (int)choices[pick];
                 ctx.Log(ctx.Pokemon.Name + " is now a " + choices[pick] + " Pokémon (Shift).");
@@ -242,7 +242,7 @@ namespace PokemonTCG.Cards
                 if (ctx.Me.Prizes.Count > 0) { labels.Add("1 of your Prize cards"); actions.Add(3); }
                 if (ctx.Opp.Prizes.Count > 0) { labels.Add("1 of your opponent's Prize cards"); actions.Add(4); }
                 if (labels.Count == 0) return;
-                int pick = labels.Count == 1 ? 0 : ctx.ChooseOption("Peek: look at which card?", labels.ToArray());
+                int pick = ctx.ChooseOneOption("Peek: look at which card?", labels.ToArray());
                 if (pick < 0 || pick >= labels.Count) return;
                 CardInstance card;
                 string what;
@@ -256,7 +256,7 @@ namespace PokemonTCG.Cards
                         var prizes = actions[pick] == 3 ? ctx.Me.Prizes : ctx.Opp.Prizes;
                         var slots = new List<string>();
                         for (int k = 0; k < prizes.Count; k++) slots.Add("Prize card " + (k + 1));
-                        int slot = prizes.Count == 1 ? 0 : ctx.ChooseOption("Peek: look at which Prize card?", slots.ToArray());
+                        int slot = ctx.ChooseOneOption("Peek: look at which Prize card?", slots.ToArray());
                         if (slot < 0 || slot >= prizes.Count) return;
                         card = prizes[slot];
                         what = actions[pick] == 3 ? "1 of your Prize cards" : "1 of your opponent's Prize cards";

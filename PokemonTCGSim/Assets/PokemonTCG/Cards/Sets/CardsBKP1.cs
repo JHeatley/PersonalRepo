@@ -180,7 +180,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.Flip()) return;
                 var active = ctx.Opp.Active;
                 if (active == null || active.Energy.Count == 0 || ctx.Opp.Bench.Count == 0 || !ctx.CanAffect(active)) return;
-                var energy = active.Energy.Count == 1 ? active.Energy[0] : ctx.ChooseCards(active.Energy.ToList(), 1, 1, "Royal Flash: move which Energy from " + active.Name + "?")[0];
+                var energy = ctx.ChooseCards(active.Energy.ToList(), 1, 1, "Royal Flash: move which Energy from " + active.Name + "?")[0];
                 var target = ctx.ChoosePokemon(ctx.OpponentBench(), "Royal Flash: move " + energy.Def.Name + " to which of your opponent's Benched Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(active, target, energy);
             }

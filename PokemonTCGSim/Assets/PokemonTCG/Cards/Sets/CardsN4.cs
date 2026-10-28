@@ -1537,7 +1537,7 @@ namespace PokemonTCG.Cards
                 if (who.Me.Deck.Count == 0) return false;
                 var candidates = who.MyPokemon(m => !CardsEVS1.EvolveBlocked(who, m));
                 if (candidates.Count == 0 || !who.AskYesNo("Evolution Song: evolve 1 of your Pokémon from your deck?")) return false;
-                var target = candidates.Count == 1 ? candidates[0] : who.ChoosePokemon(candidates, "Evolution Song: choose 1 of your Pokémon");
+                var target = who.ChoosePokemon(candidates, "Evolution Song: choose 1 of your Pokémon");
                 if (target == null) return false;
                 var found = who.SearchMyDeck(d => CardsEVS1.EvolvesOnto(who, target, d), 1, "Evolution Song: choose a card that evolves from " + target.Name, false);
                 if (found.Count > 0) who.Engine.EvolvePokemon(target, found[0]);
@@ -1808,7 +1808,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.Flip()) return;
                 var trainers = ctx.Me.Discard.Where(c => c.Def.IsTrainer).ToList();
                 if (trainers.Count == 0) return;
-                var pick = trainers.Count == 1 ? trainers : ctx.ChooseCards(trainers, 1, 1, "[Want]: put which Trainer card into your hand?");
+                var pick = ctx.ChooseCards(trainers, 1, 1, "[Want]: put which Trainer card into your hand?");
                 ctx.DiscardToHand(pick);
             }
 

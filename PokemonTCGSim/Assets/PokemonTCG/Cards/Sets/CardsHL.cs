@@ -534,7 +534,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var stadiums = ctx.Me.Discard.Where(c => c.Def.IsStadiumCard).ToList();
                 if (stadiums.Count == 0) return true;
-                ctx.DiscardToHand(stadiums.Count == 1 ? stadiums : ctx.ChooseCards(stadiums, 1, 1, "Sunshine: put which Stadium card into your hand?"));
+                ctx.DiscardToHand(ctx.ChooseCards(stadiums, 1, 1, "Sunshine: put which Stadium card into your hand?"));
                 return true;
             }
         }
@@ -548,7 +548,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var others = ctx.MyPokemon(m => m != me);
                 if (me.Energy.Count == 0 || others.Count == 0) return true;
-                var card = me.Energy.Count == 1 ? me.Energy[0] : ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Fruition: move which Energy card?")[0];
+                var card = ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Fruition: move which Energy card?")[0];
                 var to = ctx.ChoosePokemon(others, "Fruition: move it to which Pokémon?");
                 if (to != null && ctx.Engine.MoveEnergy(me, to, card) && to.DamageCounters > 0) ctx.Heal(to, 40);
                 return true;

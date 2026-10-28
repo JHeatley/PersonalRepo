@@ -711,7 +711,7 @@ namespace PokemonTCG.Cards
                 {
                     var from = RepeatableAbility.ChoosePokemonOrDone(ctx, Donors(ctx), Power + ": move an Energy card from which Pokémon to " + me.Name + "?" + (offerDone ? " Press Done when finished." : ""), offerDone);
                     if (from == null) return false;
-                    var card = from.Energy.Count == 1 ? from.Energy[0] : ctx.ChooseCards(from.Energy.ToList(), 1, 1, Power + ": move which Energy card?")[0];
+                    var card = ctx.ChooseCards(from.Energy.ToList(), 1, 1, Power + ": move which Energy card?")[0];
                     return ctx.Engine.MoveEnergy(from, me, card);
                 });
             }

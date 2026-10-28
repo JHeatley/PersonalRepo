@@ -155,7 +155,7 @@ namespace PokemonTCG.Cards
                 var picks = src.ChooseCards(energy, 0, Math.Min(2, energy.Count), "Golden Wing: move up to 2 basic Energy cards from " + mon.Name + " to your Benched Pokémon");
                 foreach (var en in picks)
                 {
-                    var dest = bench.Count == 1 ? bench[0] : src.ChoosePokemon(bench, "Golden Wing: move " + en.Def.Name + " to which Benched Pokémon?");
+                    var dest = src.ChoosePokemon(bench, "Golden Wing: move " + en.Def.Name + " to which Benched Pokémon?");
                     if (dest != null) src.Engine.MoveEnergy(mon, dest, en);
                 }
             }

@@ -396,7 +396,7 @@ namespace PokemonTCG.Cards
                 if (from.Count == 0 || magnets.Count < 2) return;
                 var source = ctx.ChoosePokemon(from, Power + ": move an Energy card from which Pokémon?");
                 if (source == null) return;
-                var card = source.Energy.Count == 1 ? source.Energy[0] : ctx.ChooseCards(source.Energy.ToList(), 1, 1, Power + ": move which Energy card?")[0];
+                var card = ctx.ChooseCards(source.Energy.ToList(), 1, 1, Power + ": move which Energy card?")[0];
                 var to = magnets.Where(m => m != source).ToList();
                 var target = ctx.ChoosePokemon(to, Power + ": attach " + card.Def.Name + " to which Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(source, target, card);

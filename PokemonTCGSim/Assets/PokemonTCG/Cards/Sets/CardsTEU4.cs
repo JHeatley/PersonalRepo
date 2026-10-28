@@ -430,7 +430,7 @@ namespace PokemonTCG.Cards
             {
                 var active = ctx.Opp.Active;
                 if (active == null || active.Energy.Count == 0 || !ctx.CanAffect(active)) return;
-                var energy = active.Energy.Count == 1 ? active.Energy[0] : ctx.ChooseCards(active.Energy.ToList(), 1, 1, "Nita: put an Energy from " + active.Name + " on top of your opponent's deck")[0];
+                var energy = ctx.ChooseCards(active.Energy.ToList(), 1, 1, "Nita: put an Energy from " + active.Name + " on top of your opponent's deck")[0];
                 if (ctx.Engine.EnergyRemovalProtected(active, energy))
                 {
                     ctx.Log(energy.Def.Name + " can't be moved by Trainer cards.");

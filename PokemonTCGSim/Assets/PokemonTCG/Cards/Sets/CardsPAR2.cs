@@ -236,8 +236,7 @@ namespace PokemonTCG.Cards
                 {
                     var holders = ctx.MyPokemon(m => m.Energy.Any(e => CardsDRI1.ProvidesType(ctx, m, e, EnergyType.Lightning)));
                     if (holders.Count == 0) break;
-                    var holder = holders.Count == 1 ? holders[0]
-                        : ctx.ChoosePokemon(holders, "Gaia Punk: discard a Lightning Energy from which of your Pokémon? (" + (i + 1) + " of 3)");
+                    var holder = ctx.ChoosePokemon(holders, "Gaia Punk: discard a Lightning Energy from which of your Pokémon? (" + (i + 1) + " of 3)");
                     if (holder == null) break;
                     var lightning = holder.Energy.Where(x => CardsDRI1.ProvidesType(ctx, holder, x, EnergyType.Lightning)).ToList();
                     var pick = ctx.ChooseCards(lightning, 1, 1, "Gaia Punk: discard which Energy from " + holder.Name + "?")[0];
@@ -696,8 +695,7 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 ctx.DamageDefending(atk.Damage);
                 if (!ctx.Flip() || !TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || ctx.Opp.Bench.Count == 0) return true;
-                var card = defending.Energy.Count == 1 ? defending.Energy[0]
-                    : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Data Displacement: move which Energy from " + defending.Name + "?")[0];
+                var card = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Data Displacement: move which Energy from " + defending.Name + "?")[0];
                 var target = ctx.ChoosePokemon(ctx.OpponentBench(), "Data Displacement: move " + card.Def.Name + " to which of your opponent's Benched Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(defending, target, card);
                 return true;

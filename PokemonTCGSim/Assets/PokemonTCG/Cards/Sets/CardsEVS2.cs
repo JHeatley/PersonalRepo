@@ -651,7 +651,7 @@ namespace PokemonTCG.Cards
             {
                 var holder = ctx.ChoosePokemon(ctx.MyPokemon(m => m.Tools.Count > 0), "Shopping Center: put a Pokémon Tool from which of your Pokémon into your hand?");
                 if (holder == null || holder.Tools.Count == 0) return false;
-                var tool = holder.Tools.Count == 1 ? holder.Tools[0] : ctx.ChooseCards(holder.Tools.ToList(), 1, 1, "Shopping Center: which Pokémon Tool?")[0];
+                var tool = ctx.ChooseCards(holder.Tools.ToList(), 1, 1, "Shopping Center: which Pokémon Tool?")[0];
                 if (!holder.Tools.Remove(tool)) return false;
                 ctx.Me.Hand.Add(tool);
                 ctx.Log(tool.Def.Name + " went from " + holder.Name + " into " + ctx.Engine.Their(ctx.Player) + " hand (Shopping Center).");

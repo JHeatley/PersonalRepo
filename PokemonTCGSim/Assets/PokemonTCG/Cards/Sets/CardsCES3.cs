@@ -289,7 +289,7 @@ namespace PokemonTCG.Cards
                     var energy = ctx.BasicEnergyInDiscard();
                     if (energy.Count == 0) break;
                     if (!ctx.InPlay(mon)) continue;
-                    var pick = energy.Count == 1 ? energy : ctx.ChooseCards(energy, 1, 1, "Dreamy Mist: attach which basic Energy card to " + mon.Name + "?");
+                    var pick = ctx.ChooseCards(energy, 1, 1, "Dreamy Mist: attach which basic Energy card to " + mon.Name + "?");
                     if (pick.Count == 0 || !ctx.Me.Discard.Remove(pick[0])) continue;
                     ctx.Engine.AttachEnergyCard(pick[0], mon);
                 }

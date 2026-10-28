@@ -191,7 +191,7 @@ namespace PokemonTCG.Cards
                 if (!TefPokemon.StillDefending(ctx, defending) || !ctx.CanAffect(defending)) return true;
                 var special = defending.Energy.Where(e => e.Def.IsAttachedSpecialEnergy).ToList();
                 if (special.Count == 0) return true;
-                var pick = special.Count == 1 ? special : ctx.ChooseCards(special, 1, 1, "Special Mow: discard which Special Energy?");
+                var pick = ctx.ChooseCards(special, 1, 1, "Special Mow: discard which Special Energy?");
                 if (pick.Count > 0) ctx.Engine.DiscardEnergy(defending, pick[0]);
                 return true;
             }

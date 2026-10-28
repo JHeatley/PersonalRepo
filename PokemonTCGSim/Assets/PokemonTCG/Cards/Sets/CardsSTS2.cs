@@ -237,7 +237,7 @@ namespace PokemonTCG.Cards
             {
                 var top = ctx.LookAtTop(2);
                 if (top.Count == 0) return;
-                var pick = top.Count == 1 ? top : ctx.ChooseCards(top, 1, 1, "Sinister Selection: put 1 of the top 2 cards of your deck into your hand");
+                var pick = ctx.ChooseCards(top, 1, 1, "Sinister Selection: put 1 of the top 2 cards of your deck into your hand");
                 ctx.DeckToHand(pick);
             }
 
@@ -357,7 +357,7 @@ namespace PokemonTCG.Cards
                 if (holders.Count == 0) return;
                 var holder = ctx.ChoosePokemon(holders, "Tear Away: take a Pokémon Tool from which of your Pokémon?");
                 if (holder == null) return;
-                var tool = holder.Tools.Count == 1 ? holder.Tools[0] : ctx.ChooseCards(holder.Tools.ToList(), 1, 1, "Tear Away: which Pokémon Tool?")[0];
+                var tool = ctx.ChooseCards(holder.Tools.ToList(), 1, 1, "Tear Away: which Pokémon Tool?")[0];
                 holder.Tools.Remove(tool);
                 ctx.Me.Hand.Add(tool);
                 ctx.Log(ctx.Engine.PlayerName(ctx.Player) + " put " + tool.Def.Name + " from " + holder.Name + " into " + ctx.Engine.Their(ctx.Player) + " hand (Tear Away).");

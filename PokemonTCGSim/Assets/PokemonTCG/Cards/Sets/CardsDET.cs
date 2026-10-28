@@ -88,7 +88,7 @@ namespace PokemonTCG.Cards
                         "Pantomime: switch 1 of your face-down Prize cards with the top card of your deck?")) return;
                 var labels = new string[faceDown.Count];
                 for (int i = 0; i < faceDown.Count; i++) labels[i] = "Face-down Prize card " + (i + 1);
-                var prize = faceDown.Count == 1 ? faceDown[0] : faceDown[ctx.ChooseOption("Pantomime: which Prize card?", labels)];
+                var prize = faceDown[ctx.ChooseOneOption("Pantomime: which Prize card?", labels)];
                 int at = me.Prizes.IndexOf(prize);
                 if (at < 0 || me.Deck.Count == 0) return;
                 var top = me.Deck[0];

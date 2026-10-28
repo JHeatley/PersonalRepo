@@ -509,7 +509,7 @@ namespace PokemonTCG.Cards
                 var from = ctx.ChoosePokemon(givers, "Poppy: move Energy from which of your Pokémon?");
                 if (from == null) return;
                 var energy = from.Energy.ToList();
-                var picks = energy.Count == 1 ? energy : ctx.ChooseCards(energy, 1, Math.Min(2, energy.Count), "Poppy: choose up to 2 Energy to move");
+                var picks = ctx.ChooseCards(energy, 1, Math.Min(2, energy.Count), "Poppy: choose up to 2 Energy to move");
                 var to = ctx.ChoosePokemon(mine.Where(m => m != from).ToList(), "Poppy: move the Energy to which Pokémon?");
                 if (to == null) return;
                 foreach (var card in picks) ctx.Engine.MoveEnergy(from, to, card);
@@ -543,8 +543,7 @@ namespace PokemonTCG.Cards
                     ctx.Log("The effect of Team Star Grunt on " + defending.Name + " was prevented.");
                     return;
                 }
-                var pick = defending.Energy.Count == 1 ? defending.Energy[0]
-                    : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Team Star Grunt: put which Energy on top of your opponent's deck?")[0];
+                var pick = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Team Star Grunt: put which Energy on top of your opponent's deck?")[0];
                 defending.Energy.Remove(pick);
                 ctx.Opp.Deck.Insert(0, pick);
                 ctx.Engine.Emit(GameEventType.Info, ctx.Opponent, pick.Def.Name + " was put on top of " + ctx.Engine.Their(ctx.Opponent) + " deck (Team Star Grunt).", pick.Id, defending.Uid);

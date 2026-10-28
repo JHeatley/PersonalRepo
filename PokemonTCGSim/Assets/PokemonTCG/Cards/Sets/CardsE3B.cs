@@ -673,7 +673,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var bench = ctx.OpponentBench();
                 if (bench.Count == 0) return true;
-                var picks = bench.Count == 1 ? bench : ctx.ChoosePokemonMany(bench, 0, 2, "Sand Trap: choose up to 2 of your opponent's Benched Pokémon");
+                var picks = ctx.ChoosePokemonMany(bench, bench.Count == 1 ? 1 : 0, 2, "Sand Trap: choose up to 2 of your opponent's Benched Pokémon");
                 foreach (var mon in picks) if (ctx.InPlay(mon)) ctx.DamageTarget(mon, 10);
                 return true;
             }
@@ -748,7 +748,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Energy Recycle") return false;
                 var pile = ctx.BasicEnergyInDiscard();
                 if (pile.Count == 0) return true;
-                ctx.DiscardToDeck(pile.Count == 1 ? pile : ctx.ChooseCards(pile, 1, 1, "Energy Recycle: shuffle which basic Energy card into your deck?"));
+                ctx.DiscardToDeck(ctx.ChooseCards(pile, 1, 1, "Energy Recycle: shuffle which basic Energy card into your deck?"));
                 ctx.ShuffleMyDeck();
                 return true;
             }

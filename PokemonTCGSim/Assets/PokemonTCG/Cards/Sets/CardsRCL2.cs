@@ -426,8 +426,7 @@ namespace PokemonTCG.Cards
                 TefPokemon.RevealOpponentHand(ctx);
                 var trainers = ctx.Opp.Hand.Where(c => c.Def.IsTrainer).ToList();
                 if (trainers.Count == 0) return;
-                var pick = trainers.Count == 1 ? trainers[0]
-                    : ctx.ChooseCards(trainers, 1, 1, "Oleana: put which Trainer card on the bottom of your opponent's deck?")[0];
+                var pick = ctx.ChooseCards(trainers, 1, 1, "Oleana: put which Trainer card on the bottom of your opponent's deck?")[0];
                 if (ctx.Opp.Hand.Remove(pick)) ctx.Opp.Deck.Add(pick);
                 ctx.Log(ctx.Engine.PlayerName(ctx.Opponent) + " put " + pick.Def.Name + " from their hand on the bottom of their deck (Oleana).");
             }

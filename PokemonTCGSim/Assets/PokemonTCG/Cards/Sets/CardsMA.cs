@@ -416,7 +416,7 @@ namespace PokemonTCG.Cards
                 var targets = ctx.MyPokemon(m => m != from);
                 var to = ctx.ChoosePokemon(targets, Power + ": move it to which Pokémon?");
                 if (to == null) return;
-                var card = from.Energy.Count == 1 ? from.Energy[0] : ctx.ChooseCards(from.Energy.ToList(), 1, 1, Power + ": move which Energy card?")[0];
+                var card = ctx.ChooseCards(from.Energy.ToList(), 1, 1, Power + ": move which Energy card?")[0];
                 ctx.Engine.MoveEnergy(from, to, card);
             }
 
@@ -617,7 +617,7 @@ namespace PokemonTCG.Cards
                 if (target == null || !ctx.InPlay(target) || target.Energy.Count == 0 || !ctx.CanAffect(target)) return true;
                 var others = ctx.OpponentPokemon(m => m != target);
                 if (others.Count == 0 || !ctx.AskYesNo("Energy Flip: move an Energy card from " + target.Name + " to another of your opponent's Pokémon?")) return true;
-                var card = target.Energy.Count == 1 ? target.Energy[0] : ctx.ChooseCards(target.Energy.ToList(), 1, 1, "Energy Flip: move which Energy card?")[0];
+                var card = ctx.ChooseCards(target.Energy.ToList(), 1, 1, "Energy Flip: move which Energy card?")[0];
                 var to = ctx.ChoosePokemon(others, "Energy Flip: move it to which Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(target, to, card);
                 return true;

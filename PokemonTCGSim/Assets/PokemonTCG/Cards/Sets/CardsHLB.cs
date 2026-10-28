@@ -396,7 +396,7 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 ctx.DamageDefending(atk.Damage);
                 if (!ctx.Flip() || !TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0) return true;
-                var card = defending.Energy.Count == 1 ? defending.Energy[0] : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Minus Energy: return which Energy card to your opponent's hand?")[0];
+                var card = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Minus Energy: return which Energy card to your opponent's hand?")[0];
                 ctx.Engine.ReturnEnergyToHand(defending, card);
                 return true;
             }

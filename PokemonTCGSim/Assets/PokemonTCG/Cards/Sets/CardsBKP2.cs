@@ -258,7 +258,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Never Enough") return false;
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 if (ctx.Me.Hand.Count == 0) return true;
-                var card = ctx.Me.Hand.Count == 1 ? ctx.Me.Hand[0] : ctx.ChooseCards(ctx.Me.Hand.ToList(), 1, 1, "Never Enough: discard a card from your hand")[0];
+                var card = ctx.ChooseCards(ctx.Me.Hand.ToList(), 1, 1, "Never Enough: discard a card from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 ctx.Draw(2);
                 return true;

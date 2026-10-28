@@ -253,7 +253,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var items = ctx.Me.Discard.Where(c => c.Def.IsItem).ToList();
                 if (items.Count == 0) return true;
-                ctx.DiscardToHand(items.Count == 1 ? items : ctx.ChooseCards(items, 1, 1, "Pickup: put which Item card from your discard pile into your hand?"));
+                ctx.DiscardToHand(ctx.ChooseCards(items, 1, 1, "Pickup: put which Item card from your discard pile into your hand?"));
                 return true;
             }
         }

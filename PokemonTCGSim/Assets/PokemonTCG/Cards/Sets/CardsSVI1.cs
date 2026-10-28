@@ -152,8 +152,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 if (!TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || !ctx.CanAffect(defending)) return true;
                 if (!ctx.AskYesNo("Trick Cape: put an Energy attached to " + defending.Name + " into your opponent's hand?")) return true;
-                var card = defending.Energy.Count == 1 ? defending.Energy[0]
-                    : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Trick Cape: put which Energy into your opponent's hand?")[0];
+                var card = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Trick Cape: put which Energy into your opponent's hand?")[0];
                 ctx.Engine.ReturnEnergyToHand(defending, card);
                 return true;
             }
@@ -195,8 +194,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 if (!TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || ctx.Opp.Bench.Count == 0 || !ctx.CanAffect(defending)) return true;
                 if (!ctx.AskYesNo("Eerie Tentacles: move an Energy from " + defending.Name + " to 1 of your opponent's Benched Pokémon?")) return true;
-                var card = defending.Energy.Count == 1 ? defending.Energy[0]
-                    : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Eerie Tentacles: move which Energy?")[0];
+                var card = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Eerie Tentacles: move which Energy?")[0];
                 var to = ctx.ChoosePokemon(ctx.OpponentBench(), "Eerie Tentacles: move it to which of your opponent's Benched Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(defending, to, card);
                 return true;

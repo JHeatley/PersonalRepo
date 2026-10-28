@@ -304,7 +304,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var me = ctx.Pokemon;
                 if (!ctx.InPlay(me) || me.Energy.Count == 0 || ctx.Me.Bench.Count == 0) return true;
-                var energy = me.Energy.Count == 1 ? me.Energy[0] : ctx.ChooseCards(me.Energy.ToList(), 1, 1, attack + ": move which Energy?")[0];
+                var energy = ctx.ChooseCards(me.Energy.ToList(), 1, 1, attack + ": move which Energy?")[0];
                 var target = ctx.ChoosePokemon(ctx.MyBench(), attack + ": move " + energy.Def.Name + " to which Benched Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(me, target, energy);
                 return true;
@@ -818,7 +818,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 CardInstance pick = null;
                 if (me.Energy.Count > 0 && ctx.AskYesNo("G-Max Spiral: put an Energy attached to " + me.Name + " into your hand for 70 more damage?"))
-                    pick = me.Energy.Count == 1 ? me.Energy[0] : ctx.ChooseCards(me.Energy.ToList(), 1, 1, "G-Max Spiral: put which Energy into your hand?")[0];
+                    pick = ctx.ChooseCards(me.Energy.ToList(), 1, 1, "G-Max Spiral: put which Energy into your hand?")[0];
                 ctx.DamageDefending(atk.Damage + (pick != null ? 70 : 0));
                 if (pick != null && ctx.InPlay(me) && me.Energy.Contains(pick)) ctx.Engine.ReturnEnergyToHand(me, pick);
                 return true;

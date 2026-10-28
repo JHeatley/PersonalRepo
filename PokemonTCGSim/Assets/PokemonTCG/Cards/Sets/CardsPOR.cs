@@ -711,7 +711,7 @@ namespace PokemonTCG.Cards
                 var all = new[] { SpecialCondition.Asleep, SpecialCondition.Burned, SpecialCondition.Confused, SpecialCondition.Paralyzed, SpecialCondition.Poisoned };
                 var has = all.Where(c => a.Has(c)).ToList();
                 if (has.Count == 0) return;
-                int pick = has.Count == 1 ? 0 : ctx.ChooseOption("Lumiose Galette: remove which Special Condition?", has.Select(c => c.ToString()).ToArray());
+                int pick = ctx.ChooseOneOption("Lumiose Galette: remove which Special Condition?", has.Select(c => c.ToString()).ToArray());
                 ctx.Engine.RemoveCondition(a, has[pick]);
             }
         }

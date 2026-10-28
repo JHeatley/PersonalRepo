@@ -775,7 +775,7 @@ namespace PokemonTCG.Cards
                 if (holders.Count == 0) return;
                 var from = ctx.ChoosePokemon(holders, Power + ": return an Energy card from which of your Pokémon?");
                 if (from == null) return;
-                var card = from.Energy.Count == 1 ? from.Energy[0] : ctx.ChooseCards(from.Energy.ToList(), 1, 1, Power + ": return which Energy card to your hand?")[0];
+                var card = ctx.ChooseCards(from.Energy.ToList(), 1, 1, Power + ": return which Energy card to your hand?")[0];
                 ctx.Engine.ReturnEnergyToHand(from, card);
             }
 
@@ -1090,8 +1090,8 @@ namespace PokemonTCG.Cards
                 if (pair.Count < 2) return;
                 var a = pair[0];
                 var b = pair[1];
-                var ca = a.Energy.Count == 1 ? a.Energy[0] : ctx.ChooseCards(a.Energy.ToList(), 1, 1, Power + ": choose an Energy card on " + a.Name)[0];
-                var cb = b.Energy.Count == 1 ? b.Energy[0] : ctx.ChooseCards(b.Energy.ToList(), 1, 1, Power + ": choose an Energy card on " + b.Name)[0];
+                var ca = ctx.ChooseCards(a.Energy.ToList(), 1, 1, Power + ": choose an Energy card on " + a.Name)[0];
+                var cb = ctx.ChooseCards(b.Energy.ToList(), 1, 1, Power + ": choose an Energy card on " + b.Name)[0];
                 ctx.Engine.MoveEnergy(a, b, ca);
                 ctx.Engine.MoveEnergy(b, a, cb);
             }

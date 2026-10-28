@@ -136,7 +136,7 @@ namespace PokemonTCG.Cards
                 if (active.DamageCounters > 0) ctx.Heal(active, 20);
                 var has = All.Where(c => active.Has(c)).ToList();
                 if (has.Count == 0) return;
-                var pick = has.Count == 1 ? has[0] : has[ctx.ChooseOption("Big Malasada: remove which Special Condition from " + active.Name + "?", has.Select(c => c.ToString()).ToArray())];
+                var pick = has[ctx.ChooseOneOption("Big Malasada: remove which Special Condition from " + active.Name + "?", has.Select(c => c.ToString()).ToArray())];
                 ctx.Engine.RemoveCondition(active, pick);
             }
         }

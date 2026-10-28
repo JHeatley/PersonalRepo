@@ -103,7 +103,7 @@ namespace PokemonTCG.Cards
             if (burn) ctx.ApplyCondition(defending, SpecialCondition.Burned);
             if (shuffle && defending.Energy.Count > 0 && ctx.CanAffect(defending))
             {
-                var card = defending.Energy.Count == 1 ? defending.Energy[0] : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Freezing Force: choose an Energy card attached to " + defending.Name)[0];
+                var card = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Freezing Force: choose an Energy card attached to " + defending.Name)[0];
                 ShuffleEnergyIntoOwnersDeck(ctx, defending, new[] { card });
             }
         }

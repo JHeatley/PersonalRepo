@@ -603,7 +603,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var me = ctx.Pokemon;
                 if (!ctx.InPlay(me) || me.Energy.Count == 0 || ctx.Me.Bench.Count == 0) return true;
-                var energy = me.Energy.Count == 1 ? me.Energy[0] : ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Reflect Energy: move which Energy?")[0];
+                var energy = ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Reflect Energy: move which Energy?")[0];
                 var target = ctx.ChoosePokemon(ctx.MyBench(), "Reflect Energy: move " + energy.Def.Name + " to which Benched Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(me, target, energy);
                 return true;

@@ -357,7 +357,7 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 if (!TefPokemon.StillDefending(ctx, defending) || defending.Tools.Count == 0 || !ctx.CanAffect(defending)) return true;
-                var tool = defending.Tools.Count == 1 ? defending.Tools[0] : ctx.ChooseCards(defending.Tools.ToList(), 1, 1, "Tool Breaker: discard which Pokémon Tool?")[0];
+                var tool = ctx.ChooseCards(defending.Tools.ToList(), 1, 1, "Tool Breaker: discard which Pokémon Tool?")[0];
                 ctx.Engine.DiscardTool(defending, tool);
                 return true;
             }

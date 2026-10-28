@@ -377,7 +377,7 @@ namespace PokemonTCG.Cards
                 if (holders.Count == 0) return true;
                 var giver = ctx.ChoosePokemon(holders, "Trick: move a Pokémon Tool from which Pokémon?");
                 if (giver == null || (giver.Owner != ctx.Player && !ctx.CanAffect(giver))) return true;
-                var tool = giver.Tools.Count == 1 ? giver.Tools[0] : ctx.ChooseCards(giver.Tools.ToList(), 1, 1, "Trick: move which Pokémon Tool?")[0];
+                var tool = ctx.ChooseCards(giver.Tools.ToList(), 1, 1, "Trick: move which Pokémon Tool?")[0];
                 var receivers = ctx.State.Players[giver.Owner].InPlay().Where(m => m != giver && m.Tools.Count == 0).ToList();
                 var receiver = ctx.ChoosePokemon(receivers, "Trick: move " + tool.Def.Name + " to which Pokémon?");
                 if (receiver == null || (receiver.Owner != ctx.Player && !ctx.CanAffect(receiver))) return true;
@@ -441,7 +441,7 @@ namespace PokemonTCG.Cards
                     var givers = ctx.MyPokemon().Where(m => m.Energy.Count > 0).ToList();
                     var giver = RepeatableAbility.ChoosePokemonOrDone(ctx, givers, "Replace: move an Energy from which of your Pokémon?" + (offerDone ? " Press Done when finished." : ""), offerDone);
                     if (giver == null) return false;
-                    var card = giver.Energy.Count == 1 ? giver.Energy[0] : ctx.ChooseCards(giver.Energy.ToList(), 1, 1, "Replace: move which Energy from " + giver.Name + "?")[0];
+                    var card = ctx.ChooseCards(giver.Energy.ToList(), 1, 1, "Replace: move which Energy from " + giver.Name + "?")[0];
                     var others = ctx.MyPokemon().Where(m => m != giver).ToList();
                     var receiver = ctx.ChoosePokemon(others, "Replace: move " + card.Def.Name + " to which Pokémon?");
                     return receiver != null && ctx.Engine.MoveEnergy(giver, receiver, card);

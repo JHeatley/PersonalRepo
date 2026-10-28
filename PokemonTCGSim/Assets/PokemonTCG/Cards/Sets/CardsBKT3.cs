@@ -250,7 +250,7 @@ namespace PokemonTCG.Cards
                 }
                 var mine = ctx.Me.Discard.Where(c => c.Def.IsPokemon).ToList();
                 if (mine.Count == 0) return;
-                var own = mine.Count == 1 ? mine : ctx.ChooseCards(mine, 1, 1, "Buddy-Buddy Rescue: put a Pokémon from your discard pile into your hand");
+                var own = ctx.ChooseCards(mine, 1, 1, "Buddy-Buddy Rescue: put a Pokémon from your discard pile into your hand");
                 ctx.DiscardToHand(own);
             }
         }

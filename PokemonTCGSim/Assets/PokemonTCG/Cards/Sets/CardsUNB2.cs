@@ -701,7 +701,7 @@ namespace PokemonTCG.Cards
                     opts.Add(new DecisionOption { Label = source.Name + ": " + move.Name + (move.Damage > 0 ? " (" + move.Damage + move.DamageSuffix + ")" : ""), Card = source, Index = i });
                 }
                 if (opts.Count == 0) return true;
-                int pick = opts.Count == 1 ? 0 : ctx.Engine.AskOne(ctx.Player, DecisionKind.ChooseOption, "Hypnotic Reign: use which attack?", opts, ctx.Source);
+                int pick = ctx.Engine.AskOne(ctx.Player, DecisionKind.ChooseOption, "Hypnotic Reign: use which attack?", opts, ctx.Source);
                 UseCopiedAttack(ctx, source, opts[pick].Index);
                 return true;
             }

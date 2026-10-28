@@ -181,7 +181,7 @@ namespace PokemonTCG.Cards
                 if (mine.Count == 0) return;
                 var own = ctx.ChoosePokemon(mine, "Super Energy Removal: discard an Energy card from which of your Pokémon?");
                 if (own == null) return;
-                var pay = own.Energy.Count == 1 ? own.Energy.ToList() : ctx.ChooseCards(own.Energy.ToList(), 1, 1, "Super Energy Removal: discard which Energy card from " + own.Name + "?");
+                var pay = ctx.ChooseCards(own.Energy.ToList(), 1, 1, "Super Energy Removal: discard which Energy card from " + own.Name + "?");
                 foreach (var card in pay) ctx.Engine.DiscardEnergy(own, card);
                 var theirs = ctx.OpponentPokemon(m => m.Energy.Count > 0);
                 if (theirs.Count == 0) return;
@@ -204,7 +204,7 @@ namespace PokemonTCG.Cards
                 if (theirs.Count == 0) return;
                 var target = ctx.ChoosePokemon(theirs, "Energy Removal: choose 1 of your opponent's Pokémon");
                 if (target == null) return;
-                var picks = target.Energy.Count == 1 ? target.Energy.ToList() : ctx.ChooseCards(target.Energy.ToList(), 1, 1, "Energy Removal: discard which Energy card from " + target.Name + "?");
+                var picks = ctx.ChooseCards(target.Energy.ToList(), 1, 1, "Energy Removal: discard which Energy card from " + target.Name + "?");
                 foreach (var card in picks) ctx.Engine.DiscardEnergy(target, card);
             }
         }
@@ -356,7 +356,7 @@ namespace PokemonTCG.Cards
                 if (targets.Count == 0) return;
                 var target = ctx.ChoosePokemon(targets, "Super Potion: discard an Energy card from which of your Pokémon (and heal 40 damage from it)?");
                 if (target == null) return;
-                var pay = target.Energy.Count == 1 ? target.Energy.ToList() : ctx.ChooseCards(target.Energy.ToList(), 1, 1, "Super Potion: discard which Energy card?");
+                var pay = ctx.ChooseCards(target.Energy.ToList(), 1, 1, "Super Potion: discard which Energy card?");
                 foreach (var card in pay) ctx.Engine.DiscardEnergy(target, card);
                 ctx.Heal(target, 40);
             }

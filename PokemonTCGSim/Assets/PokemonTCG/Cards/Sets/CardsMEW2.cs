@@ -257,8 +257,7 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 ctx.DamageDefending(atk.Damage);
                 if (!TefPokemon.StillDefending(ctx, defending) || !ctx.CanAffect(defending) || defending.Energy.Count == 0) return true;
-                var pick = defending.Energy.Count == 1 ? defending.Energy[0]
-                    : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Tentacular Return: put which Energy into your opponent's hand?")[0];
+                var pick = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Tentacular Return: put which Energy into your opponent's hand?")[0];
                 ctx.Engine.ReturnEnergyToHand(defending, pick);
                 return true;
             }
@@ -621,8 +620,7 @@ namespace PokemonTCG.Cards
                     ctx.Log("The effect of Giovanni's Charisma on " + defending.Name + " was prevented.");
                     return;
                 }
-                var pick = defending.Energy.Count == 1 ? defending.Energy[0]
-                    : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Giovanni's Charisma: put which Energy into your opponent's hand?")[0];
+                var pick = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Giovanni's Charisma: put which Energy into your opponent's hand?")[0];
                 if (!ctx.Engine.ReturnEnergyToHand(defending, pick)) return;
                 var active = ctx.Me.Active;
                 var energy = ctx.Me.Hand.Where(c => c.Def.IsEnergy).ToList();

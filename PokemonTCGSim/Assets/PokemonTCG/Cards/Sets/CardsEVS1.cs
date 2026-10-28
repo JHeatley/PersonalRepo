@@ -691,7 +691,7 @@ namespace PokemonTCG.Cards
             {
                 var from = RepeatableAbility.ChoosePokemonOrDone(ctx, Givers(ctx), Connection + ": move an Energy from which Pokémon?" + (offerDone ? " Press Done when finished." : ""), offerDone);
                 if (from == null || from.Energy.Count == 0) return false;
-                var card = from.Energy.Count == 1 ? from.Energy[0] : ctx.ChooseCards(from.Energy.ToList(), 1, 1, Connection + ": move which Energy?")[0];
+                var card = ctx.ChooseCards(from.Energy.ToList(), 1, 1, Connection + ": move which Energy?")[0];
                 var to = RepeatableAbility.ChoosePokemonOrDone(ctx, ctx.MyPokemon(m => m != from && m.Def.IsRapidStrike), Connection + ": move " + card.Def.Name + " to which Rapid Strike Pokémon?", offerDone);
                 if (to == null) return false;
                 return ctx.Engine.MoveEnergy(from, to, card);
@@ -746,7 +746,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 if (!TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || ctx.Opp.Bench.Count == 0 || !ctx.CanAffect(defending)) return true;
                 if (!ctx.AskYesNo("Tricky Steps: move an Energy from " + defending.Name + " to 1 of your opponent's Benched Pokémon?")) return true;
-                var energy = defending.Energy.Count == 1 ? defending.Energy[0] : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Tricky Steps: move which Energy?")[0];
+                var energy = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Tricky Steps: move which Energy?")[0];
                 var to = ctx.ChoosePokemon(ctx.OpponentBench(), "Tricky Steps: move " + energy.Def.Name + " to which of your opponent's Benched Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(defending, to, energy);
                 return true;

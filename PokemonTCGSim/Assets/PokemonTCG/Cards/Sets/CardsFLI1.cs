@@ -269,7 +269,7 @@ namespace PokemonTCG.Cards
             {
                 var water = Water(ctx);
                 if (water.Count == 0) return;
-                var pick = water.Count == 1 ? water : ctx.ChooseCards(water, 1, 1, "Jet Geyser: discard which Water Energy card?");
+                var pick = ctx.ChooseCards(water, 1, 1, "Jet Geyser: discard which Water Energy card?");
                 if (pick.Count == 0) return;
                 ctx.Engine.DiscardFromHand(ctx.Player, pick[0]);
                 if (ctx.Opp.Active != null && ctx.Opp.Bench.Count > 0) ctx.OpponentSwitchesActive();

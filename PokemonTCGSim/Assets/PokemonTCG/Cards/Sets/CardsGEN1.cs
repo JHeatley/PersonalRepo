@@ -260,8 +260,7 @@ namespace PokemonTCG.Cards
                 ctx.ApplyCondition(defending, SpecialCondition.Paralyzed);
                 if (defending.Energy.Count > 0 && ctx.CanAffect(defending))
                 {
-                    var energy = defending.Energy.Count == 1 ? defending.Energy[0]
-                        : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Clamp Crush: discard which Energy from " + defending.Name + "?")[0];
+                    var energy = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Clamp Crush: discard which Energy from " + defending.Name + "?")[0];
                     ctx.Engine.DiscardEnergy(defending, energy);
                 }
                 return true;

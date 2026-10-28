@@ -373,7 +373,7 @@ namespace PokemonTCG.Cards
             {
                 var me = ctx.Pokemon;
                 if (me.Tools.Count == 0) return;
-                var tool = me.Tools.Count == 1 ? me.Tools[0] : ctx.ChooseCards(me.Tools.ToList(), 1, 1, "Drive Change: put which Pokémon Tool into your hand?")[0];
+                var tool = ctx.ChooseCards(me.Tools.ToList(), 1, 1, "Drive Change: put which Pokémon Tool into your hand?")[0];
                 if (!me.Tools.Remove(tool)) return;
                 ctx.Me.Hand.Add(tool);
                 ctx.Log(ctx.Engine.PlayerName(ctx.Player) + " put " + tool.Def.Name + " from " + me.Name + " into " + ctx.Engine.Their(ctx.Player) + " hand (Drive Change).");

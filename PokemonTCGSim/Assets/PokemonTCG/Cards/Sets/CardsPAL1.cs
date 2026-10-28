@@ -385,8 +385,7 @@ namespace PokemonTCG.Cards
                     ctx.Log("The effect of Magical Flick on " + defending.Name + " was prevented.");
                     return;
                 }
-                var card = defending.Energy.Count == 1 ? defending.Energy[0]
-                    : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Magical Flick: move which Energy?")[0];
+                var card = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Magical Flick: move which Energy?")[0];
                 var target = ctx.ChoosePokemon(ctx.OpponentBench(), "Magical Flick: move " + card.Def.Name + " to which of your opponent's Benched Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(defending, target, card);
             }

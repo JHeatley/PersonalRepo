@@ -378,7 +378,7 @@ namespace PokemonTCG.Cards
                 if (!CardsBS1.CopyingWithMetronome && me != null)
                 {
                     if (me.Energy.Count == 0) return Nothing(ctx);
-                    var card = me.Energy.Count == 1 ? me.Energy[0] : ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Burn Booster: discard which Energy card? (a Fire Energy card: 10 more damage)")[0];
+                    var card = ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Burn Booster: discard which Energy card? (a Fire Energy card: 10 more damage)")[0];
                     fire = CardsDRI1.ProvidesType(ctx, me, card, EnergyType.Fire);
                     ctx.Engine.DiscardEnergy(me, card);
                 }
@@ -796,7 +796,7 @@ namespace PokemonTCG.Cards
                 if (donors.Count == 0) return;
                 var from = ctx.ChoosePokemon(donors, Power + ": move an Energy card from which Pokémon?");
                 if (from == null) return;
-                var card = from.Energy.Count == 1 ? from.Energy[0] : ctx.ChooseCards(from.Energy.ToList(), 1, 1, Power + ": move which Energy card?")[0];
+                var card = ctx.ChooseCards(from.Energy.ToList(), 1, 1, Power + ": move which Energy card?")[0];
                 var to = ctx.MyPokemon(m => m != from);
                 var target = ctx.ChoosePokemon(to, Power + ": move " + card.Def.Name + " to which Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(from, target, card);

@@ -172,7 +172,7 @@ namespace PokemonTCG.Cards
             {
                 if (atk.Name != "Dirty Throw") return false;
                 if (ctx.Me.Hand.Count == 0) return Nothing(ctx);
-                var card = ctx.Me.Hand.Count == 1 ? ctx.Me.Hand[0] : ctx.ChooseCards(ctx.Me.Hand.ToList(), 1, 1, "Dirty Throw: discard a card from your hand")[0];
+                var card = ctx.ChooseCards(ctx.Me.Hand.ToList(), 1, 1, "Dirty Throw: discard a card from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 ctx.DamageDefending(atk.Damage);
                 return true;
@@ -302,7 +302,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Sneaky Pocket") return false;
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 if (ctx.Me.Hand.Count == 0) return true;
-                var card = ctx.Me.Hand.Count == 1 ? ctx.Me.Hand[0] : ctx.ChooseCards(ctx.Me.Hand.ToList(), 1, 1, "Sneaky Pocket: put which card from your hand in the Lost Zone?")[0];
+                var card = ctx.ChooseCards(ctx.Me.Hand.ToList(), 1, 1, "Sneaky Pocket: put which card from your hand in the Lost Zone?")[0];
                 if (!ctx.Me.Hand.Remove(card)) return true;
                 ctx.Me.LostZone.Add(card);
                 ctx.Log("Sneaky Pocket: " + card.Def.Name + " was put in the Lost Zone.");
@@ -516,7 +516,7 @@ namespace PokemonTCG.Cards
                 bool bonus = false;
                 if (me.Tools.Count > 0 && ctx.AskYesNo("Scaly Uppercut: discard a Pokémon Tool from " + me.Name + " for 90 more damage?"))
                 {
-                    var tool = me.Tools.Count == 1 ? me.Tools[0] : ctx.ChooseCards(me.Tools.ToList(), 1, 1, "Scaly Uppercut: discard which Pokémon Tool?")[0];
+                    var tool = ctx.ChooseCards(me.Tools.ToList(), 1, 1, "Scaly Uppercut: discard which Pokémon Tool?")[0];
                     bonus = ctx.Engine.DiscardTool(me, tool);
                 }
                 ctx.DamageDefending(atk.Damage + (bonus ? 90 : 0));

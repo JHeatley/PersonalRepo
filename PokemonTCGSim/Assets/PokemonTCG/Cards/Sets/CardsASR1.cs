@@ -412,7 +412,7 @@ namespace PokemonTCG.Cards
                 int bonus = 0;
                 if (me.Energy.Count > 0 && ctx.AskYesNo("Parallel Spin: put an Energy attached to this Pokémon into your hand for 100 more damage?"))
                 {
-                    var pick = me.Energy.Count == 1 ? me.Energy[0] : ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Parallel Spin: put which Energy into your hand?")[0];
+                    var pick = ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Parallel Spin: put which Energy into your hand?")[0];
                     if (ctx.Engine.ReturnEnergyToHand(me, pick)) bonus = 100;
                 }
                 ctx.DamageDefending(atk.Damage + bonus);
@@ -816,7 +816,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var me = ctx.Pokemon;
                 if (!ctx.InPlay(me) || me.Energy.Count == 0 || ctx.Me.Bench.Count == 0) return true;
-                var energy = me.Energy.Count == 1 ? me.Energy[0] : ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Swirling Slice: move which Energy to your Bench?")[0];
+                var energy = ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Swirling Slice: move which Energy to your Bench?")[0];
                 var to = ctx.ChoosePokemon(ctx.MyBench(), "Swirling Slice: move " + energy.Def.Name + " to which Benched Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(me, to, energy);
                 return true;
@@ -1276,7 +1276,7 @@ namespace PokemonTCG.Cards
                     if (holders.Count == 0 || !ctx.InPlay(me)) break;
                     var source = RepeatableAbility.ChoosePokemonOrDone(ctx, holders, "Frontier Road: move an Energy from which Pokémon to " + me.Name + "? Press Done when finished.", true);
                     if (source == null) break;
-                    var card = source.Energy.Count == 1 ? source.Energy[0] : ctx.ChooseCards(source.Energy.ToList(), 1, 1, "Frontier Road: move which Energy from " + source.Name + "?")[0];
+                    var card = ctx.ChooseCards(source.Energy.ToList(), 1, 1, "Frontier Road: move which Energy from " + source.Name + "?")[0];
                     if (!ctx.Engine.MoveEnergy(source, me, card)) break;
                 }
             }
@@ -1315,7 +1315,7 @@ namespace PokemonTCG.Cards
                 if (basics.Count == 0 || targets.Count == 0) return;
                 if (!src.AskYesNo("Wish Connector: " + mon.Name + " was Knocked Out. Move a basic Energy card from it to another of your Pokémon?")) return;
                 Announce(src, "Wish Connector");
-                var card = basics.Count == 1 ? basics[0] : src.ChooseCards(basics, 1, 1, "Wish Connector: move which basic Energy card?")[0];
+                var card = src.ChooseCards(basics, 1, 1, "Wish Connector: move which basic Energy card?")[0];
                 var to = src.ChoosePokemon(targets, "Wish Connector: move " + card.Def.Name + " to which Pokémon?");
                 if (to != null) src.Engine.MoveEnergy(mon, to, card);
             }

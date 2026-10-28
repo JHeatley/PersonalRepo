@@ -453,7 +453,7 @@ namespace PokemonTCG.Cards
                     if (!ctx.InPlay(me) || givers.Count == 0) return true;
                     var giver = ctx.ChoosePokemon(givers, "Energy Wheel: move an Energy from which Benched Pokémon?");
                     if (giver == null) return true;
-                    var card = giver.Energy.Count == 1 ? giver.Energy[0] : ctx.ChooseCards(giver.Energy.ToList(), 1, 1, "Energy Wheel: move which Energy to " + me.Name + "?")[0];
+                    var card = ctx.ChooseCards(giver.Energy.ToList(), 1, 1, "Energy Wheel: move which Energy to " + me.Name + "?")[0];
                     ctx.Engine.MoveEnergy(giver, me, card);
                     return true;
                 }

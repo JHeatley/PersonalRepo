@@ -413,7 +413,7 @@ namespace PokemonTCG.Cards
                 {
                     var from = RepeatableAbility.ChoosePokemonOrDone(ctx, Holders(ctx), Power + ": return a Pokémon Tool from which Pokémon to your hand?" + (offerDone ? " Press Done when finished." : ""), offerDone);
                     if (from == null) return false;
-                    var tool = from.Tools.Count == 1 ? from.Tools[0] : ctx.ChooseCards(from.Tools.ToList(), 1, 1, Power + ": return which Tool?")[0];
+                    var tool = ctx.ChooseCards(from.Tools.ToList(), 1, 1, Power + ": return which Tool?")[0];
                     if (!from.Tools.Remove(tool)) return false;
                     ctx.State.Players[tool.Owner].Hand.Add(tool);
                     ctx.Log(Power + ": " + tool.Def.Name + " went back to " + ctx.Engine.Possessive(tool.Owner) + " hand.");
@@ -761,7 +761,7 @@ namespace PokemonTCG.Cards
                 Announce(src, "Golden Wing");
                 foreach (var card in src.ChooseCards(me.Energy.ToList(), 0, Math.Min(2, me.Energy.Count), "Golden Wing: move which Energy?"))
                 {
-                    var to = others.Count == 1 ? others[0] : src.ChoosePokemon(others, "Golden Wing: move " + card.Def.Name + " to which Pokémon?");
+                    var to = src.ChoosePokemon(others, "Golden Wing: move " + card.Def.Name + " to which Pokémon?");
                     if (to != null) src.Engine.MoveEnergy(me, to, card);
                 }
             }
@@ -785,7 +785,7 @@ namespace PokemonTCG.Cards
                 if (!holderWasActive || attacker == null || attacker.Owner == ctx.Player || !ctx.InPlay(attacker) || attacker.Energy.Count == 0) return;
                 Announce(ctx, "Silver Sparkle");
                 if (!ctx.Flip()) return;
-                var card = attacker.Energy.Count == 1 ? attacker.Energy[0] : ctx.ChooseCards(attacker.Energy.ToList(), 1, 1, "Silver Sparkle: return which Energy card to your opponent's hand?")[0];
+                var card = ctx.ChooseCards(attacker.Energy.ToList(), 1, 1, "Silver Sparkle: return which Energy card to your opponent's hand?")[0];
                 if (!attacker.Energy.Remove(card)) return;
                 ctx.State.Players[card.Owner].Hand.Add(card);
                 ctx.Log("Silver Sparkle: " + card.Def.Name + " went back to " + ctx.Engine.Possessive(card.Owner) + " hand.");

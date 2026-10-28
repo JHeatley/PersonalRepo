@@ -353,8 +353,8 @@ namespace PokemonTCG.Cards
                 if (sharers.Count > 0 && src.ChooseOption("Energy Pouch and Exp. Share: which goes first?",
                         "Exp. Share first (1 basic Energy moves to the Pokémon with Exp. Share)", "Energy Pouch first (all basic Energy to your hand)") == 0)
                 {
-                    var sharer = sharers.Count == 1 ? sharers[0] : src.ChoosePokemon(sharers, "Exp. Share: move a basic Energy to which Pokémon?");
-                    var pick = basic.Count == 1 ? basic[0] : src.ChooseCards(basic, 1, 1, "Exp. Share: move which Energy?")[0];
+                    var sharer = src.ChoosePokemon(sharers, "Exp. Share: move a basic Energy to which Pokémon?");
+                    var pick = src.ChooseCards(basic, 1, 1, "Exp. Share: move which Energy?")[0];
                     if (sharer != null && src.Engine.MoveEnergy(holder, sharer, pick)) basic.Remove(pick);
                     if (basic.Count == 0) return;
                 }

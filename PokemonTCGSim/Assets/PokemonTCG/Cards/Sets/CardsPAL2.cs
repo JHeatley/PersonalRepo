@@ -109,7 +109,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var bench = ctx.Me.Bench.Where(m => m != me).ToList();
                 if (!ctx.InPlay(me) || me.Energy.Count == 0 || bench.Count == 0) return true;
-                var card = me.Energy.Count == 1 ? me.Energy[0] : ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Make the Assist: move which Energy?")[0];
+                var card = ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Make the Assist: move which Energy?")[0];
                 var target = ctx.ChoosePokemon(bench, "Make the Assist: move " + card.Def.Name + " to which Benched Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(me, target, card);
                 return true;

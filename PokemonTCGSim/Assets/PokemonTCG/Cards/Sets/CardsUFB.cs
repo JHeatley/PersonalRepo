@@ -541,7 +541,7 @@ namespace PokemonTCG.Cards
                     if (card.Def.IsSupporter && seen.Add(card.Def.Name) && MrMimeTEF.WouldDoSomething(ctx, card)) usable.Add(card);
                 if (usable.Count == 0) return true;
                 var labels = usable.Select(x => "Use " + x.Def.Name + "'s effect").ToArray();
-                int pick = usable.Count == 1 ? 0 : ctx.ChooseOption("Hidden Power: use the effect of which Supporter from your opponent's discard pile?", labels);
+                int pick = ctx.ChooseOneOption("Hidden Power: use the effect of which Supporter from your opponent's discard pile?", labels);
                 if (pick < 0 || pick >= usable.Count) return true;
                 var chosen = usable[pick];
                 ctx.Log(ctx.Pokemon.Name + " uses the effect of " + chosen.Def.Name + ".");

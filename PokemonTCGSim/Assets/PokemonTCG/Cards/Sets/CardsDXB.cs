@@ -241,7 +241,7 @@ namespace PokemonTCG.Cards
                 if (hit == null || !ctx.InPlay(hit) || hit.Energy.Count == 0 || !ctx.CanAffect(hit)) return true;
                 var others = ctx.OpponentPokemon(m => m != hit);
                 if (others.Count == 0 || !ctx.AskYesNo("Energy Flip: move an Energy from " + hit.Name + " to another of your opponent's Pokémon?")) return true;
-                var card = hit.Energy.Count == 1 ? hit.Energy[0] : ctx.ChooseCards(hit.Energy.ToList(), 1, 1, "Energy Flip: move which Energy?")[0];
+                var card = ctx.ChooseCards(hit.Energy.ToList(), 1, 1, "Energy Flip: move which Energy?")[0];
                 var to = ctx.ChoosePokemon(others, "Energy Flip: move it to which Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(hit, to, card);
                 return true;

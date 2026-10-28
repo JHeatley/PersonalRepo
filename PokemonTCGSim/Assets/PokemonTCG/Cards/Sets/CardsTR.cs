@@ -398,7 +398,7 @@ namespace PokemonTCG.Cards
                 if (prizes.Count == 0 || ctx.Me.Deck.Count == 0) return;
                 // Face-down Prize cards are picked blind; face-up ones (Here Comes Team Rocket!) by name.
                 var labels = prizes.Select((c, i) => ctx.Me.FaceUpPrizeIds.Contains(c.Id) ? c.Def.Name + " (Prize card " + (i + 1) + ")" : "Prize card " + (i + 1)).ToArray();
-                int pick = prizes.Count == 1 ? 0 : ctx.ChooseOption(Trickery + ": switch which Prize card with the top card of your deck?", labels);
+                int pick = ctx.ChooseOneOption(Trickery + ": switch which Prize card with the top card of your deck?", labels);
                 if (pick < 0 || pick >= prizes.Count) pick = 0;
                 var prize = prizes[pick];
                 var top = ctx.Me.Deck[0];

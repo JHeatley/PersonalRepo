@@ -133,7 +133,7 @@ namespace PokemonTCG.Cards
                 if (targets.Count == 0) return true;
                 var target = ctx.ChoosePokemon(targets, "Sneaky Smash: discard an Energy from which of your opponent's Pokémon?");
                 if (target == null) return true;
-                var pick = target.Energy.Count == 1 ? target.Energy.ToList() : ctx.ChooseCards(target.Energy.ToList(), 1, 1, "Sneaky Smash: discard which Energy?");
+                var pick = ctx.ChooseCards(target.Energy.ToList(), 1, 1, "Sneaky Smash: discard which Energy?");
                 if (pick.Count > 0) ctx.Engine.DiscardEnergy(target, pick[0]);
                 return true;
             }
@@ -249,7 +249,7 @@ namespace PokemonTCG.Cards
             {
                 var holder = ctx.ChoosePokemon(ctx.MyPokemon(m => m.Tools.Count > 0), "Change Clothes: put a Pokémon Tool from which of your Pokémon into your hand?");
                 if (holder == null || holder.Tools.Count == 0) return;
-                var tool = holder.Tools.Count == 1 ? holder.Tools[0] : ctx.ChooseCards(holder.Tools.ToList(), 1, 1, "Change Clothes: which Pokémon Tool?")[0];
+                var tool = ctx.ChooseCards(holder.Tools.ToList(), 1, 1, "Change Clothes: which Pokémon Tool?")[0];
                 if (!holder.Tools.Remove(tool)) return;
                 ctx.Me.Hand.Add(tool);
                 ctx.Log(tool.Def.Name + " went from " + holder.Name + " into " + ctx.Engine.Their(ctx.Player) + " hand (Change Clothes).");

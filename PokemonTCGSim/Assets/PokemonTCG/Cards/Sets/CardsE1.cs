@@ -580,7 +580,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.Flip()) return true;
                 var energy = ctx.BasicEnergyInDiscard();
                 if (energy.Count == 0) return true;
-                ctx.DiscardToHand(energy.Count == 1 ? energy : ctx.ChooseCards(energy, 1, 1, "Energy Catch: put which basic Energy card into your hand?"));
+                ctx.DiscardToHand(ctx.ChooseCards(energy, 1, 1, "Energy Catch: put which basic Energy card into your hand?"));
                 return true;
             }
         }

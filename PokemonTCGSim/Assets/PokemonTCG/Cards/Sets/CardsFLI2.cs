@@ -123,7 +123,7 @@ namespace PokemonTCG.Cards
                 if (sources.Count == 0 || ctx.OpponentPokemon().Count < 2) return true;
                 var origin = ctx.ChoosePokemon(sources, "Energy Teaser: move an Energy from which of your opponent's Benched Pokémon?");
                 if (origin == null) return true;
-                var energy = origin.Energy.Count == 1 ? origin.Energy.ToList() : ctx.ChooseCards(origin.Energy.ToList(), 1, 1, "Energy Teaser: move which Energy?");
+                var energy = ctx.ChooseCards(origin.Energy.ToList(), 1, 1, "Energy Teaser: move which Energy?");
                 var targets = ctx.OpponentPokemon(m => m != origin && ctx.CanAffect(m));
                 if (energy.Count == 0 || targets.Count == 0) return true;
                 var dest = ctx.ChoosePokemon(targets, "Energy Teaser: move it to which of your opponent's Pokémon?");

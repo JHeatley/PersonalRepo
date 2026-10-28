@@ -162,7 +162,7 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 ctx.DamageDefending(atk.Damage);
                 if (!TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || ctx.Opp.Bench.Count == 0 || !ctx.CanAffect(defending)) return true;
-                var card = defending.Energy.Count == 1 ? defending.Energy[0] : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Curly Ribbon: move which Energy from " + defending.Name + "?")[0];
+                var card = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Curly Ribbon: move which Energy from " + defending.Name + "?")[0];
                 var bench = ctx.Opp.Bench.ToList();
                 var target = ctx.ChoosePokemon(bench, "Curly Ribbon: move " + card.Def.Name + " to which of your opponent's Benched Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(defending, target, card);
@@ -307,7 +307,7 @@ namespace PokemonTCG.Cards
                 var faceDown = p.Prizes.Where(c => !p.FaceUpPrizeIds.Contains(c.Id)).ToList();
                 if (faceDown.Count == 0) return true;
                 var labels = Enumerable.Range(1, faceDown.Count).Select(i => "Prize card " + i).ToArray();
-                int pick = faceDown.Count == 1 ? 0 : ctx.ChooseOption("Safety Check: look at which of your face-down Prize cards?", labels);
+                int pick = ctx.ChooseOneOption("Safety Check: look at which of your face-down Prize cards?", labels);
                 if (pick < 0 || pick >= faceDown.Count) return true;
                 ctx.ChooseCards(new List<CardInstance> { faceDown[pick] }, 0, 1, "Safety Check: this is the Prize card you looked at");
                 return true;

@@ -414,7 +414,7 @@ namespace PokemonTCG.Cards
                 ctx.Log(ctx.Engine.PlayerName(ctx.Player) + " discarded " + card.Def.Name + " (Power Plant).");
                 var pile = ctx.BasicEnergyInDiscard();
                 if (pile.Count == 0) return false;
-                var pick = pile.Count == 1 ? pile : ctx.ChooseCards(pile, 1, 1, "Power Plant: put which basic Energy card from your discard pile into your hand?");
+                var pick = ctx.ChooseCards(pile, 1, 1, "Power Plant: put which basic Energy card from your discard pile into your hand?");
                 ctx.Engine.ShowCards(ctx.Opponent, pick, "Power Plant", "Your opponent puts this card into their hand.", ctx.Source);
                 ctx.DiscardToHand(pick);
                 return false;

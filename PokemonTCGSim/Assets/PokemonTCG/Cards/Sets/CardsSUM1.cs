@@ -134,8 +134,7 @@ namespace PokemonTCG.Cards
                 if (!TefPokemon.StillDefending(ctx, defending) || !ctx.CanAffect(defending) || defending.Energy.Count == 0) return true;
                 var bench = ctx.OpponentBench();
                 if (bench.Count == 0) return true;
-                var energy = defending.Energy.Count == 1 ? defending.Energy[0]
-                    : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Struggle Bug: move which Energy from " + defending.Name + "?")[0];
+                var energy = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Struggle Bug: move which Energy from " + defending.Name + "?")[0];
                 var dest = ctx.ChoosePokemon(bench, "Struggle Bug: move " + energy.Def.Name + " to which of your opponent's Benched Pokémon?");
                 if (dest != null) ctx.Engine.MoveEnergy(defending, dest, energy);
                 return true;

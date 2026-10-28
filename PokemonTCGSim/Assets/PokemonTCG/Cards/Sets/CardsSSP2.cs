@@ -447,7 +447,7 @@ namespace PokemonTCG.Cards
                 ctx.Heal(active, 30);
                 var has = All.Where(c => active.Has(c)).ToList();
                 if (has.Count == 0) return;
-                int pick = has.Count == 1 ? 0 : ctx.ChooseOption("Obliging Heal: which Special Condition should " + active.Name + " recover from?", has.Select(c => c.ToString()).ToArray());
+                int pick = ctx.ChooseOneOption("Obliging Heal: which Special Condition should " + active.Name + " recover from?", has.Select(c => c.ToString()).ToArray());
                 ctx.Engine.RemoveCondition(active, has[pick]);
             }
         }

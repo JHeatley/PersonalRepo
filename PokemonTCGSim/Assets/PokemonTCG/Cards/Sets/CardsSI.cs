@@ -84,7 +84,7 @@ namespace PokemonTCG.Cards
                     {
                         var hurt = ctx.State.Players[player].InPlay().Where(m => m.DamageCounters > 0).ToList();
                         if (hurt.Count == 0) break;
-                        var target = hurt.Count == 1 ? hurt[0] : ctx.Engine.ChoosePokemon(player, hurt, "Strange Scent: remove a damage counter (" + (i + 1) + " of 3) from which of your Pokémon?", ctx.Source);
+                        var target = ctx.Engine.ChoosePokemon(player, hurt, "Strange Scent: remove a damage counter (" + (i + 1) + " of 3) from which of your Pokémon?", ctx.Source);
                         if (target == null || ctx.Heal(target, 10) <= 0) break;
                     }
                 return true;

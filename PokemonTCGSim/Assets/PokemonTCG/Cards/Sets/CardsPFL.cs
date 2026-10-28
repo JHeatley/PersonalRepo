@@ -727,7 +727,7 @@ namespace PokemonTCG.Cards
                 if (specials.Count > 0) labels.Add("Discard a Special Energy");
                 if (ctx.State.Stadium != null) labels.Add("Discard " + ctx.State.Stadium.Def.Name);
                 if (labels.Count == 0) return;
-                int pick = labels.Count == 1 ? 0 : ctx.ChooseOption("Blowtorch: choose what to discard", labels.ToArray());
+                int pick = ctx.ChooseOneOption("Blowtorch: choose what to discard", labels.ToArray());
                 string choice = labels[pick];
                 if (choice == "Discard a Pokémon Tool")
                 {

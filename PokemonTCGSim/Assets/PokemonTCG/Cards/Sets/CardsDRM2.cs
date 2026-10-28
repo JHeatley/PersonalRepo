@@ -98,7 +98,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.AskYesNo("Dark Destruction: discard an Energy from " + me.Name + " to discard an Energy from " + defending.Name + "?")) return true;
                 if (ctx.DiscardEnergyFrom(me, 1, "Dark Destruction: discard an Energy from " + me.Name) == 0) return true;
                 if (!ctx.CanAffect(defending) || defending.Energy.Count == 0) return true;
-                var card = defending.Energy.Count == 1 ? defending.Energy[0] : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Dark Destruction: choose an Energy to discard from " + defending.Name)[0];
+                var card = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Dark Destruction: choose an Energy to discard from " + defending.Name)[0];
                 ctx.Engine.DiscardEnergy(defending, card);
                 return true;
             }

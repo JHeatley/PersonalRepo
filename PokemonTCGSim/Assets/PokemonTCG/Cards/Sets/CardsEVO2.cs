@@ -152,8 +152,7 @@ namespace PokemonTCG.Cards
                 if (!engine.IsKnockedOut(info.Target)) return;
                 var attacker = info.Attacker;
                 if (engine.State.FindPokemon(attacker.Uid) != attacker || attacker.Energy.Count == 0) return;
-                var pick = attacker.Energy.Count == 1 ? attacker.Energy[0]
-                    : engine.ChooseCards(Owner, attacker.Energy.ToList(), 1, 1, "Little Grudge: discard an Energy from " + attacker.Name, null)[0];
+                var pick = engine.ChooseCards(Owner, attacker.Energy.ToList(), 1, 1, "Little Grudge: discard an Energy from " + attacker.Name, null)[0];
                 engine.DiscardEnergy(attacker, pick);
             }
         }

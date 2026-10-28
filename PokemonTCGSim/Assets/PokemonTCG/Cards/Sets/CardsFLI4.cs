@@ -69,7 +69,7 @@ namespace PokemonTCG.Cards
                 var origin = ctx.ChoosePokemon(sources, "Eneporter: move a Special Energy from which of your opponent's Pokémon?");
                 if (origin == null) return;
                 var special = origin.Energy.Where(e => e.Def.IsAttachedSpecialEnergy).ToList();
-                var energy = special.Count == 1 ? special : ctx.ChooseCards(special, 1, 1, "Eneporter: move which Special Energy?");
+                var energy = ctx.ChooseCards(special, 1, 1, "Eneporter: move which Special Energy?");
                 var targets = ctx.OpponentPokemon(m => m != origin && ctx.CanAffect(m));
                 if (energy.Count == 0 || targets.Count == 0) return;
                 var dest = ctx.ChoosePokemon(targets, "Eneporter: move it to which of your opponent's Pokémon?");

@@ -107,7 +107,7 @@ namespace PokemonTCG.Cards
                 var active = ctx.Me.Active;
                 var has = All.Where(active.Has).ToList();
                 if (has.Count == 0) return;
-                var pick = has.Count == 1 ? has[0] : has[ctx.ChooseOption(Power + ": remove which Special Condition from " + active.Name + "?", has.Select(c => c.ToString()).ToArray())];
+                var pick = has[ctx.ChooseOneOption(Power + ": remove which Special Condition from " + active.Name + "?", has.Select(c => c.ToString()).ToArray())];
                 ctx.Engine.RemoveCondition(active, pick);
                 ctx.Log(Power + ": " + active.Name + " is no longer " + pick + ".");
             }

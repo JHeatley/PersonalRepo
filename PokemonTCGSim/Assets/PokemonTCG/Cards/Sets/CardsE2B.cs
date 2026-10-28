@@ -109,9 +109,9 @@ namespace PokemonTCG.Cards
                 if (defending == null || ctx.Opp.Bench.Count == 0) return Nothing(ctx);
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 if (!ctx.Flip() || !TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || !ctx.CanAffect(defending)) return true;
-                var card = defending.Energy.Count == 1 ? defending.Energy[0] : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Energy Kick: choose an Energy card attached to " + defending.Name)[0];
+                var card = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Energy Kick: choose an Energy card attached to " + defending.Name)[0];
                 var bench = ctx.OpponentBench();
-                var target = bench.Count == 1 ? bench[0] : ctx.Engine.ChoosePokemon(ctx.Opponent, bench, "Energy Kick: move " + card.Def.Name + " to which of your Benched Pokémon?", ctx.Source);
+                var target = ctx.Engine.ChoosePokemon(ctx.Opponent, bench, "Energy Kick: move " + card.Def.Name + " to which of your Benched Pokémon?", ctx.Source);
                 if (target != null) ctx.Engine.MoveEnergy(defending, target, card);
                 return true;
             }
@@ -327,7 +327,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var cards = ctx.Me.Discard.Where(c => c.Def.IsPokemon || c.Def.IsBasicEnergy).ToList();
                 if (cards.Count == 0) return true;
-                ctx.DiscardToHand(cards.Count == 1 ? cards : ctx.ChooseCards(cards, 1, 1, "Fishing Tail: put which card into your hand?"));
+                ctx.DiscardToHand(ctx.ChooseCards(cards, 1, 1, "Fishing Tail: put which card into your hand?"));
                 return true;
             }
         }
@@ -697,7 +697,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var trainers = ctx.Me.Discard.Where(c => c.Def.IsTrainer).ToList();
                 if (trainers.Count == 0 || !ctx.Flip()) return true;
-                var pick = trainers.Count == 1 ? trainers : ctx.ChooseCards(trainers, 1, 1, "Data Sort: shuffle which Trainer card into your deck?");
+                var pick = ctx.ChooseCards(trainers, 1, 1, "Data Sort: shuffle which Trainer card into your deck?");
                 ctx.Engine.ShowCards(ctx.Opponent, pick, "Data Sort", "Your opponent shuffles this card into their deck.", ctx.Source);
                 ctx.DiscardToDeck(pick);
                 ctx.ShuffleMyDeck();

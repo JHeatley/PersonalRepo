@@ -82,8 +82,7 @@ namespace PokemonTCG.Cards
                 var markers = new Dictionary<PokemonInPlay, int>();
                 for (int i = 0; i < 3; i++)
                 {
-                    var pick = theirs.Count == 1 ? theirs[0]
-                        : ctx.Engine.ChoosePokemon(ctx.Opponent, theirs, "Fury Strikes: put marker " + (i + 1) + " of 3 on which of your Pokémon?", ctx.Source);
+                    var pick = ctx.Engine.ChoosePokemon(ctx.Opponent, theirs, "Fury Strikes: put marker " + (i + 1) + " of 3 on which of your Pokémon?", ctx.Source);
                     if (pick == null) pick = theirs[0];
                     int n;
                     markers.TryGetValue(pick, out n);

@@ -120,7 +120,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var pile = ctx.Me.Discard.ToList();
                 if (pile.Count == 0) return true;
-                var pick = pile.Count == 1 ? pile : ctx.ChooseCards(pile, 1, 1, "Trash Tentacle: put a card from your discard pile into your hand");
+                var pick = ctx.ChooseCards(pile, 1, 1, "Trash Tentacle: put a card from your discard pile into your hand");
                 ctx.DiscardToHand(pick);
                 return true;
             }

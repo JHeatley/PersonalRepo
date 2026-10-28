@@ -866,7 +866,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 if (!ctx.InPlay(me) || me.Energy.Count == 0 || !ctx.Me.Discard.Any(c => c.Def.IsEnergy)) return true;
                 if (!ctx.AskYesNo("Rotating Claws: discard an Energy card from " + me.Name + " and attach another from your discard pile?")) return true;
-                var gone = me.Energy.Count == 1 ? me.Energy[0] : ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Rotating Claws: discard which Energy card?")[0];
+                var gone = ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Rotating Claws: discard which Energy card?")[0];
                 if (!ctx.Engine.DiscardEnergy(me, gone)) return true;
                 var cards = ctx.Me.Discard.Where(c => c.Def.IsEnergy && c != gone).ToList();
                 if (cards.Count == 0) return true;

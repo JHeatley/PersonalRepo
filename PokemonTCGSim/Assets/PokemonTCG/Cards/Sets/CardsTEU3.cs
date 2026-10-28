@@ -621,7 +621,7 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var top = ctx.LookAtTop(2);
-                var pick = top.Count == 1 ? top : ctx.ChooseCards(top, 1, 1, "Air Mail: put 1 of these cards into your hand (the other goes on the bottom of your deck)");
+                var pick = ctx.ChooseCards(top, 1, 1, "Air Mail: put 1 of these cards into your hand (the other goes on the bottom of your deck)");
                 ctx.DeckToHand(pick);
                 foreach (var card in top)
                 {

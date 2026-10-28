@@ -238,7 +238,7 @@ namespace PokemonTCG.Cards
                     var holders = ctx.Me.Bench.Where(b => b.Energy.Count > 0).ToList();
                     var from = RepeatableAbility.ChoosePokemonOrDone(ctx, holders, "Ultimate Zone: move an Energy card from which Benched Pokémon to your Active Arceus?" + (offerDone ? " Press Done when finished." : ""), offerDone);
                     if (from == null) return false;
-                    var card = from.Energy.Count == 1 ? from.Energy[0] : ctx.ChooseCards(from.Energy.ToList(), 1, 1, "Ultimate Zone: move which Energy card?")[0];
+                    var card = ctx.ChooseCards(from.Energy.ToList(), 1, 1, "Ultimate Zone: move which Energy card?")[0];
                     return ctx.Engine.MoveEnergy(from, ctx.Me.Active, card);
                 });
                 return false;
@@ -642,7 +642,7 @@ namespace PokemonTCG.Cards
                 {
                     var from = RepeatableAbility.ChoosePokemonOrDone(ctx, ctx.MyPokemon(m => m.Energy.Count > 0), "Energy Flare: move an Energy card from which Pokémon? Press Done when finished.", true);
                     if (from == null) return false;
-                    var card = from.Energy.Count == 1 ? from.Energy[0] : ctx.ChooseCards(from.Energy.ToList(), 1, 1, "Energy Flare: move which Energy card?")[0];
+                    var card = ctx.ChooseCards(from.Energy.ToList(), 1, 1, "Energy Flare: move which Energy card?")[0];
                     var to = RepeatableAbility.ChoosePokemonOrDone(ctx, ctx.MyPokemon(m => m != from), "Energy Flare: move it to which Pokémon?", true);
                     return to != null && ctx.Engine.MoveEnergy(from, to, card);
                 });
@@ -669,7 +669,7 @@ namespace PokemonTCG.Cards
                 {
                     var from = RepeatableAbility.ChoosePokemonOrDone(ctx, Donors(ctx), CallForPower + ": move an Energy from which Pokémon to " + me.Name + "?" + (offerDone ? " Press Done when finished." : ""), offerDone);
                     if (from == null) return false;
-                    var card = from.Energy.Count == 1 ? from.Energy[0] : ctx.ChooseCards(from.Energy.ToList(), 1, 1, CallForPower + ": move which Energy?")[0];
+                    var card = ctx.ChooseCards(from.Energy.ToList(), 1, 1, CallForPower + ": move which Energy?")[0];
                     return ctx.Engine.MoveEnergy(from, me, card);
                 });
             }

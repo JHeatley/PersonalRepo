@@ -234,8 +234,7 @@ namespace PokemonTCG.Cards
                 if (!TefPokemon.StillDefending(ctx, defending) || !ctx.CanAffect(defending)) return true;
                 if (defending.Tools.Count > 0)
                 {
-                    var tool = defending.Tools.Count == 1 ? defending.Tools[0]
-                        : ctx.ChooseCards(defending.Tools.ToList(), 1, 1, "Hack Off: discard which Pokémon Tool?")[0];
+                    var tool = ctx.ChooseCards(defending.Tools.ToList(), 1, 1, "Hack Off: discard which Pokémon Tool?")[0];
                     ctx.Engine.DiscardTool(defending, tool);
                 }
                 var special = defending.Energy.Where(e => e.Def.IsAttachedSpecialEnergy).ToList();

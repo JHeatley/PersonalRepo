@@ -248,7 +248,7 @@ namespace PokemonTCG.Cards
         {
             var bench = ctx.Opp.Bench.Where(ctx.CanAffect).ToList();
             if (bench.Count == 0 || ctx.Opp.Active == null || !ctx.CanAffect(ctx.Opp.Active)) return;
-            var pick = bench.Count == 1 ? bench[0] : ctx.Engine.ChoosePokemon(ctx.Opponent, bench, source + ": choose the Benched Pokémon to switch with your Active Pokémon", ctx.Source);
+            var pick = ctx.Engine.ChoosePokemon(ctx.Opponent, bench, source + ": choose the Benched Pokémon to switch with your Active Pokémon", ctx.Source);
             if (pick != null) ctx.Engine.SwitchActive(ctx.Opponent, pick);
         }
 

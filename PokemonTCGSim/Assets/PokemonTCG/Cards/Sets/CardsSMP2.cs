@@ -100,8 +100,7 @@ namespace PokemonTCG.Cards
                     if (ctx.Engine.BenchSpace(player) <= 0) continue;
                     var basics = p.Discard.Where(c => c.Def.IsBasicPokemon && !ctx.Engine.PutIntoPlayBlocked(player, c.Def)).ToList();
                     if (basics.Count == 0) continue;
-                    var card = basics.Count == 1 ? basics[0]
-                        : ctx.ChooseCards(basics, 1, 1, "Shadowy Echoes: put which Basic Pokémon onto " + (player == ctx.Player ? "your" : "your opponent's") + " Bench?")[0];
+                    var card = ctx.ChooseCards(basics, 1, 1, "Shadowy Echoes: put which Basic Pokémon onto " + (player == ctx.Player ? "your" : "your opponent's") + " Bench?")[0];
                     if (p.Discard.Remove(card)) ctx.Engine.PutOntoBench(player, card, false);
                 }
                 return true;

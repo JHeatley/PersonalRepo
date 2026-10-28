@@ -522,8 +522,7 @@ namespace PokemonTCG.Cards
                     ctx.Log("The effect of Prankish on " + defending.Name + " was prevented.");
                     return;
                 }
-                var pick = defending.Energy.Count == 1 ? defending.Energy[0]
-                    : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Prankish: put which Energy on top of your opponent's deck?")[0];
+                var pick = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Prankish: put which Energy on top of your opponent's deck?")[0];
                 defending.Energy.Remove(pick);
                 ctx.Opp.Deck.Insert(0, pick);
                 ctx.Engine.Emit(GameEventType.Info, ctx.Opponent, pick.Def.Name + " was put on top of " + ctx.Engine.Their(ctx.Opponent) + " deck (Prankish).", pick.Id, defending.Uid);
@@ -542,8 +541,7 @@ namespace PokemonTCG.Cards
                 if (donors.Count == 0) return true;
                 var donor = ctx.ChoosePokemon(donors, "Energy Warp: move an Energy from which of your opponent's Benched Pokémon?");
                 if (donor == null) return true;
-                var card = donor.Energy.Count == 1 ? donor.Energy[0]
-                    : ctx.ChooseCards(donor.Energy.ToList(), 1, 1, "Energy Warp: move which Energy to " + active.Name + "?")[0];
+                var card = ctx.ChooseCards(donor.Energy.ToList(), 1, 1, "Energy Warp: move which Energy to " + active.Name + "?")[0];
                 ctx.Engine.MoveEnergy(donor, active, card);
                 return true;
             }

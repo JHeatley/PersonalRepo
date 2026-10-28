@@ -578,7 +578,7 @@ namespace PokemonTCG.Cards
                 if (givers.Count == 0) return true;
                 var from = ctx.ChoosePokemon(givers, "Wicked Tentacles: move an Energy from which of your opponent's Pokémon?");
                 if (from == null) return true;
-                var energy = from.Energy.Count == 1 ? from.Energy[0] : ctx.ChooseCards(from.Energy.ToList(), 1, 1, "Wicked Tentacles: move which Energy?")[0];
+                var energy = ctx.ChooseCards(from.Energy.ToList(), 1, 1, "Wicked Tentacles: move which Energy?")[0];
                 var receivers = ctx.OpponentPokemon(m => m != from && ctx.CanAffect(m));
                 if (receivers.Count == 0) return true;
                 var to = ctx.ChoosePokemon(receivers, "Wicked Tentacles: move " + energy.Def.Name + " to which of your opponent's Pokémon?");

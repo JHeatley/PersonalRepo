@@ -473,7 +473,7 @@ namespace PokemonTCG.Cards
                 if (active.DamageCounters > 0) ctx.Heal(active, 30);
                 var present = All.Where(c => active.Has(c)).ToList();
                 if (present.Count == 0) return;
-                var pick = present.Count == 1 ? present[0] : present[ctx.ChooseOption("Floral Breeze: remove which Special Condition from " + active.Name + "?", present.Select(c => c.ToString()).ToArray())];
+                var pick = present[ctx.ChooseOneOption("Floral Breeze: remove which Special Condition from " + active.Name + "?", present.Select(c => c.ToString()).ToArray())];
                 ctx.Engine.RemoveCondition(active, pick);
                 ctx.Log(active.Name + " is no longer " + pick + ".");
             }

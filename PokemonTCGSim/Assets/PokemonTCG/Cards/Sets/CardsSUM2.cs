@@ -179,7 +179,7 @@ namespace PokemonTCG.Cards
                     opts.Add(new DecisionOption { Label = "Prize card " + (slots[k] + 1), Index = k });
                 }
                 if (opts.Count == 0) return true;
-                int pick = opts.Count == 1 ? 0 : ctx.Engine.AskOne(ctx.Player, DecisionKind.ChooseOption, "Searching Light: look at which of your face-down Prize cards?", opts, ctx.Source);
+                int pick = ctx.Engine.AskOne(ctx.Player, DecisionKind.ChooseOption, "Searching Light: look at which of your face-down Prize cards?", opts, ctx.Source);
                 var card = me.Prizes[opts[pick].Index];
                 var shown = new List<CardInstance> { card };
                 ctx.Engine.NoteLookedAt(shown, "1 of your Prize cards", ctx.Player);

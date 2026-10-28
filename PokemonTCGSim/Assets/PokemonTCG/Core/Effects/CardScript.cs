@@ -1017,6 +1017,17 @@ namespace PokemonTCG.Core
         public bool AskYesNo(string prompt) { return Engine.AskYesNo(Player, prompt, Source); }
         public int AskNumber(int min, int max, string prompt) { return Engine.AskNumber(Player, min, max, prompt, Source); }
 
+        /// <summary>
+        /// ChooseOption where a bot takes the only choice at once (the person on screen is still asked, as in the real game). Use it
+        /// for picks among things that are there (which Special Condition to remove...), not for "do it or not" questions.
+        /// </summary>
+        public int ChooseOneOption(string prompt, params string[] labels)
+        {
+            var opts = new List<DecisionOption>();
+            for (int i = 0; i < labels.Length; i++) opts.Add(new DecisionOption { Label = labels[i], Index = i });
+            return Engine.AskOne(Player, DecisionKind.ChooseOption, prompt, opts, Source);
+        }
+
         /// <summary>Pick one of several labelled choices. Returns the index.</summary>
         public int ChooseOption(string prompt, params string[] labels)
         {

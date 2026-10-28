@@ -364,7 +364,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var basics = ctx.BasicEnergyInDiscard();
                 if (basics.Count == 0) return true;
-                ctx.DiscardToHand(basics.Count == 1 ? basics : ctx.ChooseCards(basics, 1, 1, "Energy Catch: put which basic Energy card into your hand?"));
+                ctx.DiscardToHand(ctx.ChooseCards(basics, 1, 1, "Energy Catch: put which basic Energy card into your hand?"));
                 return true;
             }
         }

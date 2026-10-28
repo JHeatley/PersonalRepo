@@ -93,7 +93,7 @@ namespace PokemonTCG.Cards
                 if (donors.Count == 0) return;
                 var donor = ctx.ChoosePokemon(donors, "Power Suction: move an Energy from which of your Pokémon?");
                 if (donor == null) return;
-                var energy = donor.Energy.Count == 1 ? donor.Energy[0] : ctx.ChooseCards(donor.Energy.ToList(), 1, 1, "Power Suction: move which Energy?")[0];
+                var energy = ctx.ChooseCards(donor.Energy.ToList(), 1, 1, "Power Suction: move which Energy?")[0];
                 var deoxys = ctx.MyPokemon(m => m.Def.Name == "Deoxys");
                 var dest = ctx.ChoosePokemon(deoxys, "Power Suction: move " + energy.Def.Name + " to which Deoxys?");
                 if (dest != null) ctx.Engine.MoveEnergy(donor, dest, energy);
@@ -325,7 +325,7 @@ namespace PokemonTCG.Cards
                 foreach (var mon in ctx.OpponentPokemon(m => m.Energy.Count > 0))
                 {
                     if (!ctx.CanAffect(mon)) continue;
-                    var en = mon.Energy.Count == 1 ? mon.Energy[0] : ctx.ChooseCards(mon.Energy.ToList(), 1, 1, "Dreadful Flames-GX: discard which Energy from " + mon.Name + "?")[0];
+                    var en = ctx.ChooseCards(mon.Energy.ToList(), 1, 1, "Dreadful Flames-GX: discard which Energy from " + mon.Name + "?")[0];
                     ctx.Engine.DiscardEnergy(mon, en);
                 }
                 return true;

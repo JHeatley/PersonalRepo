@@ -224,7 +224,7 @@ namespace PokemonTCG.Cards
             var defending = ctx.Defending;
             ctx.DamageDefending(atk.Damage);
             if (!TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || !ctx.CanAffect(defending)) return;
-            var card = defending.Energy.Count == 1 ? defending.Energy[0] : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Crushing Magma: put which Energy card on the bottom of your opponent's deck?")[0];
+            var card = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Crushing Magma: put which Energy card on the bottom of your opponent's deck?")[0];
             if (ctx.Engine.EnergyRemovalProtected(defending, card))
             {
                 ctx.Log(card.Def.Name + " on " + defending.Name + " can't be put into the deck by Crushing Magma.");

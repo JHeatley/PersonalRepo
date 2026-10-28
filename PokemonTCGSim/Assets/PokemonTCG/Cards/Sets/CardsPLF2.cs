@@ -121,7 +121,7 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 ctx.DamageDefending(atk.Damage);
                 if (!TefPokemon.StillDefending(ctx, defending) || !ctx.CanAffect(defending) || defending.Energy.Count == 0 || ctx.Opp.Bench.Count == 0) return true;
-                var card = defending.Energy.Count == 1 ? defending.Energy[0] : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Piston Headbutt: move which Energy from " + defending.Name + "?")[0];
+                var card = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Piston Headbutt: move which Energy from " + defending.Name + "?")[0];
                 var to = ctx.ChoosePokemon(ctx.OpponentBench(), "Piston Headbutt: move " + card.Def.Name + " to which of your opponent's Benched Pokémon?");
                 if (to == null) return true;
                 // Energy moved onto a Pokémon the attack can't affect (Silver Mirror) is discarded instead (2013-09/10 ruling).

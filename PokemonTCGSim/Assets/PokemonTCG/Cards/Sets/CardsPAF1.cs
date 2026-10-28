@@ -330,7 +330,7 @@ namespace PokemonTCG.Cards
                 var lightning = mon.Energy.Where(e => CardsDRI1.ProvidesType(src, mon, e, EnergyType.Lightning)).ToList();
                 if (lightning.Count == 0) return;
                 if (!src.AskYesNo("Electrical Grounding: move a Lightning Energy from " + mon.Name + " to " + me.Name + "?")) return;
-                var pick = lightning.Count == 1 ? lightning[0] : src.ChooseCards(lightning, 1, 1, "Electrical Grounding: move which Energy?")[0];
+                var pick = src.ChooseCards(lightning, 1, 1, "Electrical Grounding: move which Energy?")[0];
                 Announce(src, "Electrical Grounding");
                 src.Engine.MoveEnergy(mon, me, pick);
             }

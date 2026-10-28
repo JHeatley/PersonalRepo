@@ -155,8 +155,7 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 ctx.DamageDefending(atk.Damage);
                 if (!TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || !ctx.CanAffect(defending)) return true;
-                var pick = defending.Energy.Count == 1 ? defending.Energy[0]
-                    : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, attack + ": put which Energy attached to " + defending.Name + " into your opponent's hand?")[0];
+                var pick = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, attack + ": put which Energy attached to " + defending.Name + " into your opponent's hand?")[0];
                 ctx.Engine.ReturnEnergyToHand(defending, pick);
                 return true;
             }

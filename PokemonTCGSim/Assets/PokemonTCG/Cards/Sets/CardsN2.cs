@@ -805,7 +805,7 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 var bench = ctx.OpponentBench();
                 if (defending == null || defending.Energy.Count == 0 || bench.Count == 0) return true;
-                var card = defending.Energy.Count == 1 ? defending.Energy[0] : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Energy Cycle: move which Energy card?")[0];
+                var card = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Energy Cycle: move which Energy card?")[0];
                 var to = ctx.ChoosePokemon(bench, "Energy Cycle: attach " + card.Def.Name + " to which of your opponent's Benched Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(defending, to, card);
                 return true;

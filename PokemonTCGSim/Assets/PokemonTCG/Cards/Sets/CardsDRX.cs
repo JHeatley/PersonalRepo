@@ -227,8 +227,7 @@ namespace PokemonTCG.Cards
                     var taken = types.ToList();
                     var options = ctx.Me.Discard.Where(c => c.Def.IsEnergy && c.Def.IsBasicEnergy && !taken.Contains(c.Def.EnergyProvides)).ToList();
                     if (options.Count == 0) break;
-                    var pick = options.Count == 1 ? options[0]
-                        : ctx.ChooseCards(options, 1, 1, "Rebirth: attach a basic Energy card of a different type (" + (i + 1) + " of 3)")[0];
+                    var pick = ctx.ChooseCards(options, 1, 1, "Rebirth: attach a basic Energy card of a different type (" + (i + 1) + " of 3)")[0];
                     types.Add(pick.Def.EnergyProvides);
                     if (ctx.Me.Discard.Remove(pick)) ctx.Engine.AttachEnergyCard(pick, mon);
                 }

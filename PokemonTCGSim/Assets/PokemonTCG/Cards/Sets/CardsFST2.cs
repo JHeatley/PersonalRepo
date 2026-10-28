@@ -729,7 +729,7 @@ namespace PokemonTCG.Cards
             protected override bool Use(EffectContext ctx)
             {
                 var pile = ctx.BasicEnergyInDiscard();
-                var pick = pile.Count == 1 ? pile : ctx.ChooseCards(pile, 1, 1, "Training Court: put a basic Energy card into your hand");
+                var pick = ctx.ChooseCards(pile, 1, 1, "Training Court: put a basic Energy card into your hand");
                 ctx.DiscardToHand(pick);
                 return false;
             }
