@@ -249,7 +249,7 @@ namespace PokemonTCG.Tests
             var session = new TrainingSession(StandardCards.CreateRegistry(), brain, "All decks", decks[0].Value, "All decks", decks[0].Value, 12, 4, 5150)
             {
                 Style = style,
-                AllDecks = decks
+                DeckPool = decks
             };
             StringAssert.Contains("all 3 decks", session.MatchLabel);
             session.RunBlocking();
@@ -265,6 +265,40 @@ namespace PokemonTCG.Tests
             Assert.GreaterOrEqual(matchups.Sum(m => m.Games), 12);
             Assert.IsTrue(matchups.All(m => m.Wins + m.Losses <= m.Games && decks.Any(d => d.Key == m.Deck) && decks.Any(d => d.Key == m.Opponent)));
             if (style == AiStyle.Neural) Assert.Greater(brain.Policy.Steps, 0);
+        }
+
+        [Test]
+        public void Focused_Practice_Plays_One_Deck_Every_Game_Against_Random_Decks(
+            [Values(AiStyle.Learning, AiStyle.Neural)] AiStyle style, [Values(true, false)] bool focusOnA)
+        {
+            var brain = new LearningBrain();
+            brain.Policy.Reset();
+            brain.Policy.GamesTrained = 1;
+            var decks = ThreeDecks();
+            var focus = Zoroark();
+            var session = new TrainingSession(StandardCards.CreateRegistry(), brain,
+                focusOnA ? "Zoroark" : "Random deck", focusOnA ? focus : decks[0].Value,
+                focusOnA ? "Random deck" : "Zoroark", focusOnA ? decks[0].Value : focus, 12, 4, 6060)
+            {
+                Style = style,
+                DeckPool = decks,
+                RandomA = !focusOnA,
+                RandomB = focusOnA
+            };
+            Assert.IsTrue(session.FocusMode);
+            Assert.IsFalse(session.AllDecksMode);
+            Assert.AreEqual("Zoroark", session.FocusDeck);
+            StringAssert.StartsWith("Zoroark vs a random deck", session.MatchLabel);
+            session.RunBlocking();
+            var st = session.Status();
+            Assert.AreEqual(0, st.Errors, st.LastError);
+            Assert.AreEqual(12, st.WinsA + st.WinsB + st.Draws);
+            Assert.GreaterOrEqual(st.ScoreBefore, 0);
+            // Zoroark played every game (it's on every matchup row as the deck), against more than one deck.
+            var asDeck = brain.Matchups().Where(m => m.Deck == "Zoroark").ToList();
+            Assert.GreaterOrEqual(asDeck.Sum(m => m.Games), 12);
+            Assert.Greater(asDeck.Select(m => m.Opponent).Distinct().Count(), 1);
+            Assert.IsTrue(brain.Matchups().All(m => m.Deck == "Zoroark" || m.Opponent == "Zoroark"), "every game had Zoroark in it");
         }
 
         [Test]
