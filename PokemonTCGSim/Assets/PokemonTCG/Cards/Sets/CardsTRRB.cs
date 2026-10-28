@@ -78,7 +78,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Breaking Impact") return false;
                 var all = ctx.OpponentPokemon();
                 if (all.Count == 0) return true;
-                var target = all.Count == 1 ? all[0] : ctx.ChoosePokemon(all, "Breaking Impact: choose 1 of your opponent's Pokémon");
+                var target = ctx.ChoosePokemon(all, "Breaking Impact: choose 1 of your opponent's Pokémon");
                 if (target != null) ctx.DamageTarget(target, 20 * ctx.Engine.RetreatCostOf(target));
                 return true;
             }
@@ -198,9 +198,9 @@ namespace PokemonTCG.Cards
                 if (!TefPokemon.StillDefending(ctx, defending) || ctx.Opp.Bench.Count == 0 || !ctx.CanAffect(defending)) return true;
                 var cards = defending.Energy.Where(e => e.Def.IsBasicEnergy).ToList();
                 if (cards.Count == 0) return true;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Magnetic Lines: move which basic Energy card from " + defending.Name + "?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Magnetic Lines: move which basic Energy card from " + defending.Name + "?")[0];
                 var bench = ctx.OpponentBench();
-                var to = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Magnetic Lines: move " + card.Def.Name + " to which of your opponent's Pokémon?");
+                var to = ctx.ChoosePokemon(bench, "Magnetic Lines: move " + card.Def.Name + " to which of your opponent's Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(defending, to, card);
                 return true;
             }
@@ -298,7 +298,7 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var hurt = Hurt(ctx);
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Ripples: remove 1 damage counter from which Pokémon?");
+                var target = ctx.ChoosePokemon(hurt, "Ripples: remove 1 damage counter from which Pokémon?");
                 if (target != null) ctx.Heal(target, 10);
             }
 
@@ -354,9 +354,9 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 if (!TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || ctx.Opp.Bench.Count == 0 || !ctx.CanAffect(defending)) return true;
                 var cards = defending.Energy.ToList();
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Aqua Trick: move which Energy card from " + defending.Name + "?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Aqua Trick: move which Energy card from " + defending.Name + "?")[0];
                 var bench = ctx.OpponentBench();
-                var to = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Aqua Trick: move " + card.Def.Name + " to which Benched Pokémon?");
+                var to = ctx.ChoosePokemon(bench, "Aqua Trick: move " + card.Def.Name + " to which Benched Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(defending, to, card);
                 return true;
             }

@@ -115,7 +115,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Wonder Lock: attach Klefki as a Pokémon Tool to which of your Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Wonder Lock: attach Klefki as a Pokémon Tool to which of your Pokémon?");
                 if (target == null) return;
                 var card = me.Top;
                 ctx.Engine.RemoveFromPlay(me);
@@ -235,7 +235,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var targets = ctx.OpponentPokemon(m => m.Energy.Count > 0 && ctx.CanAffect(m));
                 if (targets.Count == 0) return true;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Stall: discard an Energy from which of your opponent's Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Stall: discard an Energy from which of your opponent's Pokémon?");
                 if (target != null) ctx.DiscardEnergyFrom(target, 1, "Stall: discard an Energy from " + target.Name);
                 return true;
             }
@@ -421,7 +421,7 @@ namespace PokemonTCG.Cards
             {
                 var basics = Basics(ctx);
                 if (basics.Count == 0) return;
-                var target = basics.Count == 1 ? basics[0] : ctx.ChoosePokemon(basics, "Ninja Boy: switch which of your Basic Pokémon?");
+                var target = ctx.ChoosePokemon(basics, "Ninja Boy: switch which of your Basic Pokémon?");
                 if (target == null) return;
                 var found = ctx.SearchMyDeck(d => d.IsBasicPokemon && !ctx.Engine.PutIntoPlayBlocked(ctx.Player, d), 1, "Ninja Boy: choose a Basic Pokémon to switch with " + target.Name);
                 if (found.Count > 0 && ctx.InPlay(target) && target.Stack.Count == 1)

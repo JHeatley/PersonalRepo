@@ -169,7 +169,7 @@ namespace PokemonTCG.Cards
             {
                 var cost = DarknessInHand(ctx);
                 if (cost.Count == 0) return;
-                var pay = cost.Count == 1 ? cost[0] : ctx.ChooseCards(cost, 1, 1, "Dangerous Drill: discard a Darkness Pokémon from your hand")[0];
+                var pay = ctx.ChooseCards(cost, 1, 1, "Dangerous Drill: discard a Darkness Pokémon from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, pay);
 
                 var labels = new List<string>();
@@ -257,7 +257,7 @@ namespace PokemonTCG.Cards
             {
                 var pokemon = ctx.Me.Hand.Where(c => c.Def.IsPokemon).ToList();
                 if (pokemon.Count == 0) return;
-                var card = pokemon.Count == 1 ? pokemon[0] : ctx.ChooseCards(pokemon, 1, 1, "Pokémon Communication: reveal a Pokémon from your hand and put it into your deck")[0];
+                var card = ctx.ChooseCards(pokemon, 1, 1, "Pokémon Communication: reveal a Pokémon from your hand and put it into your deck")[0];
                 ctx.Engine.Reveal(ctx.Player, new[] { card }, "put this card into their deck (Pokémon Communication)");
                 ctx.Me.Hand.Remove(card);
                 ctx.Me.Deck.Add(card);
@@ -407,7 +407,7 @@ namespace PokemonTCG.Cards
                 var cards = Candidates(ctx);
                 var targets = Replaceable(ctx);
                 if (cards.Count == 0 || targets.Count == 0) return;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Nanu: choose a Basic Darkness Pokémon in your discard pile")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Nanu: choose a Basic Darkness Pokémon in your discard pile")[0];
                 var mon = ctx.ChoosePokemon(targets, "Nanu: switch " + card.Def.Name + " with which of your Basic Pokémon?");
                 var old = mon.Stack[0];
                 ctx.Me.Discard.Remove(card);

@@ -336,7 +336,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var supporters = ctx.Me.Discard.Where(c => c.Def.IsSupporter).ToList();
                 if (supporters.Count == 0) return true;
-                var pick = supporters.Count == 1 ? supporters[0] : ctx.ChooseCards(supporters, 1, 1, attack + ": put which Supporter card into your hand?")[0];
+                var pick = ctx.ChooseCards(supporters, 1, 1, attack + ": put which Supporter card into your hand?")[0];
                 ctx.DiscardToHand(new List<CardInstance> { pick });
                 return true;
             }

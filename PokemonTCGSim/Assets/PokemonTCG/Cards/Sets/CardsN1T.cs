@@ -287,7 +287,7 @@ namespace PokemonTCG.Cards
             {
                 var hurt = ctx.MyPokemon(m => m.DamageCounters > 0);
                 if (hurt.Count == 0) return;
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Moo-Moo Milk: choose 1 of your Pokémon");
+                var target = ctx.ChoosePokemon(hurt, "Moo-Moo Milk: choose 1 of your Pokémon");
                 int heads = ctx.FlipCoins(2);
                 if (target != null && heads > 0) ctx.Heal(target, 20 * heads);
             }

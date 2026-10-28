@@ -122,9 +122,9 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var cards = Grass(ctx);
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Nurture and Heal: attach which Grass Energy?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Nurture and Heal: attach which Grass Energy?")[0];
                 var targets = ctx.MyPokemon().Where(m => ctx.Engine.CanAttachFromHand(m)).ToList();
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Nurture and Heal: attach " + card.Def.Name + " to which Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Nurture and Heal: attach " + card.Def.Name + " to which Pokémon?");
                 if (target == null || !ctx.Me.Hand.Remove(card)) return;
                 if (ctx.Engine.AttachEnergyCard(card, target, true) && ctx.InPlay(target)) ctx.Heal(target, 30);
             }
@@ -241,7 +241,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var fire = ctx.Me.Hand.Where(c => CardsSSP1.IsBasicOf(c.Def, EnergyType.Fire)).ToList();
                 if (fire.Count == 0) return true;
-                var card = fire.Count == 1 ? fire[0] : ctx.ChooseCards(fire, 1, 1, "Flare Bonus: discard a Fire Energy card from your hand")[0];
+                var card = ctx.ChooseCards(fire, 1, 1, "Flare Bonus: discard a Fire Energy card from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 ctx.Draw(2);
                 return true;

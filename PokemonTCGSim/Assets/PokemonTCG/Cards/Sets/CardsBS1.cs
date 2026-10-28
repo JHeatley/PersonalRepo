@@ -324,7 +324,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Buzzap: attach " + ctx.Pokemon.Name + " as Energy to which of your Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Buzzap: attach " + ctx.Pokemon.Name + " as Energy to which of your Pokémon?");
                 if (target == null) return;
                 int pick = ctx.ChooseOption("Buzzap: it provides 2 Energy of which type?", Types.Select(t => t.ToString()).ToArray());
                 if (pick < 0 || pick >= Types.Length) pick = 3;

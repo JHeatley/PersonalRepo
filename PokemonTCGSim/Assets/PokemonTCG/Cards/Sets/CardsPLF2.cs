@@ -267,7 +267,7 @@ namespace PokemonTCG.Cards
             {
                 var pile = ctx.Me.Discard.Where(c => c.Def.IsTeamPlasma && kind(c.Def)).ToList();
                 if (pile.Count == 0) return;
-                picks.Add(pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, "Transfer Junk: choose a Team Plasma " + what)[0]);
+                picks.Add(ctx.ChooseCards(pile, 1, 1, "Transfer Junk: choose a Team Plasma " + what)[0]);
             }
         }
 
@@ -381,7 +381,7 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var hand = ctx.Me.Hand.ToList();
-                var pick = hand.Count == 1 ? hand[0] : ctx.ChooseCards(hand, 1, 1, "Diving Draw: discard which card from your hand?")[0];
+                var pick = ctx.ChooseCards(hand, 1, 1, "Diving Draw: discard which card from your hand?")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, pick);
                 ctx.Draw(2);
             }
@@ -441,7 +441,7 @@ namespace PokemonTCG.Cards
             {
                 var pile = Pile(ctx);
                 if (pile.Count == 0) return;
-                var pick = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, "Shadow Triad: put which Team Plasma card into your hand?")[0];
+                var pick = ctx.ChooseCards(pile, 1, 1, "Shadow Triad: put which Team Plasma card into your hand?")[0];
                 ctx.DiscardToHand(new List<CardInstance> { pick });
             }
         }

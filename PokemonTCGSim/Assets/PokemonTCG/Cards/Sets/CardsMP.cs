@@ -45,7 +45,7 @@ namespace PokemonTCG.Cards
                 var megas = ctx.MyPokemon(m => m.Def.IsMegaEx);
                 if (megas.Count > 0 && ctx.Me.Deck.Count > 0)
                 {
-                    var target = megas.Count == 1 ? megas[0] : ctx.ChoosePokemon(megas, "Lida: attach up to 2 Basic Energy cards to which of your Mega Evolution Pokémon ex?");
+                    var target = ctx.ChoosePokemon(megas, "Lida: attach up to 2 Basic Energy cards to which of your Mega Evolution Pokémon ex?");
                     if (target != null)
                     {
                         var found = ctx.SearchMyDeck(d => d.IsBasicEnergy, 2, "Lida: choose up to 2 Basic Energy cards to attach to " + target.Name);

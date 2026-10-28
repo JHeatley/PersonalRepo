@@ -91,11 +91,11 @@ namespace PokemonTCG.Cards
             {
                 var donors = Donors(ctx);
                 if (donors.Count == 0) return;
-                var donor = donors.Count == 1 ? donors[0] : ctx.ChoosePokemon(donors, "Power Suction: move an Energy from which of your Pokémon?");
+                var donor = ctx.ChoosePokemon(donors, "Power Suction: move an Energy from which of your Pokémon?");
                 if (donor == null) return;
                 var energy = donor.Energy.Count == 1 ? donor.Energy[0] : ctx.ChooseCards(donor.Energy.ToList(), 1, 1, "Power Suction: move which Energy?")[0];
                 var deoxys = ctx.MyPokemon(m => m.Def.Name == "Deoxys");
-                var dest = deoxys.Count == 1 ? deoxys[0] : ctx.ChoosePokemon(deoxys, "Power Suction: move " + energy.Def.Name + " to which Deoxys?");
+                var dest = ctx.ChoosePokemon(deoxys, "Power Suction: move " + energy.Def.Name + " to which Deoxys?");
                 if (dest != null) ctx.Engine.MoveEnergy(donor, dest, energy);
             }
 
@@ -360,7 +360,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var bench = ctx.OpponentBench().Where(m => ctx.CanAffect(m) && ctx.Engine.CanPutIntoHand(m)).ToList();
                 if (bench.Count == 0) return true;
-                var pick = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Dark Mist-GX: put which of your opponent's Benched Pokémon into their hand?");
+                var pick = ctx.ChoosePokemon(bench, "Dark Mist-GX: put which of your opponent's Benched Pokémon into their hand?");
                 if (pick != null) ctx.Engine.ReturnPokemonToHand(pick);
                 return true;
             }

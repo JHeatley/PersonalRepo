@@ -200,7 +200,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Blindside") return false;
                 var targets = ctx.OpponentPokemon(m => m.DamageCounters > 0);
                 if (targets.Count == 0) return Nothing(ctx);
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Blindside: do 50 damage to which of your opponent's Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Blindside: do 50 damage to which of your opponent's Pokémon?");
                 if (target != null) ctx.DamageTarget(target, 50);
                 return true;
             }

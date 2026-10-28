@@ -375,11 +375,11 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var holders = Holders(ctx);
                 if (holders.Count == 0) return true;
-                var giver = holders.Count == 1 ? holders[0] : ctx.ChoosePokemon(holders, "Trick: move a Pokémon Tool from which Pokémon?");
+                var giver = ctx.ChoosePokemon(holders, "Trick: move a Pokémon Tool from which Pokémon?");
                 if (giver == null || (giver.Owner != ctx.Player && !ctx.CanAffect(giver))) return true;
                 var tool = giver.Tools.Count == 1 ? giver.Tools[0] : ctx.ChooseCards(giver.Tools.ToList(), 1, 1, "Trick: move which Pokémon Tool?")[0];
                 var receivers = ctx.State.Players[giver.Owner].InPlay().Where(m => m != giver && m.Tools.Count == 0).ToList();
-                var receiver = receivers.Count == 1 ? receivers[0] : ctx.ChoosePokemon(receivers, "Trick: move " + tool.Def.Name + " to which Pokémon?");
+                var receiver = ctx.ChoosePokemon(receivers, "Trick: move " + tool.Def.Name + " to which Pokémon?");
                 if (receiver == null || (receiver.Owner != ctx.Player && !ctx.CanAffect(receiver))) return true;
                 if (!ctx.Engine.CanAttachToolTo(tool, receiver))
                 {
@@ -443,7 +443,7 @@ namespace PokemonTCG.Cards
                     if (giver == null) return false;
                     var card = giver.Energy.Count == 1 ? giver.Energy[0] : ctx.ChooseCards(giver.Energy.ToList(), 1, 1, "Replace: move which Energy from " + giver.Name + "?")[0];
                     var others = ctx.MyPokemon().Where(m => m != giver).ToList();
-                    var receiver = others.Count == 1 ? others[0] : ctx.ChoosePokemon(others, "Replace: move " + card.Def.Name + " to which Pokémon?");
+                    var receiver = ctx.ChoosePokemon(others, "Replace: move " + card.Def.Name + " to which Pokémon?");
                     return receiver != null && ctx.Engine.MoveEnergy(giver, receiver, card);
                 });
                 return true;

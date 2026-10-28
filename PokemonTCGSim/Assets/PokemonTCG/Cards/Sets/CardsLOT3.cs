@@ -448,7 +448,7 @@ namespace PokemonTCG.Cards
                     ctx.Log("Nightcap: your opponent's Pokémon have no attacks to use.");
                     return true;
                 }
-                var mon = mons.Count == 1 ? mons[0] : ctx.ChoosePokemon(mons, "Nightcap: choose 1 of your opponent's Pokémon whose attack to use");
+                var mon = ctx.ChoosePokemon(mons, "Nightcap: choose 1 of your opponent's Pokémon whose attack to use");
                 CardDef source;
                 int index;
                 if (!ChooseCopiedAttack(ctx, mon, "Nightcap: choose the attack to use", out source, out index)) return true;
@@ -484,7 +484,7 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var energy = ctx.BasicEnergyInDiscard();
-                var card = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Charging Up: attach a basic Energy card from your discard pile to " + ctx.Pokemon.Name)[0];
+                var card = ctx.ChooseCards(energy, 1, 1, "Charging Up: attach a basic Energy card from your discard pile to " + ctx.Pokemon.Name)[0];
                 if (!ctx.Me.Discard.Remove(card)) return;
                 ctx.Engine.AttachEnergyCard(card, ctx.Pokemon);
             }

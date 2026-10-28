@@ -118,7 +118,7 @@ namespace PokemonTCG.Cards
             {
                 var grass = ctx.Me.Hand.Where(c => CardsSSP1.IsBasicOf(c.Def, EnergyType.Grass)).ToList();
                 if (grass.Count == 0) return;
-                var card = grass.Count == 1 ? grass[0] : ctx.ChooseCards(grass, 1, 1, "Leaf Draw: discard which Grass Energy card?")[0];
+                var card = ctx.ChooseCards(grass, 1, 1, "Leaf Draw: discard which Grass Energy card?")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 ctx.Draw(3);
             }

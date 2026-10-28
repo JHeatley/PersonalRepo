@@ -286,7 +286,7 @@ namespace PokemonTCG.Cards
                 {
                     var card = found[0];
                     var candidates = mine.Where(m => m.Name == card.Def.EvolvesFrom && ctx.InPlay(m)).ToList();
-                    var target = candidates.Count == 1 ? candidates[0] : ctx.ChoosePokemon(candidates, "Expert Nurturer: evolve which Pokémon into " + card.Def.Name + "?");
+                    var target = ctx.ChoosePokemon(candidates, "Expert Nurturer: evolve which Pokémon into " + card.Def.Name + "?");
                     if (target != null) ctx.Engine.EvolvePokemon(target, card);
                     else ctx.Me.Deck.Add(card);
                 }

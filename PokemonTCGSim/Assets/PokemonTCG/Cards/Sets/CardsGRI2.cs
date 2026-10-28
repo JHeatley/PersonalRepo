@@ -130,7 +130,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var pile = ctx.Me.Discard.Where(c => c.Def.IsEnergy).ToList();
                 if (pile.Count == 0 || !ctx.InPlay(me)) return true;
-                var card = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, attack + ": attach which Energy card to " + me.Name + "?")[0];
+                var card = ctx.ChooseCards(pile, 1, 1, attack + ": attach which Energy card to " + me.Name + "?")[0];
                 if (ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, me);
                 return true;
             }

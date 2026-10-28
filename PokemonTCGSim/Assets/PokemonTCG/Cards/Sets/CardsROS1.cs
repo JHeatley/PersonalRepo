@@ -254,7 +254,7 @@ namespace PokemonTCG.Cards
                 {
                     var bench = ctx.MyBench();
                     if (bench.Count == 0) break;
-                    var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Energy Bomb: move " + card.Def.Name + " to which Benched Pokémon?");
+                    var target = ctx.ChoosePokemon(bench, "Energy Bomb: move " + card.Def.Name + " to which Benched Pokémon?");
                     ctx.Engine.MoveEnergy(me, target, card);
                 }
                 return true;
@@ -314,7 +314,7 @@ namespace PokemonTCG.Cards
                 CardsTWM1.RevealOpponentHand(ctx);
                 var trainers = ctx.Opp.Hand.Where(c => c.Def.IsTrainer).ToList();
                 if (trainers.Count == 0) return true;
-                var pick = trainers.Count == 1 ? trainers[0] : ctx.ChooseCards(trainers, 1, 1, "Stressful Eye: discard which Trainer card?")[0];
+                var pick = ctx.ChooseCards(trainers, 1, 1, "Stressful Eye: discard which Trainer card?")[0];
                 ctx.Engine.DiscardFromHand(ctx.Opponent, pick);
                 return true;
             }
@@ -329,7 +329,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var targets = ctx.OpponentPokemon(m => m.Energy.Any(en => en.Def.IsAttachedSpecialEnergy) && ctx.CanAffect(m));
                 if (targets.Count == 0) return true;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Bleh: discard a Special Energy from which of your opponent's Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Bleh: discard a Special Energy from which of your opponent's Pokémon?");
                 if (target != null) ctx.DiscardEnergyFrom(target, 1, "Bleh: discard a Special Energy from " + target.Name, en => en.Def.IsAttachedSpecialEnergy);
                 return true;
             }
@@ -382,10 +382,10 @@ namespace PokemonTCG.Cards
                 var donors = ctx.OpponentPokemon(m => m.DamageCounters > 0);
                 bool ready = donors.Count > 0 && ctx.Opp.InPlay().Count() >= 2;
                 if (!TriggerOnce(ctx, "Cursed Eyes", ready, "Cursed Eyes: move 3 damage counters from 1 of your opponent's Pokémon to another of their Pokémon?")) return;
-                var donor = donors.Count == 1 ? donors[0] : ctx.ChoosePokemon(donors, "Cursed Eyes: move damage counters from which of your opponent's Pokémon?");
+                var donor = ctx.ChoosePokemon(donors, "Cursed Eyes: move damage counters from which of your opponent's Pokémon?");
                 var others = ctx.OpponentPokemon(m => m != donor);
                 if (donor == null || others.Count == 0) return;
-                var receiver = others.Count == 1 ? others[0] : ctx.ChoosePokemon(others, "Cursed Eyes: move the damage counters to which of your opponent's Pokémon?");
+                var receiver = ctx.ChoosePokemon(others, "Cursed Eyes: move the damage counters to which of your opponent's Pokémon?");
                 ctx.Engine.MoveDamageCounters(donor, receiver, Math.Min(3, donor.DamageCounters), "Cursed Eyes");
             }
 

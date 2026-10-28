@@ -290,7 +290,7 @@ namespace PokemonTCG.Cards
                 bool bonus = false;
                 if (fighting.Count > 0 && ctx.AskYesNo("Cinder Cannon: discard a Fighting Energy from " + me.Name + " to do 120 more damage?"))
                 {
-                    var pick = fighting.Count == 1 ? fighting[0] : ctx.ChooseCards(fighting, 1, 1, "Cinder Cannon: discard which Energy?")[0];
+                    var pick = ctx.ChooseCards(fighting, 1, 1, "Cinder Cannon: discard which Energy?")[0];
                     bonus = ctx.Engine.DiscardEnergy(me, pick);
                 }
                 ctx.DamageDefending(atk.Damage + (bonus ? 120 : 0));

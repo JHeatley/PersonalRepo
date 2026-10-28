@@ -146,7 +146,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Sniff Out") return false;
                 var pile = ctx.Me.Discard.ToList();
                 if (pile.Count == 0) return true;
-                var card = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, "Sniff Out: put which card into your hand?")[0];
+                var card = ctx.ChooseCards(pile, 1, 1, "Sniff Out: put which card into your hand?")[0];
                 if (ctx.Me.Discard.Remove(card)) ctx.Me.Hand.Add(card);
                 return true;
             }
@@ -242,7 +242,7 @@ namespace PokemonTCG.Cards
                 var others = ctx.OpponentPokemon(m => m != hit);
                 if (others.Count == 0 || !ctx.AskYesNo("Energy Flip: move an Energy from " + hit.Name + " to another of your opponent's Pokémon?")) return true;
                 var card = hit.Energy.Count == 1 ? hit.Energy[0] : ctx.ChooseCards(hit.Energy.ToList(), 1, 1, "Energy Flip: move which Energy?")[0];
-                var to = others.Count == 1 ? others[0] : ctx.ChoosePokemon(others, "Energy Flip: move it to which Pokémon?");
+                var to = ctx.ChoosePokemon(others, "Energy Flip: move it to which Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(hit, to, card);
                 return true;
             }

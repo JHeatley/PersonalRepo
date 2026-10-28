@@ -327,7 +327,7 @@ namespace PokemonTCG.Cards
             {
                 var top = ctx.LookAtTop(2);
                 if (top.Count == 0) return;
-                var pick = top.Count == 1 ? top[0] : ctx.ChooseCards(top, 1, 1, "Dreamy Revelation: put which card into your hand? (the other stays on top of your deck)")[0];
+                var pick = ctx.ChooseCards(top, 1, 1, "Dreamy Revelation: put which card into your hand? (the other stays on top of your deck)")[0];
                 ctx.Me.Deck.Remove(pick);
                 ctx.Me.Hand.Add(pick);
                 ctx.Log(ctx.Engine.PlayerName(ctx.Player) + " put 1 of the top 2 cards of " + ctx.Engine.Their(ctx.Player) + " deck into " + ctx.Engine.Their(ctx.Player) + " hand (Dreamy Revelation).");

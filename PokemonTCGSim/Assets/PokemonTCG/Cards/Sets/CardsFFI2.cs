@@ -164,7 +164,7 @@ namespace PokemonTCG.Cards
                 if (!TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || ctx.Opp.Bench.Count == 0 || !ctx.CanAffect(defending)) return true;
                 var card = defending.Energy.Count == 1 ? defending.Energy[0] : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Curly Ribbon: move which Energy from " + defending.Name + "?")[0];
                 var bench = ctx.Opp.Bench.ToList();
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Curly Ribbon: move " + card.Def.Name + " to which of your opponent's Benched Pokémon?");
+                var target = ctx.ChoosePokemon(bench, "Curly Ribbon: move " + card.Def.Name + " to which of your opponent's Benched Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(defending, target, card);
                 return true;
             }
@@ -204,7 +204,7 @@ namespace PokemonTCG.Cards
                     var giver = RepeatableAbility.ChoosePokemonOrDone(ctx, givers, "Bust In: move a basic Energy from which Pokémon? Press Done when finished.", moved > 0);
                     if (giver == null) break;
                     var basics = giver.Energy.Where(en => en.Def.IsBasicEnergy).ToList();
-                    var card = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Bust In: move which Energy from " + giver.Name + "?")[0];
+                    var card = ctx.ChooseCards(basics, 1, 1, "Bust In: move which Energy from " + giver.Name + "?")[0];
                     if (ctx.Engine.MoveEnergy(giver, me, card)) moved++;
                     if (!RepeatableAbility.ForPerson(ctx)) break;
                 }
@@ -325,7 +325,7 @@ namespace PokemonTCG.Cards
                 CardsTWM1.RevealOpponentHand(ctx);
                 var items = ctx.Opp.Hand.Where(c => c.Def.IsItem).ToList();
                 if (items.Count == 0) return true;
-                var pick = items.Count == 1 ? items[0] : ctx.ChooseCards(items, 1, 1, "Held-Item Inspection: your opponent shuffles which Item card into their deck?")[0];
+                var pick = ctx.ChooseCards(items, 1, 1, "Held-Item Inspection: your opponent shuffles which Item card into their deck?")[0];
                 if (ctx.Opp.Hand.Remove(pick)) ctx.Opp.Deck.Add(pick);
                 ctx.Engine.ShuffleDeck(ctx.Opponent);
                 return true;

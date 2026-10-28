@@ -285,7 +285,7 @@ namespace PokemonTCG.Cards
                 var giver = ctx.ChoosePokemon(givers, "Magnetic Laser: move a Metal Energy from which Benched Pokémon?");
                 if (giver == null) return true;
                 var metal = giver.Energy.Where(en => CardsDRI1.ProvidesType(ctx, giver, en, EnergyType.Metal)).ToList();
-                var card = metal.Count == 1 ? metal[0] : ctx.ChooseCards(metal, 1, 1, "Magnetic Laser: move which Energy?")[0];
+                var card = ctx.ChooseCards(metal, 1, 1, "Magnetic Laser: move which Energy?")[0];
                 ctx.Engine.MoveEnergy(giver, me, card);
                 return true;
             }

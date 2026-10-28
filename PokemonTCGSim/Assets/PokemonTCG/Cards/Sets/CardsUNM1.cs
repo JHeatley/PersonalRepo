@@ -232,7 +232,7 @@ namespace PokemonTCG.Cards
                 var grass = Grass(ctx);
                 var active = ctx.Me.Active;
                 if (grass.Count == 0 || active == null) return;
-                var card = grass.Count == 1 ? grass[0] : ctx.ChooseCards(grass, 1, 1, "Queenly Reward: attach which Grass Energy card?")[0];
+                var card = ctx.ChooseCards(grass, 1, 1, "Queenly Reward: attach which Grass Energy card?")[0];
                 if (ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, active);
             }
         }

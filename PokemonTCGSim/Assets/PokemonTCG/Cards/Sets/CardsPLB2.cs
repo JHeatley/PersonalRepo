@@ -196,7 +196,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.Flip()) return true;
                 var pile = ctx.Me.Discard.ToList();
                 if (pile.Count == 0) return true;
-                var pick = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, "Reverse Edge: put which card from your discard pile into your hand?")[0];
+                var pick = ctx.ChooseCards(pile, 1, 1, "Reverse Edge: put which card from your discard pile into your hand?")[0];
                 ctx.DiscardToHand(new List<CardInstance> { pick });
                 return true;
             }

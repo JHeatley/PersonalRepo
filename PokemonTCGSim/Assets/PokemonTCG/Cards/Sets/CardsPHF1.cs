@@ -231,8 +231,8 @@ namespace PokemonTCG.Cards
                     var pile = ctx.Opp.Discard.Where(c => c.Def.IsEnergy).ToList();
                     var targets = ctx.OpponentPokemon(m => ctx.CanAffect(m));
                     if (pile.Count == 0 || targets.Count == 0) break;
-                    var card = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, "Meddling: attach which Energy card from your opponent's discard pile (" + (i + 1) + " of 3)?")[0];
-                    var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Meddling: attach " + card.Def.Name + " to which of your opponent's Pokémon?");
+                    var card = ctx.ChooseCards(pile, 1, 1, "Meddling: attach which Energy card from your opponent's discard pile (" + (i + 1) + " of 3)?")[0];
+                    var target = ctx.ChoosePokemon(targets, "Meddling: attach " + card.Def.Name + " to which of your opponent's Pokémon?");
                     if (target == null || !ctx.Opp.Discard.Remove(card)) break;
                     if (!ctx.Engine.AttachEnergyCard(card, target)) ctx.Opp.Discard.Add(card);
                 }
@@ -266,7 +266,7 @@ namespace PokemonTCG.Cards
                 var pile = ctx.BasicEnergyInDiscard();
                 var bench = ctx.MyBench();
                 if (pile.Count == 0 || bench.Count == 0) return true;
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Turbo Bolt: attach 2 basic Energy cards to which Benched Pokémon?");
+                var target = ctx.ChoosePokemon(bench, "Turbo Bolt: attach 2 basic Energy cards to which Benched Pokémon?");
                 if (target != null) ctx.AttachCardsAnyWay(pile, 2, (card, mon) => mon == target, "Turbo Bolt: attach a basic Energy card to " + target.Name, false);
                 return true;
             }
@@ -336,7 +336,7 @@ namespace PokemonTCG.Cards
             {
                 if (!TriggerOnce(ctx, "Surprise Bite", ctx.OpponentPokemon().Count > 0, "Surprise Bite: put 3 damage counters on 1 of your opponent's Pokémon?")) return;
                 var targets = ctx.OpponentPokemon();
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Surprise Bite: put 3 damage counters on which Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Surprise Bite: put 3 damage counters on which Pokémon?");
                 if (target != null) ctx.PlaceCounters(target, 3);
             }
 
@@ -352,7 +352,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var targets = ctx.OpponentPokemon();
                 if (targets.Count == 0) return true;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Night Attack: put 3 damage counters on which of your opponent's Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Night Attack: put 3 damage counters on which of your opponent's Pokémon?");
                 if (target != null) ctx.PlaceCounters(target, 3);
                 return true;
             }

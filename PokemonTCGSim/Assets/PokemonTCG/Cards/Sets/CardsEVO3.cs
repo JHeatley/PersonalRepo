@@ -203,7 +203,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Devolution Spray: devolve which of your Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Devolution Spray: devolve which of your Pokémon?");
                 if (target == null) return;
                 ctx.Engine.Devolve(target, 1);
                 target.CantEvolveOnTurn = ctx.Turn;
@@ -259,7 +259,7 @@ namespace PokemonTCG.Cards
             {
                 var basics = Basics(ctx);
                 if (basics.Count == 0 || ctx.BenchSpace <= 0) return;
-                var pick = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Revive: put which Basic Pokémon from your discard pile onto your Bench?")[0];
+                var pick = ctx.ChooseCards(basics, 1, 1, "Revive: put which Basic Pokémon from your discard pile onto your Bench?")[0];
                 if (ctx.Me.Discard.Remove(pick)) ctx.Engine.PutOntoBench(ctx.Player, pick, false);
             }
         }

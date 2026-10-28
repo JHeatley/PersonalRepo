@@ -253,7 +253,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.InPlay(me) || !TefPokemon.StillDefending(ctx, defending)) return true;
                 var cards = me.Energy.Where(e => CardsHIF1.Provides(ctx, me, e, type)).ToList();
                 if (cards.Count == 0 || !ctx.AskYesNo(attack + ": discard a " + type + " Energy card from " + me.Name + " to make the Defending Pokémon " + condition + "?")) return true;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, attack + ": discard which Energy card?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, attack + ": discard which Energy card?")[0];
                 if (ctx.Engine.DiscardEnergy(me, card) && TefPokemon.StillDefending(ctx, defending)) ctx.ApplyCondition(defending, condition);
                 return true;
             }
@@ -642,7 +642,7 @@ namespace PokemonTCG.Cards
                 if (defending == null || !ctx.Flip()) return;
                 var cards = defending.Energy.ToList();
                 if (cards.Count == 0) return;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, Power + ": return which Energy card to your opponent's hand?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, Power + ": return which Energy card to your opponent's hand?")[0];
                 ctx.Engine.ReturnEnergyToHand(defending, card);
             }
 
@@ -755,7 +755,7 @@ namespace PokemonTCG.Cards
                 var picks = ctx.ChooseCards(basics, 1, Math.Min(2, basics.Count), "Energy Retrieval: choose up to 2 basic Energy cards");
                 if (picks.Count == 0) return true;
                 var mine = ctx.MyPokemon();
-                var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Energy Retrieval: attach them to which Pokémon?");
+                var target = ctx.ChoosePokemon(mine, "Energy Retrieval: attach them to which Pokémon?");
                 if (target == null) return true;
                 int attached = 0;
                 foreach (var card in picks)

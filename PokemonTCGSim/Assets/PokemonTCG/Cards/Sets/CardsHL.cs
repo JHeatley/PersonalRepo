@@ -275,7 +275,7 @@ namespace PokemonTCG.Cards
                     if (ctx.Me.Deck.Count > 0) ctx.ShuffleMyDeck();
                     return true;
                 }
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Make a Wish: evolve which of your Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Make a Wish: evolve which of your Pokémon?");
                 if (target != null && CardsEVS1.EvolveFromDeck(ctx, target, "Make a Wish") && ctx.InPlay(me)) ctx.PlaceCounters(me, 1);
                 return true;
             }
@@ -415,7 +415,7 @@ namespace PokemonTCG.Cards
                 ctx.Log(Power + ": the top card of " + ctx.Engine.Possessive(ctx.Player) + " deck is " + top.Def.Name + ".");
                 if (!top.Def.IsBasicEnergy) return;
                 var mine = ctx.MyPokemon();
-                var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, Power + ": attach " + top.Def.Name + " to which Pokémon?");
+                var target = ctx.ChoosePokemon(mine, Power + ": attach " + top.Def.Name + " to which Pokémon?");
                 if (target != null && ctx.Me.Deck.Remove(top)) ctx.Engine.AttachEnergyCard(top, target);
             }
 
@@ -448,7 +448,7 @@ namespace PokemonTCG.Cards
             {
                 var hurt = ctx.MyPokemon(m => m.DamageCounters > 0);
                 if (hurt.Count == 0) return;
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, Power + ": remove 2 damage counters from which Pokémon?");
+                var target = ctx.ChoosePokemon(hurt, Power + ": remove 2 damage counters from which Pokémon?");
                 if (target != null) ctx.Heal(target, 20);
             }
 
@@ -549,7 +549,7 @@ namespace PokemonTCG.Cards
                 var others = ctx.MyPokemon(m => m != me);
                 if (me.Energy.Count == 0 || others.Count == 0) return true;
                 var card = me.Energy.Count == 1 ? me.Energy[0] : ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Fruition: move which Energy card?")[0];
-                var to = others.Count == 1 ? others[0] : ctx.ChoosePokemon(others, "Fruition: move it to which Pokémon?");
+                var to = ctx.ChoosePokemon(others, "Fruition: move it to which Pokémon?");
                 if (to != null && ctx.Engine.MoveEnergy(me, to, card) && to.DamageCounters > 0) ctx.Heal(to, 40);
                 return true;
             }

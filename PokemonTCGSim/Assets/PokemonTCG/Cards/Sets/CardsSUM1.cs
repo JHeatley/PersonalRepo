@@ -102,7 +102,7 @@ namespace PokemonTCG.Cards
                     ctx.Me.Deck.Add(card);
                     continue;
                 }
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, source + ": attach " + card.Def.Name + " to which of your Pokémon?");
+                var target = ctx.ChoosePokemon(targets, source + ": attach " + card.Def.Name + " to which of your Pokémon?");
                 ctx.Engine.AttachEnergyCard(card, target);
             }
         }
@@ -136,7 +136,7 @@ namespace PokemonTCG.Cards
                 if (bench.Count == 0) return true;
                 var energy = defending.Energy.Count == 1 ? defending.Energy[0]
                     : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Struggle Bug: move which Energy from " + defending.Name + "?")[0];
-                var dest = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Struggle Bug: move " + energy.Def.Name + " to which of your opponent's Benched Pokémon?");
+                var dest = ctx.ChoosePokemon(bench, "Struggle Bug: move " + energy.Def.Name + " to which of your opponent's Benched Pokémon?");
                 if (dest != null) ctx.Engine.MoveEnergy(defending, dest, energy);
                 return true;
             }

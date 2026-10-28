@@ -277,7 +277,7 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var fire = ctx.Me.Hand.Where(c => CardsSSP1.IsBasicOf(c.Def, EnergyType.Fire)).ToList();
-                var pick = fire.Count == 1 ? fire[0] : ctx.ChooseCards(fire, 1, 1, "Torrid Scales: discard a Basic Fire Energy")[0];
+                var pick = ctx.ChooseCards(fire, 1, 1, "Torrid Scales: discard a Basic Fire Energy")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, pick);
                 if (ctx.Opp.Active != null) ctx.ApplyCondition(ctx.Opp.Active, SpecialCondition.Burned);
             }

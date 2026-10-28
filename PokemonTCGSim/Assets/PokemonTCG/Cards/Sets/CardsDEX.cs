@@ -606,7 +606,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.Flip()) return false;
                 var options = Restored(ctx);
                 if (options.Count == 0 || ctx.BenchSpace <= 0) return false;
-                var card = options.Count == 1 ? options[0] : ctx.ChooseCards(options, 1, 1, "Twist Mountain: put which Restored Pokémon onto your Bench?")[0];
+                var card = ctx.ChooseCards(options, 1, 1, "Twist Mountain: put which Restored Pokémon onto your Bench?")[0];
                 if (ctx.Me.Hand.Remove(card)) ctx.Engine.PutOntoBench(ctx.Player, card, false);
                 return false;
             }

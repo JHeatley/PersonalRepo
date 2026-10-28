@@ -1133,7 +1133,7 @@ namespace PokemonTCG.Cards
                 if (givers.Count == 0) return;
                 var from = ctx.ChoosePokemon(givers, "Irresistible Force: move a Fighting Energy from which Pokémon?");
                 var energy = from.Energy.Where(e => CardsDRI1.ProvidesType(ctx, from, e, EnergyType.Fighting)).ToList();
-                var pick = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Irresistible Force: choose the Energy to move")[0];
+                var pick = ctx.ChooseCards(energy, 1, 1, "Irresistible Force: choose the Energy to move")[0];
                 ctx.Engine.MoveEnergy(from, ctx.Pokemon, pick);
             }
 

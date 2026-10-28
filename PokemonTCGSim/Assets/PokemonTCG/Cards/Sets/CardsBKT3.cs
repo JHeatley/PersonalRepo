@@ -170,10 +170,10 @@ namespace PokemonTCG.Cards
                 var active = ctx.Me.Active;
                 var mine = Swappable(ctx);
                 if (active == null || mine.Count == 0) return;
-                var old = mine.Count == 1 ? mine[0] : ctx.ChooseCards(mine, 1, 1, "Second Coat: which basic Energy on " + active.Name + " do you switch?")[0];
+                var old = ctx.ChooseCards(mine, 1, 1, "Second Coat: which basic Energy on " + active.Name + " do you switch?")[0];
                 var options = ctx.Me.Discard.Where(c => c.Def.IsBasicEnergy && c.Def.EnergyProvides != old.Def.EnergyProvides).ToList();
                 if (options.Count == 0) return;
-                var fresh = options.Count == 1 ? options[0] : ctx.ChooseCards(options, 1, 1, "Second Coat: attach which basic Energy from your discard pile instead of " + old.Def.Name + "?")[0];
+                var fresh = ctx.ChooseCards(options, 1, 1, "Second Coat: attach which basic Energy from your discard pile instead of " + old.Def.Name + "?")[0];
                 if (!ctx.Engine.DiscardEnergy(active, old)) return;
                 if (ctx.Me.Discard.Remove(fresh)) ctx.Engine.AttachEnergyCard(fresh, active);
             }

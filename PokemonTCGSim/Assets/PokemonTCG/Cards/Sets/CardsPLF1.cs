@@ -256,7 +256,7 @@ namespace PokemonTCG.Cards
                     var pile = ctx.Me.Discard.Where(c => c.Def.IsEnergy).ToList();
                     if (targets.Count == 0 || pile.Count == 0) return true;
                     var card = pile.Select(c => c.Def.Name).Distinct().Count() == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, "Raiden Knuckle: attach which Energy card from your discard pile?")[0];
-                    var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Raiden Knuckle: attach " + card.Def.Name + " to which Benched Team Plasma Pokémon?");
+                    var target = ctx.ChoosePokemon(targets, "Raiden Knuckle: attach " + card.Def.Name + " to which Benched Team Plasma Pokémon?");
                     if (target != null && ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, target);
                     return true;
                 }

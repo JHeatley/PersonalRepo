@@ -572,7 +572,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var water = ctx.Me.Hand.Where(c => CardsEVS1.IsEnergyOf(c.Def, EnergyType.Water)).ToList();
                 if (!ctx.InPlay(me) || water.Count == 0) return true;
-                var card = water.Count == 1 ? water[0] : ctx.ChooseCards(water, 1, 1, "Body Surf: attach which Water Energy card?")[0];
+                var card = ctx.ChooseCards(water, 1, 1, "Body Surf: attach which Water Energy card?")[0];
                 ctx.Me.Hand.Remove(card);
                 if (ctx.Engine.AttachEnergyCard(card, me, true) && ctx.InPlay(me)) ctx.SwitchSelfWithBench();
                 return true;
@@ -710,7 +710,7 @@ namespace PokemonTCG.Cards
                 var open = ctx.MyBench();
                 foreach (var card in found)
                 {
-                    var target = open.Count == 1 ? open[0] : ctx.ChoosePokemon(open, "Adornment: attach " + card.Def.Name + " to which Benched Pokémon?");
+                    var target = ctx.ChoosePokemon(open, "Adornment: attach " + card.Def.Name + " to which Benched Pokémon?");
                     open.Remove(target);
                     ctx.Engine.AttachEnergyCard(card, target);
                 }
@@ -790,7 +790,7 @@ namespace PokemonTCG.Cards
             {
                 var fuel = Fuel(ctx);
                 if (fuel.Count == 0) return;
-                var pick = fuel.Count == 1 ? fuel[0] : ctx.ChooseCards(fuel, 1, 1, "Tea Break: discard a Pokémon with the Mad Party attack")[0];
+                var pick = ctx.ChooseCards(fuel, 1, 1, "Tea Break: discard a Pokémon with the Mad Party attack")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, pick);
                 ctx.Draw(2);
             }

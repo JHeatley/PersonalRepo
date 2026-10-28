@@ -274,7 +274,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var energy = ctx.Me.Hand.Where(c => c.Def.IsBasicEnergy).ToList();
                 if (energy.Count == 0 || !ctx.InPlay(me)) return true;
-                var card = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Be Prepared: attach which basic Energy card to " + me.Name + "?")[0];
+                var card = ctx.ChooseCards(energy, 1, 1, "Be Prepared: attach which basic Energy card to " + me.Name + "?")[0];
                 if (ctx.Me.Hand.Remove(card)) ctx.Engine.AttachEnergyCard(card, me, true);
                 return true;
             }

@@ -608,7 +608,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Soak in Water") return false;
                 var water = ctx.Me.Hand.Where(card => IsWaterEnergyCard(card.Def)).ToList();
                 if (water.Count == 0 || !ctx.InPlay(ctx.Pokemon)) return true;
-                var pick = water.Count == 1 ? water[0] : ctx.ChooseCards(water, 1, 1, "Soak in Water: attach which Water Energy card to this Pokémon?")[0];
+                var pick = ctx.ChooseCards(water, 1, 1, "Soak in Water: attach which Water Energy card to this Pokémon?")[0];
                 ctx.Me.Hand.Remove(pick);
                 ctx.Engine.AttachEnergyCard(pick, ctx.Pokemon, true);
                 return true;
@@ -702,7 +702,7 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var options = ctx.Me.Hand.Where(card => Usable(card.Def)).ToList();
-                var energy = options.Count == 1 ? options[0] : ctx.ChooseCards(options, 1, 1, "Muddy Maker: attach which Energy card?")[0];
+                var energy = ctx.ChooseCards(options, 1, 1, "Muddy Maker: attach which Energy card?")[0];
                 var target = ctx.ChoosePokemon(ctx.MyPokemon(), "Muddy Maker: attach " + energy.Def.Name + " to which of your Pokémon?");
                 ctx.Me.Hand.Remove(energy);
                 ctx.Engine.AttachEnergyCard(energy, target, true);
@@ -801,7 +801,7 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var water = ctx.Me.Hand.Where(card => IsWaterEnergyCard(card.Def)).ToList();
-                var cost = water.Count == 1 ? water[0] : ctx.ChooseCards(water, 1, 1, "Double Gunner: discard a Water Energy card from your hand")[0];
+                var cost = ctx.ChooseCards(water, 1, 1, "Double Gunner: discard a Water Energy card from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, cost);
                 var bench = ctx.OpponentBench();
                 int n = Math.Min(2, bench.Count);
@@ -922,7 +922,7 @@ namespace PokemonTCG.Cards
                 if (ctx.Engine.BenchSpace(ctx.Opponent) <= 0) return true;
                 var options = ctx.Opp.Discard.Where(card => card.Def.IsBasicPokemon && card.Def.IsPokemonV && !ctx.Engine.PutIntoPlayBlocked(ctx.Opponent, card.Def)).ToList();
                 if (options.Count == 0) return true;
-                var pick = options.Count == 1 ? options[0] : ctx.ChooseCards(options, 1, 1, "Force Regeneration: put which Basic Pokémon V onto your opponent's Bench?")[0];
+                var pick = ctx.ChooseCards(options, 1, 1, "Force Regeneration: put which Basic Pokémon V onto your opponent's Bench?")[0];
                 ctx.Opp.Discard.Remove(pick);
                 var placed = ctx.Engine.PutOntoBench(ctx.Opponent, pick, false);
                 if (placed == null) return true;

@@ -139,12 +139,12 @@ namespace PokemonTCG.Cards
             {
                 var holders = Holders(ctx);
                 if (holders.Count == 0) return;
-                var source = holders.Count == 1 ? holders[0] : ctx.ChoosePokemon(holders, "Hyper Transfer: move a basic Energy from which of your Pokémon?");
+                var source = ctx.ChoosePokemon(holders, "Hyper Transfer: move a basic Energy from which of your Pokémon?");
                 if (source == null) return;
                 var basics = source.Energy.Where(e => e.Def.IsBasicEnergy).ToList();
-                var energy = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Hyper Transfer: move which Energy?")[0];
+                var energy = ctx.ChooseCards(basics, 1, 1, "Hyper Transfer: move which Energy?")[0];
                 var targets = ctx.MyPokemon(m => m != source);
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Hyper Transfer: move " + energy.Def.Name + " to which Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Hyper Transfer: move " + energy.Def.Name + " to which Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(source, target, energy);
             }
         }
@@ -278,7 +278,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 if (ctx.Me.Bench.Count == 0 || ctx.Me.Deck.Count == 0) return true;
                 var bench = ctx.MyBench();
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Aqua Turbo: attach 2 Water Energy cards to which Benched Pokémon?");
+                var target = ctx.ChoosePokemon(bench, "Aqua Turbo: attach 2 Water Energy cards to which Benched Pokémon?");
                 var found = ctx.SearchMyDeck(d => CardsSSP1.IsBasicOf(d, EnergyType.Water), 2, "Aqua Turbo: choose 2 Water Energy cards");
                 foreach (var card in found)
                 {
@@ -414,7 +414,7 @@ namespace PokemonTCG.Cards
                 bool more = false;
                 if (water.Count > 0 && ctx.AskYesNo("Moonlight Slash: return a Water Energy from " + me.Name + " to your hand for 20 more damage?"))
                 {
-                    var pick = water.Count == 1 ? water[0] : ctx.ChooseCards(water, 1, 1, "Moonlight Slash: return which Energy?")[0];
+                    var pick = ctx.ChooseCards(water, 1, 1, "Moonlight Slash: return which Energy?")[0];
                     more = ctx.Engine.ReturnEnergyToHand(me, pick);
                 }
                 ctx.DamageDefending(atk.Damage + (more ? 20 : 0));

@@ -336,7 +336,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var options = School(ctx);
                 if (options.Count == 0 || me == null) return;
-                var pick = options.Count == 1 ? options[0] : ctx.ChooseCards(options, 1, 1, "Schooling: switch with which Wishiwashi-GX from your hand?")[0];
+                var pick = ctx.ChooseCards(options, 1, 1, "Schooling: switch with which Wishiwashi-GX from your hand?")[0];
                 ctx.Me.Hand.Remove(pick);
                 CardsTWM1.ReplaceTopCard(ctx, me, pick, ctx.Me.Hand);
             }

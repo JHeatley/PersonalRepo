@@ -310,7 +310,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var energy = ctx.BasicEnergyInDiscard();
                 if (energy.Count == 0 || !ctx.InPlay(me)) return true;
-                var card = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Limber Up: attach which basic Energy card to " + me.Name + "?")[0];
+                var card = ctx.ChooseCards(energy, 1, 1, "Limber Up: attach which basic Energy card to " + me.Name + "?")[0];
                 if (ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, me);
                 return true;
             }
@@ -328,7 +328,7 @@ namespace PokemonTCG.Cards
                 var target = ctx.ChoosePokemon(targets, "Lost Hack: put a Special Energy from which of your opponent's Pokémon in the Lost Zone?");
                 if (target == null) return true;
                 var special = target.Energy.Where(e => e.Def.IsAttachedSpecialEnergy).ToList();
-                var card = special.Count == 1 ? special[0] : ctx.ChooseCards(special, 1, 1, "Lost Hack: which Special Energy?")[0];
+                var card = ctx.ChooseCards(special, 1, 1, "Lost Hack: which Special Energy?")[0];
                 if (!target.Energy.Remove(card)) return true;
                 ctx.State.Players[target.Owner].LostZone.Add(card);
                 ctx.Log("Lost Hack: " + card.Def.Name + " attached to " + target.Name + " was put in the Lost Zone.");

@@ -172,7 +172,7 @@ namespace PokemonTCG.Cards
                 if (ctx.Flip() || !ctx.InPlay(me)) return true;
                 var typed = me.Energy.Where(en => CardsDRI1.ProvidesType(ctx, me, en, type)).ToList();
                 if (typed.Count == 0) return true;
-                var card = typed.Count == 1 ? typed[0] : ctx.ChooseCards(typed, 1, 1, attack + ": discard which " + type + " Energy?")[0];
+                var card = ctx.ChooseCards(typed, 1, 1, attack + ": discard which " + type + " Energy?")[0];
                 ctx.Engine.DiscardEnergy(me, card);
                 return true;
             }
@@ -289,7 +289,7 @@ namespace PokemonTCG.Cards
             {
                 var top = ctx.LookAtTop(3);
                 if (top.Count == 0) return;
-                var keep = top.Count == 1 ? top[0] : ctx.ChooseCards(top, 1, 1, "Burning Head: put which card into your hand? The others are discarded.")[0];
+                var keep = ctx.ChooseCards(top, 1, 1, "Burning Head: put which card into your hand? The others are discarded.")[0];
                 ctx.DeckToHand(new[] { keep });
                 foreach (var card in top)
                 {
@@ -697,7 +697,7 @@ namespace PokemonTCG.Cards
                 var energy = ctx.Me.Discard.Where(c => c.Def.IsEnergy).ToList();
                 if (energy.Count == 0 || !ctx.AskYesNo("Dragon Spirit: attach an Energy card from your discard pile to " + me.Name + "?")) return;
                 Announce(ctx, "Dragon Spirit");
-                var card = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Dragon Spirit: attach which Energy card?")[0];
+                var card = ctx.ChooseCards(energy, 1, 1, "Dragon Spirit: attach which Energy card?")[0];
                 AttachFromDiscard(ctx, card, me);
             }
 
@@ -980,7 +980,7 @@ namespace PokemonTCG.Cards
                 ctx.Engine.ShowCards(ctx.Player, ctx.Opp.Hand.ToList(), "Your opponent's hand", "Dark Hide: your opponent's hand", ctx.Source);
                 var pokemon = ctx.Opp.Hand.Where(c => c.Def.IsPokemon).ToList();
                 if (pokemon.Count == 0) return;
-                var card = pokemon.Count == 1 ? pokemon[0] : ctx.ChooseCards(pokemon, 1, 1, "Dark Hide: put which Pokémon on the bottom of your opponent's deck?")[0];
+                var card = ctx.ChooseCards(pokemon, 1, 1, "Dark Hide: put which Pokémon on the bottom of your opponent's deck?")[0];
                 if (!ctx.Opp.Hand.Remove(card)) return;
                 ctx.Opp.Deck.Add(card);
                 ctx.Log(card.Def.Name + " was put on the bottom of " + ctx.Engine.PlayerName(ctx.Opponent) + "'s deck (Dark Hide).");
@@ -1058,7 +1058,7 @@ namespace PokemonTCG.Cards
                     var from = RepeatableAbility.ChoosePokemonOrDone(ctx, TmHolders(ctx), Install + ": move a Technical Machine from which Pokémon?" + (offerDone ? " Press Done when finished." : ""), offerDone);
                     if (from == null) return false;
                     var tms = from.Tools.Where(IsTm).ToList();
-                    var tm = tms.Count == 1 ? tms[0] : ctx.ChooseCards(tms, 1, 1, Install + ": move which Technical Machine?")[0];
+                    var tm = ctx.ChooseCards(tms, 1, 1, Install + ": move which Technical Machine?")[0];
                     var targets = ctx.MyPokemon(o => o != from && ctx.Engine.CanAttachToolTo(tm, o));
                     if (targets.Count == 0) return false;
                     var to = RepeatableAbility.ChoosePokemonOrDone(ctx, targets, Install + ": move " + tm.Def.Name + " to which Pokémon?", offerDone);
@@ -1078,7 +1078,7 @@ namespace PokemonTCG.Cards
                     foreach (var lvx in found)
                     {
                         var targets = ctx.MyPokemon(m => m.Name == lvx.Def.EvolvesFrom);
-                        var target = targets.Count == 0 ? null : targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Learning: level up which Pokémon to " + lvx.Def.Name + "?");
+                        var target = targets.Count == 0 ? null : ctx.ChoosePokemon(targets, "Learning: level up which Pokémon to " + lvx.Def.Name + "?");
                         if (target != null) ctx.Engine.EvolvePokemon(target, lvx);
                         else ctx.Me.Deck.Add(lvx);
                     }
@@ -1245,11 +1245,11 @@ namespace PokemonTCG.Cards
                 int damage = atk.Damage;
                 if (canBoost && ctx.AskYesNo("Metallic Bolt: discard a Lightning and a Metal Energy for 120 damage?"))
                 {
-                    var l = lightning.Count == 1 ? lightning[0] : ctx.ChooseCards(lightning, 1, 1, "Metallic Bolt: discard which Lightning Energy?")[0];
+                    var l = ctx.ChooseCards(lightning, 1, 1, "Metallic Bolt: discard which Lightning Energy?")[0];
                     var mLeft = metal.Where(x => x != l).ToList();
                     if (mLeft.Count > 0)
                     {
-                        var m = mLeft.Count == 1 ? mLeft[0] : ctx.ChooseCards(mLeft, 1, 1, "Metallic Bolt: discard which Metal Energy?")[0];
+                        var m = ctx.ChooseCards(mLeft, 1, 1, "Metallic Bolt: discard which Metal Energy?")[0];
                         if (ctx.Engine.DiscardEnergy(me, l) && ctx.Engine.DiscardEnergy(me, m)) damage = 120;
                     }
                 }

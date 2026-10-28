@@ -166,7 +166,7 @@ namespace PokemonTCG.Cards
                 var energy = ctx.Me.Discard.Where(c => c.Def.IsEnergy).ToList();
                 var targets = ctx.MyPokemon(m => ctx.Engine.IsType(m, EnergyType.Fighting));
                 if (energy.Count == 0 || targets.Count == 0) return true;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Diamond Gift: attach Energy to which of your Fighting Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Diamond Gift: attach Energy to which of your Fighting Pokémon?");
                 if (target == null) return true;
                 int n = Math.Min(2, energy.Count);
                 var picks = n == energy.Count ? energy : ctx.ChooseCards(energy, n, n, "Diamond Gift: choose 2 Energy cards from your discard pile");
@@ -281,7 +281,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Bone Drop") return false;
                 var targets = ctx.OpponentPokemon(m => ctx.Engine.HasAbility(m));
                 if (targets.Count == 0) return true;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Bone Drop: do 60 damage to which of your opponent's Pokémon with an Ability?");
+                var target = ctx.ChoosePokemon(targets, "Bone Drop: do 60 damage to which of your opponent's Pokémon with an Ability?");
                 if (target != null) ctx.DamageTarget(target, 60);
                 return true;
             }
@@ -334,7 +334,7 @@ namespace PokemonTCG.Cards
                 {
                     var targets = ctx.OpponentPokemon();
                     if (targets.Count == 0) break;
-                    var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Metal Rain: do 30 damage to which of your opponent's Pokémon? (" + (i + 1) + " of " + discarded + ")");
+                    var target = ctx.ChoosePokemon(targets, "Metal Rain: do 30 damage to which of your opponent's Pokémon? (" + (i + 1) + " of " + discarded + ")");
                     if (target != null) ctx.DamageWith(target, 30, false, false, false);
                 }
                 return true;

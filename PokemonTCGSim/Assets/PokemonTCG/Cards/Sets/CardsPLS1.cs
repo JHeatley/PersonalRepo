@@ -200,7 +200,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Fair-Weather Heal: heal 20 damage from which Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Fair-Weather Heal: heal 20 damage from which Pokémon?");
                 if (target != null) ctx.Heal(target, 20);
             }
 
@@ -290,7 +290,7 @@ namespace PokemonTCG.Cards
                 var picks = energy.Count <= 2 ? energy : ctx.ChooseCards(energy, 2, 2, "Enefountain: attach which 2 basic Energy cards?");
                 var mine = ctx.MyPokemon();
                 if (mine.Count == 0) return true;
-                var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Enefountain: attach them to which of your Pokémon?");
+                var target = ctx.ChoosePokemon(mine, "Enefountain: attach them to which of your Pokémon?");
                 if (target == null) return true;
                 foreach (var card in picks)
                     if (ctx.Me.Hand.Remove(card)) ctx.Engine.AttachEnergyCard(card, target);
@@ -374,7 +374,7 @@ namespace PokemonTCG.Cards
                 var mine = ctx.MyPokemon();
                 if (pile.Count == 0 || mine.Count == 0) return true;
                 var picks = pile.Count <= 2 ? pile : ctx.ChooseCards(pile, 2, 2, "Double Assist: attach which 2 basic Energy cards from your discard pile?");
-                var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Double Assist: attach them to which of your Pokémon?");
+                var target = ctx.ChoosePokemon(mine, "Double Assist: attach them to which of your Pokémon?");
                 if (target == null) return true;
                 foreach (var card in picks)
                     if (ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, target);
@@ -391,7 +391,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var lightning = ctx.Me.Hand.Where(c => CardsSSP1.IsBasicOf(c.Def, EnergyType.Lightning)).ToList();
                 if (lightning.Count == 0) return true;
-                var pick = lightning.Count == 1 ? lightning[0] : ctx.ChooseCards(lightning, 1, 1, "Electribonus: discard a Lightning Energy card")[0];
+                var pick = ctx.ChooseCards(lightning, 1, 1, "Electribonus: discard a Lightning Energy card")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, pick);
                 ctx.Draw(3);
                 return true;

@@ -308,7 +308,7 @@ namespace PokemonTCG.Cards
                     ctx.Log(ctx.Engine.PlayerName(ctx.Player) + " has no Item card to discard, so Trash Crash did nothing.");
                     return true;
                 }
-                var pick = items.Count == 1 ? items[0] : ctx.ChooseCards(items, 1, 1, "Trash Crash: discard an Item card from your hand")[0];
+                var pick = ctx.ChooseCards(items, 1, 1, "Trash Crash: discard an Item card from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, pick);
                 ctx.DamageAnyOpponent(60, true);
                 return true;

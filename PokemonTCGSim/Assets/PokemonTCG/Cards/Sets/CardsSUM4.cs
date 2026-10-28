@@ -156,7 +156,7 @@ namespace PokemonTCG.Cards
             {
                 var hurt = Hurt(ctx);
                 if (hurt.Count == 0) return;
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Curative Pollen: heal 20 damage from which of your Pokémon?");
+                var target = ctx.ChoosePokemon(hurt, "Curative Pollen: heal 20 damage from which of your Pokémon?");
                 if (target != null) ctx.Heal(target, 20);
             }
         }

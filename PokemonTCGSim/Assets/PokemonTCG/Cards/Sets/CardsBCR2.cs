@@ -208,7 +208,7 @@ namespace PokemonTCG.Cards
             {
                 var basics = Basics(ctx);
                 if (basics.Count == 0) return;
-                var pick = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Transform: put which Basic Pokémon on top of Ditto?")[0];
+                var pick = ctx.ChooseCards(basics, 1, 1, "Transform: put which Basic Pokémon on top of Ditto?")[0];
                 if (!ctx.Me.Hand.Remove(pick)) return;
                 var mon = ctx.Pokemon;
                 mon.Stack.Add(pick);

@@ -543,7 +543,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var mine = ctx.MyPokemon();
                 if (mine.Count == 0) return true;
-                var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Flash Impact: do " + amount + " damage to which of your Pokémon?");
+                var target = ctx.ChoosePokemon(mine, "Flash Impact: do " + amount + " damage to which of your Pokémon?");
                 if (target != null && ctx.InPlay(target)) ctx.DamageWith(target, amount, false, false, false);
                 return true;
             }
@@ -559,7 +559,7 @@ namespace PokemonTCG.Cards
                 var bench = ctx.Me.Bench.ToList();
                 var energy = ctx.BasicEnergyInDiscard();
                 if (bench.Count == 0 || energy.Count == 0) return true;
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Energy Assist: attach 2 basic Energy cards to which of your Benched Pokémon?");
+                var target = ctx.ChoosePokemon(bench, "Energy Assist: attach 2 basic Energy cards to which of your Benched Pokémon?");
                 if (target == null) return true;
                 var picks = energy.Count <= 2 ? energy : ctx.ChooseCards(energy, 2, 2, "Energy Assist: choose 2 basic Energy cards");
                 foreach (var card in picks)
@@ -717,9 +717,9 @@ namespace PokemonTCG.Cards
                 if (!TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || ctx.Opp.Bench.Count == 0 || !ctx.CanAffect(defending)) return true;
                 if (!ctx.AskYesNo("Magnetic Lines: move an Energy from the Defending Pokémon to 1 of your opponent's Benched Pokémon?")) return true;
                 var cards = defending.Energy.ToList();
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Magnetic Lines: move which Energy?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Magnetic Lines: move which Energy?")[0];
                 var bench = ctx.Opp.Bench.ToList();
-                var to = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Magnetic Lines: move it to which of your opponent's Benched Pokémon?");
+                var to = ctx.ChoosePokemon(bench, "Magnetic Lines: move it to which of your opponent's Benched Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(defending, to, card);
                 return true;
             }
@@ -734,7 +734,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var discard = ctx.Me.Discard.ToList();
                 if (discard.Count == 0) return true;
-                var card = discard.Count == 1 ? discard[0] : ctx.ChooseCards(discard, 1, 1, "Pull Out: put which card from your discard pile on top of your deck?")[0];
+                var card = ctx.ChooseCards(discard, 1, 1, "Pull Out: put which card from your discard pile on top of your deck?")[0];
                 if (!ctx.Me.Discard.Remove(card)) return true;
                 ctx.Me.Deck.Insert(0, card);
                 ctx.Log(ctx.Engine.PlayerName(ctx.Player) + " put " + card.Def.Name + " from " + ctx.Engine.Their(ctx.Player) + " discard pile on top of " + ctx.Engine.Their(ctx.Player) + " deck (Pull Out).");

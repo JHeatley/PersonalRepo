@@ -82,14 +82,14 @@ namespace PokemonTCG.Cards
                 var forDark = plainDark.Count > 0 ? plainDark : dark;
                 if (forDark.Count > 0)
                 {
-                    var pick = forDark.Count == 1 ? forDark[0] : ctx.ChooseCards(forDark, 1, 1, "Core Enforcer: discard which Darkness Energy?")[0];
+                    var pick = ctx.ChooseCards(forDark, 1, 1, "Core Enforcer: discard which Darkness Energy?")[0];
                     ctx.Engine.DiscardEnergy(me, pick);
                 }
                 if (!ctx.InPlay(me)) return true;
                 var fairy = me.Energy.Where(en => CardsDRI1.ProvidesType(ctx, me, en, EnergyType.Fairy)).ToList();
                 if (fairy.Count > 0)
                 {
-                    var pick = fairy.Count == 1 ? fairy[0] : ctx.ChooseCards(fairy, 1, 1, "Core Enforcer: discard which Fairy Energy?")[0];
+                    var pick = ctx.ChooseCards(fairy, 1, 1, "Core Enforcer: discard which Fairy Energy?")[0];
                     ctx.Engine.DiscardEnergy(me, pick);
                 }
                 return true;

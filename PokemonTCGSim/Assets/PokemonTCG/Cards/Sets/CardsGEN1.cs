@@ -240,7 +240,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var fire = ctx.Me.Hand.Where(c => c.Def.IsBasicEnergy && c.Def.EnergyProvides == EnergyType.Fire).ToList();
                 if (fire.Count == 0) return true;
-                var card = fire.Count == 1 ? fire[0] : ctx.ChooseCards(fire, 1, 1, "Flare Bonus: discard a Fire Energy card from your hand")[0];
+                var card = ctx.ChooseCards(fire, 1, 1, "Flare Bonus: discard a Fire Energy card from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 ctx.Draw(3);
                 return true;
@@ -292,7 +292,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = ctx.OpponentPokemon();
                 if (!TriggerOnce(ctx, "Sneaky Bite", targets.Count > 0, "Sneaky Bite: put 2 damage counters on 1 of your opponent's Pokémon?")) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Sneaky Bite: put 2 damage counters on which of your opponent's Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Sneaky Bite: put 2 damage counters on which of your opponent's Pokémon?");
                 if (target != null) ctx.PlaceCounters(target, 2);
             }
 
@@ -310,7 +310,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.InPlay(me)) return true;
                 var psychic = me.Energy.Where(e => CardsHIF1.Provides(ctx, me, e, EnergyType.Psychic)).ToList();
                 if (psychic.Count == 0) return true;
-                var energy = psychic.Count == 1 ? psychic[0] : ctx.ChooseCards(psychic, 1, 1, "Scavenge: discard which Psychic Energy?")[0];
+                var energy = ctx.ChooseCards(psychic, 1, 1, "Scavenge: discard which Psychic Energy?")[0];
                 if (!ctx.Engine.DiscardEnergy(me, energy)) return true;
                 var items = ctx.Me.Discard.Where(c => c.Def.IsItem).ToList();
                 if (items.Count == 0) return true;
@@ -390,8 +390,8 @@ namespace PokemonTCG.Cards
                 var hurt = ctx.MyPokemon(m => m.DamageCounters > 0);
                 var targets = ctx.OpponentPokemon();
                 if (hurt.Count == 0 || targets.Count == 0) return;
-                var source = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Shadow Ear: move a damage counter from which of your Pokémon?");
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Shadow Ear: move it to which of your opponent's Pokémon?");
+                var source = ctx.ChoosePokemon(hurt, "Shadow Ear: move a damage counter from which of your Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Shadow Ear: move it to which of your opponent's Pokémon?");
                 if (source != null && target != null) ctx.Engine.MoveDamageCounters(source, target, 1, "Shadow Ear");
             }
 

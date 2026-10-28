@@ -673,7 +673,7 @@ namespace PokemonTCG.Cards
                 if (all.Count == 0) return true;
                 int low = all.Min(m => ctx.RemainingHp(m));
                 var tied = all.Where(m => ctx.RemainingHp(m) == low).ToList();
-                var target = tied.Count == 1 ? tied[0] : ctx.ChoosePokemon(tied, "Bring Down: which of the Pokémon with the lowest remaining HP is Knocked Out?");
+                var target = ctx.ChoosePokemon(tied, "Bring Down: which of the Pokémon with the lowest remaining HP is Knocked Out?");
                 if (target != null) ctx.Engine.KnockOut(target, "Bring Down");
                 return true;
             }

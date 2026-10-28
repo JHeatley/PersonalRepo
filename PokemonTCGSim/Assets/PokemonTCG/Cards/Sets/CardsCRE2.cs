@@ -520,7 +520,7 @@ namespace PokemonTCG.Cards
                 {
                     var holder = ctx.ChoosePokemon(targets, "Flannery: discard a Special Energy from which of your opponent's Pokémon?");
                     var specials = holder.Energy.Where(e => e.Def.IsAttachedSpecialEnergy).ToList();
-                    var energy = specials.Count == 1 ? specials[0] : ctx.ChooseCards(specials, 1, 1, "Flannery: discard which Special Energy?")[0];
+                    var energy = ctx.ChooseCards(specials, 1, 1, "Flannery: discard which Special Energy?")[0];
                     ctx.Engine.DiscardEnergy(holder, energy);
                 }
                 if (ctx.State.Stadium != null) ctx.Engine.DiscardStadium();
@@ -727,7 +727,7 @@ namespace PokemonTCG.Cards
                 if (targets.Count == 0) return;
                 var holder = ctx.ChoosePokemon(targets, "Fan of Waves: which of your opponent's Pokémon?");
                 var specials = holder.Energy.Where(e => e.Def.IsAttachedSpecialEnergy).ToList();
-                var energy = specials.Count == 1 ? specials[0] : ctx.ChooseCards(specials, 1, 1, "Fan of Waves: put which Special Energy on the bottom of their deck?")[0];
+                var energy = ctx.ChooseCards(specials, 1, 1, "Fan of Waves: put which Special Energy on the bottom of their deck?")[0];
                 if (ctx.Engine.EnergyRemovalProtected(holder, energy))
                 {
                     ctx.Log(energy.Def.Name + " on " + holder.Name + " can't be put into the deck by Fan of Waves.");

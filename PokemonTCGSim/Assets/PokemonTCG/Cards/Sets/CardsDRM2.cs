@@ -207,7 +207,7 @@ namespace PokemonTCG.Cards
                 var energy = ctx.BasicEnergyInDiscard();
                 var dragons = ctx.MyPokemon(m => IsDragon(ctx, m));
                 if (energy.Count == 0 || dragons.Count == 0) return true;
-                var card = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Dragon Wisdom: choose a basic Energy card from your discard pile")[0];
+                var card = ctx.ChooseCards(energy, 1, 1, "Dragon Wisdom: choose a basic Energy card from your discard pile")[0];
                 var target = ctx.ChoosePokemon(dragons, "Dragon Wisdom: attach " + card.Def.Name + " to which of your Dragon Pokémon?");
                 if (target == null || !ctx.Me.Discard.Remove(card)) return true;
                 ctx.Engine.AttachEnergyCard(card, target);

@@ -280,7 +280,7 @@ namespace PokemonTCG.Cards
             {
                 var fire = ctx.Me.Hand.Where(c => CardsTEU1.BasicOf(c.Def, EnergyType.Fire)).ToList();
                 if (fire.Count == 0) return false;
-                var card = fire.Count == 1 ? fire[0] : ctx.ChooseCards(fire, 1, 1, "Heat Factory: discard a Fire Energy card from your hand")[0];
+                var card = ctx.ChooseCards(fire, 1, 1, "Heat Factory: discard a Fire Energy card from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 ctx.Draw(3);
                 return false;

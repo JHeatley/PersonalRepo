@@ -108,7 +108,7 @@ namespace PokemonTCG.Cards
                 if (flip && !ctx.Flip()) return Nothing(ctx);
                 var mons = from(ctx).Where(m => m.Def.Attacks.Count > 0).ToList();
                 if (mons.Count == 0) return Nothing(ctx);
-                var mon = mons.Count == 1 ? mons[0] : ctx.ChoosePokemon(mons, attack + ": copy an attack of which Pokémon (" + what + ")?");
+                var mon = ctx.ChoosePokemon(mons, attack + ": copy an attack of which Pokémon (" + what + ")?");
                 CardDef source;
                 int index;
                 if (mon == null || !ChooseCopiedAttack(ctx, mon, attack + ": choose 1 of " + mon.Name + "'s attacks to copy", out source, out index)) return Nothing(ctx);
@@ -222,7 +222,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var cards = ctx.Me.Discard.Where(c => c.Def.IsEnergy).ToList();
                 if (cards.Count == 0 || !ctx.InPlay(me)) return true;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, attack + ": attach which Energy card to " + me.Name + "?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, attack + ": attach which Energy card to " + me.Name + "?")[0];
                 if (ctx.Me.Discard.Remove(card) && !ctx.Engine.AttachEnergyCard(card, me)) ctx.Me.Discard.Add(card);
                 return true;
             }
@@ -256,7 +256,7 @@ namespace PokemonTCG.Cards
             int mode = cards.Count < 3 ? 0 : ctx.ChooseOption(source + ": what do you want to do?", "Put 1 " + what + " into your hand", "Shuffle 3 " + what + "s into your deck");
             if (mode == 0)
             {
-                var pick = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, source + ": put which card into your hand?")[0];
+                var pick = ctx.ChooseCards(cards, 1, 1, source + ": put which card into your hand?")[0];
                 if (ctx.Me.Discard.Remove(pick)) ctx.Me.Hand.Add(pick);
                 ctx.Engine.Reveal(ctx.Player, new List<CardInstance> { pick }, "put this card from " + ctx.Engine.Their(ctx.Player) + " discard pile into " + ctx.Engine.Their(ctx.Player) + " hand (" + source + ")");
                 return true;
@@ -408,7 +408,7 @@ namespace PokemonTCG.Cards
                 foreach (var card in me.Energy.ToList())
                 {
                     var bench = ctx.Me.Bench.ToList();
-                    var to = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Energy Bomb: move " + card.Def.Name + " to which Benched Pokémon?");
+                    var to = ctx.ChoosePokemon(bench, "Energy Bomb: move " + card.Def.Name + " to which Benched Pokémon?");
                     if (to != null) ctx.Engine.MoveEnergy(me, to, card);
                 }
                 return true;
@@ -426,7 +426,7 @@ namespace PokemonTCG.Cards
                 bool more = false;
                 if (!CardsBS1.CopyingWithMetronome && cards.Count > 0 && ctx.AskYesNo("Dark Fire: discard a Fire or Darkness Energy for 20 more damage?"))
                 {
-                    var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Dark Fire: discard which Energy?")[0];
+                    var card = ctx.ChooseCards(cards, 1, 1, "Dark Fire: discard which Energy?")[0];
                     more = ctx.Engine.DiscardEnergy(me, card);
                 }
                 ctx.DamageDefending(atk.Damage + (more ? 20 : 0));
@@ -455,7 +455,7 @@ namespace PokemonTCG.Cards
                 {
                     var cards = ctx.Me.Hand.Where(c => c.Def.IsPokemon).ToList();
                     if (cards.Count == 0) return Nothing(ctx);
-                    var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Hard Bone: discard a Basic Pokémon or Evolution card")[0];
+                    var card = ctx.ChooseCards(cards, 1, 1, "Hard Bone: discard a Basic Pokémon or Evolution card")[0];
                     ctx.Engine.DiscardFromHand(ctx.Player, card);
                 }
                 ctx.DamageDefending(atk.Damage);
@@ -662,7 +662,7 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var hand = ctx.Me.Hand.ToList();
-                var card = hand.Count == 1 ? hand[0] : ctx.ChooseCards(hand, 1, 1, Power + ": shuffle which card into your deck?")[0];
+                var card = ctx.ChooseCards(hand, 1, 1, Power + ": shuffle which card into your deck?")[0];
                 if (!ctx.Me.Hand.Remove(card)) return;
                 ctx.Me.Deck.Add(card);
                 ctx.ShuffleMyDeck();
@@ -763,7 +763,7 @@ namespace PokemonTCG.Cards
             {
                 if (!ctx.Flip()) return;
                 var all = ctx.OpponentPokemon();
-                var target = all.Count == 1 ? all[0] : ctx.ChoosePokemon(all, "Dark Spell: put 1 damage counter on which of your opponent's Pokémon?");
+                var target = ctx.ChoosePokemon(all, "Dark Spell: put 1 damage counter on which of your opponent's Pokémon?");
                 if (target != null) ctx.PlaceCounters(target, 1);
             }
 
@@ -849,8 +849,8 @@ namespace PokemonTCG.Cards
                 var cards = ctx.BasicEnergyInDiscard(d => d.EnergyProvides == EnergyType.Fire);
                 var mons = ctx.MyPokemon();
                 if (cards.Count == 0 || mons.Count == 0) return true;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Fire Dance: attach which Fire Energy card?")[0];
-                var to = mons.Count == 1 ? mons[0] : ctx.ChoosePokemon(mons, "Fire Dance: attach it to which Pokémon?");
+                var card = ctx.ChooseCards(cards, 1, 1, "Fire Dance: attach which Fire Energy card?")[0];
+                var to = ctx.ChoosePokemon(mons, "Fire Dance: attach it to which Pokémon?");
                 if (to != null && ctx.Me.Discard.Remove(card) && !ctx.Engine.AttachEnergyCard(card, to)) ctx.Me.Discard.Add(card);
                 return true;
             }
@@ -870,7 +870,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.Engine.DiscardEnergy(me, gone)) return true;
                 var cards = ctx.Me.Discard.Where(c => c.Def.IsEnergy && c != gone).ToList();
                 if (cards.Count == 0) return true;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Rotating Claws: attach which Energy card?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Rotating Claws: attach which Energy card?")[0];
                 if (ctx.Me.Discard.Remove(card) && !ctx.Engine.AttachEnergyCard(card, me)) ctx.Me.Discard.Add(card);
                 return true;
             }
@@ -941,7 +941,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var mine = ctx.MyPokemon();
                 if (mine.Count == 0) return true;
-                var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Raging Thunder: do 30 damage to which of your Pokémon?");
+                var target = ctx.ChoosePokemon(mine, "Raging Thunder: do 30 damage to which of your Pokémon?");
                 if (target == me) ctx.DamageSelf(30);
                 else if (target != null) ctx.DamageWith(target, 30, false, false, false);
                 return true;

@@ -112,7 +112,7 @@ namespace PokemonTCG.Cards
             ctx.Engine.ShowCards(ctx.Player, hand, "Your opponent's hand", source + ": your opponent's hand", ctx.Source);
             var picks = hand.Where(c => kind(c.Def)).ToList();
             if (picks.Count == 0) return false;
-            var card = picks.Count == 1 ? picks[0] : ctx.ChooseCards(picks, 1, 1, source + ": choose " + what + " for your opponent to shuffle into their deck")[0];
+            var card = ctx.ChooseCards(picks, 1, 1, source + ": choose " + what + " for your opponent to shuffle into their deck")[0];
             if (!ctx.Opp.Hand.Remove(card)) return false;
             ctx.Opp.Deck.Add(card);
             ctx.Engine.ShuffleDeck(ctx.Opponent);
@@ -341,7 +341,7 @@ namespace PokemonTCG.Cards
                 foreach (var card in found)
                 {
                     var mons = ctx.MyPokemon();
-                    var target = mons.Count == 1 ? mons[0] : ctx.ChoosePokemon(mons, "Energy Plant: attach " + card.Def.Name + " to which of your Pokémon?");
+                    var target = ctx.ChoosePokemon(mons, "Energy Plant: attach " + card.Def.Name + " to which of your Pokémon?");
                     if (target != null) ctx.Engine.AttachEnergyCard(card, target);
                     else ctx.Me.Deck.Add(card);
                 }
@@ -403,7 +403,7 @@ namespace PokemonTCG.Cards
                     ctx.Log(me.Name + " can't evolve right now (Water of Evolution).");
                     return true;
                 }
-                var card = omastar.Count == 1 ? omastar[0] : ctx.ChooseCards(omastar, 1, 1, "Water of Evolution: put which Omastar onto " + me.Name + "?")[0];
+                var card = ctx.ChooseCards(omastar, 1, 1, "Water of Evolution: put which Omastar onto " + me.Name + "?")[0];
                 if (ctx.Me.Hand.Remove(card)) ctx.Engine.EvolvePokemon(me, card);
                 return true;
             }
@@ -643,7 +643,7 @@ namespace PokemonTCG.Cards
                 var basics = ctx.Me.Hand.Where(c => c.Def.IsBasicEnergy).ToList();
                 if (basics.Count > 0)
                 {
-                    var card = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, Power + ": put which basic Energy card from your hand into your deck?")[0];
+                    var card = ctx.ChooseCards(basics, 1, 1, Power + ": put which basic Energy card from your hand into your deck?")[0];
                     if (ctx.Me.Hand.Remove(card)) ctx.Me.Deck.Add(card);
                 }
                 ctx.ShuffleMyDeck();
@@ -703,7 +703,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Evil Eye") return false;
                 var theirs = ctx.OpponentPokemon();
                 if (theirs.Count == 0) return true;
-                var target = theirs.Count == 1 ? theirs[0] : ctx.ChoosePokemon(theirs, "Evil Eye: put a damage counter on which of your opponent's Pokémon?");
+                var target = ctx.ChoosePokemon(theirs, "Evil Eye: put a damage counter on which of your opponent's Pokémon?");
                 if (target != null) ctx.PlaceCounters(target, 1);
                 return true;
             }
@@ -717,7 +717,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Blindside") return false;
                 var hurt = ctx.OpponentPokemon(m => m.DamageCounters > 0);
                 if (hurt.Count == 0) return true;
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Blindside: choose 1 of your opponent's Pokémon with damage counters");
+                var target = ctx.ChoosePokemon(hurt, "Blindside: choose 1 of your opponent's Pokémon with damage counters");
                 if (target != null) ctx.DamageWith(target, atk.Damage, false, false, false);
                 return true;
             }
@@ -762,7 +762,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Energy Heal") return false;
                 var mons = ctx.MyPokemon(m => m.Energy.Count > 0);
                 if (mons.Count == 0) return true;
-                var target = mons.Count == 1 ? mons[0] : ctx.ChoosePokemon(mons, "Energy Heal: remove a damage counter from which Pokémon?");
+                var target = ctx.ChoosePokemon(mons, "Energy Heal: remove a damage counter from which Pokémon?");
                 if (target != null && target.DamageCounters > 0) ctx.Heal(target, 10);
                 return true;
             }

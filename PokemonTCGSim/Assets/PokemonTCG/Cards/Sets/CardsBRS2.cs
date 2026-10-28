@@ -551,7 +551,7 @@ namespace PokemonTCG.Cards
                     int kind = opts[pick].Index;
                     var pool = ctx.Me.Discard.Where(c => Matches(c.Def, kind)).ToList();
                     if (pool.Count == 0) continue;
-                    var card = pool.Count == 1 ? pool[0] : ctx.ChooseCards(pool, 1, 1, "Roseanne's Backup: choose " + Kinds[kind] + " to shuffle into your deck")[0];
+                    var card = ctx.ChooseCards(pool, 1, 1, "Roseanne's Backup: choose " + Kinds[kind] + " to shuffle into your deck")[0];
                     moved.AddRange(ctx.DiscardToDeck(new List<CardInstance> { card }));
                 }
                 if (moved.Count > 0) ctx.Engine.Reveal(ctx.Player, moved, "shuffled these cards from their discard pile into their deck");

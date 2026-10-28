@@ -169,7 +169,7 @@ namespace PokemonTCG.Cards
             {
                 var pile = Basics(ctx);
                 if (pile.Count == 0 || ctx.Engine.BenchSpace(ctx.Opponent) <= 0) return;
-                var pick = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, "Target Whistle: put which Basic Pokémon onto your opponent's Bench?")[0];
+                var pick = ctx.ChooseCards(pile, 1, 1, "Target Whistle: put which Basic Pokémon onto your opponent's Bench?")[0];
                 if (ctx.Opp.Discard.Remove(pick)) ctx.Engine.PutOntoBench(ctx.Opponent, pick, false);
             }
         }
@@ -197,10 +197,10 @@ namespace PokemonTCG.Cards
             {
                 var holders = Holders(ctx);
                 if (holders.Count == 0) return;
-                var mon = holders.Count == 1 ? holders[0] : ctx.ChoosePokemon(holders, "Xerosic: discard a Pokémon Tool or Special Energy from which Pokémon?");
+                var mon = ctx.ChoosePokemon(holders, "Xerosic: discard a Pokémon Tool or Special Energy from which Pokémon?");
                 if (mon == null) return;
                 var cards = mon.Tools.Concat(mon.Energy).Where(Removable).ToList();
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Xerosic: discard which card from " + mon.Name + "?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Xerosic: discard which card from " + mon.Name + "?")[0];
                 if (card.Def.IsTool) ctx.Engine.DiscardTool(mon, card);
                 else ctx.Engine.DiscardEnergy(mon, card);
             }

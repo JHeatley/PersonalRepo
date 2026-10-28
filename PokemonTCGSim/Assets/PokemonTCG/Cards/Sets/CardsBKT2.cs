@@ -221,7 +221,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Mind Bullet") return false;
                 var all = ctx.OpponentPokemon();
                 if (all.Count == 0) return true;
-                var target = all.Count == 1 ? all[0] : ctx.ChoosePokemon(all, "Mind Bullet: choose 1 of your opponent's Pokémon (20 damage for each Energy attached to it)");
+                var target = ctx.ChoosePokemon(all, "Mind Bullet: choose 1 of your opponent's Pokémon (20 damage for each Energy attached to it)");
                 if (target == null) return true;
                 ctx.DamageTarget(target, 20 * ctx.EnergyCount(target));
                 return true;

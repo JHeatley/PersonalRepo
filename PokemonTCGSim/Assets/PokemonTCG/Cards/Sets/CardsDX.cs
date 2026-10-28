@@ -484,7 +484,7 @@ namespace PokemonTCG.Cards
             {
                 var active = ctx.Me.Active;
                 var cards = Cards(ctx);
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Super Connectivity: attach which Energy card to " + active.Name + "?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Super Connectivity: attach which Energy card to " + active.Name + "?")[0];
                 if (!ctx.Me.Discard.Remove(card)) return;
                 if (!ctx.Engine.AttachEnergyCard(card, active))
                 {
@@ -817,7 +817,7 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var all = ctx.OpponentPokemon();
-                var target = all.Count == 1 ? all[0] : ctx.ChoosePokemon(all, "Distortion: put 1 damage counter on which of your opponent's Pokémon?");
+                var target = ctx.ChoosePokemon(all, "Distortion: put 1 damage counter on which of your opponent's Pokémon?");
                 if (target != null) ctx.PlaceCounters(target, 1);
             }
 
@@ -998,7 +998,7 @@ namespace PokemonTCG.Cards
                 bool more = false;
                 if (!CardsBS1.CopyingWithMetronome && dark.Count > 0 && ctx.AskYesNo("Darkness Blast: discard a Darkness Energy for 20 more damage and to discard an Energy from the Defending Pokémon?"))
                 {
-                    var card = dark.Count == 1 ? dark[0] : ctx.ChooseCards(dark, 1, 1, "Darkness Blast: discard which Energy?")[0];
+                    var card = ctx.ChooseCards(dark, 1, 1, "Darkness Blast: discard which Energy?")[0];
                     more = ctx.Engine.DiscardEnergy(me, card);
                 }
                 ctx.DamageDefending(atk.Damage + (more ? 20 : 0));

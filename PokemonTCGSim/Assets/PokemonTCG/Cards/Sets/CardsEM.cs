@@ -124,7 +124,7 @@ namespace PokemonTCG.Cards
             {
                 var hurt = ctx.MyPokemon(m => m.DamageCounters > 0);
                 if (hurt.Count == 0) return;
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, Power + ": remove 2 damage counters from which Pokémon?");
+                var target = ctx.ChoosePokemon(hurt, Power + ": remove 2 damage counters from which Pokémon?");
                 if (target != null) ctx.Heal(target, 20);
             }
 
@@ -196,7 +196,7 @@ namespace PokemonTCG.Cards
                     var to = RepeatableAbility.ChoosePokemonOrDone(ctx, ctx.Me.Bench.ToList(), Power + ": move a Water Energy from your Active Pokémon to which Benched Pokémon?" + (offerDone ? " Press Done when finished." : ""), offerDone);
                     var cards = Water(ctx);
                     if (to == null || cards.Count == 0) return false;
-                    var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, Power + ": move which Energy?")[0];
+                    var card = ctx.ChooseCards(cards, 1, 1, Power + ": move which Energy?")[0];
                     return ctx.Engine.MoveEnergy(ctx.Me.Active, to, card);
                 });
             }
@@ -352,7 +352,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Power Short") return false;
                 var all = ctx.OpponentPokemon();
                 if (all.Count == 0) return true;
-                var target = all.Count == 1 ? all[0] : ctx.ChoosePokemon(all, "Power Short: choose 1 of your opponent's Pokémon");
+                var target = ctx.ChoosePokemon(all, "Power Short: choose 1 of your opponent's Pokémon");
                 if (target == null) return true;
                 bool power = target.Def.Abilities.Any(a => a.Kind == AbilityDef.PokePower);
                 ctx.DamageTarget(target, 30 + (power ? 20 : 0));
@@ -385,7 +385,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var cards = ctx.BasicEnergyInDiscard(d => d.EnergyProvides == EnergyType.Fighting);
                 if (cards.Count == 0 || !ctx.InPlay(me)) return true;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Mend: attach which Fighting Energy card?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Mend: attach which Fighting Energy card?")[0];
                 if (!ctx.Me.Discard.Remove(card)) return true;
                 if (!ctx.Engine.AttachEnergyCard(card, me))
                 {

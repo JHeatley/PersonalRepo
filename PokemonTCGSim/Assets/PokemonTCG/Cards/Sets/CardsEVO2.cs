@@ -83,7 +83,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Buzzap Thunder: attach " + ctx.Pokemon.Name + " as Energy to which of your Lightning Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Buzzap Thunder: attach " + ctx.Pokemon.Name + " as Energy to which of your Lightning Pokémon?");
                 if (target == null) return;
                 ctx.Pokemon.Markers[TargetMarker] = target.Uid;
                 if (!ctx.Engine.KnockOut(ctx.Pokemon, Buzzap)) ctx.Pokemon.Markers.Remove(TargetMarker);

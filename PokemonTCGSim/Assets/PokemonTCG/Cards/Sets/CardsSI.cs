@@ -180,7 +180,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Sharpshooter") return false;
                 var all = ctx.OpponentPokemon();
                 if (all.Count == 0) return true;
-                var target = all.Count == 1 ? all[0] : ctx.ChoosePokemon(all, "Sharpshooter: choose 1 of your opponent's Pokémon");
+                var target = ctx.ChoosePokemon(all, "Sharpshooter: choose 1 of your opponent's Pokémon");
                 int coins = ctx.Pokemon == null ? 0 : ctx.Engine.EnergyCountOfType(ctx.Pokemon, EnergyType.Grass);
                 int heads = coins > 0 ? ctx.FlipCoins(coins) : 0;
                 if (heads > 0 && target != null && ctx.InPlay(target)) ctx.DamageWith(target, 10 * heads, false, false, false);
@@ -212,7 +212,7 @@ namespace PokemonTCG.Cards
                 var hurt = ctx.MyPokemon(m => m.DamageCounters > 0);
                 hurt.AddRange(ctx.OpponentPokemon(m => m.DamageCounters > 0 && ctx.CanAffect(m)));
                 if (hurt.Count == 0) return true;
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Lick Wounds: remove 2 damage counters from which Pokémon?");
+                var target = ctx.ChoosePokemon(hurt, "Lick Wounds: remove 2 damage counters from which Pokémon?");
                 HealTwo(ctx, target);
                 return true;
             }
@@ -231,7 +231,7 @@ namespace PokemonTCG.Cards
                 HealTwo(ctx, ctx.Pokemon);
                 var hurt = ctx.MyBench().Where(m => m.DamageCounters > 0).ToList();
                 if (hurt.Count == 0) return true;
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Paradise Pollen: remove 2 damage counters from which of your Benched Pokémon?");
+                var target = ctx.ChoosePokemon(hurt, "Paradise Pollen: remove 2 damage counters from which of your Benched Pokémon?");
                 HealTwo(ctx, target);
                 return true;
             }

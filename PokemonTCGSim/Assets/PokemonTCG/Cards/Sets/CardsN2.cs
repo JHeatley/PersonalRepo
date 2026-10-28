@@ -123,7 +123,7 @@ namespace PokemonTCG.Cards
                 {
                     var cards = me == null ? new List<CardInstance>() : me.Energy.Where(e => e.Def.IsEnergy && e.Def.EnergyProvides == type).ToList();
                     if (cards.Count == 0) return Nothing(ctx);
-                    var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, attack + ": discard which " + type + " Energy card?")[0];
+                    var card = ctx.ChooseCards(cards, 1, 1, attack + ": discard which " + type + " Energy card?")[0];
                     if (!ctx.Engine.DiscardEnergy(me, card)) return Nothing(ctx);
                 }
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
@@ -669,7 +669,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Gaze: stop the Pokémon Power of which of your opponent's Benched Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Gaze: stop the Pokémon Power of which of your opponent's Benched Pokémon?");
                 if (target == null) return;
                 ctx.AddEffect(new GazeEffect(target.Name + "'s Pokémon Power stops working this turn while it's on the Bench (Gaze)", ctx.Player, target.Uid, ctx.Turn, target.SpotSeq));
             }
@@ -806,7 +806,7 @@ namespace PokemonTCG.Cards
                 var bench = ctx.OpponentBench();
                 if (defending == null || defending.Energy.Count == 0 || bench.Count == 0) return true;
                 var card = defending.Energy.Count == 1 ? defending.Energy[0] : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Energy Cycle: move which Energy card?")[0];
-                var to = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Energy Cycle: attach " + card.Def.Name + " to which of your opponent's Benched Pokémon?");
+                var to = ctx.ChoosePokemon(bench, "Energy Cycle: attach " + card.Def.Name + " to which of your opponent's Benched Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(defending, to, card);
                 return true;
             }

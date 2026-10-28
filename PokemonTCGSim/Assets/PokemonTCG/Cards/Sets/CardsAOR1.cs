@@ -102,11 +102,11 @@ namespace PokemonTCG.Cards
                     var sources = ctx.MyPokemon(m => m.Energy.Any(en => !moved.Contains(en.Id) && CardsDRI1.ProvidesType(ctx, m, en, EnergyType.Grass)));
                     if (sources.Count == 0 || ctx.MyPokemon().Count < 2) break;
                     if (!ctx.AskYesNo("Flower Tornado: move a Grass Energy to another of your Pokémon?")) break;
-                    var giver = sources.Count == 1 ? sources[0] : ctx.ChoosePokemon(sources, "Flower Tornado: move a Grass Energy from which Pokémon?");
+                    var giver = ctx.ChoosePokemon(sources, "Flower Tornado: move a Grass Energy from which Pokémon?");
                     var grass = giver.Energy.Where(en => !moved.Contains(en.Id) && CardsDRI1.ProvidesType(ctx, giver, en, EnergyType.Grass)).ToList();
-                    var card = grass.Count == 1 ? grass[0] : ctx.ChooseCards(grass, 1, 1, "Flower Tornado: move which Energy?")[0];
+                    var card = ctx.ChooseCards(grass, 1, 1, "Flower Tornado: move which Energy?")[0];
                     var targets = ctx.MyPokemon(m => m != giver);
-                    var taker = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Flower Tornado: move " + card.Def.Name + " to which Pokémon?");
+                    var taker = ctx.ChoosePokemon(targets, "Flower Tornado: move " + card.Def.Name + " to which Pokémon?");
                     moved.Add(card.Id);
                     ctx.Engine.MoveEnergy(giver, taker, card);
                 }
@@ -160,7 +160,7 @@ namespace PokemonTCG.Cards
                     if (grass.Count == 0 || bench.Count == 0) break;
                     var picks = ctx.ChooseCards(grass, 0, 1, "Jagged Saber: attach a Grass Energy card from your hand to 1 of your Benched Pokémon (" + (i + 1) + " of up to 2)");
                     if (picks.Count == 0) break;
-                    var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Jagged Saber: attach " + picks[0].Def.Name + " to which Benched Pokémon?");
+                    var target = ctx.ChoosePokemon(bench, "Jagged Saber: attach " + picks[0].Def.Name + " to which Benched Pokémon?");
                     if (target == null || !ctx.Me.Hand.Remove(picks[0])) break;
                     if (ctx.Engine.AttachEnergyCard(picks[0], target, true) && !got.Contains(target)) got.Add(target);
                 }

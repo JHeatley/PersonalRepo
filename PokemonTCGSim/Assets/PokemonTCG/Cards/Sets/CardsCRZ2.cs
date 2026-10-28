@@ -566,7 +566,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var mine = ctx.MyPokemon();
                 if (mine.Count == 0) return true;
-                var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Dynamic Tail: do 60 damage to which of your Pokémon?");
+                var target = ctx.ChoosePokemon(mine, "Dynamic Tail: do 60 damage to which of your Pokémon?");
                 ctx.DamageTarget(target, 60);
                 return true;
             }
@@ -650,7 +650,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var mine = ctx.MyPokemon();
                 if (mine.Count == 0) return true;
-                var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Shadow Impact: put 3 damage counters on which of your Pokémon?");
+                var target = ctx.ChoosePokemon(mine, "Shadow Impact: put 3 damage counters on which of your Pokémon?");
                 ctx.PlaceCounters(target, 3);
                 return true;
             }

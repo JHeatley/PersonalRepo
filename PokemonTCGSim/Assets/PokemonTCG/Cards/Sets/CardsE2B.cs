@@ -436,7 +436,7 @@ namespace PokemonTCG.Cards
                 foreach (var card in found)
                 {
                     var bench = ctx.MyBench();
-                    var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Energy Support: attach it to which Benched Pokémon?");
+                    var target = ctx.ChoosePokemon(bench, "Energy Support: attach it to which Benched Pokémon?");
                     if (target != null) ctx.Engine.AttachEnergyCard(card, target);
                     else ctx.Me.Deck.Add(card);
                 }
@@ -455,7 +455,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Triple Bone") return false;
                 if (ctx.Opp.Bench.Count == 0) return true;
                 var bench = ctx.OpponentBench();
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Triple Bone: choose 1 of your opponent's Benched Pokémon");
+                var target = ctx.ChoosePokemon(bench, "Triple Bone: choose 1 of your opponent's Benched Pokémon");
                 int heads = ctx.FlipCoins(3);
                 if (target != null && heads > 0 && ctx.InPlay(target)) ctx.DamageTarget(target, 10 * heads);
                 return true;

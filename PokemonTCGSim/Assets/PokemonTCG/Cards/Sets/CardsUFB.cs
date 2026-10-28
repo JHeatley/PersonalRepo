@@ -176,7 +176,7 @@ namespace PokemonTCG.Cards
                 {
                     var hurt = ctx.MyPokemon(m => m.DamageCounters > 0);
                     if (hurt.Count == 0) break;
-                    var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Healing Milk: remove 2 damage counters from which Pokémon?");
+                    var target = ctx.ChoosePokemon(hurt, "Healing Milk: remove 2 damage counters from which Pokémon?");
                     if (target != null) ctx.Heal(target, 20);
                 }
                 return true;
@@ -231,14 +231,14 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var targets = Targets(ctx);
-                var mon = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, Power + ": discard a basic Energy card from which Pokémon?");
+                var mon = ctx.ChoosePokemon(targets, Power + ": discard a basic Energy card from which Pokémon?");
                 if (mon == null) return;
                 var basics = mon.Energy.Where(e => e.Def.IsBasicEnergy).ToList();
-                var gone = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, Power + ": discard which Energy card?")[0];
+                var gone = ctx.ChooseCards(basics, 1, 1, Power + ": discard which Energy card?")[0];
                 if (!ctx.Engine.DiscardEnergy(mon, gone)) return;
                 var pile = ctx.Me.Discard.Where(c => c.Def.IsBasicEnergy && c != gone).ToList();
                 if (pile.Count == 0 || !ctx.InPlay(mon)) return;
-                var card = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, Power + ": attach which basic Energy card?")[0];
+                var card = ctx.ChooseCards(pile, 1, 1, Power + ": attach which basic Energy card?")[0];
                 if (ctx.Me.Discard.Remove(card) && !ctx.Engine.AttachEnergyCard(card, mon)) ctx.Me.Discard.Add(card);
             }
 
@@ -325,7 +325,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Dig Deep") return false;
                 var cards = ctx.Me.Discard.Where(c => c.Def.IsEnergy).ToList();
                 if (cards.Count == 0) return true;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Dig Deep: put which Energy card into your hand?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Dig Deep: put which Energy card into your hand?")[0];
                 if (ctx.Me.Discard.Remove(card)) ctx.Me.Hand.Add(card);
                 ctx.Engine.Reveal(ctx.Player, new List<CardInstance> { card }, "put this card from " + ctx.Engine.Their(ctx.Player) + " discard pile into " + ctx.Engine.Their(ctx.Player) + " hand (Dig Deep)");
                 return true;
@@ -340,7 +340,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Fishing Tail") return false;
                 var cards = ctx.Me.Discard.Where(c => c.Def.IsPokemon || c.Def.IsBasicEnergy).ToList();
                 if (cards.Count == 0) return true;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Fishing Tail: put which card into your hand?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Fishing Tail: put which card into your hand?")[0];
                 if (ctx.Me.Discard.Remove(card)) ctx.Me.Hand.Add(card);
                 ctx.Engine.Reveal(ctx.Player, new List<CardInstance> { card }, "put this card from " + ctx.Engine.Their(ctx.Player) + " discard pile into " + ctx.Engine.Their(ctx.Player) + " hand (Fishing Tail)");
                 return true;
@@ -376,7 +376,7 @@ namespace PokemonTCG.Cards
                             if (!ctx.Flip()) return true;
                             var evolved = ctx.MyPokemon(CardsE2.IsEvolved).Concat(ctx.OpponentPokemon(m => CardsE2.IsEvolved(m) && ctx.CanAffect(m))).ToList();
                             if (evolved.Count == 0) return true;
-                            var target = evolved.Count == 1 ? evolved[0] : ctx.ChoosePokemon(evolved, "Hidden Power: devolve which Evolved Pokémon?");
+                            var target = ctx.ChoosePokemon(evolved, "Hidden Power: devolve which Evolved Pokémon?");
                             if (target != null) ctx.Engine.Devolve(target, 1);
                             return true;
                         }
@@ -387,7 +387,7 @@ namespace PokemonTCG.Cards
                             ctx.Engine.ShowCards(ctx.Player, hand, "Your opponent's hand", "Hidden Power: your opponent's hand", ctx.Source);
                             var basics = hand.Where(c => c.Def.IsBasicPokemon).ToList();
                             if (basics.Count == 0) return true;
-                            var card = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Hidden Power: put which Basic Pokémon onto your opponent's Bench?")[0];
+                            var card = ctx.ChooseCards(basics, 1, 1, "Hidden Power: put which Basic Pokémon onto your opponent's Bench?")[0];
                             if (!ctx.Opp.Hand.Remove(card)) return true;
                             var benched = ctx.Engine.PutOntoBench(ctx.Opponent, card, false);
                             if (benched != null && ctx.Opp.Active != null && ctx.CanAffect(ctx.Opp.Active)) ctx.Engine.SwitchActive(ctx.Opponent, benched);
@@ -451,7 +451,7 @@ namespace PokemonTCG.Cards
                             {
                                 var card = found[0];
                                 var targets = ctx.MyPokemon(m => card.Def.EvolvesFrom == m.Name);
-                                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Hidden Power: evolve which Pokémon?");
+                                var target = ctx.ChoosePokemon(targets, "Hidden Power: evolve which Pokémon?");
                                 if (target != null)
                                 {
                                     ctx.Engine.EvolvePokemon(target, card);
@@ -497,7 +497,7 @@ namespace PokemonTCG.Cards
                             ctx.DamageDefending(atk.Damage);
                             if (!ctx.Flip() || ctx.Me.Discard.Count == 0) return true;
                             var pile = ctx.Me.Discard.ToList();
-                            var card = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, "Hidden Power: put which card on top of your deck?")[0];
+                            var card = ctx.ChooseCards(pile, 1, 1, "Hidden Power: put which card on top of your deck?")[0];
                             if (ctx.Me.Discard.Remove(card)) ctx.Me.Deck.Insert(0, card);
                             ctx.Engine.Reveal(ctx.Player, new List<CardInstance> { card }, "put this card from " + ctx.Engine.Their(ctx.Player) + " discard pile on top of " + ctx.Engine.Their(ctx.Player) + " deck (Hidden Power)");
                             return true;
@@ -519,7 +519,7 @@ namespace PokemonTCG.Cards
                             bool heads = ctx.Flip();
                             var all = heads ? ctx.OpponentPokemon() : ctx.MyPokemon();
                             if (all.Count == 0) return true;
-                            var target = all.Count == 1 ? all[0] : ctx.ChoosePokemon(all, "Hidden Power: put 2 damage counters on which Pokémon?");
+                            var target = ctx.ChoosePokemon(all, "Hidden Power: put 2 damage counters on which Pokémon?");
                             if (target != null) ctx.PlaceCounters(target, 2);
                             return true;
                         }
@@ -556,7 +556,7 @@ namespace PokemonTCG.Cards
                 foreach (var tool in ctx.SearchMyDeck(d => d.IsTool, 2, "Hidden Power: choose up to 2 Pokémon Tool cards"))
                 {
                     var spots = ctx.MyPokemon(m => m.Tools.Count == 0 && ctx.Engine.CanAttachToolTo(tool, m));
-                    var target = spots.Count == 0 ? null : spots.Count == 1 ? spots[0] : ctx.ChoosePokemon(spots, "Hidden Power: attach " + tool.Def.Name + " to which Pokémon?");
+                    var target = spots.Count == 0 ? null : ctx.ChoosePokemon(spots, "Hidden Power: attach " + tool.Def.Name + " to which Pokémon?");
                     if (target != null) ctx.Engine.AttachTool(tool, target);
                     else ctx.Me.Deck.Add(tool);
                 }
@@ -571,7 +571,7 @@ namespace PokemonTCG.Cards
                 if (defending == null || !defending.Def.Abilities.Any(a => a.IsPokePowerOrBody)) return true;
                 var donors = ctx.OpponentPokemon(m => m != defending && m.Energy.Any(e => e.Def.IsBasicEnergy));
                 if (donors.Count == 0) return true;
-                var from = donors.Count == 1 ? donors[0] : ctx.ChoosePokemon(donors, "Hidden Power: move basic Energy cards from which of your opponent's Pokémon?");
+                var from = ctx.ChoosePokemon(donors, "Hidden Power: move basic Energy cards from which of your opponent's Pokémon?");
                 if (from == null || !ctx.CanAffect(from)) return true;
                 var basics = from.Energy.Where(e => e.Def.IsBasicEnergy).ToList();
                 foreach (var card in ctx.ChooseCards(basics, 0, Math.Min(2, basics.Count), "Hidden Power: move up to 2 basic Energy cards to " + defending.Name))
@@ -584,7 +584,7 @@ namespace PokemonTCG.Cards
             {
                 var hand = ctx.Me.Hand.ToList();
                 if (hand.Count == 0) return true;
-                var card = hand.Count == 1 ? hand[0] : ctx.ChooseCards(hand, 1, 1, "Hidden Power: choose a card from your hand to put face down")[0];
+                var card = ctx.ChooseCards(hand, 1, 1, "Hidden Power: choose a card from your hand to put face down")[0];
                 var options = new List<DecisionOption>
                 {
                     new DecisionOption { Label = "Pokémon", Index = 0 },

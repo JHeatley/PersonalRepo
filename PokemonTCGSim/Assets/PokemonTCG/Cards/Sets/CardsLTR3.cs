@@ -80,7 +80,7 @@ namespace PokemonTCG.Cards
             {
                 var candidates = Candidates(ctx);
                 if (candidates.Count == 0) return;
-                var pick = candidates.Count == 1 ? candidates[0] : ctx.ChooseCards(candidates, 1, 1, "Cedric Juniper: put which Pokémon face down? (Your opponent guesses its height.)")[0];
+                var pick = ctx.ChooseCards(candidates, 1, 1, "Cedric Juniper: put which Pokémon face down? (Your opponent guesses its height.)")[0];
                 int height = PokedexHeights.HeightOf(pick.Def);
                 ctx.Log("Cedric Juniper: " + ctx.Engine.PlayerName(ctx.Player) + " put a Pokémon face down and named it " + pick.Def.Name + ".");
                 int guess = Guess(ctx, pick.Def.Name);
@@ -202,7 +202,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var bears = ctx.Me.Discard.Where(c => c.Def.Name == "Teddiursa" && c.Def.IsBasicPokemon && !ctx.Engine.PutIntoPlayBlocked(ctx.Player, c.Def)).ToList();
                 if (bears.Count == 0 || ctx.BenchSpace <= 0) return true;
-                var bear = bears.Count == 1 ? bears[0] : ctx.ChooseCards(bears, 1, 1, "Picnic Weather: put which Teddiursa onto your Bench?")[0];
+                var bear = ctx.ChooseCards(bears, 1, 1, "Picnic Weather: put which Teddiursa onto your Bench?")[0];
                 if (!ctx.Me.Discard.Remove(bear)) return true;
                 var benched = ctx.Engine.PutOntoBench(ctx.Player, bear, false);
                 if (benched == null) return true;

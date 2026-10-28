@@ -175,7 +175,7 @@ namespace PokemonTCG.Cards
                 var top = ctx.Opp.Deck.Take(Math.Min(2, ctx.Opp.Deck.Count)).ToList();
                 if (top.Count == 0) return true;
                 ctx.Engine.NoteLookedAt(top, "Top cards of your opponent's deck", ctx.Player);
-                var pick = top.Count == 1 ? top[0] : ctx.ChooseCards(top, 1, 1, "Scrutinize: discard which of the top 2 cards of your opponent's deck?")[0];
+                var pick = ctx.ChooseCards(top, 1, 1, "Scrutinize: discard which of the top 2 cards of your opponent's deck?")[0];
                 if (!ctx.Opp.Deck.Remove(pick)) return true;
                 ctx.Opp.Discard.Add(pick);
                 ctx.Log(ctx.Engine.PlayerName(ctx.Player) + " discarded " + pick.Def.Name + " from the top of " + ctx.Engine.Their(ctx.Opponent) + " deck (Scrutinize).");

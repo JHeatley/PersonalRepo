@@ -240,7 +240,7 @@ namespace PokemonTCG.Cards
                         : ctx.ChoosePokemon(holders, "Gaia Punk: discard a Lightning Energy from which of your Pokémon? (" + (i + 1) + " of 3)");
                     if (holder == null) break;
                     var lightning = holder.Energy.Where(x => CardsDRI1.ProvidesType(ctx, holder, x, EnergyType.Lightning)).ToList();
-                    var pick = lightning.Count == 1 ? lightning[0] : ctx.ChooseCards(lightning, 1, 1, "Gaia Punk: discard which Energy from " + holder.Name + "?")[0];
+                    var pick = ctx.ChooseCards(lightning, 1, 1, "Gaia Punk: discard which Energy from " + holder.Name + "?")[0];
                     if (!ctx.Engine.DiscardEnergy(holder, pick)) break;
                 }
                 return true;

@@ -354,7 +354,7 @@ namespace PokemonTCG.Cards
                     if (!ctx.InPlay(me) || ctx.Me.Bench.Count == 0) return true;
                     var grass = me.Energy.Where(c => CardsTEU1.ProvidesType(ctx, me, c, EnergyType.Grass)).ToList();
                     if (grass.Count == 0) return true;
-                    var card = grass.Count == 1 ? grass[0] : ctx.ChooseCards(grass, 1, 1, "Leaf Cyclone: choose a Grass Energy to move")[0];
+                    var card = ctx.ChooseCards(grass, 1, 1, "Leaf Cyclone: choose a Grass Energy to move")[0];
                     var dest = ctx.ChoosePokemon(ctx.MyBench(), "Leaf Cyclone: move " + card.Def.Name + " to which Benched Pokémon?");
                     ctx.Engine.MoveEnergy(me, dest, card);
                     return true;
@@ -440,7 +440,7 @@ namespace PokemonTCG.Cards
                 bool ready = ctx.BenchSpace > 0 && Shedinja(ctx).Count > 0;
                 if (!TriggerOnce(ctx, "Molting", ready, "Molting: put a Shedinja from your discard pile onto your Bench?")) return;
                 var cards = Shedinja(ctx);
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Molting: choose a Shedinja")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Molting: choose a Shedinja")[0];
                 if (!ctx.Me.Discard.Remove(card)) return;
                 ctx.Engine.PutOntoBench(ctx.Player, card, false);
             }

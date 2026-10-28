@@ -217,7 +217,7 @@ namespace PokemonTCG.Cards
             {
                 var water = Water(ctx);
                 if (water.Count == 0) return;
-                var card = water.Count == 1 ? water[0] : ctx.ChooseCards(water, 1, 1, Downpour + ": discard which Water Energy card?")[0];
+                var card = ctx.ChooseCards(water, 1, 1, Downpour + ": discard which Water Energy card?")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
             }
 
@@ -415,7 +415,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.Flip()) return true;
                 var withAttacks = ctx.OpponentPokemon(m => m.Def.Attacks.Count > 0 || (m.Stack.Count >= 2 && (m.Def.IsLevelUp || m.Def.IsBreak)));
                 if (withAttacks.Count == 0) return true;
-                var mon = withAttacks.Count == 1 ? withAttacks[0] : ctx.ChoosePokemon(withAttacks, "Super Metronome: copy an attack of which of your opponent's Pokémon?");
+                var mon = ctx.ChoosePokemon(withAttacks, "Super Metronome: copy an attack of which of your opponent's Pokémon?");
                 CardDef source;
                 int index;
                 if (mon == null || !ChooseCopiedAttack(ctx, mon, "Super Metronome: choose the attack to copy", out source, out index)) return true;
@@ -446,7 +446,7 @@ namespace PokemonTCG.Cards
                 var fire = Fire(ctx);
                 var targets = FirePokemon(ctx);
                 if (fire.Count == 0 || targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, FireRecharge + ": attach a Fire Energy card to which of your Fire Pokémon?");
+                var target = ctx.ChoosePokemon(targets, FireRecharge + ": attach a Fire Energy card to which of your Fire Pokémon?");
                 if (target != null && ctx.Me.Discard.Remove(fire[0])) ctx.Engine.AttachEnergyCard(fire[0], target);
             }
 
@@ -782,7 +782,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.InPlay(me) || !ctx.IsActive(me)) return true;
                 var grass = ctx.MyBench().Where(m => ctx.Engine.IsType(m, EnergyType.Grass)).ToList();
                 if (grass.Count == 0) return true;
-                var to = grass.Count == 1 ? grass[0] : ctx.ChoosePokemon(grass, "Baton Pass: move the Grass Energy to which of your Benched Grass Pokémon?");
+                var to = ctx.ChoosePokemon(grass, "Baton Pass: move the Grass Energy to which of your Benched Grass Pokémon?");
                 if (to == null) return true;
                 foreach (var card in me.Energy.Where(e => CardsDRI1.ProvidesType(ctx, me, e, EnergyType.Grass)).ToList())
                     ctx.Engine.MoveEnergy(me, to, card);
@@ -857,7 +857,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var bench = ctx.OpponentBench();
                 if (bench.Count == 0) return true;
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Fire Wind: choose 1 of your opponent's Benched Pokémon");
+                var target = ctx.ChoosePokemon(bench, "Fire Wind: choose 1 of your opponent's Benched Pokémon");
                 int heads = ctx.FlipCoins(2);
                 if (target != null && heads > 0 && ctx.InPlay(target)) ctx.DamageWith(target, 10 * heads, false, false, false);
                 return true;

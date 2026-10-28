@@ -216,7 +216,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var basics = ctx.Me.Hand.Where(c => c.Def.IsBasicEnergy).ToList();
                 if (basics.Count == 0) return true;
-                var card = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Positive Hand: discard a basic Energy card from your hand")[0];
+                var card = ctx.ChooseCards(basics, 1, 1, "Positive Hand: discard a basic Energy card from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 ctx.Draw(2);
                 return true;
@@ -260,7 +260,7 @@ namespace PokemonTCG.Cards
                 CardsTWM1.RevealOpponentHand(ctx);
                 var supporters = ctx.Opp.Hand.Where(c => c.Def.IsSupporter).ToList();
                 if (supporters.Count == 0) return true;
-                var card = supporters.Count == 1 ? supporters[0] : ctx.ChooseCards(supporters, 1, 1, "Hand Control: choose a Supporter card in your opponent's hand")[0];
+                var card = ctx.ChooseCards(supporters, 1, 1, "Hand Control: choose a Supporter card in your opponent's hand")[0];
                 ctx.Opp.Hand.Remove(card);
                 ctx.Log(ctx.Engine.PlayerName(ctx.Opponent) + " uses the effect of " + card.Def.Name + " (Hand Control).");
                 ctx.Engine.RedirectDecisions(ctx.Opponent, ctx.Player);
@@ -290,7 +290,7 @@ namespace PokemonTCG.Cards
             {
                 var pile = Stadiums(ctx);
                 if (pile.Count == 0) return;
-                var pick = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, "Teleport Room: put which Stadium into play?")[0];
+                var pick = ctx.ChooseCards(pile, 1, 1, "Teleport Room: put which Stadium into play?")[0];
                 ctx.Engine.DiscardStadium();
                 if (ctx.State.Stadium != null || !ctx.Me.Discard.Remove(pick)) return;
                 ctx.Engine.PutStadiumIntoPlay(ctx.Player, pick);

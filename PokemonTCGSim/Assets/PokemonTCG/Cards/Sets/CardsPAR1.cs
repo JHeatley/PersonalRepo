@@ -780,7 +780,7 @@ namespace PokemonTCG.Cards
                 {
                     var bench = ctx.MyBench();
                     if (bench.Count == 0) break;
-                    var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Genome Spiral: move " + card.Def.Name + " to which Benched Pokémon?");
+                    var target = ctx.ChoosePokemon(bench, "Genome Spiral: move " + card.Def.Name + " to which Benched Pokémon?");
                     if (target != null) ctx.Engine.MoveEnergy(me, target, card);
                 }
                 return true;

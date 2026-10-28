@@ -386,7 +386,7 @@ namespace PokemonTCG.Cards
                     ctx.Log("Impersonation did nothing: there's no Supporter card in the hand.");
                     return true;
                 }
-                var card = supporters.Count == 1 ? supporters[0] : ctx.ChooseCards(supporters, 1, 1, "Impersonation: discard which Supporter card and use its effect?")[0];
+                var card = ctx.ChooseCards(supporters, 1, 1, "Impersonation: discard which Supporter card and use its effect?")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 if (!ctx.Me.Discard.Contains(card)) return true;
                 ctx.Log("Impersonation: " + ctx.Pokemon.Name + " uses the effect of " + card.Def.Name + ".");
@@ -420,7 +420,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var trainers = ctx.Me.Discard.Where(c => c.Def.IsTrainer).ToList();
                 if (trainers.Count == 0) return true;
-                var pick = trainers.Count == 1 ? trainers[0] : ctx.ChooseCards(trainers, 1, 1, "Seaweed Grab: put which Trainer card into your hand?")[0];
+                var pick = ctx.ChooseCards(trainers, 1, 1, "Seaweed Grab: put which Trainer card into your hand?")[0];
                 ctx.DiscardToHand(new List<CardInstance> { pick });
                 return true;
             }
@@ -509,7 +509,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var energy = ctx.Me.Discard.Where(c => c.Def.IsEnergy).ToList();
                 if (energy.Count == 0) return true;
-                var pick = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Dig Deep: put which Energy card into your hand?")[0];
+                var pick = ctx.ChooseCards(energy, 1, 1, "Dig Deep: put which Energy card into your hand?")[0];
                 ctx.DiscardToHand(new List<CardInstance> { pick });
                 return true;
             }

@@ -133,7 +133,7 @@ namespace PokemonTCG.Cards
             {
                 var hurt = ctx.MyPokemon().Where(m => m.DamageCounters > 0).ToList();
                 if (!TriggerOnce(ctx, "Max Wind", hurt.Count > 0, "Max Wind: heal all damage from 1 of your Pokémon?")) return;
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Max Wind: heal all damage from which Pokémon?");
+                var target = ctx.ChoosePokemon(hurt, "Max Wind: heal all damage from which Pokémon?");
                 if (target != null) ctx.Heal(target, target.DamageCounters * 10);
             }
 

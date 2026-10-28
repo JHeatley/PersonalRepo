@@ -271,7 +271,7 @@ namespace PokemonTCG.Cards
                     var pick = ctx.ChooseCards(cards, i == 0 ? 1 : 0, 1, Power + ": attach a Basic Fire or Lightning Energy card" + (i == 0 ? "" : " (or none)"));
                     if (pick.Count == 0) return;
                     var card = pick[0];
-                    var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, Power + ": attach " + card.Def.Name + " to which Pokémon?");
+                    var target = ctx.ChoosePokemon(targets, Power + ": attach " + card.Def.Name + " to which Pokémon?");
                     if (target == null || !ctx.Me.Hand.Remove(card)) return;
                     used.Add(card.Def.EnergyProvides);
                     ctx.Engine.AttachEnergyCard(card, target, true);
@@ -367,7 +367,7 @@ namespace PokemonTCG.Cards
                 var active = ctx.Me.Active;
                 if (old == null || active == null || old == active || old.Energy.Count == 0) return;
                 var energy = old.Energy.ToList();
-                var card = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Zinnia's Trust: move which Energy from " + old.Name + " to " + active.Name + "?")[0];
+                var card = ctx.ChooseCards(energy, 1, 1, "Zinnia's Trust: move which Energy from " + old.Name + " to " + active.Name + "?")[0];
                 ctx.Engine.MoveEnergy(old, active, card);
             }
         }

@@ -71,7 +71,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var mon = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Mr. Briney's Compassion: return which Pokémon and everything attached to your hand?");
+                var mon = ctx.ChoosePokemon(targets, "Mr. Briney's Compassion: return which Pokémon and everything attached to your hand?");
                 if (mon != null) ctx.Engine.ReturnPokemonToHand(mon);
             }
         }

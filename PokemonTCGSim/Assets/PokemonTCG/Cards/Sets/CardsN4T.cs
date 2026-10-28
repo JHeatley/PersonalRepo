@@ -204,7 +204,7 @@ namespace PokemonTCG.Cards
             {
                 var mons = ctx.MyPokemon();
                 if (mons.Count == 0) return;
-                var target = mons.Count == 1 ? mons[0] : ctx.ChoosePokemon(mons, "Magnifier: attach it to which of your Pokémon?");
+                var target = ctx.ChoosePokemon(mons, "Magnifier: attach it to which of your Pokémon?");
                 if (target == null) return;
                 ctx.AddEffect(new MagnifierEffect(target.Name + "'s attacks don't apply Resistance this turn (Magnifier)", ctx.Player, target.Uid, ctx.Turn));
             }
@@ -236,7 +236,7 @@ namespace PokemonTCG.Cards
             {
                 var cards = Evolutions(ctx);
                 if (cards.Count == 0) return;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Pokémon Personality Test: put which Evolution card face down?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Pokémon Personality Test: put which Evolution card face down?")[0];
                 string name = card.Def.Name;
                 int truth = name.StartsWith("Light ", StringComparison.Ordinal) ? 0 : name.StartsWith("Dark ", StringComparison.Ordinal) ? 1 : 2;
                 var options = new List<DecisionOption>();

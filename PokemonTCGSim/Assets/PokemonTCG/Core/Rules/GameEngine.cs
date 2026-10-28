@@ -899,8 +899,20 @@ namespace PokemonTCG.Core
         public int AskOne(int player, DecisionKind kind, string prompt, List<DecisionOption> options, CardDef source = null, bool autoPickSingle = true)
         {
             if (options.Count == 0) throw new InvalidOperationException("No options for decision: " + prompt);
-            if (autoPickSingle && options.Count == 1) return 0;
+            // A bot takes the only option at once; the person on screen is still asked, as in the real game (your ruling).
+            if (autoPickSingle && options.Count == 1 && !AsksEveryChoice(player)) return 0;
             return Ask(player, kind, prompt, options, 1, 1, source)[0];
+        }
+
+        /// <summary>
+        /// The person on screen is asked every question, even one with a single possible answer, as in the real game (your
+        /// ruling). Off only to play back a game recorded before that (GameRecord.AskedEveryChoice), whose answers skip them.
+        /// </summary>
+        public bool AskPersonEveryChoice = true;
+
+        private bool AsksEveryChoice(int player)
+        {
+            return AskPersonEveryChoice && IsInteractive(player);
         }
 
         /// <summary>The seat is played by a person on screen (see IInteractiveAgent).</summary>
@@ -910,15 +922,15 @@ namespace PokemonTCG.Core
         }
 
         /// <summary>
-        /// Asks for min..max of the options. When only one answer is possible (all of them), it's taken at once,
-        /// unless alwaysAsk is set (cards from a person's discard pile: they still see them and pick them).
+        /// Asks for min..max of the options. When only one answer is possible (all of them), a bot takes it at once; the person
+        /// on screen is still asked, as in the real game (your ruling), and so is anyone when alwaysAsk is set.
         /// </summary>
         public List<int> AskMany(int player, DecisionKind kind, string prompt, List<DecisionOption> options, int min, int max, CardDef source = null, bool alwaysAsk = false)
         {
             max = Math.Min(max, options.Count);
             min = Math.Max(0, Math.Min(min, max));
             if (max == 0) return new List<int>();
-            if (min == options.Count && !alwaysAsk)
+            if (min == options.Count && !alwaysAsk && !AsksEveryChoice(player))
             {
                 var all = new List<int>();
                 for (int i = 0; i < options.Count; i++) all.Add(i);

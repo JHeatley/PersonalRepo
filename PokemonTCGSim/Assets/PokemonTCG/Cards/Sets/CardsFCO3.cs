@@ -116,7 +116,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Turmoil Strike") return false;
                 var targets = ctx.OpponentPokemon(m => m.DamageCounters > 0);
                 if (targets.Count == 0) return true;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Turmoil Strike: do 50 damage to which of your opponent's damaged Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Turmoil Strike: do 50 damage to which of your opponent's damaged Pokémon?");
                 if (target != null) ctx.DamageTarget(target, 50);
                 return true;
             }
@@ -272,7 +272,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var hurt = ctx.MyBench().Where(m => m.DamageCounters > 0).ToList();
                 if (hurt.Count == 0) return true;
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Sweeping Cure: heal 90 damage from which of your Benched Pokémon?");
+                var target = ctx.ChoosePokemon(hurt, "Sweeping Cure: heal 90 damage from which of your Benched Pokémon?");
                 if (target != null) ctx.Heal(target, 90);
                 return true;
             }
@@ -404,7 +404,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Fairy Drop: heal 50 damage from which of your Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Fairy Drop: heal 50 damage from which of your Pokémon?");
                 if (target != null) ctx.Heal(target, 50);
             }
         }
@@ -460,7 +460,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Mega Catcher: switch which of your opponent's Benched Mega Evolution Pokémon into the Active Spot?");
+                var target = ctx.ChoosePokemon(targets, "Mega Catcher: switch which of your opponent's Benched Mega Evolution Pokémon into the Active Spot?");
                 if (target != null) ctx.Engine.SwitchActive(ctx.Opponent, target);
             }
         }
@@ -522,7 +522,7 @@ namespace PokemonTCG.Cards
             {
                 var cards = Discardable(ctx);
                 if (cards.Count == 0) return false;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Scorched Earth: discard which Fire or Fighting Energy card?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Scorched Earth: discard which Fire or Fighting Energy card?")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 ctx.Draw(2);
                 return true;

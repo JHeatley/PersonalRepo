@@ -201,7 +201,7 @@ namespace PokemonTCG.Cards
                 var old = ctx.Pokemon;
                 var choices = Choices(ctx);
                 if (choices.Count == 0 || !ctx.InPlay(old)) return;
-                var pick = choices.Count == 1 ? choices[0] : ctx.ChooseCards(choices, 1, 1, Transform + ": choose a Stage 1 Pokémon from your discard pile")[0];
+                var pick = ctx.ChooseCards(choices, 1, 1, Transform + ": choose a Stage 1 Pokémon from your discard pile")[0];
                 bool wasActive = ctx.IsActive(old);
                 int slot = ctx.Me.Bench.IndexOf(old);
                 if (!ctx.Me.Discard.Remove(pick)) return;

@@ -198,7 +198,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.Flip()) return;
                 var hurt = Hurt(ctx);
                 if (hurt.Count == 0) return;
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Heal: remove 1 damage counter from which of your Pokémon?");
+                var target = ctx.ChoosePokemon(hurt, "Heal: remove 1 damage counter from which of your Pokémon?");
                 if (target != null) ctx.Heal(target, 10);
             }
 

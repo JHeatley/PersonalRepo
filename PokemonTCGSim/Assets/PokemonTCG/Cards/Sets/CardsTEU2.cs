@@ -136,7 +136,7 @@ namespace PokemonTCG.Cards
                     if (!ctx.AskYesNo("Electromagnetic Bomb: move a Lightning Energy from your Bench to " + me.Name + "? (" + moved + " moved so far)")) break;
                     var from = ctx.ChoosePokemon(sources, "Electromagnetic Bomb: move a Lightning Energy from which Benched Pokémon?");
                     var energy = from.Energy.Where(c => CardsDRI1.ProvidesType(ctx, from, c, EnergyType.Lightning)).ToList();
-                    var card = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Electromagnetic Bomb: choose the Energy to move")[0];
+                    var card = ctx.ChooseCards(energy, 1, 1, "Electromagnetic Bomb: choose the Energy to move")[0];
                     if (ctx.Engine.MoveEnergy(from, me, card)) moved++;
                 }
                 ctx.DamageDefending(atk.Damage * moved);
@@ -166,7 +166,7 @@ namespace PokemonTCG.Cards
                     if (guard > 0 && !ctx.AskYesNo("Electro Shaker: move another Lightning Energy?")) break;
                     var from = ctx.ChoosePokemon(sources, "Electro Shaker: move a Lightning Energy from which Pokémon?");
                     var energy = from.Energy.Where(c => CardsDRI1.ProvidesType(ctx, from, c, EnergyType.Lightning)).ToList();
-                    var card = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Electro Shaker: choose the Energy to move")[0];
+                    var card = ctx.ChooseCards(energy, 1, 1, "Electro Shaker: choose the Energy to move")[0];
                     var to = ctx.ChoosePokemon(ctx.MyPokemon(m => m != from), "Electro Shaker: move " + card.Def.Name + " to which Pokémon?");
                     ctx.Engine.MoveEnergy(from, to, card);
                 }

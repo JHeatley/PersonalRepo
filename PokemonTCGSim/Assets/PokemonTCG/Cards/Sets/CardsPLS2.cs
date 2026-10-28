@@ -137,7 +137,7 @@ namespace PokemonTCG.Cards
                     if (!TefPokemon.StillDefending(ctx, defending)) break;
                     var hurt = ctx.MyPokemon(m => m.DamageCounters > 0);
                     if (hurt.Count == 0) break;
-                    var from = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Damakinesis: move damage counter " + (i + 1) + " of " + total + " from which of your Pokémon?");
+                    var from = ctx.ChoosePokemon(hurt, "Damakinesis: move damage counter " + (i + 1) + " of " + total + " from which of your Pokémon?");
                     if (from == null) break;
                     ctx.Engine.MoveDamageCounters(from, defending, 1, atk.Name);
                 }
@@ -201,7 +201,7 @@ namespace PokemonTCG.Cards
                 TefPokemon.RevealOpponentHand(ctx);
                 var supporters = ctx.Opp.Hand.Where(c => c.Def.IsSupporter).ToList();
                 if (supporters.Count == 0) return true;
-                var pick = supporters.Count == 1 ? supporters[0] : ctx.ChooseCards(supporters, 1, 1, "Silent Claw: discard which Supporter? (You use its effect.)")[0];
+                var pick = ctx.ChooseCards(supporters, 1, 1, "Silent Claw: discard which Supporter? (You use its effect.)")[0];
                 ctx.Engine.DiscardFromHand(ctx.Opponent, pick);
                 var script = ctx.Engine.Scripts.For(pick.Def);
                 if (!script.CanPlayTrainer(new EffectContext(ctx.Engine, ctx.Player, pick, null)))
@@ -226,7 +226,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var plasma = ctx.Me.Hand.Where(c => c.Def.IsTeamPlasma).ToList();
                 if (plasma.Count == 0) return true;
-                var pick = plasma.Count == 1 ? plasma[0] : ctx.ChooseCards(plasma, 1, 1, "Cargo Jet: discard a Team Plasma card")[0];
+                var pick = ctx.ChooseCards(plasma, 1, 1, "Cargo Jet: discard a Team Plasma card")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, pick);
                 ctx.Draw(3);
                 return true;
@@ -278,7 +278,7 @@ namespace PokemonTCG.Cards
                 {
                     var card = found[0];
                     var targets = Evolvable(ctx, card.Def);
-                    var target = targets.Count == 0 ? null : targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Moon Guidance: evolve which Pokémon into " + card.Def.Name + "?");
+                    var target = targets.Count == 0 ? null : ctx.ChoosePokemon(targets, "Moon Guidance: evolve which Pokémon into " + card.Def.Name + "?");
                     if (target != null) ctx.Engine.EvolvePokemon(target, card);
                     else ctx.Me.Deck.Add(card);
                 }
@@ -411,7 +411,7 @@ namespace PokemonTCG.Cards
                 var found = targets.Count == 0 ? new List<CardInstance>() : ctx.SearchMyDeck(d => d.Name == "Plasma Energy", 1, "Colress Machine: choose a Plasma Energy card");
                 if (found.Count > 0)
                 {
-                    var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Colress Machine: attach Plasma Energy to which Team Plasma Pokémon?");
+                    var target = ctx.ChoosePokemon(targets, "Colress Machine: attach Plasma Energy to which Team Plasma Pokémon?");
                     if (target != null) ctx.Engine.AttachEnergyCard(found[0], target);
                     else ctx.Me.Deck.Add(found[0]);
                 }
@@ -431,7 +431,7 @@ namespace PokemonTCG.Cards
                 ctx.Engine.Reveal(ctx.Player, new List<CardInstance> { top }, "revealed the top card of the deck (Ether)");
                 var mine = ctx.MyPokemon();
                 if (!top.Def.IsBasicEnergy || mine.Count == 0) return;
-                var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Ether: attach " + top.Def.Name + " to which of your Pokémon?");
+                var target = ctx.ChoosePokemon(mine, "Ether: attach " + top.Def.Name + " to which of your Pokémon?");
                 if (target == null) return;
                 ctx.Me.Deck.RemoveAt(0);
                 ctx.Engine.AttachEnergyCard(top, target);
@@ -480,7 +480,7 @@ namespace PokemonTCG.Cards
             {
                 var cost = Cost(ctx);
                 if (cost.Count == 0) return;
-                var pick = cost.Count == 1 ? cost[0] : ctx.ChooseCards(cost, 1, 1, "Team Plasma Grunt: discard a Team Plasma card")[0];
+                var pick = ctx.ChooseCards(cost, 1, 1, "Team Plasma Grunt: discard a Team Plasma card")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, pick);
                 ctx.Draw(4);
             }
@@ -507,7 +507,7 @@ namespace PokemonTCG.Cards
                 foreach (var card in discarded) ctx.Engine.DiscardFromHand(ctx.Player, card);
                 var trainers = ctx.Me.Discard.Where(c => c.Def.IsTrainer && !discarded.Contains(c) && c != ctx.Card).ToList();
                 if (trainers.Count == 0) return;
-                var pick = trainers.Count == 1 ? trainers[0] : ctx.ChooseCards(trainers, 1, 1, "Dowsing Machine: put which Trainer card into your hand?")[0];
+                var pick = ctx.ChooseCards(trainers, 1, 1, "Dowsing Machine: put which Trainer card into your hand?")[0];
                 ctx.DiscardToHand(new List<CardInstance> { pick });
             }
         }

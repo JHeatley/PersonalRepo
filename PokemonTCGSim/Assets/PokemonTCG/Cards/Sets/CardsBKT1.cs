@@ -153,7 +153,7 @@ namespace PokemonTCG.Cards
                 foreach (var card in found)
                 {
                     var mine = ctx.MyPokemon();
-                    var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Energy Color: attach " + card.Def.Name + " to which of your Pokémon?");
+                    var target = ctx.ChoosePokemon(mine, "Energy Color: attach " + card.Def.Name + " to which of your Pokémon?");
                     if (target != null) ctx.Engine.AttachEnergyCard(card, target);
                     else ctx.Me.Deck.Add(card);
                 }
@@ -216,7 +216,7 @@ namespace PokemonTCG.Cards
                 var bench = ctx.MyBench();
                 if (pile.Count == 0 || bench.Count == 0) return true;
                 var card = pile[0];
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Grand Flame: attach a Fire Energy card to which Benched Pokémon?");
+                var target = ctx.ChoosePokemon(bench, "Grand Flame: attach a Fire Energy card to which Benched Pokémon?");
                 if (target != null && ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, target);
                 return true;
             }

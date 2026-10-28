@@ -343,7 +343,7 @@ namespace PokemonTCG.Cards
                     ctx.Log("Apricorn Forest: no basic Energy card in the hand to show.");
                     return false;
                 }
-                var shown = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Apricorn Forest: show which basic Energy card?")[0];
+                var shown = ctx.ChooseCards(energy, 1, 1, "Apricorn Forest: show which basic Energy card?")[0];
                 var type = shown.Def.EnergyProvides;
                 ctx.Engine.ShowCards(ctx.Opponent, new List<CardInstance> { shown }, "Apricorn Forest", "Your opponent shows this card.", ctx.Source);
                 if (ctx.Me.Deck.Count == 0 || ctx.BenchSpace <= 0) return false;
@@ -390,7 +390,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.Flip()) return false;
                 var evolved = Evolved(ctx);
                 if (evolved.Count == 0) return false;
-                var target = evolved.Count == 1 ? evolved[0] : ctx.ChoosePokemon(evolved, "Undersea Ruins: discard the top Evolution card from which of your Pokémon?");
+                var target = ctx.ChoosePokemon(evolved, "Undersea Ruins: discard the top Evolution card from which of your Pokémon?");
                 if (target != null) ctx.Engine.DevolveIntoDiscard(target, 1);
                 return false;
             }
@@ -408,7 +408,7 @@ namespace PokemonTCG.Cards
                 ctx.MarkNamedLimit(Limit);
                 var hand = ctx.Me.Hand.Where(c => c.Def.IsBasicEnergy).ToList();
                 if (hand.Count == 0) return false;
-                var card = hand.Count == 1 ? hand[0] : ctx.ChooseCards(hand, 1, 1, "Power Plant: discard which basic Energy card from your hand?")[0];
+                var card = ctx.ChooseCards(hand, 1, 1, "Power Plant: discard which basic Energy card from your hand?")[0];
                 if (!ctx.Me.Hand.Remove(card)) return false;
                 ctx.Me.Discard.Add(card);
                 ctx.Log(ctx.Engine.PlayerName(ctx.Player) + " discarded " + card.Def.Name + " (Power Plant).");

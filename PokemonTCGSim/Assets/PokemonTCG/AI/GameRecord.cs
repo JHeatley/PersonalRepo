@@ -41,6 +41,8 @@ namespace PokemonTCG.AI
         public bool TieBreaker;
         /// <summary>Seats played by a person (the engine asks a person a few more questions than a bot).</summary>
         public bool[] Interactive = { false, false };
+        /// <summary>The person was asked every question, even ones with a single possible answer (games recorded since then).</summary>
+        public bool AskedEveryChoice = true;
         /// <summary>-1 a draw, 0 or 1 the winner, -2 not finished.</summary>
         public int Winner = -2;
         public string Reason = "";
@@ -92,6 +94,7 @@ namespace PokemonTCG.AI
                 Line(sb, "order", OrderChooser.ToString(CultureInfo.InvariantCulture), OrderChooserIsHigherSeed ? "1" : "0");
                 Line(sb, "interactive", Interactive[0] ? "1" : "0", Interactive[1] ? "1" : "0");
                 if (TieBreaker) Line(sb, "tiebreaker", "1");
+                if (AskedEveryChoice) Line(sb, "asks", "1");
                 if (Rules != null && !Rules.IsDefault) Line(sb, "rules", Rules.ToString());
                 Line(sb, "result", Winner.ToString(CultureInfo.InvariantCulture), Turns.ToString(CultureInfo.InvariantCulture), Reason);
                 for (int s = 0; s < 2; s++)
@@ -120,7 +123,7 @@ namespace PokemonTCG.AI
         /// <summary>Reads a record. Cards that aren't in the pool are reported in problems (the record can't be played back then).</summary>
         public static GameRecord Parse(string text, CardDatabase db, List<string> problems)
         {
-            var r = new GameRecord();
+            var r = new GameRecord { AskedEveryChoice = false }; // older records don't say: their single-answer questions weren't asked
             foreach (var raw in (text ?? "").Replace("\r", "").Split('\n'))
             {
                 if (raw.Length == 0 || raw[0] == '#') continue;
@@ -145,6 +148,7 @@ namespace PokemonTCG.AI
                             break;
                         case "interactive": r.Interactive = new[] { Field(p, 1) == "1", Field(p, 2) == "1" }; break;
                         case "tiebreaker": r.TieBreaker = Field(p, 1) == "1"; break;
+                        case "asks": r.AskedEveryChoice = Field(p, 1) == "1"; break;
                         case "rules": r.Rules = GameRules.Parse(Field(p, 1)); break;
                         case "result":
                             r.Winner = Int(Field(p, 1));
