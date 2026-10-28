@@ -1161,9 +1161,15 @@ namespace PokemonTCG.AI
         }
 
         /// <summary>Writes the brain to FilePath (through a temporary file, so a crash can't leave half a brain).</summary>
+        /// <summary>
+        /// Saving is paused: another program is training this brain's file (the app's "Train in the background"), and the app
+        /// reloads the file when it's done rather than writing over it.
+        /// </summary>
+        public bool SavesPaused;
+
         public void Save()
         {
-            if (string.IsNullOrEmpty(FilePath)) return;
+            if (string.IsNullOrEmpty(FilePath) || SavesPaused) return;
             // v134.4: streamed to the file, not built as one big string first (that string and its copies were large enough
             // to set off long garbage collections, which freeze the whole app). Saves take turns.
             lock (fileLock)

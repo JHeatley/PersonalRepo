@@ -373,6 +373,7 @@ namespace PokemonTCG.Presentation
         private void UpdateTraining()
         {
             if (training != null) trainView = training.Status();
+            UpdateBackgroundTraining();
             if (mode == Mode.Train && brain != null && Time.unscaledTime >= nextBrainRefresh)
             {
                 nextBrainRefresh = Time.unscaledTime + 1f;
@@ -735,7 +736,8 @@ namespace PokemonTCG.Presentation
             }
             GUILayout.Space(6);
             GUILayout.BeginHorizontal();
-            GUI.enabled = !running && TrainDecksReady && brain != null;
+            bool background = BackgroundRunning;
+            GUI.enabled = !running && !background && TrainDecksReady && brain != null;
             if (GUILayout.Button("Start training", GUILayout.Height(32))) actions.Add(StartTraining);
             GUI.enabled = running;
             if (GUILayout.Button("Stop", GUILayout.Height(32), GUILayout.Width(80))) actions.Add(() => training.Cancel());
@@ -744,6 +746,7 @@ namespace PokemonTCG.Presentation
             GUI.enabled = true;
             if (GUILayout.Button("Back to menu", GUILayout.Height(32), GUILayout.Width(120))) actions.Add(() => { RefreshDecks(); mode = Mode.Menu; });
             GUILayout.EndHorizontal();
+            DrawBackgroundTraining(ui, actions, running);
             if (running && PowerSaver.Active) GUILayout.Label("Battery saver on: training plays half the time and rests the other half.", Hint(ui));
             if (!TrainDecksReady && TrainAll)
                 GUILayout.Label("There are no legal decks to train with.", ui.Error);

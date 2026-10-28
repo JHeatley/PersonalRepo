@@ -46,3 +46,14 @@ with `--vs FILE`, half the games on each seat, random decks.
 The sim keeps the Neural AI's network next to the AI's file (the Save Folders screen
 shows where): `<AI file>.neural`. Copy `out/policy.neural` over it while the sim is
 closed. Training on the Train screen continues from there.
+
+## background
+
+What the app's **Train in the background (fastest)** button runs: a training session on the AI's own brain file, as
+the Train screen would run it. The app writes a job folder (`job.txt` with the settings, `decks/` with the decklists),
+then this keeps `progress.txt` up to date, stops when a file named `stop` appears there, and saves the brain (the
+network, matchups, deck mastery, card results and the session's record) for the app to reload.
+
+    sim-train background --job <folder> [--root <PokemonTCGSim folder>] [--skip-cpu 2,3]
+
+A ready-built Windows copy is in `../Tools/sim-train/` (see its README for rebuilding it).
