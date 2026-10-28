@@ -428,10 +428,24 @@ namespace PokemonTCG.AI
         /// </summary>
         public static IPolicyMath FastMath;
 
-        private static IPolicyMath Kernels { get { return FastMath ?? ManagedPolicyMath.Instance; } }
+        [ThreadStatic] private static bool plainOnThisThread;
+
+        /// <summary>
+        /// This thread always runs the plain C# loops, even when Burst is installed. Training threads call it: Burst's vector maths
+        /// on many cores at once is a stress-test-like load that crashed a PC, so Burst is only used while playing.
+        /// </summary>
+        public static void UsePlainMathOnThisThread()
+        {
+            plainOnThisThread = true;
+        }
+
+        /// <summary>The fast loops for this thread, or null for the plain C# ones.</summary>
+        private static IPolicyMath Fast { get { return plainOnThisThread ? null : FastMath; } }
+
+        private static IPolicyMath Kernels { get { return Fast ?? ManagedPolicyMath.Instance; } }
 
         /// <summary>Which version of the inner loops the network is using ("Burst" or "C#").</summary>
-        public static string MathName { get { return FastMath == null ? "C#" : FastMath.GetType().Name.Replace("PolicyMath", ""); } }
+        public static string MathName { get { return Fast == null ? "C#" : Fast.GetType().Name.Replace("PolicyMath", ""); } }
 
         /// <summary>y[o] = b[o] + sum_i W[o, i] * x[xOff + i].</summary>
         private static void Linear(float[] w, float[] b, int outN, int inN, float[] x, int xOff, float[] y, int yOff)
@@ -795,7 +809,7 @@ namespace PokemonTCG.AI
         private static void LinearBatch(float[] w, float[] b, int outN, int inN, float[][] xs, float[][] ys)
         {
             int n = xs.Length;
-            if (FastMath != null)
+            if (Fast != null)
             {
                 for (int k = 0; k < n; k++) Linear(w, b, outN, inN, xs[k], 0, ys[k], 0);
                 return;
@@ -812,7 +826,7 @@ namespace PokemonTCG.AI
         private static void LinearBackBatch(float[] w, int outN, int inN, float[][] xs, float[][] dys, float[][] dxs, float[] gw, float[] gb)
         {
             int n = xs.Length;
-            if (FastMath != null)
+            if (Fast != null)
             {
                 for (int k = 0; k < n; k++) LinearBack(w, outN, inN, xs[k], 0, dys[k], 0, dxs == null ? null : dxs[k], 0, gw, gb);
                 return;
@@ -845,14 +859,14 @@ namespace PokemonTCG.AI
             // Trunk, batched
             var pre = Scratch("pre", n, Width, false);
             // The input layer only over the parts of the state that aren't zeros (empty slots and bags are skipped).
-            if (FastMath != null)
+            if (Fast != null)
             {
                 for (int i = 0; i < n; i++)
                 {
                     var p = ps[i];
                     Array.Copy(inpB.Data, pre[i], Width);
                     var seg = p.Segments;
-                    for (int k = 0; k < seg.Length; k += 2) FastMath.MatVecAcc(inpW.Data, seg[k], StateSize, Width, seg[k + 1], p.State, seg[k], pre[i], 0);
+                    for (int k = 0; k < seg.Length; k += 2) Fast.MatVecAcc(inpW.Data, seg[k], StateSize, Width, seg[k + 1], p.State, seg[k], pre[i], 0);
                 }
             }
             else
@@ -1228,7 +1242,7 @@ namespace PokemonTCG.AI
             }
             var dState = Scratch("dState", n, StateSize, true);
             float[] gInpW = G(g, inpW), gInpB = G(g, inpB);
-            if (FastMath != null)
+            if (Fast != null)
             {
                 for (int i = 0; i < n; i++)
                 {
@@ -1236,9 +1250,9 @@ namespace PokemonTCG.AI
                     var d = dx[i];
                     for (int o = 0; o < Width; o++) gInpB[o] += d[o];
                     var seg = p.Segments;
-                    for (int k = 0; k < seg.Length; k += 2) FastMath.OuterAcc(gInpW, seg[k], StateSize, Width, seg[k + 1], d, 0, p.State, seg[k]);
+                    for (int k = 0; k < seg.Length; k += 2) Fast.OuterAcc(gInpW, seg[k], StateSize, Width, seg[k + 1], d, 0, p.State, seg[k]);
                     seg = p.GradSegments;
-                    for (int k = 0; k < seg.Length; k += 2) FastMath.MatTVecAcc(inpW.Data, seg[k], StateSize, Width, seg[k + 1], d, 0, dState[i], seg[k]);
+                    for (int k = 0; k < seg.Length; k += 2) Fast.MatTVecAcc(inpW.Data, seg[k], StateSize, Width, seg[k + 1], d, 0, dState[i], seg[k]);
                 }
             }
             else

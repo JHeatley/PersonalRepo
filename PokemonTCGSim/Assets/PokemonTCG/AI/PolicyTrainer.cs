@@ -427,6 +427,7 @@ namespace PokemonTCG.AI
 
             private void Loop(int index)
             {
+                PolicyNet.UsePlainMathOnThisThread(); // training never uses Burst (see PolicyNet.UsePlainMathOnThisThread)
                 int seen = 0;
                 while (true)
                 {

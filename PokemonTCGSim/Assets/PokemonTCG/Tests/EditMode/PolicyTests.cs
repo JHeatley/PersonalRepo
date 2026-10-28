@@ -203,6 +203,62 @@ namespace PokemonTCG.Tests
             Assert.AreEqual(steps, brain.Policy.Steps, "no learning step after Stop");
         }
 
+        /// <summary>Counts calls made from training threads (the plain C# loops do the work).</summary>
+        private sealed class CountingMath : IPolicyMath
+        {
+            public int TrainingCalls;
+
+            private void Note()
+            {
+                var name = System.Threading.Thread.CurrentThread.Name;
+                if (name != null && name.StartsWith("Neural AI", StringComparison.Ordinal)) System.Threading.Interlocked.Increment(ref TrainingCalls);
+            }
+
+            public void MatVecAcc(float[] w, int wo, int stride, int rows, int cols, float[] x, int xo, float[] y, int yo)
+            {
+                Note();
+                ManagedPolicyMath.Instance.MatVecAcc(w, wo, stride, rows, cols, x, xo, y, yo);
+            }
+
+            public void MatTVecAcc(float[] w, int wo, int stride, int rows, int cols, float[] dy, int dyo, float[] dx, int dxo)
+            {
+                Note();
+                ManagedPolicyMath.Instance.MatTVecAcc(w, wo, stride, rows, cols, dy, dyo, dx, dxo);
+            }
+
+            public void OuterAcc(float[] gw, int wo, int stride, int rows, int cols, float[] dy, int dyo, float[] x, int xo)
+            {
+                Note();
+                ManagedPolicyMath.Instance.OuterAcc(gw, wo, stride, rows, cols, dy, dyo, x, xo);
+            }
+        }
+
+        [Test]
+        public void Training_Never_Uses_The_Fast_Loops()
+        {
+            var counting = new CountingMath();
+            var before = PolicyNet.FastMath;
+            PolicyNet.FastMath = counting;
+            try
+            {
+                var decks = new List<KeyValuePair<string, List<CardDef>>>
+                {
+                    new KeyValuePair<string, List<CardDef>>("Dragapult", Dragapult()),
+                    new KeyValuePair<string, List<CardDef>>("Zoroark", Zoroark())
+                };
+                var trainer = new PolicyTrainer(new PolicyNet(), StandardCards.CreateRegistry(), decks, 9) { GamesPerRound = 4, Threads = 2, Minibatch = 256 };
+                var round = trainer.Round();
+                trainer.Dispose();
+                Assert.AreEqual(0, round.Errors, round.LastError);
+                Assert.Greater(round.Decisions, 0);
+                Assert.AreEqual(0, counting.TrainingCalls, "training threads use the plain C# loops, never Burst");
+            }
+            finally
+            {
+                PolicyNet.FastMath = before;
+            }
+        }
+
         [Test]
         public void The_Trainer_Learns_From_Games_Against_Itself_Its_Past_And_The_Classic_Bot()
         {
