@@ -171,6 +171,22 @@ namespace PokemonTCG.Presentation
             skipCpuMessage = CpuThreads.Apply(skipCpu ? CpuThreads.Parse(skipCpuText) : new List<int>());
         }
 
+        /// <summary>
+        /// The "Don't use CPU threads" switch as one row (the menu and the Regional Sim; the Train screen has its own layout).
+        /// Every place shows the same setting.
+        /// </summary>
+        private void DrawSkipCpuRow(UiStyles ui, List<Action> actions, float labelWidth)
+        {
+            if (!CpuThreads.Supported) return;
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("CPU threads", GUILayout.Width(labelWidth));
+            bool newSkip = GUILayout.Toggle(skipCpu, " Don't use", GUILayout.Width(100));
+            string newSkipText = GUILayout.TextField(skipCpuText, GUILayout.Width(90));
+            GUILayout.Label("  " + (skipCpu && skipCpuMessage != null ? skipCpuMessage : "Off: every thread is used.") + " For a faulty CPU core.", Hint(ui));
+            GUILayout.EndHorizontal();
+            if (newSkip != skipCpu || newSkipText != skipCpuText) actions.Add(() => SetSkipCpu(newSkip, newSkipText));
+        }
+
         private void SetOpponentLearning(bool on)
         {
             opponentLearning = on;

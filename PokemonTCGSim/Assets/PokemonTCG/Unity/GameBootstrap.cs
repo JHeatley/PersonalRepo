@@ -777,6 +777,8 @@ namespace PokemonTCG.Presentation
             int saverPick = GUILayout.Toolbar(PowerSaver.Mode, PowerSaver.ModeNames, GUILayout.Width(240));
             GUILayout.Label("  " + PowerSaver.StatusLine(), Hint(ui));
             GUILayout.EndHorizontal();
+            var cpuActions = new List<Action>();
+            DrawSkipCpuRow(ui, cpuActions, 170);
             GUILayout.Space(6);
 
             bool ready = myDeck >= 0 && oppDeck >= 0 && deckProblems[myDeck].Count == 0 && deckProblems[oppDeck].Count == 0
@@ -812,6 +814,7 @@ namespace PokemonTCG.Presentation
             if (newUiPick != uiPick) UiScale.Setting = UiScale.Choices[newUiPick];
             if (saverPick != PowerSaver.Mode) PowerSaver.Mode = saverPick;
             if (newPace != pace) ApplyPace(newPace);
+            foreach (var a in cpuActions) a();
             if (aiPick != OpponentPick) SetOpponentPick(aiPick);
             if (newBirthday != birthday)
             {
