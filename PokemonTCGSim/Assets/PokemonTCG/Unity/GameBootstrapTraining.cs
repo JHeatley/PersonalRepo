@@ -653,10 +653,13 @@ namespace PokemonTCG.Presentation
             // The session's results, the growth chart and what the AI knows, in the space under the deck lists.
             GUILayout.Space(6);
             trainScrollInfo = GUILayout.BeginScrollView(trainScrollInfo, false, false, GUIStyle.none, GUI.skin.verticalScrollbar, GUILayout.ExpandHeight(true));
+            // Held to the panel's width (less its scroll bar), so long lines wrap and the lists' own scroll bars stay in view.
+            GUILayout.BeginVertical(GUILayout.Width(2 * colW - 16f));
             DrawTrainResults(ui, st, actions);
-            DrawGrowthChart(ui, 2 * colW - 20f);
+            DrawGrowthChart(ui, 2 * colW - 30f);
             DrawLogStudyPanel(ui, actions, running);
             DrawBrainPanel(ui, actions, running);
+            GUILayout.EndVertical();
             GUILayout.EndScrollView();
             GUILayout.EndVertical();
 
