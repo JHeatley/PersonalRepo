@@ -10,6 +10,9 @@ namespace PokemonTCG.AI
     {
         public int Games, LearnerWins, Draws, Errors, Decisions, Turns;
         public int VsPool, PoolWins;
+        /// <summary>Games against the league (League) and the network's points in them (a draw is half).</summary>
+        public int VsLeague;
+        public double LeaguePoints;
         public int Mistakes;
         /// <summary>Decisions where it sampled a move other than its top-rated one (Decisions counts them all).</summary>
         public int Explored;
@@ -104,6 +107,15 @@ namespace PokemonTCG.AI
         public GpuMoves Moves { get { return moves; } }
         public int PoolSize = 8;
         public int SnapshotEvery = 10;
+        /// <summary>
+        /// Past versions kept with the AI (expert roadmap step 6), played in the games against past versions (PoolShare): half of
+        /// them when this session has snapshots of its own, all of them when it has none. Null: only this session's snapshots.
+        /// </summary>
+        public League League;
+        /// <summary>The GPU learner's slot this network learns in (0: the AI's network; an exploiter learns in another, GpuLearner.Train).</summary>
+        public int GpuSlot;
+        /// <summary>Dispose closes Gpu (false when it's lent by another trainer, as an exploiter's is).</summary>
+        public bool OwnsGpu = true;
         /// <summary>Games played at once (one thread each), and threads for the learning step.</summary>
         public int Threads = Math.Max(1, Environment.ProcessorCount - 1);
         /// <summary>When set, the learner plays this deck in every game (the other seat gets a random deck).</summary>
@@ -249,6 +261,8 @@ namespace PokemonTCG.AI
             into.Turns += one.Turns;
             into.VsPool += one.VsPool;
             into.PoolWins += one.PoolWins;
+            into.VsLeague += one.VsLeague;
+            into.LeaguePoints += one.LeaguePoints;
             into.Mistakes += one.Mistakes;
             into.Explored += one.Explored;
             into.Searched += one.Searched;
@@ -262,9 +276,10 @@ namespace PokemonTCG.AI
             var r = new PolicyRound();
             var samples = new List<Sample>();
             double u = rng.Next(1000000) / 1000000.0;
-            double total = SelfShare + (poolNow.Length > 0 ? PoolShare : 0) + ClassicShare;
+            bool hasPast = poolNow.Length > 0 || (League != null && League.Count > 0);
+            double total = SelfShare + (hasPast ? PoolShare : 0) + ClassicShare;
             u *= total;
-            int mode = u < SelfShare ? 0 : u < SelfShare + (poolNow.Length > 0 ? PoolShare : 0) ? 1 : 2;
+            int mode = u < SelfShare ? 0 : u < SelfShare + (hasPast ? PoolShare : 0) ? 1 : 2;
             int seat = rng.Next(2);
             KeyValuePair<string, List<CardDef>> mine, theirs;
             if (Matchup && decks.Count >= 2)
@@ -281,10 +296,20 @@ namespace PokemonTCG.AI
             }
             var game = new PolicyGame { LearnerDeck = mine.Key, OpponentDeck = theirs.Key, SelfPlay = mode == 0 };
             var learner = new PolicyAgent(Net, seed + 1, seat, mine.Value) { Greedy = false, Record = true, Abort = Abort };
+            // A past version: from the league (the ones it does worst against most) or this session's snapshots.
+            LeagueMember member = null;
+            PolicyNet past = null;
+            if (mode == 1)
+            {
+                if (League != null && (poolNow.Length == 0 || rng.Next(2) == 0)) member = League.Pick(rng);
+                if (member != null) past = member.Net;
+                else if (poolNow.Length > 0) past = poolNow[rng.Next(poolNow.Length)];
+                else mode = 2;
+            }
             IPlayerAgent other;
             PolicyAgent otherLearner = null;
             if (mode == 0) other = otherLearner = new PolicyAgent(Net, seed + 2, 1 - seat, theirs.Value) { Greedy = false, Record = true, Abort = Abort };
-            else if (mode == 1) other = new PolicyAgent(poolNow[rng.Next(poolNow.Length)], seed + 2, 1 - seat, theirs.Value) { Greedy = false, Abort = Abort };
+            else if (mode == 1) other = new PolicyAgent(past, seed + 2, 1 - seat, theirs.Value) { Greedy = false, Abort = Abort };
             else other = new HeuristicAgent(seed + 2);
             var gpuMoves = moves != null && GpuMoves && Gpu != null ? moves : null;
             learner.Moves = gpuMoves;
@@ -321,6 +346,13 @@ namespace PokemonTCG.AI
                 {
                     r.VsPool = 1;
                     r.PoolWins = result.Winner == seat ? 1 : 0;
+                }
+                if (member != null)
+                {
+                    double points = result.Winner < 0 ? 0.5 : result.Winner == seat ? 1 : 0;
+                    League.Record(member.Id, points);
+                    r.VsLeague = 1;
+                    r.LeaguePoints = points;
                 }
                 foreach (var a in new[] { learner, otherLearner })
                 {
@@ -533,7 +565,7 @@ namespace PokemonTCG.AI
             gamePool = null;
             if (moves != null) moves.Dispose();
             moves = null;
-            if (Gpu != null) Gpu.Dispose();
+            if (Gpu != null && OwnsGpu) Gpu.Dispose();
         }
 
         /// <summary>
@@ -661,7 +693,7 @@ namespace PokemonTCG.AI
                     targets[i] = samples[i].Target;
                 }
                 var r = Gpu.Train(Net, inputs, actions, logp, adv, ret, Epochs, Minibatch, rounds * 31 + 7, Clip, DualClip, ValueCoef, EntropyCoef,
-                    targets, DistillCoef);
+                    targets, DistillCoef, GpuSlot);
                 round.DistillLoss = r.DistillLoss;
                 round.PolicyLoss = r.PolicyLoss;
                 round.ValueLoss = r.ValueLoss;

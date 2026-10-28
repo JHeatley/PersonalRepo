@@ -204,6 +204,12 @@ namespace PokemonTCG.AI
         public PolicyNet Champion { get; private set; }
         /// <summary>How many times the network has become the champion (1 for the first).</summary>
         public int ChampionVersion { get; private set; }
+
+        /// <summary>
+        /// The league: past versions of the network that training plays against too (League). Their networks are saved in a folder
+        /// next to the brain's file (LeaguePath), their results in the brain's file.
+        /// </summary>
+        public readonly League League = new League();
         private readonly List<ChampionCheck> championChecks = new List<ChampionCheck>();
 
         /// <summary>The checks against the champion, oldest first.</summary>
@@ -940,6 +946,7 @@ namespace PokemonTCG.AI
                 Champion = null;
                 ChampionVersion = 0;
                 championChecks.Clear();
+                League.Clear();
                 weights.Clear();
                 matchups.Clear();
                 history.Clear();
@@ -970,6 +977,7 @@ namespace PokemonTCG.AI
         ///   s  games  winsA  winsB  scoreBefore  scoreAfter  evalGames  when  deckA  deckB
         ///   n  base64 of the neural network's weights (v74; only once it has learned something)
         ///   yv  championVersion;  y  gamesTrained  games  wins  draws  losses  winRate  promoted  version  when   (the yardstick, ChampionGate)
+        ///   lgn, lg, lgh  the league (League.Write)
         ///   (Serialize() only: p  base64 of the policy network;  pc  base64 of the champion network)
         /// </summary>
         public string Serialize()
@@ -1032,6 +1040,7 @@ namespace PokemonTCG.AI
                       .Append(y.Losses).Append('\t').Append(D(y.WinRate)).Append('\t').Append(y.Promoted ? 1 : 0).Append('\t').Append(y.Version).Append('\t')
                       .Append(Clean(y.When)).Append('\n');
                 }
+                League.Write(sb);
                 foreach (var h in habits.Values.OrderBy(x => x.Key, StringComparer.Ordinal))
                 {
                     sb.Append("h\t").Append(h.Games).Append('\t').Append(h.Times).Append('\t').Append(D(h.Strength)).Append('\t').Append(D(h.Recent)).Append('\t')
@@ -1093,6 +1102,7 @@ namespace PokemonTCG.AI
                 championChecks.Clear();
                 ChampionVersion = 0;
                 Champion = null; // a "pc" line brings it back (Undo); the brain's own file keeps it in its own file (Load)
+                League.BeginLoad(); // its lines bring the members back, with the networks it remembers (Undo) or from their files (Load)
                 GamesTrained = GamesVsYou = YourDecisionsStudied = FeedbackGiven = 0;
                 LogsStudied = LogDecisionsStudied = 0;
                 Net.Reset();
@@ -1144,6 +1154,11 @@ namespace PokemonTCG.AI
                                 break;
                             case "hr":
                                 if (p.Length >= 2) HabitReviews = I(p[1]);
+                                break;
+                            case "lgn":
+                            case "lg":
+                            case "lgh":
+                                League.LoadLine(p);
                                 break;
                             case "yv":
                                 if (p.Length >= 2) ChampionVersion = I(p[1]);
@@ -1238,6 +1253,14 @@ namespace PokemonTCG.AI
                 var net = new PolicyNet();
                 if (net.FromBytes(File.ReadAllBytes(champion))) brain.Champion = net;
             }
+            string league = LeaguePath(path);
+            brain.League.LoadNets(id =>
+            {
+                string file = league != null ? Path.Combine(league, id + ".neural") : null;
+                if (file == null || !File.Exists(file)) return null;
+                var net = new PolicyNet();
+                return net.FromBytes(File.ReadAllBytes(file)) ? net : null;
+            });
             return brain;
         }
 
@@ -1282,7 +1305,41 @@ namespace PokemonTCG.AI
                     if (File.Exists(champion)) File.Delete(champion);
                     File.Move(champion + ".tmp", champion);
                 }
+                SaveLeague();
             }
+        }
+
+        /// <summary>
+        /// The league's networks, one file each in LeaguePath (written once, when a member joins; a member that left has its file
+        /// removed).
+        /// </summary>
+        private void SaveLeague()
+        {
+            string folder = LeaguePath(FilePath);
+            var nets = League.Networks();
+            if (nets.Count == 0)
+            {
+                if (Directory.Exists(folder)) Directory.Delete(folder, true);
+                return;
+            }
+            Directory.CreateDirectory(folder);
+            var keep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var kv in nets)
+            {
+                string file = Path.Combine(folder, kv.Key + ".neural");
+                keep.Add(Path.GetFileName(file));
+                if (File.Exists(file) || kv.Value == null || !kv.Value.AllFinite()) continue;
+                File.WriteAllBytes(file + ".tmp", kv.Value.ToBytes());
+                File.Move(file + ".tmp", file);
+            }
+            foreach (var file in Directory.GetFiles(folder))
+                if (!keep.Contains(Path.GetFileName(file))) File.Delete(file);
+        }
+
+        /// <summary>The folder holding the league's networks (League) for the brain saved at path.</summary>
+        public static string LeaguePath(string path)
+        {
+            return string.IsNullOrEmpty(path) ? null : path + ".league";
         }
 
         /// <summary>The file holding the champion network (ChampionGate) for the brain saved at path.</summary>

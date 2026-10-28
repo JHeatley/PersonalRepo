@@ -66,3 +66,8 @@ each round the sim sends its current weights and the round's decisions, the lear
 (the same settings, dual clip, gradient clipping and Adam) and sends the learned weights back. The sim's network
 and the learner's agree to within rounding (largest difference 7e-5 on 898 real decisions). It doesn't read or
 change the Python bot (`PokemonTCGBot`). The message layout is at the top of `learner.py`.
+
+It also follows the sim's network when it changes shape (Make the network bigger), and keeps a second model for
+the league's exploiters (a copy of the network training only to beat it), so their learning never mixes with the
+network's own. Copy the new `learner.py` along with the sim's files: an older one can't train exploiters (the sim
+then trains them on the CPU and says so).
