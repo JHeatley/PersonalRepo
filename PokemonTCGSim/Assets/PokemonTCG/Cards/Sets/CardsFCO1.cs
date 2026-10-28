@@ -281,12 +281,15 @@ namespace PokemonTCG.Cards
             private const string Kinesis = "Kinesis";
             private static readonly Mon Zen = new CardsMEW1.CounterBonusMon("Zen Force", 30);
 
+            // Kinesis is Alakazam-EX's Ability: M Alakazam-EX has none, so the engine runs this anyway and it checks the block here.
+            public override bool EvolveEffectFromCardBelow { get { return true; } }
+
             public override void OnEvolvedFromHand(EffectContext ctx)
             {
                 var me = ctx.Pokemon;
                 if (me == null || me.Stack.Count < 2) return;
                 var lower = me.Stack[me.Stack.Count - 2].Def;
-                if (!lower.Abilities.Any(a => a.Name == Kinesis)) return;
+                if (!lower.Abilities.Any(a => a.Name == Kinesis) || ctx.Engine.AbilityBlocked(me, Kinesis)) return;
                 bool any = ctx.Opp.Active != null || ctx.Opp.Bench.Count > 0;
                 if (!TriggerOnce(ctx, Kinesis, any, "Kinesis: put 2 damage counters on your opponent's Active Pokémon and 3 on 1 of their Benched Pokémon?")) return;
                 if (ctx.Opp.Active != null) ctx.PlaceCounters(ctx.Opp.Active, 2);

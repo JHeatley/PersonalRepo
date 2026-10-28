@@ -279,7 +279,7 @@ namespace PokemonTCG.Cards
                     if (bench.Count == 0) { ctx.Me.Deck.Add(card); continue; }
                     var target = ctx.ChoosePokemon(bench, "Turbo Energize: attach " + card.Def.Name + " to which Benched Pokémon?");
                     // A Pokémon protected from the attack's effects (Sigilyph's Safeguard) can be chosen, but the Energy is discarded (2013-06-20).
-                    if (target != null && !ctx.CanAffect(target))
+                    if (target != null && (!ctx.CanAffect(target) || CardsLTR2.SafeguardMon.StopsOwnAttack(ctx, target)))
                     {
                         ctx.Me.Discard.Add(card);
                         ctx.Log("Turbo Energize: " + target.Name + " is protected, so " + card.Def.Name + " is discarded.");

@@ -78,6 +78,9 @@ namespace PokemonTCG.Cards
             r.RegisterByName("Glimwood Tangle", new GlimwoodTangle());
             r.RegisterByName("Old PC", new OldPC());
             r.RegisterByName("Pokémon Breeder's Nurturing", new BreedersNurturing());
+            // Rare Fossil's play rules are in the engine, from its card data (CardDef.IsFossil): 70 HP, no Special Conditions, a
+            // Prize card when Knocked Out, like Unidentified Fossil's.
+            r.RegisterByName("Rare Fossil", new CardScript());
             r.RegisterByName("Rose Tower", new RoseTower());
             r.RegisterByName("Spikemuth", new Spikemuth());
             r.RegisterByName("Struggle Gloves", new StruggleGloves());

@@ -316,20 +316,23 @@ namespace PokemonTCG.Cards
             private readonly int affected;
             private readonly HashSet<int> seen;
             private readonly HashSet<int> exempt;
+            /// <summary>The Pokémon that used it (Pure Heart looks at whether the attacker is a Pokémon-GX).</summary>
+            private readonly PokemonInPlay attacker;
 
-            public ClearVisionEffect(string name, int owner, int affectedPlayer, HashSet<int> seen, HashSet<int> exempt)
+            public ClearVisionEffect(string name, int owner, int affectedPlayer, HashSet<int> seen, HashSet<int> exempt, PokemonInPlay attacker)
                 : base(name, owner, -1, int.MaxValue, false)
             {
                 affected = affectedPlayer;
                 this.seen = seen;
                 this.exempt = exempt;
+                this.attacker = attacker;
             }
 
             public override bool PreventsAttackNamed(GameEngine engine, PokemonInPlay mon, string name)
             {
                 if (mon == null || mon.Owner != affected || name == null || !name.EndsWith("-GX", StringComparison.Ordinal)) return false;
                 if (seen.Contains(mon.Uid)) return !exempt.Contains(mon.Uid);
-                return !engine.EffectsPrevented(mon, EffectSourceKind.Attack, Owner, false);
+                return !engine.EffectsPreventedFrom(mon, EffectSourceKind.Attack, Owner, attacker);
             }
         }
 
@@ -362,7 +365,7 @@ namespace PokemonTCG.Cards
                     var seen = new HashSet<int>(ctx.OpponentPokemon().Select(m => m.Uid));
                     var exempt = new HashSet<int>(ctx.OpponentPokemon(m => !ctx.CanAffect(m)).Select(m => m.Uid));
                     ctx.AddEffect(new ClearVisionEffect("Clear Vision-GX: " + ctx.Engine.PlayerName(ctx.Opponent) + "'s Pokémon can't use GX attacks for the rest of the game",
-                        ctx.Player, ctx.Opponent, seen, exempt));
+                        ctx.Player, ctx.Opponent, seen, exempt, ctx.Pokemon));
                     return true;
                 }
                 return false;

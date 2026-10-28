@@ -130,15 +130,8 @@ namespace PokemonTCG.Cards
         {
             private static readonly Mon Swallow = new CardsDAA1.DrainMon("Swallow");
 
-            public override bool AllowsAttackWhileAsleepOrParalyzed(EffectContext src, PokemonInPlay mon)
-            {
-                return src.Pokemon != null && mon == src.Pokemon && mon.Has(SpecialCondition.Asleep) && !mon.Has(SpecialCondition.Paralyzed);
-            }
-
-            public override bool CanUseAttack(EffectContext ctx, int attackIndex)
-            {
-                return ctx.Attack(attackIndex).Name == "Toss and Turn" || !ctx.Pokemon.Has(SpecialCondition.Asleep);
-            }
+            // "This attack can be used even if this Pokémon is Asleep" (not while Paralyzed): the engine's hook for that (Dream Waltz).
+            public override bool UsableWhileAsleep(AttackDef attack) { return attack != null && attack.Name == "Toss and Turn"; }
 
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {

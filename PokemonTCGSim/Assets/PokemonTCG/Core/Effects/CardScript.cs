@@ -44,6 +44,11 @@ namespace PokemonTCG.Core
         public virtual void OnPlayedFromHandToBench(EffectContext ctx) { }
         /// <summary>Triggered when this card is played from hand to evolve a Pokémon (ctx.Pokemon is the evolved Pokémon).</summary>
         public virtual void OnEvolvedFromHand(EffectContext ctx) { }
+        /// <summary>
+        /// OnEvolvedFromHand is an Ability of the card underneath (Alakazam-EX's Kinesis for M Alakazam-EX): it runs although the
+        /// evolved Pokémon has no Ability of its own, and the script checks whether that Ability is blocked.
+        /// </summary>
+        public virtual bool EvolveEffectFromCardBelow { get { return false; } }
         /// <summary>Extra conditions on an attack beyond its Energy cost.</summary>
         public virtual bool CanUseAttack(EffectContext ctx, int attackIndex) { return true; }
         /// <summary>"If you go first, you can use this attack during your first turn."</summary>

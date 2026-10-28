@@ -464,6 +464,9 @@ namespace PokemonTCG.Cards
                 return ctx.Me.Deck.Count > 0 && Targets(ctx).Any(m => EvolutionLines.CanEvolveAtAll(m.Name, true));
             }
 
+            // "You can use this card during your first turn": the first player's first-turn Supporter rule doesn't stop it.
+            public override bool PlayableOnFirstTurn(EffectContext ctx) { return true; }
+
             public override void ResolveTrainer(EffectContext ctx) { EvolveOneFromDeck(ctx, Targets(ctx), d => !d.IsPokemonEX, "Wally"); }
         }
     }

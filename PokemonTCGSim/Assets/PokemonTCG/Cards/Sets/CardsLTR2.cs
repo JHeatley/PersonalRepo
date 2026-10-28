@@ -151,6 +151,16 @@ namespace PokemonTCG.Cards
 
             public SafeguardMon(Mon attacks) { this.attacks = attacks; }
 
+            /// <summary>
+            /// Safeguard stops the attack of the player's own Pokémon-EX too, which the engine's prevention never checks (it only
+            /// looks at the opponent's attacks): true when this Pokémon-EX's attack can't affect that Pokémon of its own side.
+            /// </summary>
+            internal static bool StopsOwnAttack(EffectContext ctx, PokemonInPlay target)
+            {
+                return target != null && ctx.Pokemon != null && target != ctx.Pokemon && ctx.Pokemon.Def.IsPokemonEX
+                       && ctx.Engine.Scripts.For(target.Def) is SafeguardMon && !ctx.Engine.AbilityBlocked(target, "Safeguard");
+            }
+
             public override int ModifyDamageTaken(EffectContext src, DamageInfo info, int damage)
             {
                 var a = info.Attacker;
