@@ -160,6 +160,8 @@ namespace PokemonTCG.Tests
         {
             var e = Scenario(new ScriptedAgent(), new ScriptedAgent());
             var lapras = e.ScenarioActive(0, C(LaprasGX));
+            e.ScenarioAttach(lapras, C(Water)); // its Retreat Cost of 2
+            e.ScenarioAttach(lapras, C(Water));
             e.ScenarioBench(0, C(SnorlaxGX));
             var dragalge = e.ScenarioActive(1, C(Skrelp));
             e.ScenarioEvolve(dragalge, C(Dragalge));

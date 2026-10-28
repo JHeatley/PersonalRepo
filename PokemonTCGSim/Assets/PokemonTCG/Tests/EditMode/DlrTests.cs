@@ -81,11 +81,11 @@ namespace PokemonTCG.Tests
             Assert.AreEqual(1, e.GetMainActions(0).Count(o => o.Label.Contains("Play Legendary Pyroduct")));
             e.ScenarioAddToHand(1, C(Chansey));
             e.ScenarioAddToHand(1, C(Chansey));
-            Assert.IsNull(Invariants.Check(e, 3), "3 cards each");
+            Assert.IsNull(Invariants.Check(e, 29), "29 cards each (6 Prize cards and 20 in the deck too)");
             Step(e);
             Assert.AreSame(top, e.State.Stadium);
             Assert.AreSame(bottom, e.State.StadiumPartner);
-            Assert.IsNull(Invariants.Check(e, 3), "v154.1: the other half in play is still counted (it was 59 of 60)");
+            Assert.IsNull(Invariants.Check(e, 29), "v154.1: the other half in play is still counted (it was 59 of 60)");
             Assert.AreEqual(0, e.State.Players[0].Hand.Count);
             e.DiscardStadium();
             Assert.IsNull(e.State.Stadium);

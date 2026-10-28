@@ -258,7 +258,7 @@ namespace PokemonTCG.Tests
         [Test]
         public void Fiery_Flint_Costs_2_Other_Cards()
         {
-            var e = Scenario(new ScriptedAgent().Then("Play Fiery Flint", "Psychic Energy|Psychic Energy", "Fire Energy|Fire Energy|Fire Energy|Fire Energy"), new ScriptedAgent());
+            var e = Scenario(new ScriptedAgent().Then("Play Fiery Flint", "Fire Energy|Fire Energy|Fire Energy|Fire Energy") /* the 2 other cards are the only choice: not asked */, new ScriptedAgent());
             e.ScenarioActive(0, C(Snubbull));
             e.ScenarioAddToHand(0, C(FieryFlint));
             e.ScenarioAddToHand(0, C(Psychic));

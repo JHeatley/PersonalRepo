@@ -100,7 +100,7 @@ namespace PokemonTCG.Tests
         [Test]
         public void Superior_Energy_Retrieval_Takes_Up_To_4_And_Needs_Only_2_Other_Cards()
         {
-            var e = Scenario(new ScriptedAgent().Then("Play Superior Energy Retrieval", "Pidgey|Pidgey", "Fire Energy|Fire Energy"), new ScriptedAgent());
+            var e = Scenario(new ScriptedAgent().Then("Play Superior Energy Retrieval", "Fire Energy|Fire Energy") /* the 2 Pidgey are the only choice: not asked */, new ScriptedAgent());
             e.ScenarioActive(0, C(Tauros));
             e.ScenarioActive(1, C(Tauros));
             e.ScenarioAddToHand(0, C(SuperiorEnergyRetrieval));

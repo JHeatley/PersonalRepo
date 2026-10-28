@@ -284,7 +284,7 @@ namespace PokemonTCG.Tests
             var chansey = other.ScenarioActive(1, C(Blissey));
             other.ScenarioSetTurn(0, 3);
             Step(other);
-            Assert.AreEqual(2, chansey.DamageCounters, "not a Darkness Pokémon: no bonus and no damage to it");
+            Assert.AreEqual(4, chansey.DamageCounters, "not a Darkness Pokémon: no bonus (20 x 2 for Blissey's Fighting Weakness)");
             Assert.AreEqual(0, lee.DamageCounters);
         }
 

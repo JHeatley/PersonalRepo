@@ -350,7 +350,7 @@ namespace PokemonTCG.Tests
         {
             var e = Scenario(new ScriptedAgent().Then("Attack: Yoga Loop", "Feebas"), new ScriptedAgent());
             var medicham = e.ScenarioActive(0, C(MedichamV));
-            Attach(e, medicham, Fighting, 2);
+            Attach(e, medicham, Fighting, 3); // Smash Uppercut costs [F][C][C]
             e.ScenarioActive(1, C(Tauros));
             var feebas = e.ScenarioBench(1, C(Feebas));
             feebas.DamageCounters = 1;

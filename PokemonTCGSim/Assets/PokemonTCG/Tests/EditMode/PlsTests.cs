@@ -281,6 +281,7 @@ namespace PokemonTCG.Tests
                 e.ScenarioAddToDeck(0, C(Lucario), 1);
                 e.ScenarioAddToDeck(0, C(Fighting), 3);
                 e.ScenarioSetTurn(0, 1);
+                e.State.Rng = new Rng(1000 + i); // a different coin flip each time (every scenario starts from the same seed)
                 Step(e);
                 if (riolu.Name == "Lucario") evolved++;
                 else missed++;

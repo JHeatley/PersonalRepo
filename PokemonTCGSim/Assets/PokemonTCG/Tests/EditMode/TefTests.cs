@@ -313,7 +313,7 @@ namespace PokemonTCG.Tests
         [Test]
         public void Summoning_Gate_Can_Bench_Evolution_Pokemon()
         {
-            var agent = new ScriptedAgent().Then("Attack: Summoning Gate");
+            var agent = new ScriptedAgent().Then("Attack: Summoning Gate", "Duosion|Solosis");
             var e = Scenario(agent, new ScriptedAgent());
             var reuniclus = e.ScenarioActive(0, C("TEF-72"));
             e.ScenarioAttach(reuniclus, C(Psychic));

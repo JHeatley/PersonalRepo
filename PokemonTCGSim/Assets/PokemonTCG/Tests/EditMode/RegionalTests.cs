@@ -124,7 +124,8 @@ namespace PokemonTCG.Tests
             var round2 = RoundMatches(sim, 2);
             int bye2 = round2.Single(x => x.IsBye).A;
             Assert.AreNotEqual(bye1, bye2, "not the same player twice");
-            Assert.AreEqual(0, standings.Single(x => x.Id == bye2).Points, "a player without a win gets it");
+            // The round 2 bye counts as a win as soon as it's given: its 3 points are the player's only ones.
+            Assert.AreEqual(3, standings.Single(x => x.Id == bye2).Points, "a player without a win gets it");
         }
 
         [Test]

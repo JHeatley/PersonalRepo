@@ -128,7 +128,7 @@ namespace PokemonTCG.Tests
             e.ScenarioAttachTool(chansey, C(Buffer));
             e.ScenarioSetTurn(0, 3);
             Step(e);
-            Assert.AreEqual(2, chansey.DamageCounters, "40 - 20");
+            Assert.AreEqual(6, chansey.DamageCounters, "40 x 2 for Chansey's Fighting Weakness, then 20 less");
             e.EndTurn();
             Assert.AreEqual(0, chansey.Tools.Count);
         }
