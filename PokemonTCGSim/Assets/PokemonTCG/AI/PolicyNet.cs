@@ -315,6 +315,14 @@ namespace PokemonTCG.AI
 
         public int CardRows { get { lock (cardLock) return cardRows.Count; } }
 
+        private int weightsRevision;
+
+        /// <summary>
+        /// Goes up whenever the weights change (a learning step, the learner's weights taken in, loading, a reset), so a copy kept
+        /// elsewhere (the GPU learner choosing moves, GpuMoves) knows when it's out of date. New card rows don't count: see CardRows.
+        /// </summary>
+        public int WeightsRevision { get { return System.Threading.Volatile.Read(ref weightsRevision); } }
+
         // ------------------------------------------------------------------ Cards
 
         /// <summary>Row of the card table for this card (added on first sight, starting from its printed stats only).</summary>
@@ -1420,6 +1428,7 @@ namespace PokemonTCG.AI
             }
             finally
             {
+                weightsRevision++; // the GPU learner's copy is out of date now (GpuMoves)
                 rw.ExitWriteLock();
             }
         }
@@ -1542,8 +1551,9 @@ namespace PokemonTCG.AI
         /// Writes the weights for the GPU learner: each tensor (name, shape, numbers), then the card table's learned rows and,
         /// with stats, their printed stats. Strings are an int32 byte length and UTF-8.
         /// </summary>
-        public void WriteLearnerWeights(BinaryWriter w, bool withStats)
+        public int WriteLearnerWeights(BinaryWriter w, bool withStats)
         {
+            int rows;
             rw.EnterReadLock();
             try
             {
@@ -1557,9 +1567,36 @@ namespace PokemonTCG.AI
                 }
                 lock (cardLock)
                 {
-                    w.Write(cardRows.Count);
+                    rows = cardRows.Count;
+                    w.Write(rows);
                     foreach (var row in cardRows) foreach (float v in row) w.Write(v);
                     if (withStats) foreach (var st in cardStatic) foreach (float v in st) w.Write(v);
+                }
+            }
+            finally
+            {
+                rw.ExitReadLock();
+            }
+            return rows;
+        }
+
+        /// <summary>
+        /// The card rows from row from on (cards met since the GPU learner last had the table): their count, learned rows and
+        /// printed stats. Returns the card table's size it wrote up to.
+        /// </summary>
+        public int WriteNewCardRows(BinaryWriter w, int from)
+        {
+            rw.EnterReadLock();
+            try
+            {
+                lock (cardLock)
+                {
+                    int rows = cardRows.Count;
+                    w.Write(from);
+                    w.Write(rows - from);
+                    for (int i = from; i < rows; i++) foreach (float v in cardRows[i]) w.Write(v);
+                    for (int i = from; i < rows; i++) foreach (float v in cardStatic[i]) w.Write(v);
+                    return rows;
                 }
             }
             finally
@@ -1631,6 +1668,7 @@ namespace PokemonTCG.AI
             }
             finally
             {
+                weightsRevision++; // the GPU learner's copy is out of date now (GpuMoves)
                 rw.ExitWriteLock();
             }
         }
@@ -1722,6 +1760,7 @@ namespace PokemonTCG.AI
                 }
                 finally
                 {
+                    weightsRevision++; // the GPU learner's copy is out of date now (GpuMoves)
                     rw.ExitWriteLock();
                 }
                 return true;
@@ -1803,6 +1842,7 @@ namespace PokemonTCG.AI
                 }
                 finally
                 {
+                    weightsRevision++; // the GPU learner's copy is out of date now (GpuMoves)
                     rw.ExitWriteLock();
                 }
                 return true;
@@ -1866,6 +1906,7 @@ namespace PokemonTCG.AI
             }
             finally
             {
+                weightsRevision++; // the GPU learner's copy is out of date now (GpuMoves)
                 rw.ExitWriteLock();
             }
         }

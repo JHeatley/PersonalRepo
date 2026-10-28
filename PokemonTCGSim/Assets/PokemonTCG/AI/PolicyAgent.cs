@@ -63,6 +63,14 @@ namespace PokemonTCG.AI
         public double LearnFromSearch;
         /// <summary>Decisions the look-ahead made while training (they carry a target).</summary>
         public int Searched;
+        /// <summary>Choosing moves on the GPU (many games at once): the network runs there instead of here; null: here.</summary>
+        public GpuMoves Moves;
+
+        private float[] Evaluate(PolicyInput x, out float value)
+        {
+            var moves = Moves;
+            return moves != null && moves.Net == Net ? moves.Evaluate(x, out value) : Net.Evaluate(x, out value);
+        }
         private GameEngine engine;
 
         /// <summary>Counts for the sequencing report.</summary>
@@ -91,7 +99,7 @@ namespace PokemonTCG.AI
             var choices = PolicyEncoder.Choices(r, new List<int>());
             if (choices.Count == 0) return 0;
             float value;
-            Net.Evaluate(PolicyEncoder.Encode(r, Memory, Net, choices), out value);
+            Evaluate(PolicyEncoder.Encode(r, Memory, Net, choices), out value);
             return value;
         }
 
@@ -131,7 +139,7 @@ namespace PokemonTCG.AI
         {
             var x = PolicyEncoder.Encode(r, Memory, Net, choices);
             float value;
-            var logits = Net.Evaluate(x, out value);
+            var logits = Evaluate(x, out value);
             var p = PolicyNet.Softmax(logits);
             int a = 0, top = 0;
             for (int i = 1; i < p.Length; i++) if (logits[i] > logits[top]) top = i;
