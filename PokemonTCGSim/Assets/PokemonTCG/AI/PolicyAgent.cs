@@ -17,6 +17,11 @@ namespace PokemonTCG.AI
         public int Mistakes;
         /// <summary>Sampled a move other than its top-rated one (it tried something new, for the Train screen).</summary>
         public bool Explored;
+        /// <summary>
+        /// Training from the look-ahead: the improved choice the play-outs found (over the same options), which the network learns
+        /// to match; null for an ordinary decision (learned by PPO).
+        /// </summary>
+        public float[] Target;
     }
 
     /// <summary>
@@ -51,6 +56,13 @@ namespace PokemonTCG.AI
         public Func<bool> Abort;
         /// <summary>Look-ahead at main actions (playing for real, not while training or recording); null plays on the network alone.</summary>
         public PolicySearch Search;
+        /// <summary>
+        /// Training from the look-ahead: while training (Record), this share of its main actions the network isn't sure of are
+        /// played by the look-ahead (Search), and the decision keeps the look-ahead's improved choice as its target.
+        /// </summary>
+        public double LearnFromSearch;
+        /// <summary>Decisions the look-ahead made while training (they carry a target).</summary>
+        public int Searched;
         private GameEngine engine;
 
         /// <summary>Counts for the sequencing report.</summary>
@@ -123,8 +135,15 @@ namespace PokemonTCG.AI
             var p = PolicyNet.Softmax(logits);
             int a = 0, top = 0;
             for (int i = 1; i < p.Length; i++) if (logits[i] > logits[top]) top = i;
+            float[] target = null;
             if (Greedy && Search != null && !Record && r.Kind == DecisionKind.MainAction && engine != null)
                 a = Search.Pick(engine, r, Memory, choices, p, top);
+            else if (Record && LearnFromSearch > 0 && Search != null && r.Kind == DecisionKind.MainAction && engine != null
+                     && (rng.NextULong() >> 11) * (1.0 / 9007199254740992.0) < LearnFromSearch
+                     && (a = SearchedPick(r, choices, p, top, out target)) >= 0)
+            {
+                // the look-ahead's move, with its improved choice as the target (SearchedPick)
+            }
             else if (Greedy) a = top;
             else
             {
@@ -158,10 +177,24 @@ namespace PokemonTCG.AI
                     Value = value,
                     PrizeLead = lead,
                     Mistakes = mistakes,
-                    Explored = a != top
+                    Explored = target == null && a != top,
+                    Target = target
                 });
             }
             return a;
+        }
+
+        /// <summary>The look-ahead's move and improved choice for a training decision; -1 when it didn't look ahead (sure enough).</summary>
+        private int SearchedPick(DecisionRequest r, List<PolicyEncoder.Choice> choices, double[] p, int top, out float[] target)
+        {
+            target = null;
+            double[] improved;
+            int pick = Search.Pick(engine, r, Memory, choices, p, top, out improved);
+            if (improved == null) return -1;
+            target = new float[improved.Length];
+            for (int i = 0; i < improved.Length; i++) target[i] = (float)improved[i];
+            Searched++;
+            return pick;
         }
 
         /// <summary>

@@ -45,6 +45,10 @@ overall and keeps the heaviest maths off the CPU.
 If the learner isn't running or stops, the sim learns that round on the CPU, says why, and tries the GPU again a
 few rounds later; nothing is lost. Stop the learner with Ctrl+C when you're done.
 
+**Learn from look-ahead** (the Train screen's setting, `--search-share` for the command-line trainer) needs this
+version of `learner.py`: those rounds also send the look-ahead's choices, which the learner trains the network to match.
+An older learner.py says "different versions" and the sim learns those rounds on the CPU.
+
 `python learner.py --device cpu` runs it on the CPU instead (PyTorch's CPU maths is still faster than the
 sim's own), and `--port` changes the port.
 

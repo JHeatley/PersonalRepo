@@ -10,6 +10,8 @@ namespace PokemonTCG.AI
     public sealed class GpuLearnResult
     {
         public double PolicyLoss, ValueLoss, Entropy, ClipFraction, Seconds;
+        /// <summary>Cross-entropy to the look-ahead's choices (training from the look-ahead; 0 without).</summary>
+        public double DistillLoss;
         public int Batches, Skipped;
         /// <summary>Where it learned, e.g. "cuda:0 (NVIDIA GeForce RTX 2060)".</summary>
         public string Device = "";
@@ -24,7 +26,12 @@ namespace PokemonTCG.AI
     /// </summary>
     public sealed class GpuLearner : IDisposable
     {
-        public const int Version = 1;
+        /// <summary>
+        /// Message version: 1, or 2 when some decisions carry the look-ahead's improved choice (training from the look-ahead): then
+        /// TRN1 adds the distillation weight after max grad norm, and the samples end with f32 has-target[N] and f32
+        /// targets[sum of option counts]. learner.py reads both; RES1 ends with f64 distillation loss (after the weights) for version 2.
+        /// </summary>
+        public const int Version = 1, VersionWithTargets = 2;
         public const string DefaultAddress = "127.0.0.1:5577";
 
         public readonly string Host;
@@ -104,13 +111,16 @@ namespace PokemonTCG.AI
         /// Throws IOException when the learner can't be reached or answers with an error.
         /// </summary>
         public GpuLearnResult Train(PolicyNet net, IList<PolicyInput> inputs, int[] actions, float[] logp, float[] adv, float[] ret,
-            int epochs, int minibatch, int seed, double clip, double dualClip, double valueCoef, double entropyCoef)
+            int epochs, int minibatch, int seed, double clip, double dualClip, double valueCoef, double entropyCoef,
+            float[][] targets = null, double distillCoef = 0)
         {
             if (!Connected) Connect(3000);
+            bool withTargets = false;
+            if (targets != null) foreach (var t in targets) if (t != null) withTargets = true;
             var body = new MemoryStream();
             using (var w = new BinaryWriter(body, Encoding.UTF8, true))
             {
-                w.Write(Version);
+                w.Write(withTargets ? VersionWithTargets : Version);
                 w.Write(epochs);
                 w.Write(minibatch);
                 w.Write(seed);
@@ -120,8 +130,19 @@ namespace PokemonTCG.AI
                 w.Write(entropyCoef);
                 w.Write(net.LearningRate);
                 w.Write(net.MaxGradNorm);
+                if (withTargets) w.Write(distillCoef);
                 net.WriteLearnerWeights(w, true);
                 WriteSamples(w, inputs, actions, logp, adv, ret);
+                if (withTargets)
+                {
+                    for (int i = 0; i < inputs.Count; i++) w.Write(targets[i] != null && targets[i].Length == inputs[i].Count ? 1f : 0f);
+                    for (int i = 0; i < inputs.Count; i++)
+                    {
+                        var t = targets[i];
+                        bool ok = t != null && t.Length == inputs[i].Count;
+                        for (int k = 0; k < inputs[i].Count; k++) w.Write(ok ? t[k] : 0f);
+                    }
+                }
             }
             var reply = Exchange("TRN1", body, "RES1");
             using (var r = new BinaryReader(new MemoryStream(reply)))
@@ -132,6 +153,7 @@ namespace PokemonTCG.AI
                     Batches = r.ReadInt32(), Skipped = r.ReadInt32(), Seconds = r.ReadDouble(), Device = ReadString(r)
                 };
                 net.ReadLearnerWeights(r, result.Batches);
+                if (withTargets) result.DistillLoss = r.ReadDouble(); // after the weights
                 Device = result.Device;
                 return result;
             }

@@ -32,6 +32,11 @@ namespace PokemonTCG.AI
         /// it, so the play-outs' noise doesn't make it change its mind for nothing.
         /// </summary>
         public double Margin = 0.03;
+        /// <summary>
+        /// How strongly what the play-outs found reshapes the network's choice in the target it learns from (training from the
+        /// look-ahead): the target is the network's probabilities times e^(TargetScale x the move's play-out value).
+        /// </summary>
+        public double TargetScale = 10;
 
         public static SearchSettings Quick(int threads)
         {
@@ -41,6 +46,12 @@ namespace PokemonTCG.AI
         public static SearchSettings Deep(int threads)
         {
             return new SearchSettings { Playouts = 96, MaxCandidates = 5, Turns = 2, Threads = Math.Max(1, threads), MaxSeconds = 6 };
+        }
+
+        /// <summary>A light look-ahead for training games (learning from the look-ahead): many decisions, a little each.</summary>
+        public static SearchSettings Training()
+        {
+            return new SearchSettings { Playouts = 16, MaxCandidates = 3, SkipAbove = 0.85, Turns = 1, Threads = 1, MaxSeconds = 1 };
         }
     }
 
@@ -80,6 +91,8 @@ namespace PokemonTCG.AI
         private sealed class Candidate
         {
             public PolicyEncoder.Choice Choice;
+            /// <summary>Its index in the choices.</summary>
+            public int Index;
             public DecisionOption Option;
             public double Prior;
             public double Sum;
@@ -93,6 +106,18 @@ namespace PokemonTCG.AI
         /// </summary>
         public int Pick(GameEngine engine, DecisionRequest r, PolicyMemory memory, List<PolicyEncoder.Choice> choices, double[] probs, int top)
         {
+            double[] target;
+            return Pick(engine, r, memory, choices, probs, top, out target);
+        }
+
+        /// <summary>
+        /// Pick, and the improved choice the network learns from (training from the look-ahead): its probabilities over the
+        /// choices, reweighted by what the play-outs found (null when it didn't look ahead).
+        /// </summary>
+        public int Pick(GameEngine engine, DecisionRequest r, PolicyMemory memory, List<PolicyEncoder.Choice> choices, double[] probs, int top,
+            out double[] target)
+        {
+            target = null;
             LastReport = "";
             if (engine == null || engine.State == null || r == null || r.Kind != DecisionKind.MainAction || choices.Count < 2) return top;
             if (probs[top] >= Settings.SkipAbove || choices[top].Done) return top;
@@ -105,7 +130,7 @@ namespace PokemonTCG.AI
             foreach (int i in order)
             {
                 if (cands.Count >= Math.Max(1, Settings.MaxCandidates) || (cands.Count > 0 && cover >= Settings.PriorCover)) break;
-                cands.Add(new Candidate { Choice = choices[i], Option = r.Options[choices[i].Option], Prior = probs[i] });
+                cands.Add(new Candidate { Choice = choices[i], Index = i, Option = r.Options[choices[i].Option], Prior = probs[i] });
                 cover += probs[i];
             }
             if (cands.Count < 2) return top;
@@ -168,8 +193,44 @@ namespace PokemonTCG.AI
             var best = alive[0].N > 0 ? alive[0] : topCand;
             if (best != topCand && alive.Contains(topCand) && best.Mean - topCand.Mean < Settings.Margin) best = topCand;
             LastReport = Report(cands, best);
+            target = Target(cands, probs);
             if (best != topCand) lock (counts) Changed++;
             return choices.IndexOf(best.Choice);
+        }
+
+        /// <summary>
+        /// The network's probabilities reweighted by the play-outs (Gumbel MuZero's "completed" values): a move played out gets its
+        /// average result, one that wasn't the prior-weighted average of those that were; each gets e^(TargetScale x value).
+        /// </summary>
+        private double[] Target(List<Candidate> cands, double[] probs)
+        {
+            double weight = 0, mixed = 0;
+            foreach (var c in cands)
+            {
+                if (c.N == 0) continue;
+                weight += c.Prior;
+                mixed += c.Prior * c.Mean;
+            }
+            if (weight <= 0) return null;
+            mixed /= weight;
+            var value = new double[probs.Length];
+            for (int i = 0; i < value.Length; i++) value[i] = mixed;
+            foreach (var c in cands) if (c.N > 0) value[c.Index] = c.Mean;
+            var logits = new double[probs.Length];
+            double max = double.NegativeInfinity;
+            for (int i = 0; i < logits.Length; i++)
+            {
+                logits[i] = Math.Log(Math.Max(1e-9, probs[i])) + Settings.TargetScale * value[i];
+                if (logits[i] > max) max = logits[i];
+            }
+            double sum = 0;
+            for (int i = 0; i < logits.Length; i++)
+            {
+                logits[i] = Math.Exp(logits[i] - max);
+                sum += logits[i];
+            }
+            for (int i = 0; i < logits.Length; i++) logits[i] /= sum;
+            return logits;
         }
 
         private static string Report(List<Candidate> cands, Candidate best)

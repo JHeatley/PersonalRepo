@@ -28,6 +28,10 @@ samples: int32 N, slots, slot features, global features, turn features, option f
          [N*slots], slot tools [N*slots]; f32 slot features; per bag: int32 lengths[N], int32 ids[sum]; int32 stadium[N],
          source[N]; f32 globals, turn features; int32 option counts[N]; int32 kinds, cards, targets [sum]; f32 option
          features; int32 actions[N]; f32 old log-probabilities[N], advantages[N], returns[N]
+Version 2 (training from the look-ahead: some decisions carry the look-ahead's improved choice): TRN1 adds f64
+         distillation weight after max grad norm, the samples end with f32 has-target[N] and f32 targets[sum of option
+         counts], and RES1 ends with f64 distillation loss. Those decisions learn to match their target (cross-entropy)
+         instead of PPO. Version 1 messages work as before.
 """
 import argparse
 import io
@@ -42,6 +46,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 VERSION = 1
+VERSIONS = (1, 2)
 CARD_DIM, STATIC_SIZE = 48, 64
 NEG_INF = -1e9
 
@@ -103,6 +108,20 @@ def read_weights(r, with_static=True):
     learned = r.floats(rows * CARD_DIM).reshape(rows, CARD_DIM)
     static = r.floats(rows * STATIC_SIZE).reshape(rows, STATIC_SIZE) if with_static else None
     return tensors, learned, static
+
+
+def read_targets(r, s):
+    """Version 2: which decisions carry the look-ahead's improved choice, and the choices (padded like the options)."""
+    n, counts = s["n"], s["counts"]
+    s["has_target"] = r.floats(n).astype(np.float32)
+    flat = r.floats(int(counts.sum()))
+    width = s["opt_mask"].shape[1]
+    s["target"] = np.zeros((n, width), np.float32)
+    pos = 0
+    for i in range(n):
+        c = counts[i]
+        s["target"][i, :c] = flat[pos:pos + c]
+        pos += c
 
 
 def read_samples(r):
@@ -307,12 +326,15 @@ class Learner:
                         grown[k] = v
                 self.opt.state[bigger] = grown
 
-    def train(self, r):
+    def train(self, r, version=1):
         start = time.time()
         epochs, minibatch, seed = r.i32(), r.i32(), r.i32()
         clip, dual, value_coef, ent_coef, lr, max_norm = (r.f64() for _ in range(6))
+        distill = r.f64() if version >= 2 else 0.0
         tensors, learned, static = read_weights(r)
         s = read_samples(r)
+        if version >= 2:
+            read_targets(r, s)
         self._sync(tensors, learned, static, lr)
         model, dev = self.model, self.device
         n = s["n"]
@@ -320,6 +342,7 @@ class Learner:
         adv_all = ((adv_all - adv_all.mean()) / (adv_all.std() + 1e-8)).astype(np.float32)
         rng = np.random.default_rng(seed)
         stats = np.zeros(4)
+        distill_sum = distill_n = 0.0
         batches = skipped = 0
         model.train()
         for _ in range(epochs):
@@ -342,7 +365,18 @@ class Learner:
                 # can't produce a huge step.
                 pg = torch.where((adv < 0) & (ratio > dual), (-dual * adv).detach(), pg)
                 v_err = value - ret
-                loss = pg.mean() + value_coef * (v_err ** 2).mean() - ent_coef * entropy.mean()
+                loss = value_coef * (v_err ** 2).mean() - ent_coef * entropy.mean()
+                if version >= 2:
+                    # Decisions the look-ahead made learn to match its improved choice (cross-entropy), not PPO.
+                    has = torch.as_tensor(s["has_target"][idx], device=dev)
+                    tgt = torch.as_tensor(s["target"][idx], device=dev)
+                    ce = -(tgt * logp_all.masked_fill(~b["opt_mask"], 0)).sum(-1)
+                    pg = pg * (1 - has)
+                    loss = loss + distill * (ce * has).mean()
+                    with torch.no_grad():
+                        distill_sum += (ce * has).sum().item()
+                        distill_n += has.sum().item()
+                loss = loss + pg.mean()
                 self.opt.zero_grad(set_to_none=True)
                 loss.backward()
                 norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm)
@@ -363,8 +397,12 @@ class Learner:
         w_f64(out, time.time() - start)
         w_str(out, str(dev) + (" (" + torch.cuda.get_device_name(dev) + ")" if dev.type == "cuda" else ""))
         write_weights(out, model)
+        if version >= 2:
+            w_f64(out, distill_sum / distill_n if distill_n > 0 else 0.0)
         print(f"round: {n:,} decisions, {batches} steps on {dev} in {time.time() - start:.2f}s "
-              f"(policy {stats[0]:+.3f}, value {stats[1]:.3f}, entropy {stats[2]:.2f})", flush=True)
+              f"(policy {stats[0]:+.3f}, value {stats[1]:.3f}, entropy {stats[2]:.2f}"
+              + (f", {int(distill_n / max(1, epochs)):,} look-ahead decisions, match {distill_sum / distill_n:.2f}" if distill_n > 0 else "")
+              + ")", flush=True)
         return b"RES1", out.getvalue()
 
     def forward(self, r):
@@ -411,10 +449,11 @@ def serve(learner, host, port):
                 kind, size = head[:4], struct.unpack("<q", head[4:])[0]
                 r = Reader(recv_exact(conn, size))
                 try:
-                    if r.i32() != VERSION:
+                    version = r.i32()
+                    if version not in VERSIONS:
                         raise ValueError("the sim and this learner are different versions: update both")
                     if kind == b"TRN1":
-                        reply = learner.train(r)
+                        reply = learner.train(r, version)
                     elif kind == b"FWD1":
                         reply = learner.forward(r)
                     else:
