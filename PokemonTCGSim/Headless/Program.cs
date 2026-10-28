@@ -130,7 +130,7 @@ public static class Program
         var net = new PolicyNet();
         if (!net.FromBytes(File.ReadAllBytes(path))) throw new ArgumentException(path + " isn't a network file.");
         Console.WriteLine("network: " + path + " (" + (string.IsNullOrEmpty(net.Origin) ? "fresh" : net.Origin) + ", " + net.Steps + " steps here, "
-                          + net.GamesTrained.ToString("N0") + " games)");
+                          + net.GamesTrained.ToString("N0") + " games, " + net.Blocks + " blocks)");
         return net;
     }
 
@@ -150,6 +150,14 @@ public static class Program
         var db = LoadCards();
         var decks = LoadDecks(db, o);
         var net = LoadNet(o, outPath);
+        int blocks = Int(o, "blocks", net.Blocks);
+        if (blocks > net.Blocks)
+        {
+            // Deeper, keeping what it knows (it plays the same until training puts the new blocks to use).
+            Console.WriteLine("making the network bigger: " + net.Blocks + " -> " + blocks + " blocks");
+            net.Grow(blocks);
+        }
+        else if (blocks < net.Blocks) Console.WriteLine("--blocks " + blocks + ": the network already has " + net.Blocks + " blocks (it can't be made smaller)");
         var trainer = new PolicyTrainer(net, StandardCards.CreateRegistry(), decks, Int(o, "seed", Environment.TickCount & 0xFFFFF))
         {
             GamesPerRound = Int(o, "games-per-round", 128),

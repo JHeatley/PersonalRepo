@@ -289,6 +289,13 @@ class Learner:
         """Puts the sim's current weights into the model, keeping the optimizer's state from round to round."""
         rows = learned.shape[0]
         fresh = self.model is None or self.model.cards.ids.weight.shape[0] > rows
+        carried = None
+        if not fresh and set(tensors) != self._names():
+            # The network was made bigger in the sim (more blocks): a new model, keeping the optimizer's state for the
+            # weights it already had.
+            fresh = True
+            if self.opt is not None:
+                carried = {n: self.opt.state[p] for n, p in self.model.named_parameters() if p in self.opt.state}
         if fresh:
             self.model = SimNet(tensors, rows).to(self.device)
             self.opt = None
@@ -310,6 +317,15 @@ class Learner:
                 for g in self.opt.param_groups:
                     g["lr"] = lr
             self.lr = lr
+        if carried:
+            for n, p in self.model.named_parameters():
+                st = carried.get(n)
+                if st and all(not torch.is_tensor(v) or v.dim() == 0 or v.shape == p.shape for v in st.values()):
+                    self.opt.state[p] = st
+
+    def _names(self):
+        """The weights the sim sends for this model (all but the card table's rows)."""
+        return {n for n, _ in self.model.named_parameters()} - {"cards.ids.weight"}
 
     def _grow(self, rows):
         """New cards: a bigger card table, carrying over the old rows' optimizer state."""

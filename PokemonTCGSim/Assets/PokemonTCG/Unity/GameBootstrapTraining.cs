@@ -125,6 +125,7 @@ namespace PokemonTCG.Presentation
             public long NetSteps;
             public double NetLoss;
             public string NetOrigin;
+            public int NetBlocks;
             public AiStyle Style;
             public List<MatchupStats> Matchups = new List<MatchupStats>();
             public List<DeckSkill> Decks = new List<DeckSkill>();
@@ -444,6 +445,7 @@ namespace PokemonTCG.Presentation
                     NetSteps = brain.Policy.Steps,
                     NetLoss = brain.Policy.AverageLoss,
                     NetOrigin = brain.Policy.Origin,
+                    NetBlocks = brain.Policy.Blocks,
                     Style = brain.Style,
                     Matchups = brain.Matchups(),
                     Decks = brain.DeckSkills(),
@@ -651,6 +653,19 @@ namespace PokemonTCG.Presentation
             sessionUndone = true;
             nextBrainRefresh = 0f;
             trainMessage = "The AI is back to how it was before this session.";
+        }
+
+        /// <summary>
+        /// Makes the Neural AI's network deeper (PolicyNet.Grow): it keeps what it knows and plays the same until training puts the
+        /// new blocks to use. Not while training runs here or in the background (that would save over it with the old size).
+        /// </summary>
+        private void GrowNetwork()
+        {
+            if (brain == null || (training != null && training.Running) || BackgroundRunning) return;
+            brain.Policy.Grow(PolicyNet.BigBlocks);
+            SaveBrainInBackground();
+            nextBrainRefresh = 0f;
+            trainMessage = "The neural network is bigger now (" + brain.Policy.Blocks + " blocks). It plays exactly as before; training puts the new blocks to use.";
         }
 
         private void ResetBrain()
@@ -1016,6 +1031,8 @@ namespace PokemonTCG.Presentation
         private static string ChampionEveryText { get { return TrainingSession.DefaultChampionEvery.ToString("N0"); } }
         private static string ChampionMinText { get { return TrainingSession.DefaultChampionMinGames.ToString("N0"); } }
 
+        private const string GrowCostText = "On the CPU, training is about 25% slower with it (learning takes about 40% longer); learning on the GPU, with Choose moves on the GPU too, it hardly matters. Against you, each move still takes a moment.";
+
         private void DrawBrainPanel(UiStyles ui, List<Action> actions, bool running)
         {
             var b = brainView;
@@ -1032,6 +1049,19 @@ namespace PokemonTCG.Presentation
                                 : "no learning steps here yet (Train as Neural AI to train it)")
                             + " · your opponent plays as " + StyleName(b.Style) + " (the Opponent switch on the menu); training plays as " + StyleName(trainStyle)
                             + " (Train as, above).", ui.Label);
+            GUILayout.BeginHorizontal();
+            if (b.NetBlocks < PolicyNet.BigBlocks)
+            {
+                GUI.enabled = !running && !BackgroundRunning;
+                if (GUILayout.Button("Make the network bigger (" + PolicyNet.BigBlocks + " blocks)", GUILayout.Width(280))) actions.Add(GrowNetwork);
+                GUI.enabled = true;
+                GUILayout.Label("Network size: " + b.NetBlocks + " blocks. Bigger (" + PolicyNet.BigBlocks + ") can learn more: it keeps everything it knows and plays "
+                                + "exactly the same at first, and training puts the new blocks to use. " + GrowCostText + " It can't be made smaller "
+                                + "again (Reset the AI goes back to the starting network)." + (running || BackgroundRunning ? " (Not while training runs.)" : ""), Hint(ui));
+            }
+            else
+                GUILayout.Label("Network size: " + b.NetBlocks + " blocks (made bigger). " + GrowCostText, Hint(ui));
+            GUILayout.EndHorizontal();
             // Each list scrolls on its own (scroll with the mouse over it, or drag its scroll bar) and holds everything.
             float listMax = Mathf.Clamp(UiScale.Height * 0.3f, 150f, 360f);
             // The yardstick (ChampionGate): the network's champion version and its checks.
