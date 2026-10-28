@@ -32,6 +32,7 @@ games. Ctrl+C stops it after the current round.
 | `--eval-games N` | 200 | games per report against the classic bot |
 | `--sequence-penalty X` | 0.02 | reward taken off per sequencing mistake |
 | `--games-per-round N` | 128 | games between learning steps |
+| `--skip-cpu 2,3` | | keep off these CPU threads (a faulty core; Windows only; train and eval) |
 
 ## eval
 

@@ -28,6 +28,7 @@ public static class Program
             return 0;
         }
         var opts = Options(args.Skip(1).ToArray());
+        if (opts.TryGetValue("skip-cpu", out var skipCpu)) Console.WriteLine(CpuThreads.Apply(CpuThreads.Parse(skipCpu)));
         try
         {
             switch (args[0])

@@ -121,6 +121,7 @@ namespace PokemonTCG.Presentation
             db = UnityCardData.LoadAllCards();
             CardVisuals.WarmIndexInBackground(); // v134.6: list the card images now, off the main thread
             SavePaths.Load();
+            LoadSkipCpu();
             ApplyPace(PlayerPrefs.GetInt(PrefPace, 1));
             logOpen = PlayerPrefs.GetInt(PrefLogOpen, 0) == 1;
             birthday = Mathf.Max(0, PlayerPrefs.GetInt(PrefBirthday, 0));
