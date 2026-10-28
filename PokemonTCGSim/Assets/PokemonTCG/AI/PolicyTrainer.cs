@@ -11,6 +11,8 @@ namespace PokemonTCG.AI
         public int Games, LearnerWins, Draws, Errors, Decisions, Turns;
         public int VsPool, PoolWins;
         public int Mistakes;
+        /// <summary>Seats the network played and learned from (2 in a game against itself).</summary>
+        public int LearnerSeats;
         public double PolicyLoss, ValueLoss, Entropy, ClipFraction;
         public string LastError;
         /// <summary>Time spent playing the games and learning from them.</summary>
@@ -167,6 +169,7 @@ namespace PokemonTCG.AI
             into.VsPool += one.VsPool;
             into.PoolWins += one.PoolWins;
             into.Mistakes += one.Mistakes;
+            into.LearnerSeats += one.LearnerSeats;
             if (one.LastError != null) into.LastError = one.LastError;
         }
 
@@ -228,6 +231,7 @@ namespace PokemonTCG.AI
                     int finalLead = s.Players[1 - me].Prizes.Count - s.Players[me].Prizes.Count;
                     samples.AddRange(Finish(a.Trajectory, outcome, finalLead));
                     r.Decisions += a.Trajectory.Count;
+                    r.LearnerSeats++;
                     foreach (var step in a.Trajectory) r.Mistakes += step.Mistakes;
                 }
             }
@@ -328,6 +332,7 @@ namespace PokemonTCG.AI
             int threads = Math.Max(1, Math.Min(WorkThrottle.Threads(Threads), count / 16 + 1));
             var grads = new PolicyNet.Grad[threads];
             var failures = new Exception[threads];
+            if (gradPool.Length < threads) Array.Resize(ref gradPool, threads);
             var workers = new Thread[threads];
             for (int t = 0; t < threads; t++)
             {
@@ -336,7 +341,9 @@ namespace PokemonTCG.AI
                 {
                     try
                     {
-                        var g = Net.NewGrad();
+                        // Each thread keeps its gradient buffer (8 MB) from one learning step to the next.
+                        var g = gradPool[tt] ?? (gradPool[tt] = Net.NewGrad());
+                        g.Clear();
                         // This thread's share of the minibatch, a few decisions at a time (the network is faster in batches).
                         var mine = new List<int>();
                         for (int k = tt; k < count; k += threads) mine.Add(order[start + k]);
@@ -358,6 +365,8 @@ namespace PokemonTCG.AI
             return grads[0];
         }
 
+        private PolicyNet.Grad[] gradPool = new PolicyNet.Grad[0];
+
         /// <summary>With a negative advantage, ratios above this stop pushing (dual-clip PPO).</summary>
         public double DualClip = 3.0;
 
@@ -368,7 +377,7 @@ namespace PokemonTCG.AI
         {
             var inputs = new PolicyInput[batch.Count];
             for (int k = 0; k < batch.Count; k++) inputs[k] = samples[batch[k]].Input;
-            var passes = Net.ForwardMany(inputs);
+            var passes = Net.ForwardPooled(inputs);
             var dLogits = new float[batch.Count][];
             var dValues = new float[batch.Count];
             for (int k = 0; k < batch.Count; k++)
@@ -439,10 +448,21 @@ namespace PokemonTCG.AI
                         }
                         int seed = seed0 + k;
                         var rng = new Rng(seed);
-                        var mine = FocusDeck != null ? decks.Find(x => x.Key == FocusDeck) : decks[rng.Next(decks.Count)];
-                        if (mine.Value == null) mine = decks[rng.Next(decks.Count)];
-                        var theirs = decks[rng.Next(decks.Count)];
+                        KeyValuePair<string, List<CardDef>> mine, theirs;
                         int seat = k % 2;
+                        if (Matchup && decks.Count >= 2)
+                        {
+                            // Deck A against deck B: half the games with each deck, seats alternating.
+                            mine = decks[k % 2];
+                            theirs = decks[1 - k % 2];
+                            seat = (k / 2) % 2;
+                        }
+                        else
+                        {
+                            mine = FocusDeck != null ? decks.Find(x => x.Key == FocusDeck) : decks[rng.Next(decks.Count)];
+                            if (mine.Value == null) mine = decks[rng.Next(decks.Count)];
+                            theirs = decks[rng.Next(decks.Count)];
+                        }
                         var bot = new PolicyAgent(Net, seed + 1, seat, mine.Value) { Greedy = true };
                         var opp = opponent(seed + 2);
                         int outcome = 0;
