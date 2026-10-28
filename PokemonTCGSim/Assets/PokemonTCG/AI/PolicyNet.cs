@@ -156,7 +156,10 @@ namespace PokemonTCG.AI
         private readonly List<string> cardKeys = new List<string>();
         private readonly List<float[]> cardM = new List<float[]>(), cardV = new List<float[]>();
         private readonly Dictionary<string, int> rowOfKey = new Dictionary<string, int>(StringComparer.Ordinal);
-        private Dictionary<int, float[]> cardCache = new Dictionary<int, float[]>();
+        /// <summary>A copy of rowOfKey that games read without locking (replaced whenever a card is added).</summary>
+        private volatile Dictionary<string, int> rowIndex = new Dictionary<string, int>(StringComparer.Ordinal);
+        /// <summary>Card vectors for the current weights, by row (filled as they're needed; cleared when the weights change).</summary>
+        private float[][] cardCache = new float[0][];
 
         private readonly Param projW, projB, slot0W, slot0B, slot2W, slot2B, inpW, inpB, finalLnG, finalLnB, kind,
             opt0W, opt0B, opt2W, opt2B, queryW, queryB, score1W, score1B, score3W, score3B, value0W, value0B, value2W, value2B, noneSlot;
@@ -251,12 +254,13 @@ namespace PokemonTCG.AI
                 cardM.Clear();
                 cardV.Clear();
                 rowOfKey.Clear();
+                rowIndex = new Dictionary<string, int>(StringComparer.Ordinal);
                 cardRows.Add(new float[CardDim]);
                 cardStatic.Add(new float[StaticSize]);
                 cardKeys.Add("");
                 cardM.Add(null);
                 cardV.Add(null);
-                cardCache = new Dictionary<int, float[]>();
+                cardCache = new float[0][];
             }
             steps = 0;
             adamT = 0;
@@ -290,6 +294,8 @@ namespace PokemonTCG.AI
         {
             if (def == null) return 0;
             string key = def.BaseKey ?? def.Name;
+            int known;
+            if (rowIndex.TryGetValue(key, out known)) return known;
             lock (cardLock)
             {
                 int row;
@@ -298,6 +304,7 @@ namespace PokemonTCG.AI
                 if (rowOfKey.TryGetValue("name:" + NameKey(def), out row))
                 {
                     rowOfKey[key] = row;
+                    rowIndex = new Dictionary<string, int>(rowOfKey, StringComparer.Ordinal);
                     return row;
                 }
                 row = cardRows.Count;
@@ -307,6 +314,7 @@ namespace PokemonTCG.AI
                 cardM.Add(null);
                 cardV.Add(null);
                 rowOfKey[key] = row;
+                rowIndex = new Dictionary<string, int>(rowOfKey, StringComparer.Ordinal);
                 return row;
             }
         }
@@ -323,10 +331,10 @@ namespace PokemonTCG.AI
         {
             if (row <= 0) return null;
             var cache = cardCache;
-            lock (cache)
+            if (row < cache.Length)
             {
-                float[] v;
-                if (cache.TryGetValue(row, out v)) return v;
+                var v = cache[row];
+                if (v != null) return v;
             }
             float[] r, s;
             lock (cardLock)
@@ -343,7 +351,22 @@ namespace PokemonTCG.AI
                 for (int i = 0; i < StaticSize; i++) sum += w[off + i] * s[i];
                 outv[o] = sum;
             }
-            lock (cache) cache[row] = outv;
+            if (row < cache.Length) cache[row] = outv; // two threads may both compute it: same numbers either way
+            else
+            {
+                lock (cardLock)
+                {
+                    var now = cardCache;
+                    if (row >= now.Length)
+                    {
+                        var bigger = new float[Math.Max(row + 1, cardRows.Count + 64)][];
+                        Array.Copy(now, bigger, now.Length);
+                        now = bigger;
+                        cardCache = now;
+                    }
+                    now[row] = outv;
+                }
+            }
             return outv;
         }
 
@@ -392,18 +415,33 @@ namespace PokemonTCG.AI
         }
 
         private static readonly int Lanes = Vector<float>.Count;
+        /// <summary>Use the CPU's vector instructions (where the runtime supports them well).</summary>
+        public static bool Simd = Vector.IsHardwareAccelerated && Environment.GetEnvironmentVariable("POLICY_NO_SIMD") == null;
 
         /// <summary>sum_i a[ao + i] * b[bo + i], with SIMD where the platform has it.</summary>
         private static float Dot(float[] a, int ao, float[] b, int bo, int n)
         {
             int i = 0;
             float sum = 0f;
-            if (Vector.IsHardwareAccelerated && n >= Lanes)
+            if (Simd && n >= Lanes)
             {
                 var acc = Vector<float>.Zero;
                 int last = n - Lanes;
                 for (; i <= last; i += Lanes) acc += new Vector<float>(a, ao + i) * new Vector<float>(b, bo + i);
                 sum = Vector.Dot(acc, Vector<float>.One);
+            }
+            else
+            {
+                float s0 = 0f, s1 = 0f, s2 = 0f, s3 = 0f;
+                int last4 = n - 4;
+                for (; i <= last4; i += 4)
+                {
+                    s0 += a[ao + i] * b[bo + i];
+                    s1 += a[ao + i + 1] * b[bo + i + 1];
+                    s2 += a[ao + i + 2] * b[bo + i + 2];
+                    s3 += a[ao + i + 3] * b[bo + i + 3];
+                }
+                sum = (s0 + s1) + (s2 + s3);
             }
             for (; i < n; i++) sum += a[ao + i] * b[bo + i];
             return sum;
@@ -413,11 +451,22 @@ namespace PokemonTCG.AI
         private static void Axpy(float alpha, float[] x, int xo, float[] y, int yo, int n)
         {
             int i = 0;
-            if (Vector.IsHardwareAccelerated && n >= Lanes)
+            if (Simd && n >= Lanes)
             {
                 var va = new Vector<float>(alpha);
                 int last = n - Lanes;
                 for (; i <= last; i += Lanes) (new Vector<float>(y, yo + i) + va * new Vector<float>(x, xo + i)).CopyTo(y, yo + i);
+            }
+            else
+            {
+                int last4 = n - 4;
+                for (; i <= last4; i += 4)
+                {
+                    y[yo + i] += alpha * x[xo + i];
+                    y[yo + i + 1] += alpha * x[xo + i + 1];
+                    y[yo + i + 2] += alpha * x[xo + i + 2];
+                    y[yo + i + 3] += alpha * x[xo + i + 3];
+                }
             }
             for (; i < n; i++) y[yo + i] += alpha * x[xo + i];
         }
@@ -462,29 +511,89 @@ namespace PokemonTCG.AI
 
         // ------------------------------------------------------------------ Forward
 
+        /// <summary>GELU and its derivative, computed exactly (they share the exponential). Used to fill the tables below.</summary>
+        private static void GeluExact(double x, out double y, out double dy)
+        {
+            double ax = Math.Abs(x) * InvSqrt2;
+            double t = 1.0 / (1.0 + 0.3275911 * ax);
+            double e = Math.Exp(-ax * ax); // = exp(-x^2 / 2)
+            double erf = 1.0 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * e;
+            if (x < 0) erf = -erf;
+            y = 0.5 * x * (1 + erf);
+            dy = 0.5 * (1 + erf) + x * InvSqrt2Pi * e;
+        }
+
+        // GELU and its derivative tabulated on [-GeluRange, GeluRange] (linear interpolation, error below 2e-6): an exponential
+        // per number was the slowest part of the network. Outside the range GELU is x (or 0) to within 1e-14.
+        private const float GeluRange = 8f;
+        private const int GeluSteps = 256; // per unit
+        private static readonly float[] GeluTable = BuildGeluTable(false), GeluGradTable = BuildGeluTable(true);
+
+        private static float[] BuildGeluTable(bool grad)
+        {
+            int n = (int)(2 * GeluRange * GeluSteps) + 2;
+            var t = new float[n];
+            for (int i = 0; i < n; i++)
+            {
+                double x = -GeluRange + (double)i / GeluSteps;
+                GeluExact(x, out double y, out double dy);
+                t[i] = (float)(grad ? dy : y);
+            }
+            return t;
+        }
+
+        private static void GeluBoth(float x, out float y, out float dy)
+        {
+            if (x >= GeluRange)
+            {
+                y = x;
+                dy = 1f;
+                return;
+            }
+            if (x <= -GeluRange)
+            {
+                y = 0f;
+                dy = 0f;
+                return;
+            }
+            float f = (x + GeluRange) * GeluSteps;
+            int i = (int)f;
+            float w = f - i;
+            y = GeluTable[i] + w * (GeluTable[i + 1] - GeluTable[i]);
+            dy = GeluGradTable[i] + w * (GeluGradTable[i + 1] - GeluGradTable[i]);
+        }
+
+        private static void GeluAll(float[] pre, float[] act, float[] grad)
+        {
+            for (int j = 0; j < pre.Length; j++) GeluBoth(pre[j], out act[j], out grad[j]);
+        }
+
         /// <summary>Everything one forward pass computed (the backward pass needs it).</summary>
         public sealed class Pass
         {
             internal readonly float[][] SlotInput = new float[PolicyInput.NumSlots][];
-            internal readonly float[][] SlotPre = new float[PolicyInput.NumSlots][];
             internal readonly float[][] SlotAct = new float[PolicyInput.NumSlots][];
+            internal readonly float[][] SlotGrad = new float[PolicyInput.NumSlots][];
             internal readonly float[] Slots = new float[PolicyInput.NumSlots * SlotDim];
             internal readonly float[] State = new float[StateSize];
-            internal readonly float[] InpPre = new float[Width];
+            /// <summary>Parts of State that aren't all zeros (start, length pairs; empty slots and bags are skipped).</summary>
+            internal int[] Segments;
+            /// <summary>Parts of State whose gradient is needed (card vectors and slots; not the plain numbers).</summary>
+            internal int[] GradSegments;
+            internal readonly float[] InpGrad = new float[Width];
             internal readonly float[][] X = new float[Blocks + 1][];
             internal readonly float[][] LnHat = new float[Blocks][];
             internal readonly float[][] LnOut = new float[Blocks][];
             internal readonly float[] LnInv = new float[Blocks];
-            internal readonly float[][] HPre = new float[Blocks][];
             internal readonly float[][] HAct = new float[Blocks][];
+            internal readonly float[][] HGrad = new float[Blocks][];
             internal readonly float[] FinalHat = new float[Width];
             internal float FinalInv;
             internal readonly float[] H = new float[Width];
             internal readonly float[] Q = new float[OptionDim];
-            internal float[][] OptIn, OptPre, OptAct, Z, S1Pre;
-            internal readonly float[] VPre = new float[ValueHidden];
-            internal float VOut;
-            internal float[][] BagCards;
+            internal float[][] OptIn, OptAct, OptGrad, ZAct, ZGrad, S1Act, S1Grad;
+            internal readonly float[] VAct = new float[ValueHidden];
+            internal readonly float[] VGrad = new float[ValueHidden];
             public float[] Logits;
             public float Value;
 
@@ -495,8 +604,8 @@ namespace PokemonTCG.AI
                 {
                     LnHat[b] = new float[Width];
                     LnOut[b] = new float[Width];
-                    HPre[b] = new float[Width];
                     HAct[b] = new float[Width];
+                    HGrad[b] = new float[Width];
                 }
             }
         }
@@ -504,10 +613,19 @@ namespace PokemonTCG.AI
         /// <summary>Logits for the options and the value. Safe to call from many threads at once.</summary>
         public Pass Forward(PolicyInput x)
         {
+            return ForwardMany(new[] { x })[0];
+        }
+
+        /// <summary>
+        /// Forward passes for several decisions at once. The big layers run over the whole batch row by row, so each weight is
+        /// read from memory once per batch instead of once per decision (several times faster when training).
+        /// </summary>
+        public Pass[] ForwardMany(IList<PolicyInput> xs)
+        {
             rw.EnterReadLock();
             try
             {
-                return ForwardLocked(x);
+                return ForwardLocked(xs);
             }
             finally
             {
@@ -535,10 +653,101 @@ namespace PokemonTCG.AI
         private const int GlobalsOffset = SourceOffset + CardDim;
         private const int TurnOffset = StateSize - PolicyInput.TurnFeatures;
 
-        private Pass ForwardLocked(PolicyInput x)
+        /// <summary>ys[k][o] = b[o] + W[o] . xs[k], one weight row at a time for the whole batch.</summary>
+        private static void LinearBatch(float[] w, float[] b, int outN, int inN, float[][] xs, float[][] ys)
+        {
+            int n = xs.Length;
+            for (int o = 0; o < outN; o++)
+            {
+                int row = o * inN;
+                float bias = b[o];
+                for (int k = 0; k < n; k++) ys[k][o] = bias + Dot(w, row, xs[k], 0, inN);
+            }
+        }
+
+        /// <summary>Backward of LinearBatch: gW, gB and (if dxs isn't null) dxs[k] += W^T dys[k].</summary>
+        private static void LinearBackBatch(float[] w, int outN, int inN, float[][] xs, float[][] dys, float[][] dxs, float[] gw, float[] gb)
+        {
+            int n = xs.Length;
+            for (int o = 0; o < outN; o++)
+            {
+                int row = o * inN;
+                for (int k = 0; k < n; k++)
+                {
+                    float d = dys[k][o];
+                    if (d == 0f) continue;
+                    gb[o] += d;
+                    Axpy(d, xs[k], 0, gw, row, inN);
+                    if (dxs != null) Axpy(d, w, row, dxs[k], 0, inN);
+                }
+            }
+        }
+
+        private Pass[] ForwardLocked(IList<PolicyInput> xs)
+        {
+            int n = xs.Count;
+            var ps = new Pass[n];
+            for (int i = 0; i < n; i++) ps[i] = Inputs(xs[i]);
+
+            // Trunk, batched
+            var pre = new float[n][];
+            for (int i = 0; i < n; i++) pre[i] = new float[Width];
+            for (int o = 0; o < Width; o++)
+            {
+                int row = o * StateSize;
+                for (int i = 0; i < n; i++)
+                {
+                    var p = ps[i];
+                    float sum = inpB.Data[o];
+                    var seg = p.Segments;
+                    for (int k = 0; k < seg.Length; k += 2) sum += Dot(inpW.Data, row + seg[k], p.State, seg[k], seg[k + 1]);
+                    pre[i][o] = sum;
+                }
+            }
+            for (int i = 0; i < n; i++) GeluAll(pre[i], ps[i].X[0], ps[i].InpGrad);
+            var tmp = new float[n][];
+            for (int i = 0; i < n; i++) tmp[i] = new float[Width];
+            for (int b = 0; b < Blocks; b++)
+            {
+                for (int i = 0; i < n; i++) LayerNorm(ps[i].X[b], lnG[b].Data, lnB[b].Data, ps[i].LnHat[b], ps[i].LnOut[b], out ps[i].LnInv[b]);
+                LinearBatch(b1W[b].Data, b1B[b].Data, Width, Width, Each(ps, p => p.LnOut[b]), pre);
+                for (int i = 0; i < n; i++) GeluAll(pre[i], ps[i].HAct[b], ps[i].HGrad[b]);
+                LinearBatch(b3W[b].Data, b3B[b].Data, Width, Width, Each(ps, p => p.HAct[b]), tmp);
+                for (int i = 0; i < n; i++)
+                {
+                    var xb = ps[i].X[b];
+                    var xn = ps[i].X[b + 1];
+                    var t = tmp[i];
+                    for (int j = 0; j < Width; j++) xn[j] = xb[j] + t[j];
+                }
+            }
+            for (int i = 0; i < n; i++) LayerNorm(ps[i].X[Blocks], finalLnG.Data, finalLnB.Data, ps[i].FinalHat, ps[i].H, out ps[i].FinalInv);
+            var hs = Each(ps, p => p.H);
+            LinearBatch(queryW.Data, queryB.Data, OptionDim, Width, hs, Each(ps, p => p.Q));
+            var vpre = new float[n][];
+            for (int i = 0; i < n; i++) vpre[i] = new float[ValueHidden];
+            LinearBatch(value0W.Data, value0B.Data, ValueHidden, Width, hs, vpre);
+            for (int i = 0; i < n; i++)
+            {
+                var p = ps[i];
+                GeluAll(vpre[i], p.VAct, p.VGrad);
+                p.Value = (float)Math.Tanh(value2B.Data[0] + Dot(value2W.Data, 0, p.VAct, 0, ValueHidden));
+                Options(xs[i], p);
+            }
+            return ps;
+        }
+
+        private static float[][] Each(Pass[] ps, Func<Pass, float[]> pick)
+        {
+            var a = new float[ps.Length][];
+            for (int i = 0; i < ps.Length; i++) a[i] = pick(ps[i]);
+            return a;
+        }
+
+        /// <summary>The board slots and the state vector of one decision.</summary>
+        private Pass Inputs(PolicyInput x)
         {
             var p = new Pass();
-            // Board slots
             for (int s = 0; s < PolicyInput.NumSlots; s++)
             {
                 if (x.SlotCard[s] <= 0) continue;
@@ -551,21 +760,20 @@ namespace PokemonTCG.AI
                 var pre = new float[SlotDim];
                 Linear(slot0W.Data, slot0B.Data, SlotDim, SlotIn, inp, 0, pre, 0);
                 var act = new float[SlotDim];
-                for (int j = 0; j < SlotDim; j++) act[j] = Gelu(pre[j]);
+                var grad = new float[SlotDim];
+                GeluAll(pre, act, grad);
                 Linear(slot2W.Data, slot2B.Data, SlotDim, SlotDim, act, 0, p.Slots, s * SlotDim);
                 p.SlotInput[s] = inp;
-                p.SlotPre[s] = pre;
                 p.SlotAct[s] = act;
+                p.SlotGrad[s] = grad;
             }
             var st = p.State;
             Array.Copy(p.Slots, 0, st, 0, p.Slots.Length);
-            p.BagCards = new float[PolicyInput.BagCount][];
             for (int b = 0; b < PolicyInput.BagCount; b++)
             {
-                var ids = x.Bags[b];
                 int off = bagOffset(b);
                 int n = 0;
-                foreach (int row in ids)
+                foreach (int row in x.Bags[b])
                 {
                     var cv = CardVector(row);
                     if (cv == null) continue;
@@ -582,32 +790,64 @@ namespace PokemonTCG.AI
             Array.Copy(x.Globals, 0, st, GlobalsOffset, PolicyInput.GlobalFeatures);
             Array.Copy(x.TurnFeats, 0, st, TurnOffset, PolicyInput.TurnFeatures);
 
-            // Trunk
-            Linear(inpW.Data, inpB.Data, Width, StateSize, st, 0, p.InpPre, 0);
-            for (int j = 0; j < Width; j++) p.X[0][j] = Gelu(p.InpPre[j]);
-            var tmp = new float[Width];
-            for (int b = 0; b < Blocks; b++)
+            var segs = new List<int>();
+            var grads = new List<int>();
+            for (int s = 0; s < PolicyInput.NumSlots; s++)
             {
-                LayerNorm(p.X[b], lnG[b].Data, lnB[b].Data, p.LnHat[b], p.LnOut[b], out p.LnInv[b]);
-                Linear(b1W[b].Data, b1B[b].Data, Width, Width, p.LnOut[b], 0, p.HPre[b], 0);
-                for (int j = 0; j < Width; j++) p.HAct[b][j] = Gelu(p.HPre[b][j]);
-                Linear(b3W[b].Data, b3B[b].Data, Width, Width, p.HAct[b], 0, tmp, 0);
-                for (int j = 0; j < Width; j++) p.X[b + 1][j] = p.X[b][j] + tmp[j];
+                if (x.SlotCard[s] <= 0) continue;
+                Segment(segs, s * SlotDim, SlotDim);
+                Segment(grads, s * SlotDim, SlotDim);
             }
-            LayerNorm(p.X[Blocks], finalLnG.Data, finalLnB.Data, p.FinalHat, p.H, out p.FinalInv);
+            for (int b = 0; b < PolicyInput.BagCount; b++)
+            {
+                int off = bagOffset(b);
+                if (st[off + CardDim] == 0f) continue; // empty bag: all zeros
+                Segment(segs, off, BagSize);
+                Segment(grads, off, CardDim);
+            }
+            if (sv != null)
+            {
+                Segment(segs, StadiumOffset, CardDim);
+                Segment(grads, StadiumOffset, CardDim);
+            }
+            if (srcv != null)
+            {
+                Segment(segs, SourceOffset, CardDim);
+                Segment(grads, SourceOffset, CardDim);
+            }
+            Segment(segs, GlobalsOffset, PolicyInput.GlobalFeatures);
+            Segment(segs, TurnOffset, PolicyInput.TurnFeatures);
+            p.Segments = segs.ToArray();
+            p.GradSegments = grads.ToArray();
+            return p;
+        }
 
-            // Options
-            Linear(queryW.Data, queryB.Data, OptionDim, Width, p.H, 0, p.Q, 0);
+        /// <summary>Adds [start, start + length) to a list of (start, length) pairs, joining it to the last one when they touch.</summary>
+        private static void Segment(List<int> segs, int start, int length)
+        {
+            int n = segs.Count;
+            if (n >= 2 && segs[n - 2] + segs[n - 1] == start) segs[n - 1] += length;
+            else
+            {
+                segs.Add(start);
+                segs.Add(length);
+            }
+        }
+
+        /// <summary>Scores each option of one decision against its state.</summary>
+        private void Options(PolicyInput x, Pass p)
+        {
             int k = x.Count;
             p.OptIn = new float[k][];
-            p.OptPre = new float[k][];
             p.OptAct = new float[k][];
-            p.Z = new float[k][];
-            p.S1Pre = new float[k][];
+            p.OptGrad = new float[k][];
+            p.ZAct = new float[k][];
+            p.ZGrad = new float[k][];
+            p.S1Act = new float[k][];
+            p.S1Grad = new float[k][];
             p.Logits = new float[k];
+            var tmp = new float[OptionDim];
             var o2 = new float[OptionDim];
-            var zAct = new float[OptionDim];
-            var s1Act = new float[OptionDim];
             for (int i = 0; i < k; i++)
             {
                 var oin = new float[OptionIn];
@@ -618,40 +858,28 @@ namespace PokemonTCG.AI
                 if (t >= 0 && t < PolicyInput.NumSlots) Array.Copy(p.Slots, t * SlotDim, oin, 2 * CardDim, SlotDim);
                 else Array.Copy(noneSlot.Data, 0, oin, 2 * CardDim, SlotDim);
                 Array.Copy(x.OptFeat, i * PolicyInput.OptionFeatures, oin, 2 * CardDim + SlotDim, PolicyInput.OptionFeatures);
-                var pre = new float[OptionDim];
-                Linear(opt0W.Data, opt0B.Data, OptionDim, OptionIn, oin, 0, pre, 0);
+                Linear(opt0W.Data, opt0B.Data, OptionDim, OptionIn, oin, 0, tmp, 0);
                 var act = new float[OptionDim];
-                for (int j = 0; j < OptionDim; j++) act[j] = Gelu(pre[j]);
+                var grad = new float[OptionDim];
+                GeluAll(tmp, act, grad);
                 Linear(opt2W.Data, opt2B.Data, OptionDim, OptionDim, act, 0, o2, 0);
-                var z = new float[OptionDim];
-                for (int j = 0; j < OptionDim; j++)
-                {
-                    z[j] = o2[j] + p.Q[j];
-                    zAct[j] = Gelu(z[j]);
-                }
-                var s1 = new float[OptionDim];
-                Linear(score1W.Data, score1B.Data, OptionDim, OptionDim, zAct, 0, s1, 0);
-                float logit = score3B.Data[0];
-                for (int j = 0; j < OptionDim; j++)
-                {
-                    s1Act[j] = Gelu(s1[j]);
-                    logit += score3W.Data[j] * s1Act[j];
-                }
+                for (int j = 0; j < OptionDim; j++) tmp[j] = o2[j] + p.Q[j];
+                var zAct = new float[OptionDim];
+                var zGrad = new float[OptionDim];
+                GeluAll(tmp, zAct, zGrad);
+                Linear(score1W.Data, score1B.Data, OptionDim, OptionDim, zAct, 0, tmp, 0);
+                var s1Act = new float[OptionDim];
+                var s1Grad = new float[OptionDim];
+                GeluAll(tmp, s1Act, s1Grad);
+                p.Logits[i] = score3B.Data[0] + Dot(score3W.Data, 0, s1Act, 0, OptionDim);
                 p.OptIn[i] = oin;
-                p.OptPre[i] = pre;
                 p.OptAct[i] = act;
-                p.Z[i] = z;
-                p.S1Pre[i] = s1;
-                p.Logits[i] = logit;
+                p.OptGrad[i] = grad;
+                p.ZAct[i] = zAct;
+                p.ZGrad[i] = zGrad;
+                p.S1Act[i] = s1Act;
+                p.S1Grad[i] = s1Grad;
             }
-
-            // Value
-            Linear(value0W.Data, value0B.Data, ValueHidden, Width, p.H, 0, p.VPre, 0);
-            float v = value2B.Data[0];
-            for (int j = 0; j < ValueHidden; j++) v += value2W.Data[j] * Gelu(p.VPre[j]);
-            p.VOut = v;
-            p.Value = (float)Math.Tanh(v);
-            return p;
         }
 
         // ------------------------------------------------------------------ Backward
@@ -717,10 +945,16 @@ namespace PokemonTCG.AI
         /// </summary>
         public void Backward(PolicyInput x, Pass p, float[] dLogits, float dValue, Grad g)
         {
+            BackwardMany(new[] { x }, new[] { p }, new[] { dLogits }, new[] { dValue }, g);
+        }
+
+        /// <summary>Backward passes for a batch made by ForwardMany (same weights).</summary>
+        public void BackwardMany(IList<PolicyInput> xs, Pass[] ps, float[][] dLogits, float[] dValues, Grad g)
+        {
             rw.EnterReadLock();
             try
             {
-                BackwardLocked(x, p, dLogits, dValue, g);
+                BackwardLocked(xs, ps, dLogits, dValues, g);
             }
             finally
             {
@@ -728,124 +962,170 @@ namespace PokemonTCG.AI
             }
         }
 
-        private void BackwardLocked(PolicyInput x, Pass p, float[] dLogits, float dValue, Grad g)
+        private static float[][] Zeros(int n, int size)
         {
-            var dh = new float[Width];
-            // Value head
-            if (dValue != 0f)
-            {
-                float dv = dValue * (1f - p.Value * p.Value);
-                var vAct = new float[ValueHidden];
-                for (int j = 0; j < ValueHidden; j++) vAct[j] = Gelu(p.VPre[j]);
-                var dvAct = new float[ValueHidden];
-                LinearBack(value2W.Data, 1, ValueHidden, vAct, 0, new[] { dv }, 0, dvAct, 0, G(g, value2W), G(g, value2B));
-                var dvPre = new float[ValueHidden];
-                for (int j = 0; j < ValueHidden; j++) dvPre[j] = dvAct[j] * GeluGrad(p.VPre[j]);
-                LinearBack(value0W.Data, ValueHidden, Width, p.H, 0, dvPre, 0, dh, 0, G(g, value0W), G(g, value0B));
-            }
+            var a = new float[n][];
+            for (int i = 0; i < n; i++) a[i] = new float[size];
+            return a;
+        }
 
-            // Options
-            var dSlots = new float[PolicyInput.NumSlots * SlotDim];
-            var dq = new float[OptionDim];
-            var zAct = new float[OptionDim];
-            var s1Act = new float[OptionDim];
+        private void BackwardLocked(IList<PolicyInput> xs, Pass[] ps, float[][] dLogits, float[] dValues, Grad g)
+        {
+            int n = ps.Length;
+            var dh = Zeros(n, Width);
+            var dq = Zeros(n, OptionDim);
+            var dvPre = Zeros(n, ValueHidden);
+            var dSlots = Zeros(n, PolicyInput.NumSlots * SlotDim);
+            float[] gS3W = G(g, score3W), gS3B = G(g, score3B), gS1W = G(g, score1W), gS1B = G(g, score1B),
+                gO2W = G(g, opt2W), gO2B = G(g, opt2B), gO0W = G(g, opt0W), gO0B = G(g, opt0B), gKind = G(g, kind), gNone = G(g, noneSlot),
+                gV2W = G(g, value2W), gV2B = G(g, value2B);
             var ds1 = new float[OptionDim];
             var dzAct = new float[OptionDim];
             var dz = new float[OptionDim];
             var dAct = new float[OptionDim];
             var dPre = new float[OptionDim];
             var dIn = new float[OptionIn];
-            float[] gS3W = G(g, score3W), gS3B = G(g, score3B), gS1W = G(g, score1W), gS1B = G(g, score1B),
-                gO2W = G(g, opt2W), gO2B = G(g, opt2B), gO0W = G(g, opt0W), gO0B = G(g, opt0B), gKind = G(g, kind), gNone = G(g, noneSlot);
-            for (int i = 0; i < x.Count; i++)
-            {
-                float dl = dLogits[i];
-                if (dl == 0f) continue;
-                for (int j = 0; j < OptionDim; j++)
-                {
-                    zAct[j] = Gelu(p.Z[i][j]);
-                    s1Act[j] = Gelu(p.S1Pre[i][j]);
-                }
-                gS3B[0] += dl;
-                for (int j = 0; j < OptionDim; j++)
-                {
-                    gS3W[j] += dl * s1Act[j];
-                    ds1[j] = dl * score3W.Data[j] * GeluGrad(p.S1Pre[i][j]);
-                }
-                Array.Clear(dzAct, 0, OptionDim);
-                LinearBack(score1W.Data, OptionDim, OptionDim, zAct, 0, ds1, 0, dzAct, 0, gS1W, gS1B);
-                for (int j = 0; j < OptionDim; j++)
-                {
-                    dz[j] = dzAct[j] * GeluGrad(p.Z[i][j]);
-                    dq[j] += dz[j];
-                }
-                Array.Clear(dAct, 0, OptionDim);
-                LinearBack(opt2W.Data, OptionDim, OptionDim, p.OptAct[i], 0, dz, 0, dAct, 0, gO2W, gO2B);
-                for (int j = 0; j < OptionDim; j++) dPre[j] = dAct[j] * GeluGrad(p.OptPre[i][j]);
-                Array.Clear(dIn, 0, OptionIn);
-                LinearBack(opt0W.Data, OptionDim, OptionIn, p.OptIn[i], 0, dPre, 0, dIn, 0, gO0W, gO0B);
-                int krow = x.OptKind[i] * CardDim;
-                for (int j = 0; j < CardDim; j++) gKind[krow + j] += dIn[j];
-                CardGrad(g, x.OptCard[i], dIn, CardDim, 1f);
-                int t = x.OptTarget[i];
-                if (t >= 0 && t < PolicyInput.NumSlots)
-                    for (int j = 0; j < SlotDim; j++) dSlots[t * SlotDim + j] += dIn[2 * CardDim + j];
-                else
-                    for (int j = 0; j < SlotDim; j++) gNone[j] += dIn[2 * CardDim + j];
-            }
-            LinearBack(queryW.Data, OptionDim, Width, p.H, 0, dq, 0, dh, 0, G(g, queryW), G(g, queryB));
 
-            // Trunk
-            var dx = new float[Width];
-            LayerNormBack(dh, p.FinalHat, p.FinalInv, finalLnG.Data, dx, G(g, finalLnG), G(g, finalLnB));
-            var dHAct = new float[Width];
-            var dHPre = new float[Width];
-            var dLn = new float[Width];
+            // Heads, one decision at a time
+            for (int k = 0; k < n; k++)
+            {
+                var x = xs[k];
+                var p = ps[k];
+                float dValue = dValues[k];
+                if (dValue != 0f)
+                {
+                    float dv = dValue * (1f - p.Value * p.Value);
+                    gV2B[0] += dv;
+                    for (int j = 0; j < ValueHidden; j++)
+                    {
+                        gV2W[j] += dv * p.VAct[j];
+                        dvPre[k][j] = dv * value2W.Data[j] * p.VGrad[j];
+                    }
+                }
+                var dl = dLogits[k];
+                for (int i = 0; i < x.Count; i++)
+                {
+                    float d = dl[i];
+                    if (d == 0f) continue;
+                    gS3B[0] += d;
+                    var s1Act = p.S1Act[i];
+                    var s1Grad = p.S1Grad[i];
+                    for (int j = 0; j < OptionDim; j++)
+                    {
+                        gS3W[j] += d * s1Act[j];
+                        ds1[j] = d * score3W.Data[j] * s1Grad[j];
+                    }
+                    Array.Clear(dzAct, 0, OptionDim);
+                    LinearBack(score1W.Data, OptionDim, OptionDim, p.ZAct[i], 0, ds1, 0, dzAct, 0, gS1W, gS1B);
+                    var zGrad = p.ZGrad[i];
+                    var dqk = dq[k];
+                    for (int j = 0; j < OptionDim; j++)
+                    {
+                        dz[j] = dzAct[j] * zGrad[j];
+                        dqk[j] += dz[j];
+                    }
+                    Array.Clear(dAct, 0, OptionDim);
+                    LinearBack(opt2W.Data, OptionDim, OptionDim, p.OptAct[i], 0, dz, 0, dAct, 0, gO2W, gO2B);
+                    var optGrad = p.OptGrad[i];
+                    for (int j = 0; j < OptionDim; j++) dPre[j] = dAct[j] * optGrad[j];
+                    Array.Clear(dIn, 0, OptionIn);
+                    LinearBack(opt0W.Data, OptionDim, OptionIn, p.OptIn[i], 0, dPre, 0, dIn, 0, gO0W, gO0B);
+                    int krow = x.OptKind[i] * CardDim;
+                    for (int j = 0; j < CardDim; j++) gKind[krow + j] += dIn[j];
+                    CardGrad(g, x.OptCard[i], dIn, CardDim, 1f);
+                    int t = x.OptTarget[i];
+                    if (t >= 0 && t < PolicyInput.NumSlots)
+                        for (int j = 0; j < SlotDim; j++) dSlots[k][t * SlotDim + j] += dIn[2 * CardDim + j];
+                    else
+                        for (int j = 0; j < SlotDim; j++) gNone[j] += dIn[2 * CardDim + j];
+                }
+            }
+
+            // Trunk, batched
+            var hs = Each(ps, p => p.H);
+            LinearBackBatch(queryW.Data, OptionDim, Width, hs, dq, dh, G(g, queryW), G(g, queryB));
+            LinearBackBatch(value0W.Data, ValueHidden, Width, hs, dvPre, dh, G(g, value0W), G(g, value0B));
+            var dx = Zeros(n, Width);
+            for (int k = 0; k < n; k++) LayerNormBack(dh[k], ps[k].FinalHat, ps[k].FinalInv, finalLnG.Data, dx[k], G(g, finalLnG), G(g, finalLnB));
+            var dHAct = Zeros(n, Width);
+            var dLn = Zeros(n, Width);
             for (int b = Blocks - 1; b >= 0; b--)
             {
                 // x[b+1] = x[b] + W3 gelu(W1 LN(x[b])): dx passes straight through, plus the branch
-                Array.Clear(dHAct, 0, Width);
-                LinearBack(b3W[b].Data, Width, Width, p.HAct[b], 0, dx, 0, dHAct, 0, G(g, b3W[b]), G(g, b3B[b]));
-                for (int j = 0; j < Width; j++) dHPre[j] = dHAct[j] * GeluGrad(p.HPre[b][j]);
-                Array.Clear(dLn, 0, Width);
-                LinearBack(b1W[b].Data, Width, Width, p.LnOut[b], 0, dHPre, 0, dLn, 0, G(g, b1W[b]), G(g, b1B[b]));
-                LayerNormBack(dLn, p.LnHat[b], p.LnInv[b], lnG[b].Data, dx, G(g, lnG[b]), G(g, lnB[b]));
+                for (int k = 0; k < n; k++)
+                {
+                    Array.Clear(dHAct[k], 0, Width);
+                    Array.Clear(dLn[k], 0, Width);
+                }
+                LinearBackBatch(b3W[b].Data, Width, Width, Each(ps, p => p.HAct[b]), dx, dHAct, G(g, b3W[b]), G(g, b3B[b]));
+                for (int k = 0; k < n; k++)
+                {
+                    var hg = ps[k].HGrad[b];
+                    var d = dHAct[k];
+                    for (int j = 0; j < Width; j++) d[j] *= hg[j];
+                }
+                LinearBackBatch(b1W[b].Data, Width, Width, Each(ps, p => p.LnOut[b]), dHAct, dLn, G(g, b1W[b]), G(g, b1B[b]));
+                for (int k = 0; k < n; k++) LayerNormBack(dLn[k], ps[k].LnHat[b], ps[k].LnInv[b], lnG[b].Data, dx[k], G(g, lnG[b]), G(g, lnB[b]));
             }
-            var dInp = new float[Width];
-            for (int j = 0; j < Width; j++) dInp[j] = dx[j] * GeluGrad(p.InpPre[j]);
-            var dState = new float[StateSize];
-            LinearBack(inpW.Data, Width, StateSize, p.State, 0, dInp, 0, dState, 0, G(g, inpW), G(g, inpB));
-
-            // State pieces
-            for (int j = 0; j < dSlots.Length; j++) dSlots[j] += dState[j];
-            for (int b = 0; b < PolicyInput.BagCount; b++)
+            for (int k = 0; k < n; k++)
             {
-                int off = bagOffset(b);
-                int n = 0;
-                foreach (int row in x.Bags[b]) if (row > 0) n++;
-                if (n == 0) continue;
-                foreach (int row in x.Bags[b]) CardGrad(g, row, dState, off, 1f / n);
+                var ig = ps[k].InpGrad;
+                var d = dx[k];
+                for (int j = 0; j < Width; j++) d[j] *= ig[j];
             }
-            CardGrad(g, x.Stadium, dState, StadiumOffset, 1f);
-            CardGrad(g, x.Source, dState, SourceOffset, 1f);
+            var dState = Zeros(n, StateSize);
+            float[] gInpW = G(g, inpW), gInpB = G(g, inpB);
+            for (int o = 0; o < Width; o++)
+            {
+                int row = o * StateSize;
+                for (int i = 0; i < n; i++)
+                {
+                    float d = dx[i][o];
+                    if (d == 0f) continue;
+                    gInpB[o] += d;
+                    var p = ps[i];
+                    var seg = p.Segments;
+                    for (int k = 0; k < seg.Length; k += 2) Axpy(d, p.State, seg[k], gInpW, row + seg[k], seg[k + 1]);
+                    seg = p.GradSegments;
+                    for (int k = 0; k < seg.Length; k += 2) Axpy(d, inpW.Data, row + seg[k], dState[i], seg[k], seg[k + 1]);
+                }
+            }
 
-            // Slots
-            var dSAct = new float[SlotDim];
-            var dSPre = new float[SlotDim];
+            // State pieces and slots, one decision at a time
             var dSIn = new float[SlotIn];
+            var dSPre = new float[SlotDim];
             float[] gS2W = G(g, slot2W), gS2B = G(g, slot2B), gS0W = G(g, slot0W), gS0B = G(g, slot0B);
-            for (int s = 0; s < PolicyInput.NumSlots; s++)
+            for (int k = 0; k < n; k++)
             {
-                if (x.SlotCard[s] <= 0) continue;
-                Array.Clear(dSAct, 0, SlotDim);
-                LinearBack(slot2W.Data, SlotDim, SlotDim, p.SlotAct[s], 0, dSlots, s * SlotDim, dSAct, 0, gS2W, gS2B);
-                for (int j = 0; j < SlotDim; j++) dSPre[j] = dSAct[j] * GeluGrad(p.SlotPre[s][j]);
-                Array.Clear(dSIn, 0, SlotIn);
-                LinearBack(slot0W.Data, SlotDim, SlotIn, p.SlotInput[s], 0, dSPre, 0, dSIn, 0, gS0W, gS0B);
-                CardGrad(g, x.SlotCard[s], dSIn, 0, 1f);
-                CardGrad(g, x.SlotTool[s], dSIn, CardDim, 1f);
+                var x = xs[k];
+                var p = ps[k];
+                var ds = dState[k];
+                var dsl = dSlots[k];
+                for (int j = 0; j < dsl.Length; j++) dsl[j] += ds[j];
+                for (int b = 0; b < PolicyInput.BagCount; b++)
+                {
+                    int off = bagOffset(b);
+                    int cnt = 0;
+                    foreach (int row in x.Bags[b]) if (row > 0) cnt++;
+                    if (cnt == 0) continue;
+                    foreach (int row in x.Bags[b]) CardGrad(g, row, ds, off, 1f / cnt);
+                }
+                CardGrad(g, x.Stadium, ds, StadiumOffset, 1f);
+                CardGrad(g, x.Source, ds, SourceOffset, 1f);
+                for (int s = 0; s < PolicyInput.NumSlots; s++)
+                {
+                    if (x.SlotCard[s] <= 0) continue;
+                    Array.Clear(dSPre, 0, SlotDim);
+                    LinearBack(slot2W.Data, SlotDim, SlotDim, p.SlotAct[s], 0, dsl, s * SlotDim, dSPre, 0, gS2W, gS2B);
+                    var sg = p.SlotGrad[s];
+                    for (int j = 0; j < SlotDim; j++) dSPre[j] *= sg[j];
+                    Array.Clear(dSIn, 0, SlotIn);
+                    LinearBack(slot0W.Data, SlotDim, SlotIn, p.SlotInput[s], 0, dSPre, 0, dSIn, 0, gS0W, gS0B);
+                    CardGrad(g, x.SlotCard[s], dSIn, 0, 1f);
+                    CardGrad(g, x.SlotTool[s], dSIn, CardDim, 1f);
+                }
+                g.Samples++;
             }
-            g.Samples++;
         }
 
         /// <summary>Compares analytic gradients with finite differences on a few weights (headless tests).</summary>
@@ -871,11 +1151,11 @@ namespace PokemonTCG.AI
                 {
                     float old = p.Data[i];
                     const float h = 1e-2f;
-                    p.Data[i] = old + h; cardCache = new Dictionary<int, float[]>();
+                    p.Data[i] = old + h; cardCache = new float[0][];
                     double up = loss();
-                    p.Data[i] = old - h; cardCache = new Dictionary<int, float[]>();
+                    p.Data[i] = old - h; cardCache = new float[0][];
                     double down = loss();
-                    p.Data[i] = old; cardCache = new Dictionary<int, float[]>();
+                    p.Data[i] = old; cardCache = new float[0][];
                     double num = (up - down) / (2 * h);
                     double ana = g.G[p.Index][i];
                     double err = Math.Abs(num - ana) / Math.Max(1e-3, Math.Abs(num) + Math.Abs(ana));
@@ -888,9 +1168,9 @@ namespace PokemonTCG.AI
                 var row = cardRows[kv.Key];
                 float old = row[0];
                 const float h = 1e-2f;
-                row[0] = old + h; cardCache = new Dictionary<int, float[]>(); double up = loss();
-                row[0] = old - h; cardCache = new Dictionary<int, float[]>(); double down = loss();
-                row[0] = old; cardCache = new Dictionary<int, float[]>();
+                row[0] = old + h; cardCache = new float[0][]; double up = loss();
+                row[0] = old - h; cardCache = new float[0][]; double down = loss();
+                row[0] = old; cardCache = new float[0][];
                 double num = (up - down) / (2 * h);
                 Console.WriteLine("card row " + kv.Key + ": numeric " + num.ToString("g4") + " analytic " + kv.Value[0].ToString("g4"));
                 break;
@@ -960,7 +1240,7 @@ namespace PokemonTCG.AI
                         AdamUpdate(cardRows[row], cardM[row], cardV[row], kv.Value, scale, b1, b2, eps, lr);
                     }
                 }
-                cardCache = new Dictionary<int, float[]>();
+                cardCache = new float[0][];
                 Interlocked.Increment(ref steps);
             }
             finally
@@ -987,20 +1267,26 @@ namespace PokemonTCG.AI
         public void Imitate(List<KeyValuePair<PolicyInput, int>> picks, float strength)
         {
             var g = NewGrad();
-            int n = 0;
+            var batch = new List<KeyValuePair<PolicyInput, int>>();
             foreach (var kv in picks)
+                if (kv.Key != null && kv.Value >= 0 && kv.Value < kv.Key.Count && kv.Key.Count >= 2) batch.Add(kv);
+            for (int b = 0; b < batch.Count; b += 32)
             {
-                var x = kv.Key;
-                int target = kv.Value;
-                if (x == null || target < 0 || target >= x.Count || x.Count < 2) continue;
-                var pass = Forward(x);
-                var p = Softmax(pass.Logits);
-                var d = new float[x.Count];
-                for (int i = 0; i < d.Length; i++) d[i] = strength * (float)(p[i] - (i == target ? 1 : 0));
-                Backward(x, pass, d, 0f, g);
-                n++;
+                var part = batch.GetRange(b, Math.Min(32, batch.Count - b));
+                var xs = new PolicyInput[part.Count];
+                for (int k = 0; k < part.Count; k++) xs[k] = part[k].Key;
+                var passes = ForwardMany(xs);
+                var dl = new float[part.Count][];
+                for (int k = 0; k < part.Count; k++)
+                {
+                    var p = Softmax(passes[k].Logits);
+                    var d = new float[xs[k].Count];
+                    for (int i = 0; i < d.Length; i++) d[i] = strength * (float)(p[i] - (i == part[k].Value ? 1 : 0));
+                    dl[k] = d;
+                }
+                BackwardMany(xs, passes, dl, new float[part.Count], g);
             }
-            if (n > 0) Apply(g, n);
+            if (batch.Count > 0) Apply(g, batch.Count);
         }
 
         // ------------------------------------------------------------------ Policy helpers
@@ -1267,7 +1553,8 @@ namespace PokemonTCG.AI
                 }
                 foreach (var kv in aliases)
                     if (kv.Value > 0 && kv.Value < keys.Count && !rowOfKey.ContainsKey(kv.Key)) rowOfKey[kv.Key] = kv.Value;
-                cardCache = new Dictionary<int, float[]>();
+                rowIndex = new Dictionary<string, int>(rowOfKey, StringComparer.Ordinal);
+                cardCache = new float[0][];
             }
         }
 
