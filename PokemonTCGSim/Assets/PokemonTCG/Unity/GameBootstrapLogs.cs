@@ -281,6 +281,9 @@ namespace PokemonTCG.Presentation
             if (GUILayout.Button("Study this log", GUILayout.Width(160))) actions.Add(() => StudyPastedLog());
             GUI.enabled = !busy;
             if (GUILayout.Button("Paste from clipboard", GUILayout.Width(170))) actions.Add(() => pasteLog = GUIUtility.systemCopyBuffer ?? "");
+            GUILayout.EndHorizontal();
+            // Two rows of two: four in a row are wider than the Train screen's panel.
+            GUILayout.BeginHorizontal();
             string newLabel = newLogsView > 0 ? "Study new logs in the folder (" + newLogsView + ")" : "Study new logs in the folder";
             GUI.enabled = !busy && newLogsView != 0;
             if (GUILayout.Button(newLabel, GUILayout.Width(250))) actions.Add(() => StudyNewLogs());
