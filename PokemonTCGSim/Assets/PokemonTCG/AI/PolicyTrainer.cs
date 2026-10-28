@@ -13,6 +13,8 @@ namespace PokemonTCG.AI
         public int Mistakes;
         public double PolicyLoss, ValueLoss, Entropy, ClipFraction;
         public string LastError;
+        /// <summary>Time spent playing the games and learning from them.</summary>
+        public double CollectSeconds, LearnSeconds;
     }
 
     /// <summary>How one training game went (for the Train screen's deck A / deck B counts).</summary>
@@ -97,6 +99,7 @@ namespace PokemonTCG.AI
         {
             var round = new PolicyRound();
             var samples = new List<Sample>();
+            var clock = System.Diagnostics.Stopwatch.StartNew();
             int next = 0, finished = 0;
             object gate = new object();
             int baseSeed = Interlocked.Add(ref seedCounter, GamesPerRound * 3);
@@ -134,8 +137,11 @@ namespace PokemonTCG.AI
                 th.Start();
             }
             foreach (var th in workers) th.Join();
+            round.CollectSeconds = clock.Elapsed.TotalSeconds;
             if (Aborted) return round;
+            clock.Restart();
             if (samples.Count > 0) Learn(samples, round);
+            round.LearnSeconds = clock.Elapsed.TotalSeconds;
             Net.GamesTrained += round.Games;
             rounds++;
             if (SnapshotEvery > 0 && rounds % SnapshotEvery == 0)
@@ -328,12 +334,11 @@ namespace PokemonTCG.AI
                 workers[t] = new Thread(() =>
                 {
                     var g = Net.NewGrad();
-                    for (int k = tt; k < count; k += threads)
-                    {
-                        if (Aborted) break;
-                        int i = order[start + k];
-                        Accumulate(samples[i], adv[i], g);
-                    }
+                    // This thread's share of the minibatch, a few decisions at a time (the network is faster in batches).
+                    var mine = new List<int>();
+                    for (int k = tt; k < count; k += threads) mine.Add(order[start + k]);
+                    for (int b = 0; b < mine.Count && !Aborted; b += BatchSize)
+                        Accumulate(samples, adv, mine.GetRange(b, Math.Min(BatchSize, mine.Count - b)), g);
                     grads[tt] = g;
                 }) { IsBackground = true, Name = "Neural AI learning", Priority = ThreadPriority.BelowNormal };
                 workers[t].Start();
@@ -343,40 +348,54 @@ namespace PokemonTCG.AI
             return grads[0];
         }
 
-        private void Accumulate(Sample s, float a, PolicyNet.Grad g)
+        /// <summary>Decisions run through the network together in the learning step.</summary>
+        public int BatchSize = 32;
+
+        private void Accumulate(List<Sample> samples, float[] adv, List<int> batch, PolicyNet.Grad g)
         {
-            var pass = Net.Forward(s.Input);
-            var logits = pass.Logits;
-            int n = logits.Length;
-            var p = PolicyNet.Softmax(logits);
-            var logp = new double[n];
-            double entropy = 0;
-            for (int i = 0; i < n; i++)
+            var inputs = new PolicyInput[batch.Count];
+            for (int k = 0; k < batch.Count; k++) inputs[k] = samples[batch[k]].Input;
+            var passes = Net.ForwardMany(inputs);
+            var dLogits = new float[batch.Count][];
+            var dValues = new float[batch.Count];
+            for (int k = 0; k < batch.Count; k++)
             {
-                logp[i] = Math.Log(Math.Max(1e-12, p[i]));
-                entropy -= p[i] * logp[i];
+                var s = samples[batch[k]];
+                float a = adv[batch[k]];
+                var pass = passes[k];
+                var logits = pass.Logits;
+                int n = logits.Length;
+                var p = PolicyNet.Softmax(logits);
+                var logp = new double[n];
+                double entropy = 0;
+                for (int i = 0; i < n; i++)
+                {
+                    logp[i] = Math.Log(Math.Max(1e-12, p[i]));
+                    entropy -= p[i] * logp[i];
+                }
+                double ratio = Math.Exp(logp[s.Action] - s.LogP);
+                double clipped = Math.Max(1 - Clip, Math.Min(1 + Clip, ratio));
+                double pg = -Math.Min(ratio * a, clipped * a);
+                // d(pg)/d(logp[action]): the unclipped term's, unless the clipped term is the smaller one and is clipped.
+                bool flat = (a > 0 && ratio > 1 + Clip) || (a < 0 && ratio < 1 - Clip);
+                double dLogpA = flat ? 0 : -a * ratio;
+                var d = new float[n];
+                for (int i = 0; i < n; i++)
+                {
+                    double v = dLogpA * ((i == s.Action ? 1 : 0) - p[i]);
+                    v += EntropyCoef * p[i] * (logp[i] + entropy); // - coef * entropy
+                    d[i] = (float)v;
+                }
+                dLogits[k] = d;
+                double ret = Math.Max(-1.5, Math.Min(1.5, s.Ret));
+                double vErr = pass.Value - ret;
+                dValues[k] = (float)(2 * ValueCoef * vErr);
+                g.PolicyLoss += pg;
+                g.ValueLoss += vErr * vErr;
+                g.Entropy += entropy;
+                g.ClipFraction += Math.Abs(ratio - 1) > Clip ? 1 : 0;
             }
-            double ratio = Math.Exp(logp[s.Action] - s.LogP);
-            double clipped = Math.Max(1 - Clip, Math.Min(1 + Clip, ratio));
-            double pg = -Math.Min(ratio * a, clipped * a);
-            // d(pg)/d(logp[action]): the unclipped term's, unless the clipped term is the smaller one and is clipped.
-            bool flat = (a > 0 && ratio > 1 + Clip) || (a < 0 && ratio < 1 - Clip);
-            double dLogpA = flat ? 0 : -a * ratio;
-            var dLogits = new float[n];
-            for (int i = 0; i < n; i++)
-            {
-                double d = dLogpA * ((i == s.Action ? 1 : 0) - p[i]);
-                d += EntropyCoef * p[i] * (logp[i] + entropy); // - coef * entropy
-                dLogits[i] = (float)d;
-            }
-            double ret = Math.Max(-1.5, Math.Min(1.5, s.Ret));
-            double vErr = pass.Value - ret;
-            float dValue = (float)(2 * ValueCoef * vErr);
-            Net.Backward(s.Input, pass, dLogits, dValue, g);
-            g.PolicyLoss += pg;
-            g.ValueLoss += vErr * vErr;
-            g.Entropy += entropy;
-            g.ClipFraction += Math.Abs(ratio - 1) > Clip ? 1 : 0;
+            Net.BackwardMany(inputs, passes, dLogits, dValues, g);
         }
 
         // ------------------------------------------------------------------ Measuring
