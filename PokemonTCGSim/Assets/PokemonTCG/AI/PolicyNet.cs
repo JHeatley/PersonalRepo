@@ -1536,6 +1536,105 @@ namespace PokemonTCG.AI
             }
         }
 
+        // ------------------------------------------------------------------ The GPU learner (GpuLearner.cs, GpuLearner/learner.py)
+
+        /// <summary>
+        /// Writes the weights for the GPU learner: each tensor (name, shape, numbers), then the card table's learned rows and,
+        /// with stats, their printed stats. Strings are an int32 byte length and UTF-8.
+        /// </summary>
+        public void WriteLearnerWeights(BinaryWriter w, bool withStats)
+        {
+            rw.EnterReadLock();
+            try
+            {
+                w.Write(parameters.Count);
+                foreach (var p in parameters)
+                {
+                    GpuLearner.WriteString(w, p.Name);
+                    w.Write(p.Shape.Length);
+                    foreach (int d in p.Shape) w.Write(d);
+                    foreach (float v in p.Data) w.Write(v);
+                }
+                lock (cardLock)
+                {
+                    w.Write(cardRows.Count);
+                    foreach (var row in cardRows) foreach (float v in row) w.Write(v);
+                    if (withStats) foreach (var st in cardStatic) foreach (float v in st) w.Write(v);
+                }
+            }
+            finally
+            {
+                rw.ExitReadLock();
+            }
+        }
+
+        /// <summary>
+        /// Takes the weights the GPU learner sends back after learning (WriteLearnerWeights' layout, without stats): every tensor
+        /// by name, and the card rows it had (a card added here meanwhile keeps its row). Counts the learner's steps as this
+        /// network's. Refuses numbers that aren't finite, leaving the weights as they were.
+        /// </summary>
+        public void ReadLearnerWeights(BinaryReader r, int stepsTaken)
+        {
+            int count = r.ReadInt32();
+            var data = new Dictionary<string, float[]>(StringComparer.Ordinal);
+            for (int k = 0; k < count; k++)
+            {
+                string name = GpuLearner.ReadString(r);
+                int nd = r.ReadInt32();
+                int n = 1;
+                for (int d = 0; d < nd; d++) n *= r.ReadInt32();
+                var a = new float[n];
+                for (int i = 0; i < n; i++)
+                {
+                    a[i] = r.ReadSingle();
+                    if (float.IsNaN(a[i]) || float.IsInfinity(a[i])) throw new InvalidDataException("the learner sent a weight that isn't a number");
+                }
+                data[name] = a;
+            }
+            foreach (var p in parameters)
+            {
+                float[] a;
+                if (!data.TryGetValue(p.Name, out a) || a.Length != p.Data.Length) throw new InvalidDataException("the learner's weights don't fit this network (" + p.Name + ")");
+            }
+            int rows = r.ReadInt32();
+            var learned = new float[rows][];
+            for (int row = 0; row < rows; row++)
+            {
+                var e = new float[CardDim];
+                for (int j = 0; j < CardDim; j++)
+                {
+                    e[j] = r.ReadSingle();
+                    if (float.IsNaN(e[j]) || float.IsInfinity(e[j])) throw new InvalidDataException("the learner sent a card row that isn't a number");
+                }
+                learned[row] = e;
+            }
+            rw.EnterWriteLock();
+            try
+            {
+                foreach (var p in parameters)
+                {
+                    p.Data = data[p.Name];
+                    p.M = null; // the learner keeps the optimizer's state
+                    p.V = null;
+                }
+                lock (cardLock)
+                {
+                    for (int row = 1; row < rows && row < cardRows.Count; row++)
+                    {
+                        cardRows[row] = learned[row];
+                        cardM[row] = null;
+                        cardV[row] = null;
+                    }
+                }
+                cardCache = new float[0][];
+                steps += stepsTaken;
+            }
+            finally
+            {
+                rw.ExitWriteLock();
+            }
+        }
+
         /// <summary>Loads ToBytes() output, or a file exported from the Python bot (tools/export_to_sim.py). False if it isn't one.</summary>
         public bool FromBytes(byte[] bytes)
         {

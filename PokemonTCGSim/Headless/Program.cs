@@ -147,6 +147,13 @@ public static class Program
             Minibatch = Int(o, "minibatch", 1024)
         };
         net.LearningRate = Dbl(o, "lr", 2e-4);
+        if (o.TryGetValue("gpu", out var gpu))
+        {
+            if (!GpuLearner.TryParse(gpu == "true" ? GpuLearner.DefaultAddress : gpu, out var gpuHost, out var gpuPort))
+                throw new ArgumentException("--gpu takes host:port, like " + GpuLearner.DefaultAddress);
+            trainer.Gpu = new GpuLearner(gpuHost, gpuPort);
+            Console.WriteLine($"learning on the GPU learner at {gpuHost}:{gpuPort} (start ../GpuLearner/learner.py first)");
+        }
         int games = Int(o, "games", 10000);
         int reportEvery = Int(o, "report-every", 5000);
         int evalGames = Int(o, "eval-games", 200);
@@ -168,7 +175,8 @@ public static class Program
             done += r.Games;
             Console.WriteLine($"games {done,8:N0} | {r.Decisions / Math.Max(1, r.Games),4} decisions/game | seq mistakes/game {r.Mistakes / (double)Math.Max(1, r.Games),4:F1}"
                               + $" | vs pool/classic {(r.VsPool > 0 ? (r.PoolWins / (double)r.VsPool).ToString("F2") : " -  ")} | pi {r.PolicyLoss:+0.000;-0.000} v {r.ValueLoss:F3}"
-                              + $" H {r.Entropy:F2} clip {r.ClipFraction:F2}" + (r.Errors > 0 ? $" | {r.Errors} errors: {r.LastError}" : "")
+                              + $" H {r.Entropy:F2} clip {r.ClipFraction:F2}" + (r.Errors > 0 || (r.LastError ?? "").StartsWith("GPU") ? $" | {r.Errors} errors: {r.LastError}" : "")
+                              + (r.LearnedOn.Length > 0 ? $" | learned on {r.LearnedOn} in {r.LearnSeconds:F1}s" : $" | learned in {r.LearnSeconds:F1}s")
                               + $" | {done / clock.Elapsed.TotalSeconds:F1} games/s");
             Save(net, outPath);
             if (done >= nextReport || done >= games || stop)

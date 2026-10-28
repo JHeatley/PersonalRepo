@@ -101,6 +101,8 @@ namespace PokemonTCG.AI
         /// </summary>
         public int NeuralThreads;
         public double NeuralRest = 0.25;
+        /// <summary>Neural AI training learns on the GPU learner at this address ("127.0.0.1:5577"; null or "": on the CPU).</summary>
+        public string GpuAddress;
 
         /// <summary>
         /// The decks a random side picks from, a new one every game (set before Start). With RandomA and RandomB both on (the
@@ -450,6 +452,9 @@ namespace PokemonTCG.AI
                 CollectGarbage = true,
                 GameBudget = Games
             };
+            string gpuHost;
+            int gpuPort;
+            if (!string.IsNullOrEmpty(GpuAddress) && GpuLearner.TryParse(GpuAddress, out gpuHost, out gpuPort)) trainer.Gpu = new GpuLearner(gpuHost, gpuPort);
             int played = 0;
             trainer.ShouldStop = () => cancel || Volatile.Read(ref played) >= Games;
             trainer.Abort = () => cancel; // Stop: leave the games in progress and don't learn from the unfinished batch
@@ -545,12 +550,15 @@ namespace PokemonTCG.AI
                 if (recentMistakes >= 0)
                     progress += " · sequencing mistakes per game " + recentMistakes.ToString("0.0", CultureInfo.InvariantCulture)
                                 + " (first round " + firstMistakes.ToString("0.0", CultureInfo.InvariantCulture) + "; lower is better)";
+                if (round.LearnedOn.Length > 0) progress += " · learning on the GPU (" + round.LearnedOn + ")";
                 if (checks.Count > 0) progress += " · vs the classic bot: " + string.Join(" → ", checks.ToArray()) + " games";
                 else if (EvalGames == 0) progress += " · tick \"Measure it against the classic bot\" to see it checked as it trains";
                 SetPhase(progress);
                 long skipped = brain.Policy.SkippedSteps - skippedBefore;
                 if (skipped > 0)
                     lock (gate) status.LastError = skipped + " learning step" + (skipped == 1 ? " was" : "s were") + " skipped (numbers out of range); the network is unharmed.";
+                if (!string.IsNullOrEmpty(round.LastError) && round.LastError.StartsWith("GPU learner", StringComparison.Ordinal))
+                    lock (gate) status.LastError = round.LastError;
                 SafeSave();
                 if (round.Games == 0) break;
             }

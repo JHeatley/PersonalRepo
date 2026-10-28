@@ -35,6 +35,9 @@ namespace PokemonTCG.Presentation
         private const string PrefTrainRandomA = "PokemonTCG.TrainRandomA";
         /// <summary>Speed for Neural AI training: Gentle (half the threads, rests) or Fast (every usable thread but two, no rests).</summary>
         private const string PrefTrainFast = "PokemonTCG.TrainFast";
+        /// <summary>Neural AI training learns on the GPU learner (GpuLearner/learner.py), and where it listens.</summary>
+        private const string PrefTrainGpu = "PokemonTCG.TrainGpu";
+        private const string PrefTrainGpuAddress = "PokemonTCG.TrainGpuAddress";
         private const string PrefTrainRandomB = "PokemonTCG.TrainRandomB";
         /// <summary>The most games one session can be set to play (typed in).</summary>
         private const int MaxTrainGames = 1000000;
@@ -65,6 +68,8 @@ namespace PokemonTCG.Presentation
         /// </summary>
         private bool trainRandomA, trainRandomB;
         private bool trainFast;
+        private bool trainGpu;
+        private string trainGpuAddress = GpuLearner.DefaultAddress;
         private bool TrainAll { get { return trainRandomA && trainRandomB; } }
         private bool TrainFocus { get { return trainRandomA != trainRandomB; } }
         /// <summary>The deck that plays every game in focus mode (index into decks), or -1.</summary>
@@ -352,6 +357,8 @@ namespace PokemonTCG.Presentation
             bool all = PlayerPrefs.GetInt(PrefTrainAll, 0) == 1; // the earlier All decks switch
             trainRandomA = PlayerPrefs.GetInt(PrefTrainRandomA, all ? 1 : 0) == 1;
             trainFast = PlayerPrefs.GetInt(PrefTrainFast, 0) == 1;
+            trainGpu = PlayerPrefs.GetInt(PrefTrainGpu, 0) == 1;
+            trainGpuAddress = PlayerPrefs.GetString(PrefTrainGpuAddress, GpuLearner.DefaultAddress) ?? GpuLearner.DefaultAddress;
             trainRandomB = PlayerPrefs.GetInt(PrefTrainRandomB, all ? 1 : 0) == 1;
             confirmReset = false;
             nextBrainRefresh = 0f;
@@ -423,6 +430,7 @@ namespace PokemonTCG.Presentation
         {
             session.NeuralThreads = trainFast ? FastThreads : 0;
             session.NeuralRest = trainFast ? 0 : 0.25;
+            session.GpuAddress = trainGpu ? trainGpuAddress : null;
         }
 
         private void SetTrainRandom(bool a, bool b)
@@ -670,6 +678,22 @@ namespace PokemonTCG.Presentation
             GUILayout.Label(trainFast
                 ? "Fast (Neural AI training): " + FastThreads + " games at once and no rests, about 1.5 to 2 times Gentle's speed. It works the CPU hard: keep \"Don't use CPU threads\" on while your CPU has a faulty core."
                 : "Gentle (Neural AI training): half the CPU's threads, with a short rest after each learning step: cooler and quieter.", Hint(ui));
+            GUILayout.BeginHorizontal();
+            bool newGpu = GUILayout.Toggle(trainGpu, " Learn on the GPU at");
+            string newGpuAddress = GUILayout.TextField(trainGpuAddress, GUILayout.Width(130));
+            GUILayout.EndHorizontal();
+            if (newGpu != trainGpu || newGpuAddress != trainGpuAddress)
+                actions.Add(() =>
+                {
+                    trainGpu = newGpu;
+                    trainGpuAddress = newGpuAddress;
+                    PlayerPrefs.SetInt(PrefTrainGpu, trainGpu ? 1 : 0);
+                    PlayerPrefs.SetString(PrefTrainGpuAddress, trainGpuAddress ?? "");
+                });
+            if (trainGpu)
+                GUILayout.Label("Neural AI training plays its games here and learns on the graphics card: start PokemonTCGSim/GpuLearner/learner.py first "
+                                + "(see its README). Learning is most of the training time, so this is about 2 to 3 times as fast and keeps that work off the CPU. "
+                                + "If the learner isn't running, it learns on the CPU and says so.", Hint(ui));
             GUI.enabled = true;
             if (CpuThreads.Supported)
             {

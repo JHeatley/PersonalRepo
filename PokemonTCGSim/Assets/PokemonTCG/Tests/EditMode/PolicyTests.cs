@@ -379,6 +379,145 @@ namespace PokemonTCG.Tests
             StringAssert.Contains("the AI wins 60% with it", notes, "the similar library deck it has trained with enough");
         }
 
+        private PolicyTrainer SmallTrainer(PolicyNet net)
+        {
+            var decks = new List<KeyValuePair<string, List<CardDef>>>
+            {
+                new KeyValuePair<string, List<CardDef>>("Dragapult", Dragapult()),
+                new KeyValuePair<string, List<CardDef>>("Zoroark", Zoroark())
+            };
+            return new PolicyTrainer(net, StandardCards.CreateRegistry(), decks, 12) { GamesPerRound = 4, Threads = 2, Minibatch = 256 };
+        }
+
+        [Test]
+        public void Without_A_GPU_Learner_A_Round_Learns_On_The_CPU()
+        {
+            var net = new PolicyNet();
+            var trainer = SmallTrainer(net);
+            // Nothing listens on this port.
+            var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
+            listener.Start();
+            int port = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
+            listener.Stop();
+            trainer.Gpu = new GpuLearner("127.0.0.1", port);
+            var round = trainer.Round();
+            trainer.Dispose();
+            Assert.AreEqual(0, round.Errors);
+            StringAssert.Contains("GPU learner", round.LastError);
+            StringAssert.Contains("learned on the CPU", round.LastError);
+            Assert.AreEqual("", round.LearnedOn);
+            Assert.Greater(net.Steps, 0, "it learned anyway");
+        }
+
+        [Test]
+        public void A_Round_Can_Learn_On_The_GPU_Learner()
+        {
+            var net = new PolicyNet();
+            // Stands in for the learner's new weights: a network that took a round of learning (different numbers, same shapes).
+            var learned = new PolicyNet();
+            var other = SmallTrainer(learned);
+            other.Round();
+            other.Dispose();
+            Assert.AreNotEqual(Dense(net), Dense(learned));
+            var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
+            listener.Start();
+            int port = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
+            int decisions = -1;
+            string kind = null;
+            // A stand-in for learner.py: reads one TRN1 message and answers with stats and the "learned" weights.
+            var fake = new System.Threading.Thread(() =>
+            {
+                using (var client = listener.AcceptTcpClient())
+                using (var stream = client.GetStream())
+                {
+                    var r = new System.IO.BinaryReader(stream);
+                    kind = System.Text.Encoding.ASCII.GetString(r.ReadBytes(4));
+                    long size = r.ReadInt64();
+                    var body = new System.IO.BinaryReader(new System.IO.MemoryStream(r.ReadBytes((int)size)));
+                    Assert.AreEqual(GpuLearner.Version, body.ReadInt32());
+                    body.ReadBytes(3 * 4 + 6 * 8); // epochs, minibatch, seed and the PPO settings
+                    int count = body.ReadInt32();
+                    for (int k = 0; k < count; k++)
+                    {
+                        GpuLearner.ReadString(body);
+                        int nd = body.ReadInt32();
+                        int n = 1;
+                        for (int d = 0; d < nd; d++) n *= body.ReadInt32();
+                        body.ReadBytes(4 * n);
+                    }
+                    int rows = body.ReadInt32();
+                    body.ReadBytes(rows * (PolicyNet.CardDim + PolicyNet.StaticSize) * 4);
+                    decisions = body.ReadInt32();
+                    var reply = new System.IO.MemoryStream();
+                    using (var w = new System.IO.BinaryWriter(reply, System.Text.Encoding.UTF8, true))
+                    {
+                        w.Write(-0.01);
+                        w.Write(0.2);
+                        w.Write(0.9);
+                        w.Write(0.1);
+                        w.Write(3);
+                        w.Write(0);
+                        w.Write(0.05);
+                        GpuLearner.WriteString(w, "fake GPU");
+                        learned.WriteLearnerWeights(w, false);
+                    }
+                    var head = new System.IO.BinaryWriter(stream);
+                    head.Write(System.Text.Encoding.ASCII.GetBytes("RES1"));
+                    head.Write(reply.Length);
+                    head.Write(reply.ToArray());
+                    head.Flush();
+                }
+            });
+            fake.Start();
+            var trainer = SmallTrainer(net);
+            trainer.Gpu = new GpuLearner("127.0.0.1", port);
+            var round = trainer.Round();
+            fake.Join(30000);
+            listener.Stop();
+            trainer.Dispose();
+            Assert.AreEqual("TRN1", kind);
+            Assert.Greater(decisions, 0, "the round's decisions were sent");
+            Assert.AreEqual("fake GPU", round.LearnedOn, round.LastError);
+            Assert.AreEqual(3, net.Steps, "the learner's steps count as the network's");
+            Assert.AreEqual(0.2, round.ValueLoss, 1e-9);
+            Assert.AreEqual(Dense(learned), Dense(net), "the weights are the learner's now");
+        }
+
+        /// <summary>The network's tensors (not the card table) as the GPU learner sees them, as text to compare.</summary>
+        private static string Dense(PolicyNet net)
+        {
+            var ms = new System.IO.MemoryStream();
+            using (var w = new System.IO.BinaryWriter(ms, System.Text.Encoding.UTF8, true)) net.WriteLearnerWeights(w, false);
+            ms.Position = 0;
+            var r = new System.IO.BinaryReader(ms);
+            int count = r.ReadInt32();
+            for (int k = 0; k < count; k++)
+            {
+                GpuLearner.ReadString(r);
+                int nd = r.ReadInt32();
+                int n = 1;
+                for (int d = 0; d < nd; d++) n *= r.ReadInt32();
+                r.ReadBytes(4 * n);
+            }
+            return Convert.ToBase64String(ms.ToArray(), 0, (int)ms.Position);
+        }
+
+        [Test]
+        public void GPU_Learner_Addresses_Are_Read()
+        {
+            string host;
+            int port;
+            Assert.IsTrue(GpuLearner.TryParse("127.0.0.1:5577", out host, out port));
+            Assert.AreEqual("127.0.0.1", host);
+            Assert.AreEqual(5577, port);
+            Assert.IsTrue(GpuLearner.TryParse("6000", out host, out port));
+            Assert.AreEqual(6000, port);
+            Assert.IsTrue(GpuLearner.TryParse(" pc-in-the-den:5578 ", out host, out port));
+            Assert.AreEqual("pc-in-the-den", host);
+            Assert.IsFalse(GpuLearner.TryParse("127.0.0.1:port", out host, out port));
+            Assert.IsFalse(GpuLearner.TryParse("", out host, out port));
+        }
+
         [Test]
         public void Skipping_CPU_Threads_Leaves_Every_Other_Thread()
         {

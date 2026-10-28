@@ -19,6 +19,8 @@ namespace PokemonTCG.AI
         public string LastError;
         /// <summary>Time spent playing the games and learning from them.</summary>
         public double CollectSeconds, LearnSeconds;
+        /// <summary>Where it learned: the GPU learner's device (e.g. "cuda:0 (NVIDIA GeForce RTX 2060)"), or "" for this computer's CPU.</summary>
+        public string LearnedOn = "";
     }
 
     /// <summary>One side the network played and learned from in a training game (for deck building: LearningBrain.RecordDeckGame).</summary>
@@ -166,10 +168,11 @@ namespace PokemonTCG.AI
             clock.Restart();
             Log("[PokemonTCG] Neural AI round " + (rounds + 1) + ": played " + round.Games + " games in " + round.CollectSeconds.ToString("0.0") + "s; learning from "
                 + samples.Count + " decisions (" + PolicyNet.MathName + ", memory " + (GC.GetTotalMemory(false) / 1000000) + " MB)...");
-            if (samples.Count > 0) Learn(samples, round);
+            if (samples.Count > 0 && !LearnOnGpu(samples, round)) Learn(samples, round);
             round.LearnSeconds = clock.Elapsed.TotalSeconds;
             if (CollectGarbage) GC.Collect();
-            Log("[PokemonTCG] Neural AI round " + (rounds + 1) + ": learned in " + round.LearnSeconds.ToString("0.0") + "s (" + Net.Steps + " learning steps so far"
+            Log("[PokemonTCG] Neural AI round " + (rounds + 1) + ": learned in " + round.LearnSeconds.ToString("0.0") + "s"
+                + (round.LearnedOn.Length > 0 ? " on " + round.LearnedOn : "") + " (" + Net.Steps + " learning steps so far"
                 + (Net.SkippedSteps > 0 ? ", " + Net.SkippedSteps + " skipped" : "") + ").");
             Net.GamesTrained += round.Games;
             rounds++;
@@ -444,6 +447,7 @@ namespace PokemonTCG.AI
         {
             if (pool2 != null) pool2.Dispose();
             pool2 = null;
+            if (Gpu != null) Gpu.Dispose();
         }
 
         /// <summary>
@@ -538,6 +542,54 @@ namespace PokemonTCG.AI
 
         /// <summary>With a negative advantage, ratios above this stop pushing (dual-clip PPO).</summary>
         public double DualClip = 3.0;
+
+        /// <summary>
+        /// Learn on the graphics card (GpuLearner/learner.py) instead of here. When it can't be reached or fails, the round is
+        /// learned on the CPU and the reason is in the round's LastError; it's tried again a few rounds later.
+        /// </summary>
+        public GpuLearner Gpu;
+        private int gpuRetryRound = -1;
+
+        /// <summary>Learns this round on the GPU learner; false when it couldn't (then Learn runs here).</summary>
+        private bool LearnOnGpu(List<Sample> samples, PolicyRound round)
+        {
+            if (Gpu == null || rounds < gpuRetryRound) return false;
+            try
+            {
+                int n = samples.Count;
+                var inputs = new PolicyInput[n];
+                var actions = new int[n];
+                var logp = new float[n];
+                var adv = new float[n];
+                var ret = new float[n];
+                for (int i = 0; i < n; i++)
+                {
+                    inputs[i] = samples[i].Input;
+                    actions[i] = samples[i].Action;
+                    logp[i] = samples[i].LogP;
+                    adv[i] = samples[i].Adv;
+                    ret[i] = samples[i].Ret;
+                }
+                var r = Gpu.Train(Net, inputs, actions, logp, adv, ret, Epochs, Minibatch, rounds * 31 + 7, Clip, DualClip, ValueCoef, EntropyCoef);
+                round.PolicyLoss = r.PolicyLoss;
+                round.ValueLoss = r.ValueLoss;
+                round.Entropy = r.Entropy;
+                round.ClipFraction = r.ClipFraction;
+                round.LearnedOn = r.Device;
+                if (r.Batches > 0)
+                    Net.AverageLoss = Net.Steps <= r.Batches ? round.PolicyLoss + ValueCoef * round.ValueLoss
+                        : Net.AverageLoss + 0.1 * (round.PolicyLoss + ValueCoef * round.ValueLoss - Net.AverageLoss);
+                return true;
+            }
+            catch (Exception e)
+            {
+                // Learn here this round, and try the GPU again in a few rounds (don't wait on it every round).
+                gpuRetryRound = rounds + 5;
+                round.LastError = "GPU learner: " + e.Message + " (learned on the CPU this round; trying the GPU again in 5 rounds)";
+                Log("[PokemonTCG] " + round.LastError);
+                return false;
+            }
+        }
 
         /// <summary>Decisions run through the network together in the learning step.</summary>
         public int BatchSize = 32;
