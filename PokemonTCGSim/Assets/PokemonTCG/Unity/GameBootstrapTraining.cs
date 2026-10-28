@@ -122,7 +122,15 @@ namespace PokemonTCG.Presentation
             public List<DeckSkill> Decks = new List<DeckSkill>();
             public List<KeyValuePair<string, double>> Lessons = new List<KeyValuePair<string, double>>();
             public List<SessionRecord> History = new List<SessionRecord>();
+            public int ChampionVersion;
+            /// <summary>The checks against the champion, newest first.</summary>
+            public List<ChampionCheck> ChampionChecks = new List<ChampionCheck>();
             private string[] lessonText;
+
+            public string ChampionRow(int k)
+            {
+                return "   " + ChampionChecks[k].When + "  " + ChampionGate.Describe(ChampionChecks[k]);
+            }
 
             public string DeckRow(int k)
             {
@@ -430,9 +438,24 @@ namespace PokemonTCG.Presentation
                     Matchups = brain.Matchups(),
                     Decks = brain.DeckSkills(),
                     Lessons = brain.StrongestLessons(0, 5), // all of them; the Train screen shows them in a scrolling list
-                    History = brain.History()
+                    History = brain.History(),
+                    ChampionVersion = brain.ChampionVersion,
+                    ChampionChecks = Enumerable.Reverse(brain.ChampionChecks).ToList()
                 };
             }
+        }
+
+        /// <summary>The decks the Neural AI's checks against its champion play: every legal deck (All decks' list), the same whatever is trained.</summary>
+        private List<KeyValuePair<string, List<CardDef>>> ChampionDeckPool()
+        {
+            var pool = new List<KeyValuePair<string, List<CardDef>>>();
+            foreach (int i in AllTrainDecks())
+            {
+                var problems = new List<string>();
+                var cards = DeckLibrary.Build(db, decks[i], problems);
+                if (problems.Count == 0 && cards.Count > 0) pool.Add(new KeyValuePair<string, List<CardDef>>(decks[i].Name, cards));
+            }
+            return pool;
         }
 
         /// <summary>The decks All decks mode trains with: every legal deck, but not decks for a custom format (other rules and Prize cards).</summary>
@@ -577,6 +600,7 @@ namespace PokemonTCG.Presentation
                 sessionUndone = false;
                 trainMessage = null;
                 ApplyTrainSpeed(training);
+                training.ChampionDecks = ChampionDeckPool();
                 training.Start();
                 trainView = training.Status();
                 return;
@@ -602,6 +626,7 @@ namespace PokemonTCG.Presentation
             sessionUndone = false;
             trainMessage = null;
             ApplyTrainSpeed(training);
+            training.ChampionDecks = ChampionDeckPool();
             training.Start();
             trainView = training.Status();
         }
@@ -947,6 +972,10 @@ namespace PokemonTCG.Presentation
             GUILayout.Space(8);
         }
 
+        private Vector2 trainScrollChampion;
+        private static string ChampionEveryText { get { return TrainingSession.DefaultChampionEvery.ToString("N0"); } }
+        private static string ChampionMinText { get { return TrainingSession.DefaultChampionMinGames.ToString("N0"); } }
+
         private void DrawBrainPanel(UiStyles ui, List<Action> actions, bool running)
         {
             var b = brainView;
@@ -965,6 +994,18 @@ namespace PokemonTCG.Presentation
                             + " (Train as, above).", ui.Label);
             // Each list scrolls on its own (scroll with the mouse over it, or drag its scroll bar) and holds everything.
             float listMax = Mathf.Clamp(UiScale.Height * 0.3f, 150f, 360f);
+            // The yardstick (ChampionGate): the network's champion version and its checks.
+            if (b.ChampionVersion > 0)
+            {
+                GUILayout.Label("Champion: version " + b.ChampionVersion + ". The yardstick: every " + ChampionEveryText + " Neural AI training games, and at the "
+                                + "end of a session of " + ChampionMinText + " or more, the network plays " + ChampionGate.DefaultGames + " games against the champion (the "
+                                + "same games each time, all your legal decks). It takes over at " + Math.Round(ChampionGate.PromoteAt * 100) + "% or more, so a new "
+                                + "version means it really got better · " + b.ChampionChecks.Count + (b.ChampionChecks.Count == 1 ? " check" : " checks"), Hint(ui));
+                trainScrollChampion = DrawScrollList(ui, trainScrollChampion, b.ChampionChecks.Count, Mathf.Min(listMax, 150f), b.ChampionRow);
+            }
+            else
+                GUILayout.Label("Champion: none yet. The next Neural AI training session keeps the network as it is as the first champion, the yardstick it "
+                                + "has to beat later.", Hint(ui));
             if (b.Decks.Count > 0)
             {
                 GUILayout.Label("How well the Neural AI knows each deck it has trained with, most games first (about 0.6 = plays it confidently, 0.9 = still "

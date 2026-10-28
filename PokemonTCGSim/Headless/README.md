@@ -36,6 +36,13 @@ games. Ctrl+C stops it after the current round.
 | `--games-per-second N` | | play at most N games a second (room to spare for the CPU) |
 | `--skip-cpu 2,3` | | keep off these CPU threads (a faulty core; Windows only; train and eval) |
 
+## The champion (background training)
+
+`background` (the app's Train in the background) checks the Neural AI against its champion like the Train screen does: a copy
+of the network that later versions have to beat. Every 10,000 games, and at the end of a session of 2,000 or more, the
+network plays 300 games against it on the same games each time (every legal deck the app sent); at 55% or more it becomes
+the new champion. The champion is saved next to the AI's file (`<AI file>.champion`), and its checks in the file itself.
+
 ## eval
 
 Plays the network (top-rated moves) against the classic bot, or against another network

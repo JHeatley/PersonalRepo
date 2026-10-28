@@ -276,6 +276,9 @@ public static class Program
             }
             foreach (var part in J("pool").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 if (int.TryParse(part, out int i) && byIndex.TryGetValue(i, out var d)) decks.Add(d);
+            var championDecks = new List<KeyValuePair<string, List<CardDef>>>();
+            foreach (var part in J("champion").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                if (int.TryParse(part, out int i) && byIndex.TryGetValue(i, out var d)) championDecks.Add(d);
             bool randomA = J("randomA") == "1", randomB = J("randomB") == "1";
             byIndex.TryGetValue(JI("a", -1), out var deckA);
             byIndex.TryGetValue(JI("b", -1), out var deckB);
@@ -297,7 +300,8 @@ public static class Program
                 NeuralRest = JD("rest", 0),
                 GpuAddress = J("gpu", null),
                 GamesPerSecond = JD("rate", 0),
-                PrizeCount = JI("prizes", 6)
+                PrizeCount = JI("prizes", 6),
+                ChampionDecks = championDecks.Count > 0 ? championDecks : null
             };
             Console.WriteLine($"background training: {session.MatchLabel}, {session.Games:N0} games as the {session.StyleLabel}; brain {brain.FilePath}");
             session.Start();

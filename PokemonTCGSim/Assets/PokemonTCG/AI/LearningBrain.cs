@@ -196,6 +196,39 @@ namespace PokemonTCG.AI
         /// bot's trained weights) and trains by PPO in Neural AI training sessions. Saved next to the brain's file (FilePath + ".neural").
         /// </summary>
         public readonly PolicyNet Policy = new PolicyNet();
+
+        /// <summary>
+        /// The champion: a copy of the network that later versions have to beat to replace it (ChampionGate), saved next to the
+        /// brain's file (FilePath + ".champion"). Null until the first check.
+        /// </summary>
+        public PolicyNet Champion { get; private set; }
+        /// <summary>How many times the network has become the champion (1 for the first).</summary>
+        public int ChampionVersion { get; private set; }
+        private readonly List<ChampionCheck> championChecks = new List<ChampionCheck>();
+
+        /// <summary>The checks against the champion, oldest first.</summary>
+        public List<ChampionCheck> ChampionChecks
+        {
+            get { lock (sync) return new List<ChampionCheck>(championChecks); }
+        }
+
+        public void SetChampion(PolicyNet net)
+        {
+            lock (sync)
+            {
+                Champion = net;
+                ChampionVersion++;
+            }
+        }
+
+        public void RecordChampionCheck(ChampionCheck check)
+        {
+            lock (sync)
+            {
+                championChecks.Add(check);
+                if (championChecks.Count > 200) championChecks.RemoveAt(0);
+            }
+        }
         /// <summary>
         /// The network the Neural AI starts from and goes back to when the AI is reset: Resources/AI/policy_start.bytes, exported
         /// from the Python bot by PokemonTCGBot/tools/export_to_sim.py. Set once at startup; nothing ever writes to it.
@@ -904,6 +937,9 @@ namespace PokemonTCG.AI
         {
             lock (sync)
             {
+                Champion = null;
+                ChampionVersion = 0;
+                championChecks.Clear();
                 weights.Clear();
                 matchups.Clear();
                 history.Clear();
@@ -933,6 +969,8 @@ namespace PokemonTCG.AI
         ///   m  games  wins  losses  baseline  shortBaseline  deck  opponent
         ///   s  games  winsA  winsB  scoreBefore  scoreAfter  evalGames  when  deckA  deckB
         ///   n  base64 of the neural network's weights (v74; only once it has learned something)
+        ///   yv  championVersion;  y  gamesTrained  games  wins  draws  losses  winRate  promoted  version  when   (the yardstick, ChampionGate)
+        ///   (Serialize() only: p  base64 of the policy network;  pc  base64 of the champion network)
         /// </summary>
         public string Serialize()
         {
@@ -943,6 +981,13 @@ namespace PokemonTCG.AI
                 w.Write("p\t");
                 w.Write(Convert.ToBase64String(Policy.ToBytes()));
                 w.Write('\n');
+                var champ = Champion;
+                if (champ != null)
+                {
+                    w.Write("pc\t");
+                    w.Write(Convert.ToBase64String(champ.ToBytes()));
+                    w.Write('\n');
+                }
                 return w.ToString();
             }
         }
@@ -980,6 +1025,13 @@ namespace PokemonTCG.AI
                       .Append(D(k.Uncertainty)).Append('\t').Append(Clean(k.Deck)).Append('\n');
                 }
                 if (HabitReviews > 0) sb.Append("hr\t").Append(HabitReviews).Append('\n');
+                if (ChampionVersion > 0) sb.Append("yv\t").Append(ChampionVersion).Append('\n');
+                foreach (var y in championChecks)
+                {
+                    sb.Append("y\t").Append(y.GamesTrained).Append('\t').Append(y.Games).Append('\t').Append(y.Wins).Append('\t').Append(y.Draws).Append('\t')
+                      .Append(y.Losses).Append('\t').Append(D(y.WinRate)).Append('\t').Append(y.Promoted ? 1 : 0).Append('\t').Append(y.Version).Append('\t')
+                      .Append(Clean(y.When)).Append('\n');
+                }
                 foreach (var h in habits.Values.OrderBy(x => x.Key, StringComparer.Ordinal))
                 {
                     sb.Append("h\t").Append(h.Games).Append('\t').Append(h.Times).Append('\t').Append(D(h.Strength)).Append('\t').Append(D(h.Recent)).Append('\t')
@@ -1038,6 +1090,9 @@ namespace PokemonTCG.AI
                 deckSkills.Clear();
                 habits.Clear();
                 HabitReviews = 0;
+                championChecks.Clear();
+                ChampionVersion = 0;
+                Champion = null; // a "pc" line brings it back (Undo); the brain's own file keeps it in its own file (Load)
                 GamesTrained = GamesVsYou = YourDecisionsStudied = FeedbackGiven = 0;
                 LogsStudied = LogDecisionsStudied = 0;
                 Net.Reset();
@@ -1090,6 +1145,19 @@ namespace PokemonTCG.AI
                             case "hr":
                                 if (p.Length >= 2) HabitReviews = I(p[1]);
                                 break;
+                            case "yv":
+                                if (p.Length >= 2) ChampionVersion = I(p[1]);
+                                break;
+                            case "y":
+                                if (p.Length >= 10)
+                                {
+                                    championChecks.Add(new ChampionCheck
+                                    {
+                                        GamesTrained = I(p[1]), Games = I(p[2]), Wins = I(p[3]), Draws = I(p[4]), Losses = I(p[5]), WinRate = Dp(p[6]),
+                                        Promoted = p[7] == "1", Version = I(p[8]), When = p[9]
+                                    });
+                                }
+                                break;
                             case "h":
                                 if (p.Length >= 8)
                                 {
@@ -1126,6 +1194,13 @@ namespace PokemonTCG.AI
                             case "p":
                                 if (p.Length >= 2) Policy.FromBytes(Convert.FromBase64String(p[1].Trim()));
                                 break;
+                            case "pc":
+                                if (p.Length >= 2)
+                                {
+                                    var champ = new PolicyNet();
+                                    if (champ.FromBytes(Convert.FromBase64String(p[1].Trim()))) Champion = champ;
+                                }
+                                break;
                             case "s":
                                 if (p.Length >= 10)
                                 {
@@ -1157,6 +1232,12 @@ namespace PokemonTCG.AI
             if (!string.IsNullOrEmpty(path) && File.Exists(path)) brain.LoadText(File.ReadAllText(path, Encoding.UTF8));
             string neural = NeuralPath(path);
             if (neural != null && File.Exists(neural)) brain.Policy.FromBytes(File.ReadAllBytes(neural));
+            string champion = ChampionPath(path);
+            if (champion != null && File.Exists(champion))
+            {
+                var net = new PolicyNet();
+                if (net.FromBytes(File.ReadAllBytes(champion))) brain.Champion = net;
+            }
             return brain;
         }
 
@@ -1188,7 +1269,26 @@ namespace PokemonTCG.AI
                     if (File.Exists(neural)) File.Delete(neural);
                     File.Move(neural + ".tmp", neural);
                 }
+                // The champion (the yardstick), in its own file too; none after a reset.
+                string champion = ChampionPath(FilePath);
+                var champ = Champion;
+                if (champ == null)
+                {
+                    if (File.Exists(champion)) File.Delete(champion);
+                }
+                else if (champ.AllFinite())
+                {
+                    File.WriteAllBytes(champion + ".tmp", champ.ToBytes());
+                    if (File.Exists(champion)) File.Delete(champion);
+                    File.Move(champion + ".tmp", champion);
+                }
             }
+        }
+
+        /// <summary>The file holding the champion network (ChampionGate) for the brain saved at path.</summary>
+        public static string ChampionPath(string path)
+        {
+            return string.IsNullOrEmpty(path) ? null : path + ".champion";
         }
 
         /// <summary>The file holding the Neural AI's network for the brain saved at path.</summary>

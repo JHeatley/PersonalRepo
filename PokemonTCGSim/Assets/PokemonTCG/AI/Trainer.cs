@@ -114,6 +114,20 @@ namespace PokemonTCG.AI
         public List<KeyValuePair<string, List<CardDef>>> DeckPool;
         public bool RandomA = true, RandomB = true;
 
+        /// <summary>
+        /// The decks the Neural AI's checks against its champion play (ChampionGate): all your legal decks, so the yardstick is
+        /// the same whatever this session trains on. Null: the pool, or this session's decks.
+        /// </summary>
+        public List<KeyValuePair<string, List<CardDef>>> ChampionDecks;
+        /// <summary>A check against the champion every this many training games (0: none), and at the end of a long enough session.</summary>
+        public int ChampionEvery = DefaultChampionEvery;
+        /// <summary>A session's last check needs at least this many games trained since the one before.</summary>
+        public int ChampionMinGames = DefaultChampionMinGames;
+        public const int DefaultChampionEvery = 10000, DefaultChampionMinGames = 2000;
+        public int ChampionGames = ChampionGate.DefaultGames;
+        /// <summary>What the last check against the champion found ("" before one).</summary>
+        public string ChampionNote { get; private set; }
+
         private bool HasPool { get { return DeckPool != null && DeckPool.Count > 0; } }
         /// <summary>Both sides random: all decks against all decks.</summary>
         public bool AllDecksMode { get { return HasPool && RandomA && RandomB; } }
@@ -514,7 +528,7 @@ namespace PokemonTCG.AI
             };
             try
             {
-                TrainNeuralRounds(trainer, () => Volatile.Read(ref played));
+                TrainNeuralRounds(trainer, () => Volatile.Read(ref played), decks);
             }
             finally
             {
@@ -522,8 +536,16 @@ namespace PokemonTCG.AI
             }
         }
 
-        private void TrainNeuralRounds(PolicyTrainer trainer, Func<int> playedSoFar)
+        private void TrainNeuralRounds(PolicyTrainer trainer, Func<int> playedSoFar, List<KeyValuePair<string, List<CardDef>>> sessionDecks)
         {
+            int nextChampion = ChampionEvery, lastChampion = 0;
+            var championDecks = ChampionDecks != null && ChampionDecks.Count > 0 ? ChampionDecks : HasPool ? DeckPool : sessionDecks;
+            // The first session with the yardstick: the network as it is now becomes the first champion (nothing to play).
+            if (ChampionEvery > 0 && brain.Champion == null)
+            {
+                var first = ChampionGate.Run(brain, scripts, championDecks, ChampionGames, trainer.Threads, () => cancel);
+                if (first != null) ChampionNote = "champion: " + ChampionGate.Describe(first);
+            }
             long skippedBefore = brain.Policy.SkippedSteps;
             // Progress, shown on the status line: sequencing mistakes per game (they should fall), and, when measuring is on,
             // a check against the classic bot every fifth of the session on the same games each time (it should rise).
@@ -558,7 +580,14 @@ namespace PokemonTCG.AI
                 if (round.LearnedOn.Length > 0) progress += " · learning on the GPU (" + round.LearnedOn + ")";
                 if (checks.Count > 0) progress += " · vs the classic bot: " + string.Join(" → ", checks.ToArray()) + " games";
                 else if (EvalGames == 0) progress += " · tick \"Measure it against the classic bot\" to see it checked as it trains";
+                if (!string.IsNullOrEmpty(ChampionNote)) progress += " · " + ChampionNote;
                 SetPhase(progress);
+                if (ChampionEvery > 0 && done >= nextChampion && done < Games && !cancel)
+                {
+                    while (nextChampion <= done) nextChampion += ChampionEvery;
+                    CheckChampion(basePhase, trainer.Threads, championDecks);
+                    lastChampion = done;
+                }
                 long skipped = brain.Policy.SkippedSteps - skippedBefore;
                 if (skipped > 0)
                     lock (gate) status.LastError = skipped + " learning step" + (skipped == 1 ? " was" : "s were") + " skipped (numbers out of range); the network is unharmed.";
@@ -567,6 +596,20 @@ namespace PokemonTCG.AI
                 SafeSave();
                 if (round.Games == 0) break;
             }
+            // The end of a long enough session: the network against the champion, so the screen shows where it stands.
+            if (!cancel && ChampionEvery > 0 && playedSoFar() - lastChampion >= ChampionMinGames)
+                CheckChampion(basePhase, trainer.Threads, championDecks);
+        }
+
+        /// <summary>The network against its champion (the yardstick, ChampionGate), promoted if it won clearly.</summary>
+        private void CheckChampion(string basePhase, int threads, List<KeyValuePair<string, List<CardDef>>> decks)
+        {
+            SetPhase(basePhase + " · checking against the champion (" + ChampionGames + " games)...");
+            var check = ChampionGate.Run(brain, scripts, decks, ChampionGames, threads, () => cancel);
+            if (check == null) return;
+            ChampionNote = "champion: " + ChampionGate.Describe(check);
+            SetPhase(basePhase + " · " + ChampionNote);
+            SafeSave();
         }
 
         /// <summary>Call inside the lock.</summary>

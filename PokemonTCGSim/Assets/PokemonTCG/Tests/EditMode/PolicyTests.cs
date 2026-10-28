@@ -154,6 +154,85 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
+        public void The_Champion_Is_Kept_Checked_And_Replaced_Only_By_A_Clearly_Better_Network()
+        {
+            var brain = new LearningBrain();
+            brain.Policy.Reset();
+            brain.Policy.GamesTrained = 1;
+            var decks = new List<KeyValuePair<string, List<CardDef>>>
+            {
+                new KeyValuePair<string, List<CardDef>>("Dragapult", Dragapult()), new KeyValuePair<string, List<CardDef>>("Zoroark", Zoroark())
+            };
+            var scripts = StandardCards.CreateRegistry();
+
+            // The first check: the network as it is becomes version 1 (nothing played).
+            var first = ChampionGate.Run(brain, scripts, decks, 20, 2, null);
+            Assert.AreEqual(1, brain.ChampionVersion);
+            Assert.IsTrue(first.Promoted);
+            Assert.AreEqual(0, first.Games);
+            CollectionAssert.AreEqual(brain.Policy.ToBytes(), brain.Champion.ToBytes(), "a copy of the network");
+            StringAssert.Contains("first champion (version 1)", ChampionGate.Describe(first));
+
+            // Later checks play the same games each time; it takes over only at 55% or more.
+            var check = ChampionGate.Run(brain, scripts, decks, 20, 2, null);
+            Assert.AreEqual(20, check.Games);
+            Assert.AreEqual(check.WinRate >= ChampionGate.PromoteAt, check.Promoted);
+            Assert.AreEqual(check.Promoted ? 2 : 1, brain.ChampionVersion);
+            var again = ChampionGate.Run(brain, scripts, decks, 20, 2, null);
+            if (!check.Promoted) Assert.AreEqual(check.WinRate, again.WinRate, 1e-9, "the same games, the same result");
+            Assert.AreEqual(3, brain.ChampionChecks.Count);
+
+            // Saved and read back, champion network included; Undo brings it back; a reset forgets it.
+            string path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "champion_test_" + Guid.NewGuid().ToString("N") + ".txt");
+            try
+            {
+                brain.FilePath = path;
+                brain.Save();
+                var back = LearningBrain.Load(path);
+                Assert.AreEqual(brain.ChampionVersion, back.ChampionVersion);
+                Assert.AreEqual(3, back.ChampionChecks.Count);
+                Assert.AreEqual(check.WinRate, back.ChampionChecks[1].WinRate, 1e-6);
+                CollectionAssert.AreEqual(brain.Champion.ToBytes(), back.Champion.ToBytes());
+
+                string before = brain.Serialize();
+                var champ = brain.Champion.ToBytes();
+                brain.Reset();
+                Assert.IsNull(brain.Champion);
+                Assert.AreEqual(0, brain.ChampionVersion);
+                brain.Save();
+                Assert.IsFalse(System.IO.File.Exists(LearningBrain.ChampionPath(path)), "no champion file after a reset");
+                brain.LoadText(before);
+                CollectionAssert.AreEqual(champ, brain.Champion.ToBytes(), "Undo keeps the champion as it was");
+            }
+            finally
+            {
+                foreach (var f in new[] { path, LearningBrain.NeuralPath(path), LearningBrain.ChampionPath(path) })
+                    if (System.IO.File.Exists(f)) System.IO.File.Delete(f);
+            }
+        }
+
+        [Test]
+        public void A_Neural_Training_Session_Checks_Its_Champion()
+        {
+            var brain = new LearningBrain();
+            brain.Policy.Reset();
+            brain.Policy.GamesTrained = 1;
+            var session = new TrainingSession(StandardCards.CreateRegistry(), brain, "Dragapult", Dragapult(), "Zoroark", Zoroark(), 24, 0, 777)
+            {
+                Style = AiStyle.Neural,
+                ChampionEvery = 12,
+                ChampionMinGames = 8,
+                ChampionGames = 10
+            };
+            session.RunBlocking();
+            var checks = brain.ChampionChecks;
+            Assert.GreaterOrEqual(checks.Count, 2, "the first champion, then a check during the session");
+            Assert.AreEqual(-1, checks[0].WinRate, "the first is the network as it was");
+            Assert.IsTrue(checks.Skip(1).All(c => c.Games == 10));
+            StringAssert.Contains("champion", session.ChampionNote);
+        }
+
+        [Test]
         public void A_Network_With_Broken_Numbers_Is_Never_Loaded_Or_Learned_Into()
         {
             var net = new PolicyNet { GamesTrained = 5 };
