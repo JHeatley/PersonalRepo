@@ -600,7 +600,8 @@ namespace PokemonTCG.Presentation
             var actions = new List<Action>();
             var st = trainView;
             bool running = st != null && st.Running;
-            float w = Mathf.Min(1180f, UiScale.Width - 30f);
+            // The whole window's width (on a PC the screen has room for it), less a margin.
+            float w = UiScale.Width - 30f;
             var r = new Rect(UiScale.Width / 2f - w / 2f, 15f, w, UiScale.Height - 30f);
             GUI.Box(r, GUIContent.none);
             GUILayout.BeginArea(new Rect(r.x + 14, r.y + 10, r.width - 28, r.height - 20));
@@ -609,12 +610,15 @@ namespace PokemonTCG.Presentation
                             + "It also learns from every game you play against it, and from your answers on the Areas of Improvement screen.", ui.Label);
             if (brainError != null) GUILayout.Label(brainError, ui.Error);
 
-            float colW = (r.width - 60f) / 3f;
+            // The settings column gets at least the room its widest row needs; the deck lists and the info panel share the rest.
+            float setW = Mathf.Clamp((r.width - 28f) * 0.36f, 460f, 640f);
+            float leftW = r.width - 28f - setW - 14f;
+            float colW = (leftW - 8f) / 2f;
             float listH = Mathf.Clamp(r.height * 0.32f, 140f, 300f);
             // Two sides: the deck lists with the results and what the AI knows under them (left, two columns wide), and the
             // settings and progress in a column of their own that scrolls (right).
             GUILayout.BeginHorizontal();
-            GUILayout.BeginVertical(GUILayout.Width(2 * colW + 8));
+            GUILayout.BeginVertical(GUILayout.Width(leftW));
             GUILayout.BeginHorizontal();
 
             GUILayout.BeginVertical(GUILayout.Width(colW));
@@ -654,17 +658,19 @@ namespace PokemonTCG.Presentation
             GUILayout.Space(6);
             trainScrollInfo = GUILayout.BeginScrollView(trainScrollInfo, false, false, GUIStyle.none, GUI.skin.verticalScrollbar, GUILayout.ExpandHeight(true));
             // Held to the panel's width (less its scroll bar), so long lines wrap and the lists' own scroll bars stay in view.
-            GUILayout.BeginVertical(GUILayout.Width(2 * colW - 16f));
+            GUILayout.BeginVertical(GUILayout.Width(leftW - 24f));
             DrawTrainResults(ui, st, actions);
-            DrawGrowthChart(ui, 2 * colW - 30f);
+            DrawGrowthChart(ui, leftW - 38f);
             DrawLogStudyPanel(ui, actions, running);
             DrawBrainPanel(ui, actions, running);
             GUILayout.EndVertical();
             GUILayout.EndScrollView();
             GUILayout.EndVertical();
 
-            GUILayout.BeginVertical(GUILayout.Width(colW));
+            GUILayout.BeginVertical(GUILayout.Width(setW));
             trainScrollSettings = GUILayout.BeginScrollView(trainScrollSettings, false, false, GUIStyle.none, GUI.skin.verticalScrollbar, GUILayout.ExpandHeight(true));
+            // Held to the column's width (less its scroll bar), so long lines wrap instead of running off the right edge.
+            GUILayout.BeginVertical(GUILayout.Width(setW - 20f));
             GUILayout.Label("Games to play", ui.Title);
             GUI.enabled = !running;
             int countPick = Array.IndexOf(TrainCounts, trainGames);
@@ -673,8 +679,8 @@ namespace PokemonTCG.Presentation
             GUILayout.BeginHorizontal();
             GUILayout.Label("Or type any number:", GUILayout.Width(140));
             string newGamesText = GUILayout.TextField(trainGamesText, GUILayout.Width(110));
-            GUILayout.Label("  " + trainGames.ToString("N0") + " games (up to 5,000,000)", Hint(ui));
             GUILayout.EndHorizontal();
+            GUILayout.Label(trainGames.ToString("N0") + " games (up to 5,000,000)", Hint(ui));
             if (newGamesText != trainGamesText) actions.Add(() => TypeTrainGames(newGamesText));
             if (TrainAll)
                 GUILayout.Label("All decks against all decks: every game picks two of your " + AllTrainDecks().Count + " legal decks at random (mirrors too), "
@@ -759,11 +765,13 @@ namespace PokemonTCG.Presentation
             GUI.enabled = !running && !background && TrainDecksReady && brain != null;
             if (GUILayout.Button("Start training", GUILayout.Height(32))) actions.Add(StartTraining);
             GUI.enabled = running;
-            if (GUILayout.Button("Stop", GUILayout.Height(32), GUILayout.Width(80))) actions.Add(() => training.Cancel());
+            if (GUILayout.Button("Stop", GUILayout.Height(32), GUILayout.Width(100))) actions.Add(() => training.Cancel());
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
             // v120: a black screen while it trains (it keeps going; tap to wake).
-            if (GUILayout.Button("Dark screen", GUILayout.Height(32), GUILayout.Width(110))) actions.Add(PowerSaver.GoDark);
+            if (GUILayout.Button("Dark screen", GUILayout.Height(32))) actions.Add(PowerSaver.GoDark);
             GUI.enabled = true;
-            if (GUILayout.Button("Back to menu", GUILayout.Height(32), GUILayout.Width(120))) actions.Add(() => { RefreshDecks(); mode = Mode.Menu; });
+            if (GUILayout.Button("Back to menu", GUILayout.Height(32))) actions.Add(() => { RefreshDecks(); mode = Mode.Menu; });
             GUILayout.EndHorizontal();
             DrawBackgroundTraining(ui, actions, running);
             if (running && PowerSaver.Active) GUILayout.Label("Battery saver on: training plays half the time and rests the other half.", Hint(ui));
@@ -775,7 +783,8 @@ namespace PokemonTCG.Presentation
                 GUILayout.Label("Both decks must be legal to train with them.", ui.Error);
             if (!trainRandomA && !trainRandomB && trainA >= 0 && trainA == trainB) GUILayout.Label("Same deck on both sides: a mirror match. The AI learns that deck's own play.", Hint(ui));
             if (trainMessage != null) GUILayout.Label(trainMessage, ui.Good);
-            DrawTrainProgress(ui, st, colW - 20f);
+            DrawTrainProgress(ui, st, setW - 34f);
+            GUILayout.EndVertical();
             GUILayout.EndScrollView();
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
