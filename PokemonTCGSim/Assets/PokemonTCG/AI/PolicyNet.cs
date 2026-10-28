@@ -394,24 +394,31 @@ namespace PokemonTCG.AI
             return 0.5f * (1f + Erf(x * InvSqrt2)) + x * InvSqrt2Pi * (float)Math.Exp(-0.5 * x * x);
         }
 
+        /// <summary>
+        /// Faster versions of the inner loops, when installed (Unity's Burst compiler, from Assets/PokemonTCG/Burst); null runs the
+        /// plain C# ones. Set once at startup.
+        /// </summary>
+        public static IPolicyMath FastMath;
+
+        private static IPolicyMath Kernels { get { return FastMath ?? ManagedPolicyMath.Instance; } }
+
+        /// <summary>Which version of the inner loops the network is using ("Burst" or "C#").</summary>
+        public static string MathName { get { return FastMath == null ? "C#" : FastMath.GetType().Name.Replace("PolicyMath", ""); } }
+
         /// <summary>y[o] = b[o] + sum_i W[o, i] * x[xOff + i].</summary>
         private static void Linear(float[] w, float[] b, int outN, int inN, float[] x, int xOff, float[] y, int yOff)
         {
-            for (int o = 0; o < outN; o++) y[yOff + o] = b[o] + Dot(w, o * inN, x, xOff, inN);
+            Array.Copy(b, 0, y, yOff, outN);
+            Kernels.MatVecAcc(w, 0, inN, outN, inN, x, xOff, y, yOff);
         }
+
 
         /// <summary>dx[xOff + i] += sum_o W[o, i] * dy[o]; gW[o, i] += dy[o] * x[xOff + i]; gB[o] += dy[o].</summary>
         private static void LinearBack(float[] w, int outN, int inN, float[] x, int xOff, float[] dy, int dyOff, float[] dx, int dxOff, float[] gw, float[] gb)
         {
-            for (int o = 0; o < outN; o++)
-            {
-                float d = dy[dyOff + o];
-                if (d == 0f) continue;
-                int row = o * inN;
-                if (gb != null) gb[o] += d;
-                if (gw != null) Axpy(d, x, xOff, gw, row, inN);
-                if (dx != null) Axpy(d, w, row, dx, dxOff, inN);
-            }
+            if (gb != null) for (int o = 0; o < outN; o++) gb[o] += dy[dyOff + o];
+            if (gw != null) Kernels.OuterAcc(gw, 0, inN, outN, inN, dy, dyOff, x, xOff);
+            if (dx != null) Kernels.MatTVecAcc(w, 0, inN, outN, inN, dy, dyOff, dx, dxOff);
         }
 
         private static readonly int Lanes = Vector<float>.Count;
@@ -419,7 +426,7 @@ namespace PokemonTCG.AI
         public static bool Simd = Vector.IsHardwareAccelerated && Environment.GetEnvironmentVariable("POLICY_NO_SIMD") == null;
 
         /// <summary>sum_i a[ao + i] * b[bo + i], with SIMD where the platform has it.</summary>
-        private static float Dot(float[] a, int ao, float[] b, int bo, int n)
+        internal static float Dot(float[] a, int ao, float[] b, int bo, int n)
         {
             int i = 0;
             float sum = 0f;
@@ -448,7 +455,7 @@ namespace PokemonTCG.AI
         }
 
         /// <summary>y[yo + i] += alpha * x[xo + i].</summary>
-        private static void Axpy(float alpha, float[] x, int xo, float[] y, int yo, int n)
+        internal static void Axpy(float alpha, float[] x, int xo, float[] y, int yo, int n)
         {
             int i = 0;
             if (Simd && n >= Lanes)
@@ -653,10 +660,18 @@ namespace PokemonTCG.AI
         private const int GlobalsOffset = SourceOffset + CardDim;
         private const int TurnOffset = StateSize - PolicyInput.TurnFeatures;
 
-        /// <summary>ys[k][o] = b[o] + W[o] . xs[k], one weight row at a time for the whole batch.</summary>
+        /// <summary>
+        /// ys[k] = b + W xs[k] for each decision of a batch. Plain C# goes one weight row at a time for the whole batch (each row
+        /// is read once); fast kernels take one decision at a time.
+        /// </summary>
         private static void LinearBatch(float[] w, float[] b, int outN, int inN, float[][] xs, float[][] ys)
         {
             int n = xs.Length;
+            if (FastMath != null)
+            {
+                for (int k = 0; k < n; k++) Linear(w, b, outN, inN, xs[k], 0, ys[k], 0);
+                return;
+            }
             for (int o = 0; o < outN; o++)
             {
                 int row = o * inN;
@@ -669,6 +684,11 @@ namespace PokemonTCG.AI
         private static void LinearBackBatch(float[] w, int outN, int inN, float[][] xs, float[][] dys, float[][] dxs, float[] gw, float[] gb)
         {
             int n = xs.Length;
+            if (FastMath != null)
+            {
+                for (int k = 0; k < n; k++) LinearBack(w, outN, inN, xs[k], 0, dys[k], 0, dxs == null ? null : dxs[k], 0, gw, gb);
+                return;
+            }
             for (int o = 0; o < outN; o++)
             {
                 int row = o * inN;
@@ -692,16 +712,30 @@ namespace PokemonTCG.AI
             // Trunk, batched
             var pre = new float[n][];
             for (int i = 0; i < n; i++) pre[i] = new float[Width];
-            for (int o = 0; o < Width; o++)
+            // The input layer only over the parts of the state that aren't zeros (empty slots and bags are skipped).
+            if (FastMath != null)
             {
-                int row = o * StateSize;
                 for (int i = 0; i < n; i++)
                 {
                     var p = ps[i];
-                    float sum = inpB.Data[o];
+                    Array.Copy(inpB.Data, pre[i], Width);
                     var seg = p.Segments;
-                    for (int k = 0; k < seg.Length; k += 2) sum += Dot(inpW.Data, row + seg[k], p.State, seg[k], seg[k + 1]);
-                    pre[i][o] = sum;
+                    for (int k = 0; k < seg.Length; k += 2) FastMath.MatVecAcc(inpW.Data, seg[k], StateSize, Width, seg[k + 1], p.State, seg[k], pre[i], 0);
+                }
+            }
+            else
+            {
+                for (int o = 0; o < Width; o++)
+                {
+                    int row = o * StateSize;
+                    for (int i = 0; i < n; i++)
+                    {
+                        var p = ps[i];
+                        float sum = inpB.Data[o];
+                        var seg = p.Segments;
+                        for (int k = 0; k < seg.Length; k += 2) sum += Dot(inpW.Data, row + seg[k], p.State, seg[k], seg[k + 1]);
+                        pre[i][o] = sum;
+                    }
                 }
             }
             for (int i = 0; i < n; i++) GeluAll(pre[i], ps[i].X[0], ps[i].InpGrad);
@@ -1075,19 +1109,35 @@ namespace PokemonTCG.AI
             }
             var dState = Zeros(n, StateSize);
             float[] gInpW = G(g, inpW), gInpB = G(g, inpB);
-            for (int o = 0; o < Width; o++)
+            if (FastMath != null)
             {
-                int row = o * StateSize;
                 for (int i = 0; i < n; i++)
                 {
-                    float d = dx[i][o];
-                    if (d == 0f) continue;
-                    gInpB[o] += d;
                     var p = ps[i];
+                    var d = dx[i];
+                    for (int o = 0; o < Width; o++) gInpB[o] += d[o];
                     var seg = p.Segments;
-                    for (int k = 0; k < seg.Length; k += 2) Axpy(d, p.State, seg[k], gInpW, row + seg[k], seg[k + 1]);
+                    for (int k = 0; k < seg.Length; k += 2) FastMath.OuterAcc(gInpW, seg[k], StateSize, Width, seg[k + 1], d, 0, p.State, seg[k]);
                     seg = p.GradSegments;
-                    for (int k = 0; k < seg.Length; k += 2) Axpy(d, inpW.Data, row + seg[k], dState[i], seg[k], seg[k + 1]);
+                    for (int k = 0; k < seg.Length; k += 2) FastMath.MatTVecAcc(inpW.Data, seg[k], StateSize, Width, seg[k + 1], d, 0, dState[i], seg[k]);
+                }
+            }
+            else
+            {
+                for (int o = 0; o < Width; o++)
+                {
+                    int row = o * StateSize;
+                    for (int i = 0; i < n; i++)
+                    {
+                        float d = dx[i][o];
+                        if (d == 0f) continue;
+                        gInpB[o] += d;
+                        var p = ps[i];
+                        var seg = p.Segments;
+                        for (int k = 0; k < seg.Length; k += 2) Axpy(d, p.State, seg[k], gInpW, row + seg[k], seg[k + 1]);
+                        seg = p.GradSegments;
+                        for (int k = 0; k < seg.Length; k += 2) Axpy(d, inpW.Data, row + seg[k], dState[i], seg[k], seg[k + 1]);
+                    }
                 }
             }
 

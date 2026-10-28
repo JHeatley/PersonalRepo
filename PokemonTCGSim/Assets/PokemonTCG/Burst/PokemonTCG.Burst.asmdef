@@ -1,0 +1,25 @@
+{
+    "name": "PokemonTCG.Burst",
+    "rootNamespace": "PokemonTCG.Burst",
+    "references": [
+        "PokemonTCG.AI",
+        "Unity.Burst"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "POKEMONTCG_BURST"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.burst",
+            "expression": "1.6.0",
+            "define": "POKEMONTCG_BURST"
+        }
+    ],
+    "noEngineReferences": false
+}
