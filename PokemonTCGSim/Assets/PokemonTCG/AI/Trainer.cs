@@ -96,37 +96,56 @@ namespace PokemonTCG.AI
         public int PrizeCount = 6;
 
         /// <summary>
-        /// All decks against all decks: every game plays two decks picked at random from these, a new pair each game (as the
-        /// Python bot trains). Set before Start; DeckA and DeckB are only labels then.
+        /// The decks a random side picks from, a new one every game (set before Start). With RandomA and RandomB both on (the
+        /// default) it's all decks against all decks, as the Python bot trains, and DeckA and DeckB are only labels; with one of
+        /// them off, that side keeps its deck every game against a random one (focused practice for that deck).
         /// </summary>
-        public List<KeyValuePair<string, List<CardDef>>> AllDecks;
+        public List<KeyValuePair<string, List<CardDef>>> DeckPool;
+        public bool RandomA = true, RandomB = true;
 
-        public bool AllDecksMode { get { return AllDecks != null && AllDecks.Count > 0; } }
+        private bool HasPool { get { return DeckPool != null && DeckPool.Count > 0; } }
+        /// <summary>Both sides random: all decks against all decks.</summary>
+        public bool AllDecksMode { get { return HasPool && RandomA && RandomB; } }
+        /// <summary>One side keeps its deck, the other gets a random one each game.</summary>
+        public bool FocusMode { get { return HasPool && RandomA != RandomB; } }
+        /// <summary>In focus mode: the deck that plays every game (deck A or deck B).</summary>
+        public string FocusDeck { get { return FocusMode ? (RandomB ? DeckA : DeckB) : null; } }
 
-        /// <summary>What the games are: "Deck A vs Deck B", or all decks.</summary>
+        /// <summary>What the games are: "Deck A vs Deck B", one deck against random decks, or all decks.</summary>
         public string MatchLabel
         {
-            get { return AllDecksMode ? "all " + AllDecks.Count + " decks, a random pair every game" : DeckA + " vs " + DeckB; }
+            get
+            {
+                if (AllDecksMode) return "all " + DeckPool.Count + " decks, a random pair every game";
+                if (FocusMode) return FocusDeck + " vs a random deck every game (of " + DeckPool.Count + ")";
+                return DeckA + " vs " + DeckB;
+            }
         }
 
-        /// <summary>The two decks for the game with this seed: deck A and deck B, or a random pair in All decks mode (the same for the same seed).</summary>
+        /// <summary>
+        /// The two decks for the game with this seed: deck A and deck B, with a random deck from the pool on each random side
+        /// (the same for the same seed).
+        /// </summary>
         private void Pair(int seed, out string nameA, out List<CardDef> deckA, out string nameB, out List<CardDef> deckB)
         {
-            if (!AllDecksMode)
-            {
-                nameA = DeckA;
-                deckA = cardsA;
-                nameB = DeckB;
-                deckB = cardsB;
-                return;
-            }
+            nameA = DeckA;
+            deckA = cardsA;
+            nameB = DeckB;
+            deckB = cardsB;
+            if (!HasPool) return;
             var rng = new Rng(seed ^ 0x2C1B3C6D);
-            var a = AllDecks[rng.Next(AllDecks.Count)];
-            var b = AllDecks[rng.Next(AllDecks.Count)];
-            nameA = a.Key;
-            deckA = a.Value;
-            nameB = b.Key;
-            deckB = b.Value;
+            var a = DeckPool[rng.Next(DeckPool.Count)];
+            var b = DeckPool[rng.Next(DeckPool.Count)];
+            if (RandomA)
+            {
+                nameA = a.Key;
+                deckA = a.Value;
+            }
+            if (RandomB)
+            {
+                nameB = b.Key;
+                deckB = b.Value;
+            }
         }
 
         /// <summary>"Learning AI", "Neural AI" or "Hybrid AI" for the style this session plays.</summary>
@@ -393,17 +412,26 @@ namespace PokemonTCG.AI
         /// </summary>
         private void TrainNeural()
         {
-            var decks = AllDecksMode
-                ? AllDecks
-                : new List<KeyValuePair<string, List<CardDef>>>
+            List<KeyValuePair<string, List<CardDef>>> decks;
+            if (AllDecksMode) decks = DeckPool;
+            else if (FocusMode)
+            {
+                // The focused deck plays every game (it's the learner's), against a random deck from the pool.
+                decks = DeckPool.ToList();
+                if (!decks.Any(d => d.Key == FocusDeck))
+                    decks.Add(new KeyValuePair<string, List<CardDef>>(FocusDeck, RandomB ? cardsA : cardsB));
+            }
+            else
+                decks = new List<KeyValuePair<string, List<CardDef>>>
                 {
                     new KeyValuePair<string, List<CardDef>>(DeckA, cardsA),
                     new KeyValuePair<string, List<CardDef>>(DeckB == DeckA ? DeckB + " " : DeckB, cardsB)
                 };
             var trainer = new PolicyTrainer(brain.Policy, scripts, decks, seedBase)
             {
-                // Deck A against deck B, or (All decks) a random deck for each side in every game.
-                Matchup = !AllDecksMode,
+                // Deck A against deck B; one deck against a random one (focus); or all decks, a random deck for each side.
+                Matchup = !HasPool || !(RandomA || RandomB),
+                FocusDeck = FocusDeck,
                 Rules = Rules ?? GameRules.Default,
                 PrizeCount = PrizeCount,
                 GamesPerRound = Math.Max(8, Math.Min(64, Games)),
@@ -432,12 +460,12 @@ namespace PokemonTCG.AI
                         status.LastError = game.Error;
                         block.Errors++;
                     }
-                    else if (game.WinnerDeck == (AllDecksMode ? game.LearnerDeck : DeckA))
+                    else if (AllDecksMode ? game.Outcome > 0 : FocusMode ? (RandomB ? game.Outcome > 0 : game.Outcome < 0) : game.WinnerDeck == DeckA)
                     {
                         status.WinsA++;
                         block.WinsA++;
                     }
-                    else if (game.WinnerDeck == "")
+                    else if (HasPool && (RandomA || RandomB) ? game.Outcome == 0 : game.WinnerDeck == "")
                     {
                         status.Draws++;
                         block.Draws++;
@@ -448,11 +476,20 @@ namespace PokemonTCG.AI
                         block.WinsB++;
                     }
                     if (game.Error == null) block.TotalTurns += game.Turns;
+                    block.Decisions += game.Decisions;
+                    block.Explored += game.Explored;
                     if (g + 1 == block.To)
                     {
                         status.Blocks.Add(block);
                         block = null;
                     }
+                }
+                if (game.Error == null)
+                {
+                    // The Train screen's matchup list: the network's deck, and the other deck too when the network played both
+                    // seats (self-play). The names are trimmed: a mirror's second deck has a space added to tell them apart.
+                    brain.RecordMatchup(game.LearnerDeck.Trim(), game.OpponentDeck.Trim(), game.Outcome);
+                    if (game.SelfPlay) brain.RecordMatchup(game.OpponentDeck.Trim(), game.LearnerDeck.Trim(), -game.Outcome);
                 }
             };
             try
@@ -504,10 +541,6 @@ namespace PokemonTCG.AI
                 long skipped = brain.Policy.SkippedSteps - skippedBefore;
                 if (skipped > 0)
                     lock (gate) status.LastError = skipped + " learning step" + (skipped == 1 ? " was" : "s were") + " skipped (numbers out of range); the network is unharmed.";
-                lock (gate)
-                {
-                    if (block != null) block.Decisions += round.Decisions;
-                }
                 SafeSave();
                 if (round.Games == 0) break;
             }
@@ -532,8 +565,9 @@ namespace PokemonTCG.AI
             for (int k = 0; k < games && !cancel; k++)
             {
                 int seed = seed0 + k;
-                bool learningPlaysA = k % 2 == 0;
-                int learningSeat = (k / 2) % 2;
+                // Focus mode measures the focused deck (against random decks); otherwise half the games with each side's deck.
+                bool learningPlaysA = FocusMode ? RandomB : k % 2 == 0;
+                int learningSeat = FocusMode ? k % 2 : (k / 2) % 2;
                 string nameA, nameB;
                 List<CardDef> cardsA, cardsB;
                 Pair(seed, out nameA, out cardsA, out nameB, out cardsB);

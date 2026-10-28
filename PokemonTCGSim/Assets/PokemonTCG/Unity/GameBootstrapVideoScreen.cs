@@ -54,12 +54,19 @@ namespace PokemonTCG.Presentation
             GUILayout.BeginArea(new Rect(r.x + 10, r.y + 6, r.width - 20, 70));
             GUILayout.BeginHorizontal();
             GUILayout.Label("Learn from a video", ui.Header, GUILayout.Width(250));
-            GUI.enabled = videoJob == null;
-            GUILayout.Label("Video file:", ui.Label, GUILayout.Width(75));
+            GUI.enabled = videoJob == null && !YouTubeBusy;
+            GUILayout.Label("Video file or YouTube link:", ui.Label, GUILayout.Width(175));
             videoPathInput = GUILayout.TextField(videoPathInput ?? "", GUILayout.MinWidth(200));
-            if (GUILayout.Button("Open", GUILayout.Width(70))) actions.Add(() => OpenVideo(videoPathInput));
+            if (GUILayout.Button("Open", GUILayout.Width(70))) actions.Add(() => OpenVideoInput(videoPathInput));
             if (FilePicker.CanBrowse && GUILayout.Button("Browse...", GUILayout.Width(90))) actions.Add(() => pendingVideoBrowse = true);
             GUI.enabled = true;
+            if (youTube != null && GUILayout.Button("Cancel download", GUILayout.Width(130))) actions.Add(() => youTube.Cancel());
+            if (youTubeNeedsTool && youTube == null)
+            {
+                GUI.enabled = youTubeToolDownload == null;
+                if (GUILayout.Button("Get yt-dlp", GUILayout.Width(100))) actions.Add(StartYouTubeToolDownload);
+                GUI.enabled = true;
+            }
             if (GUILayout.Button("Back", GUILayout.Width(80))) actions.Add(() => CloseVideoScreen());
             GUILayout.EndHorizontal();
             if (!string.IsNullOrEmpty(videoMessage)) GUILayout.Label(videoMessage, Hint(ui));
@@ -96,7 +103,8 @@ namespace PokemonTCG.Presentation
             if (videoFrame == null || !videoReady)
             {
                 GUI.Label(new Rect(area.x + 20, area.y + 20, area.width - 40, 80),
-                    "Open a video of a game: a stream with an overlay, a recording of Pokémon TCG Live, or a camera over the table.", ui.Label);
+                    "Open a video of a game: a stream with an overlay, a recording of Pokémon TCG Live, or a camera over the table. "
+                    + "A YouTube link works too: it's downloaded into the Videos folder first (only download videos you're allowed to).", ui.Label);
                 return;
             }
             float aspect = videoFrame.width / (float)videoFrame.height;

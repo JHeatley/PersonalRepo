@@ -438,6 +438,21 @@ namespace PokemonTCG.AI
             return m;
         }
 
+        /// <summary>
+        /// Adds a game to a matchup's games, wins and losses only (outcome: 1 win, -1 loss, 0 draw): the Neural AI's training
+        /// games, which the feature weights don't learn from, so their expected result is left alone.
+        /// </summary>
+        public void RecordMatchup(string deck, string opponent, int outcome)
+        {
+            lock (sync)
+            {
+                var stats = Matchup(deck, opponent);
+                stats.Games++;
+                if (outcome > 0) stats.Wins++;
+                else if (outcome < 0) stats.Losses++;
+            }
+        }
+
         public List<MatchupStats> Matchups()
         {
             lock (sync)
