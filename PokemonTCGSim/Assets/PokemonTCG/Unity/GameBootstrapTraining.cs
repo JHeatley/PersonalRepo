@@ -51,7 +51,7 @@ namespace PokemonTCG.Presentation
         private const string PrefTrainGpuAddress = "PokemonTCG.TrainGpuAddress";
         private const string PrefTrainRandomB = "PokemonTCG.TrainRandomB";
         /// <summary>The most games one session can be set to play (typed in).</summary>
-        private const int MaxTrainGames = 5000000;
+        private const int MaxTrainGames = 100000000;
         /// <summary>Keep the app off some CPU threads (a faulty core), and which ones (CpuThreads).</summary>
         private const string PrefSkipCpu = "PokemonTCG.SkipCpuThreads";
         private const string PrefLookAhead = "PokemonTCG.LookAhead";
@@ -564,7 +564,7 @@ namespace PokemonTCG.Presentation
             PlayerPrefs.SetInt(PrefTrainGames, trainGames);
         }
 
-        /// <summary>The number typed in the games box (commas and spaces allowed); up to 5,000,000.</summary>
+        /// <summary>The number typed in the games box (commas and spaces allowed); up to MaxTrainGames.</summary>
         private void TypeTrainGames(string text)
         {
             trainGamesText = text ?? "";
@@ -792,9 +792,9 @@ namespace PokemonTCG.Presentation
             if (newCount != countPick && newCount >= 0) actions.Add(() => SetTrainGames(TrainCounts[newCount]));
             GUILayout.BeginHorizontal();
             GUILayout.Label("Or type any number:", GUILayout.Width(140));
-            string newGamesText = GUILayout.TextField(trainGamesText, GUILayout.Width(110));
+            string newGamesText = GUILayout.TextField(trainGamesText, GUILayout.Width(130));
             GUILayout.EndHorizontal();
-            GUILayout.Label(trainGames.ToString("N0") + " games (up to 5,000,000)", Hint(ui));
+            GUILayout.Label(trainGames.ToString("N0") + " games (up to " + MaxTrainGames.ToString("N0") + ")", Hint(ui));
             if (newGamesText != trainGamesText) actions.Add(() => TypeTrainGames(newGamesText));
             if (TrainAll)
                 GUILayout.Label("All decks against all decks: every game picks two of your " + AllTrainDecks().Count + " legal decks at random (mirrors too), "
