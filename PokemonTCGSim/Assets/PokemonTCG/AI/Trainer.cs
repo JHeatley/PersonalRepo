@@ -190,8 +190,6 @@ namespace PokemonTCG.AI
 
         private void Run()
         {
-            // Training (and its measuring games) never uses Burst, only the plain C# loops (see PolicyNet.UsePlainMathOnThisThread).
-            PolicyNet.UsePlainMathOnThisThread();
             BrainBefore = brain.Serialize();
             var record = new SessionRecord
             {
