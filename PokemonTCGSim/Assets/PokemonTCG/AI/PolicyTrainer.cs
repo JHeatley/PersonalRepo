@@ -31,6 +31,10 @@ namespace PokemonTCG.AI
         public string Error;
         /// <summary>The network's decisions in this game, and how many of them weren't its top-rated move.</summary>
         public int Decisions, Explored;
+        /// <summary>1 when the learner's deck won, -1 when it lost, 0 for a draw (or a failed game).</summary>
+        public int Outcome;
+        /// <summary>The network played both seats (and learned from both).</summary>
+        public bool SelfPlay;
     }
 
     /// <summary>
@@ -204,7 +208,7 @@ namespace PokemonTCG.AI
                 if (mine.Value == null) mine = decks[rng.Next(decks.Count)];
                 theirs = decks[rng.Next(decks.Count)];
             }
-            var game = new PolicyGame { LearnerDeck = mine.Key, OpponentDeck = theirs.Key };
+            var game = new PolicyGame { LearnerDeck = mine.Key, OpponentDeck = theirs.Key, SelfPlay = mode == 0 };
             var learner = new PolicyAgent(Net, seed + 1, seat, mine.Value) { Greedy = false, Record = true, Abort = Abort };
             IPlayerAgent other;
             PolicyAgent otherLearner = null;
@@ -224,6 +228,7 @@ namespace PokemonTCG.AI
                 r.Turns = result.Turns;
                 game.Turns = result.Turns;
                 game.WinnerDeck = result.Winner < 0 ? "" : result.Winner == seat ? mine.Key : theirs.Key;
+                game.Outcome = result.Winner < 0 ? 0 : result.Winner == seat ? 1 : -1;
                 if (result.Winner < 0) r.Draws = 1;
                 else if (mode == 0 || result.Winner == seat) r.LearnerWins = 1;
                 if (mode != 0)

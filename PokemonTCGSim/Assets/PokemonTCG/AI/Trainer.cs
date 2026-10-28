@@ -432,12 +432,12 @@ namespace PokemonTCG.AI
                         status.LastError = game.Error;
                         block.Errors++;
                     }
-                    else if (game.WinnerDeck == (AllDecksMode ? game.LearnerDeck : DeckA))
+                    else if (AllDecksMode ? game.Outcome > 0 : game.WinnerDeck == DeckA)
                     {
                         status.WinsA++;
                         block.WinsA++;
                     }
-                    else if (game.WinnerDeck == "")
+                    else if (AllDecksMode ? game.Outcome == 0 : game.WinnerDeck == "")
                     {
                         status.Draws++;
                         block.Draws++;
@@ -455,6 +455,13 @@ namespace PokemonTCG.AI
                         status.Blocks.Add(block);
                         block = null;
                     }
+                }
+                if (game.Error == null)
+                {
+                    // The Train screen's matchup list: the network's deck, and the other deck too when the network played both
+                    // seats (self-play). The names are trimmed: a mirror's second deck has a space added to tell them apart.
+                    brain.RecordMatchup(game.LearnerDeck.Trim(), game.OpponentDeck.Trim(), game.Outcome);
+                    if (game.SelfPlay) brain.RecordMatchup(game.OpponentDeck.Trim(), game.LearnerDeck.Trim(), -game.Outcome);
                 }
             };
             try
