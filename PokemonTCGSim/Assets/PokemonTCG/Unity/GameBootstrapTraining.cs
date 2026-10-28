@@ -81,7 +81,7 @@ namespace PokemonTCG.Presentation
         private AiStyle trainStyle = AiStyle.Hybrid;
         private bool confirmReset;
         private bool sessionUndone;
-        private Vector2 trainScrollA, trainScrollB, trainScrollInfo, trainScrollMatchups, trainScrollLessons, trainScrollDecks;
+        private Vector2 trainScrollA, trainScrollB, trainScrollInfo, trainScrollMatchups, trainScrollLessons, trainScrollDecks, trainScrollSettings;
         private GUIStyle listRowStyle;
         private float listRowHeight = 20f;
         private float nextBrainRefresh;
@@ -611,6 +611,10 @@ namespace PokemonTCG.Presentation
 
             float colW = (r.width - 60f) / 3f;
             float listH = Mathf.Clamp(r.height * 0.32f, 140f, 300f);
+            // Two sides: the deck lists with the results and what the AI knows under them (left, two columns wide), and the
+            // settings and progress in a column of their own that scrolls (right).
+            GUILayout.BeginHorizontal();
+            GUILayout.BeginVertical(GUILayout.Width(2 * colW + 8));
             GUILayout.BeginHorizontal();
 
             GUILayout.BeginVertical(GUILayout.Width(colW));
@@ -644,8 +648,20 @@ namespace PokemonTCG.Presentation
             GUILayout.EndScrollView();
             GUI.enabled = true;
             GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+
+            // The session's results, the growth chart and what the AI knows, in the space under the deck lists.
+            GUILayout.Space(6);
+            trainScrollInfo = GUILayout.BeginScrollView(trainScrollInfo, false, false, GUIStyle.none, GUI.skin.verticalScrollbar, GUILayout.ExpandHeight(true));
+            DrawTrainResults(ui, st, actions);
+            DrawGrowthChart(ui, 2 * colW - 20f);
+            DrawLogStudyPanel(ui, actions, running);
+            DrawBrainPanel(ui, actions, running);
+            GUILayout.EndScrollView();
+            GUILayout.EndVertical();
 
             GUILayout.BeginVertical(GUILayout.Width(colW));
+            trainScrollSettings = GUILayout.BeginScrollView(trainScrollSettings, false, false, GUIStyle.none, GUI.skin.verticalScrollbar, GUILayout.ExpandHeight(true));
             GUILayout.Label("Games to play", ui.Title);
             GUI.enabled = !running;
             int countPick = Array.IndexOf(TrainCounts, trainGames);
@@ -756,18 +772,10 @@ namespace PokemonTCG.Presentation
                 GUILayout.Label("Both decks must be legal to train with them.", ui.Error);
             if (!trainRandomA && !trainRandomB && trainA >= 0 && trainA == trainB) GUILayout.Label("Same deck on both sides: a mirror match. The AI learns that deck's own play.", Hint(ui));
             if (trainMessage != null) GUILayout.Label(trainMessage, ui.Good);
-            DrawTrainProgress(ui, st, colW);
-            GUILayout.EndVertical();
-
-            GUILayout.EndHorizontal();
-            GUILayout.Space(6);
-
-            trainScrollInfo = GUILayout.BeginScrollView(trainScrollInfo);
-            DrawTrainResults(ui, st, actions);
-            DrawGrowthChart(ui, r.width - 60f);
-            DrawLogStudyPanel(ui, actions, running);
-            DrawBrainPanel(ui, actions, running);
+            DrawTrainProgress(ui, st, colW - 20f);
             GUILayout.EndScrollView();
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
             GUILayout.EndArea();
 
             foreach (var a in actions) a();
