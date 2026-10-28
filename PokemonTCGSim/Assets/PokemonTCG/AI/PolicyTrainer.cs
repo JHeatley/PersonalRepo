@@ -327,26 +327,39 @@ namespace PokemonTCG.AI
         {
             int threads = Math.Max(1, Math.Min(WorkThrottle.Threads(Threads), count / 16 + 1));
             var grads = new PolicyNet.Grad[threads];
+            var failures = new Exception[threads];
             var workers = new Thread[threads];
             for (int t = 0; t < threads; t++)
             {
                 int tt = t;
                 workers[t] = new Thread(() =>
                 {
-                    var g = Net.NewGrad();
-                    // This thread's share of the minibatch, a few decisions at a time (the network is faster in batches).
-                    var mine = new List<int>();
-                    for (int k = tt; k < count; k += threads) mine.Add(order[start + k]);
-                    for (int b = 0; b < mine.Count && !Aborted; b += BatchSize)
-                        Accumulate(samples, adv, mine.GetRange(b, Math.Min(BatchSize, mine.Count - b)), g);
-                    grads[tt] = g;
+                    try
+                    {
+                        var g = Net.NewGrad();
+                        // This thread's share of the minibatch, a few decisions at a time (the network is faster in batches).
+                        var mine = new List<int>();
+                        for (int k = tt; k < count; k += threads) mine.Add(order[start + k]);
+                        for (int b = 0; b < mine.Count && !Aborted; b += BatchSize)
+                            Accumulate(samples, adv, mine.GetRange(b, Math.Min(BatchSize, mine.Count - b)), g);
+                        grads[tt] = g;
+                    }
+                    catch (Exception e)
+                    {
+                        failures[tt] = e;
+                    }
                 }) { IsBackground = true, Name = "Neural AI learning", Priority = ThreadPriority.BelowNormal };
                 workers[t].Start();
             }
             foreach (var w in workers) w.Join();
+            // A learning thread that failed is reported on this thread (training stops with the error) instead of dying alone.
+            foreach (var e in failures) if (e != null) throw new InvalidOperationException("Neural AI learning failed: " + e.Message, e);
             for (int t = 1; t < threads; t++) grads[0].Add(grads[t]);
             return grads[0];
         }
+
+        /// <summary>With a negative advantage, ratios above this stop pushing (dual-clip PPO).</summary>
+        public double DualClip = 3.0;
 
         /// <summary>Decisions run through the network together in the learning step.</summary>
         public int BatchSize = 32;
@@ -377,7 +390,10 @@ namespace PokemonTCG.AI
                 double clipped = Math.Max(1 - Clip, Math.Min(1 + Clip, ratio));
                 double pg = -Math.Min(ratio * a, clipped * a);
                 // d(pg)/d(logp[action]): the unclipped term's, unless the clipped term is the smaller one and is clipped.
-                bool flat = (a > 0 && ratio > 1 + Clip) || (a < 0 && ratio < 1 - Clip);
+                // Dual clip: with a negative advantage the ratio's pull is capped too (at DualClip), so one decision whose
+                // probability grew a lot can't produce a huge step.
+                bool flat = (a > 0 && ratio > 1 + Clip) || (a < 0 && ratio < 1 - Clip) || (a < 0 && ratio > DualClip);
+                if (a < 0 && ratio > DualClip) pg = -DualClip * a;
                 double dLogpA = flat ? 0 : -a * ratio;
                 var d = new float[n];
                 for (int i = 0; i < n; i++)

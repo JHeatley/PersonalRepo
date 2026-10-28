@@ -147,6 +147,38 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
+        public void A_Network_With_Broken_Numbers_Is_Never_Loaded_Or_Learned_Into()
+        {
+            var net = new PolicyNet { GamesTrained = 5 };
+            var x = SomeDecision(net);
+            var good = net.ToBytes();
+
+            // A learning step whose gradients aren't finite is skipped: the weights stay as they were.
+            var before = net.Forward(x).Logits[0];
+            var g = net.NewGrad();
+            var pass = net.Forward(x);
+            var bad = new float[x.Count];
+            bad[0] = float.NaN;
+            net.Backward(x, pass, bad, 0f, g);
+            net.Apply(g, 1);
+            Assert.AreEqual(1, net.SkippedSteps);
+            Assert.AreEqual(before, net.Forward(x).Logits[0]);
+            Assert.IsTrue(net.AllFinite());
+
+            // A file holding a NaN (saved by an older version after a bad step) isn't loaded: the network is left alone.
+            // The first weight comes after the header: "PTCGNET1", version, steps, games, loss, origin (""), count, the first
+            // name ("cards.proj.weight") and its length.
+            int first = 8 + 4 + 8 + 8 + 8 + 1 + 4 + 1 + "cards.proj.weight".Length + 4;
+            var damaged = (byte[])good.Clone();
+            Array.Copy(BitConverter.GetBytes(float.NaN), 0, damaged, first, 4);
+            var other = new PolicyNet();
+            Assert.IsTrue(other.FromBytes(good));
+            Assert.IsFalse(other.FromBytes(damaged), "a damaged network isn't loaded");
+            Assert.IsTrue(other.AllFinite());
+            Assert.AreEqual(net.Forward(x).Logits[0], other.Forward(x).Logits[0], 1e-6, "still the good one");
+        }
+
+        [Test]
         public void Stopping_A_Neural_Training_Session_Stops_It_Quickly()
         {
             var brain = new LearningBrain();
