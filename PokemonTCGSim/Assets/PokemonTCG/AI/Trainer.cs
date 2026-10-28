@@ -367,6 +367,8 @@ namespace PokemonTCG.AI
                 Rules = Rules ?? GameRules.Default,
                 PrizeCount = PrizeCount,
                 GamesPerRound = Math.Max(8, Math.Min(64, Games)),
+                // Leave two cores for the app itself (the screen and the garbage collector), so it stays responsive.
+                Threads = Math.Max(1, Environment.ProcessorCount - 2),
                 GameBudget = Games
             };
             int played = 0;
@@ -410,10 +412,39 @@ namespace PokemonTCG.AI
                 }
             };
             long skippedBefore = brain.Policy.SkippedSteps;
+            // Progress, shown on the status line: sequencing mistakes per game (they should fall), and, when measuring is on,
+            // a check against the classic bot every fifth of the session on the same games each time (it should rise).
+            string basePhase = "Training the " + StyleLabel + ": " + DeckA + " vs " + DeckB;
+            double firstMistakes = -1, recentMistakes = -1;
+            var checks = new List<string>();
+            int checkEvery = Math.Max(250, Games / 5), nextCheck = checkEvery;
+            int checkSeed = seedBase + 700000;
             while (!cancel && Volatile.Read(ref played) < Games)
             {
                 var round = trainer.Round();
                 brain.IncrementCounters(round.Games, 0, 0);
+                if (round.LearnerSeats > 0)
+                {
+                    double m = round.Mistakes / (double)round.LearnerSeats;
+                    if (firstMistakes < 0) firstMistakes = m;
+                    recentMistakes = recentMistakes < 0 ? m : 0.7 * recentMistakes + 0.3 * m;
+                }
+                int done = Volatile.Read(ref played);
+                if (EvalGames > 0 && done >= nextCheck && done < Games && !cancel)
+                {
+                    while (nextCheck <= done) nextCheck += checkEvery;
+                    SetPhase(basePhase + " · checking against the classic bot (100 games)...");
+                    int w, d, l;
+                    double wr = trainer.Evaluate(seed => new HeuristicAgent(seed), 100, checkSeed, out w, out d, out l);
+                    if (wr >= 0) checks.Add((wr * 100).ToString("0", CultureInfo.InvariantCulture) + "% at " + done.ToString("N0", CultureInfo.InvariantCulture));
+                }
+                string progress = basePhase;
+                if (recentMistakes >= 0)
+                    progress += " · sequencing mistakes per game " + recentMistakes.ToString("0.0", CultureInfo.InvariantCulture)
+                                + " (first round " + firstMistakes.ToString("0.0", CultureInfo.InvariantCulture) + "; lower is better)";
+                if (checks.Count > 0) progress += " · vs the classic bot: " + string.Join(" → ", checks.ToArray()) + " games";
+                else if (EvalGames == 0) progress += " · tick \"Measure it against the classic bot\" to see it checked as it trains";
+                SetPhase(progress);
                 long skipped = brain.Policy.SkippedSteps - skippedBefore;
                 if (skipped > 0)
                     lock (gate) status.LastError = skipped + " learning step" + (skipped == 1 ? " was" : "s were") + " skipped (numbers out of range); the network is unharmed.";

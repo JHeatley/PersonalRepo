@@ -94,12 +94,13 @@ namespace PokemonTCG.AI
         private int Choose(DecisionRequest r, List<PolicyEncoder.Choice> choices)
         {
             var x = PolicyEncoder.Encode(r, Memory, Net, choices);
-            var pass = Net.Forward(x);
-            var p = PolicyNet.Softmax(pass.Logits);
+            float value;
+            var logits = Net.Evaluate(x, out value);
+            var p = PolicyNet.Softmax(logits);
             int a = 0;
             if (Greedy)
             {
-                for (int i = 1; i < p.Length; i++) if (pass.Logits[i] > pass.Logits[a]) a = i;
+                for (int i = 1; i < p.Length; i++) if (logits[i] > logits[a]) a = i;
             }
             else
             {
@@ -125,7 +126,7 @@ namespace PokemonTCG.AI
                     Input = x,
                     Action = a,
                     LogP = (float)Math.Log(Math.Max(1e-12, p[a])),
-                    Value = pass.Value,
+                    Value = value,
                     PrizeLead = lead,
                     Mistakes = mistakes
                 });

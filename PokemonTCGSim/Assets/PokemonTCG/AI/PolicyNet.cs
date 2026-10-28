@@ -626,11 +626,37 @@ namespace PokemonTCG.AI
             internal float FinalInv;
             internal readonly float[] H = new float[Width];
             internal readonly float[] Q = new float[OptionDim];
-            internal float[][] OptIn, OptAct, OptGrad, ZAct, ZGrad, S1Act, S1Grad;
+            internal float[][] OptIn = new float[0][], OptAct = new float[0][], OptGrad = new float[0][], ZAct = new float[0][],
+                ZGrad = new float[0][], S1Act = new float[0][], S1Grad = new float[0][];
+            internal readonly float[] SlotPre = new float[SlotDim];
+            internal readonly float[] OptTmp = new float[OptionDim], OptOut = new float[OptionDim];
+            internal readonly List<int> SegList = new List<int>(), GradSegList = new List<int>();
             internal readonly float[] VAct = new float[ValueHidden];
             internal readonly float[] VGrad = new float[ValueHidden];
             public float[] Logits;
             public float Value;
+
+            /// <summary>Room for k options (the arrays are kept and reused when this Pass is used again).</summary>
+            internal void EnsureOptions(int k)
+            {
+                if (OptIn.Length >= k) return;
+                int size = Math.Max(k, OptIn.Length * 2);
+                OptIn = Grow(OptIn, size, OptionIn);
+                OptAct = Grow(OptAct, size, OptionDim);
+                OptGrad = Grow(OptGrad, size, OptionDim);
+                ZAct = Grow(ZAct, size, OptionDim);
+                ZGrad = Grow(ZGrad, size, OptionDim);
+                S1Act = Grow(S1Act, size, OptionDim);
+                S1Grad = Grow(S1Grad, size, OptionDim);
+            }
+
+            private static float[][] Grow(float[][] a, int size, int width)
+            {
+                var b = new float[size][];
+                Array.Copy(a, b, a.Length);
+                for (int i = a.Length; i < size; i++) b[i] = new float[width];
+                return b;
+            }
 
             public Pass()
             {
@@ -652,6 +678,80 @@ namespace PokemonTCG.AI
         }
 
         /// <summary>
+        /// Just the option scores (a new array) and the value, working in this thread's reused memory: what playing needs, with
+        /// almost nothing left for the garbage collector (Unity's is slow and stops everything while it works).
+        /// </summary>
+        public float[] Evaluate(PolicyInput x, out float value)
+        {
+            rw.EnterReadLock();
+            try
+            {
+                var p = ForwardLocked(new[] { x }, true)[0];
+                value = p.Value;
+                return p.Logits;
+            }
+            finally
+            {
+                rw.ExitReadLock();
+            }
+        }
+
+        /// <summary>
+        /// ForwardMany in this thread's reused memory, for training: the passes are only good until this thread's next forward
+        /// pass, so run the backward pass first.
+        /// </summary>
+        internal Pass[] ForwardPooled(IList<PolicyInput> xs)
+        {
+            rw.EnterReadLock();
+            try
+            {
+                return ForwardLocked(xs, true);
+            }
+            finally
+            {
+                rw.ExitReadLock();
+            }
+        }
+
+        [ThreadStatic] private static Pass[] passPool;
+        [ThreadStatic] private static Dictionary<string, float[][]> scratchPool;
+
+        private static Pass[] PassPool(int n)
+        {
+            var a = passPool;
+            if (a == null || a.Length < n)
+            {
+                var b = new Pass[Math.Max(n, 32)];
+                if (a != null) Array.Copy(a, b, a.Length);
+                for (int i = 0; i < b.Length; i++) if (b[i] == null) b[i] = new Pass();
+                passPool = a = b;
+            }
+            return a;
+        }
+
+        /// <summary>This thread's working arrays called name: at least n rows of length size (cleared when asked).</summary>
+        private static float[][] Scratch(string name, int n, int size, bool clear)
+        {
+            var pool = scratchPool ?? (scratchPool = new Dictionary<string, float[][]>());
+            float[][] a;
+            if (!pool.TryGetValue(name, out a) || a.Length < n)
+            {
+                var b = new float[Math.Max(n, 32)][];
+                if (a != null) Array.Copy(a, b, a.Length);
+                for (int i = 0; i < b.Length; i++) if (b[i] == null) b[i] = new float[size];
+                pool[name] = a = b;
+            }
+            if (clear) for (int i = 0; i < n; i++) Array.Clear(a[i], 0, size);
+            if (a.Length != n)
+            {
+                var exact = new float[n][];
+                Array.Copy(a, exact, n);
+                return exact;
+            }
+            return a;
+        }
+
+        /// <summary>
         /// Forward passes for several decisions at once. The big layers run over the whole batch row by row, so each weight is
         /// read from memory once per batch instead of once per decision (several times faster when training).
         /// </summary>
@@ -660,7 +760,7 @@ namespace PokemonTCG.AI
             rw.EnterReadLock();
             try
             {
-                return ForwardLocked(xs);
+                return ForwardLocked(xs, false);
             }
             finally
             {
@@ -731,15 +831,19 @@ namespace PokemonTCG.AI
             }
         }
 
-        private Pass[] ForwardLocked(IList<PolicyInput> xs)
+        private Pass[] ForwardLocked(IList<PolicyInput> xs, bool pooled)
         {
             int n = xs.Count;
             var ps = new Pass[n];
-            for (int i = 0; i < n; i++) ps[i] = Inputs(xs[i]);
+            var pool = pooled ? PassPool(n) : null;
+            for (int i = 0; i < n; i++)
+            {
+                ps[i] = pooled ? pool[i] : new Pass();
+                Inputs(xs[i], ps[i]);
+            }
 
             // Trunk, batched
-            var pre = new float[n][];
-            for (int i = 0; i < n; i++) pre[i] = new float[Width];
+            var pre = Scratch("pre", n, Width, false);
             // The input layer only over the parts of the state that aren't zeros (empty slots and bags are skipped).
             if (FastMath != null)
             {
@@ -767,8 +871,7 @@ namespace PokemonTCG.AI
                 }
             }
             for (int i = 0; i < n; i++) GeluAll(pre[i], ps[i].X[0], ps[i].InpGrad);
-            var tmp = new float[n][];
-            for (int i = 0; i < n; i++) tmp[i] = new float[Width];
+            var tmp = Scratch("tmp", n, Width, false);
             for (int b = 0; b < Blocks; b++)
             {
                 for (int i = 0; i < n; i++) LayerNorm(ps[i].X[b], lnG[b].Data, lnB[b].Data, ps[i].LnHat[b], ps[i].LnOut[b], out ps[i].LnInv[b]);
@@ -786,8 +889,7 @@ namespace PokemonTCG.AI
             for (int i = 0; i < n; i++) LayerNorm(ps[i].X[Blocks], finalLnG.Data, finalLnB.Data, ps[i].FinalHat, ps[i].H, out ps[i].FinalInv);
             var hs = Each(ps, p => p.H);
             LinearBatch(queryW.Data, queryB.Data, OptionDim, Width, hs, Each(ps, p => p.Q));
-            var vpre = new float[n][];
-            for (int i = 0; i < n; i++) vpre[i] = new float[ValueHidden];
+            var vpre = Scratch("vpre", n, ValueHidden, false);
             LinearBatch(value0W.Data, value0B.Data, ValueHidden, Width, hs, vpre);
             for (int i = 0; i < n; i++)
             {
@@ -807,27 +909,25 @@ namespace PokemonTCG.AI
         }
 
         /// <summary>The board slots and the state vector of one decision.</summary>
-        private Pass Inputs(PolicyInput x)
+        private void Inputs(PolicyInput x, Pass p)
         {
-            var p = new Pass();
+            Array.Clear(p.Slots, 0, p.Slots.Length);
+            Array.Clear(p.State, 0, p.State.Length);
             for (int s = 0; s < PolicyInput.NumSlots; s++)
             {
                 if (x.SlotCard[s] <= 0) continue;
-                var inp = new float[SlotIn];
+                var inp = p.SlotInput[s] ?? (p.SlotInput[s] = new float[SlotIn]);
+                var act = p.SlotAct[s] ?? (p.SlotAct[s] = new float[SlotDim]);
+                var grad = p.SlotGrad[s] ?? (p.SlotGrad[s] = new float[SlotDim]);
+                Array.Clear(inp, 0, SlotIn);
                 var cv = CardVector(x.SlotCard[s]);
                 Array.Copy(cv, 0, inp, 0, CardDim);
                 var tv = CardVector(x.SlotTool[s]);
                 if (tv != null) Array.Copy(tv, 0, inp, CardDim, CardDim);
                 Array.Copy(x.SlotFeat, s * PolicyInput.SlotFeatures, inp, 2 * CardDim, PolicyInput.SlotFeatures);
-                var pre = new float[SlotDim];
-                Linear(slot0W.Data, slot0B.Data, SlotDim, SlotIn, inp, 0, pre, 0);
-                var act = new float[SlotDim];
-                var grad = new float[SlotDim];
-                GeluAll(pre, act, grad);
+                Linear(slot0W.Data, slot0B.Data, SlotDim, SlotIn, inp, 0, p.SlotPre, 0);
+                GeluAll(p.SlotPre, act, grad);
                 Linear(slot2W.Data, slot2B.Data, SlotDim, SlotDim, act, 0, p.Slots, s * SlotDim);
-                p.SlotInput[s] = inp;
-                p.SlotAct[s] = act;
-                p.SlotGrad[s] = grad;
             }
             var st = p.State;
             Array.Copy(p.Slots, 0, st, 0, p.Slots.Length);
@@ -852,8 +952,10 @@ namespace PokemonTCG.AI
             Array.Copy(x.Globals, 0, st, GlobalsOffset, PolicyInput.GlobalFeatures);
             Array.Copy(x.TurnFeats, 0, st, TurnOffset, PolicyInput.TurnFeatures);
 
-            var segs = new List<int>();
-            var grads = new List<int>();
+            var segs = p.SegList;
+            var grads = p.GradSegList;
+            segs.Clear();
+            grads.Clear();
             for (int s = 0; s < PolicyInput.NumSlots; s++)
             {
                 if (x.SlotCard[s] <= 0) continue;
@@ -881,7 +983,6 @@ namespace PokemonTCG.AI
             Segment(segs, TurnOffset, PolicyInput.TurnFeatures);
             p.Segments = segs.ToArray();
             p.GradSegments = grads.ToArray();
-            return p;
         }
 
         /// <summary>Adds [start, start + length) to a list of (start, length) pairs, joining it to the last one when they touch.</summary>
@@ -900,19 +1001,14 @@ namespace PokemonTCG.AI
         private void Options(PolicyInput x, Pass p)
         {
             int k = x.Count;
-            p.OptIn = new float[k][];
-            p.OptAct = new float[k][];
-            p.OptGrad = new float[k][];
-            p.ZAct = new float[k][];
-            p.ZGrad = new float[k][];
-            p.S1Act = new float[k][];
-            p.S1Grad = new float[k][];
+            p.EnsureOptions(k);
             p.Logits = new float[k];
-            var tmp = new float[OptionDim];
-            var o2 = new float[OptionDim];
+            var tmp = p.OptTmp;
+            var o2 = p.OptOut;
             for (int i = 0; i < k; i++)
             {
-                var oin = new float[OptionIn];
+                var oin = p.OptIn[i];
+                Array.Clear(oin, 0, OptionIn);
                 Array.Copy(kind.Data, x.OptKind[i] * CardDim, oin, 0, CardDim);
                 var cv = CardVector(x.OptCard[i]);
                 if (cv != null) Array.Copy(cv, 0, oin, CardDim, CardDim);
@@ -921,26 +1017,19 @@ namespace PokemonTCG.AI
                 else Array.Copy(noneSlot.Data, 0, oin, 2 * CardDim, SlotDim);
                 Array.Copy(x.OptFeat, i * PolicyInput.OptionFeatures, oin, 2 * CardDim + SlotDim, PolicyInput.OptionFeatures);
                 Linear(opt0W.Data, opt0B.Data, OptionDim, OptionIn, oin, 0, tmp, 0);
-                var act = new float[OptionDim];
-                var grad = new float[OptionDim];
+                var act = p.OptAct[i];
+                var grad = p.OptGrad[i];
                 GeluAll(tmp, act, grad);
                 Linear(opt2W.Data, opt2B.Data, OptionDim, OptionDim, act, 0, o2, 0);
                 for (int j = 0; j < OptionDim; j++) tmp[j] = o2[j] + p.Q[j];
-                var zAct = new float[OptionDim];
-                var zGrad = new float[OptionDim];
+                var zAct = p.ZAct[i];
+                var zGrad = p.ZGrad[i];
                 GeluAll(tmp, zAct, zGrad);
                 Linear(score1W.Data, score1B.Data, OptionDim, OptionDim, zAct, 0, tmp, 0);
-                var s1Act = new float[OptionDim];
-                var s1Grad = new float[OptionDim];
+                var s1Act = p.S1Act[i];
+                var s1Grad = p.S1Grad[i];
                 GeluAll(tmp, s1Act, s1Grad);
                 p.Logits[i] = score3B.Data[0] + Dot(score3W.Data, 0, s1Act, 0, OptionDim);
-                p.OptIn[i] = oin;
-                p.OptAct[i] = act;
-                p.OptGrad[i] = grad;
-                p.ZAct[i] = zAct;
-                p.ZGrad[i] = zGrad;
-                p.S1Act[i] = s1Act;
-                p.S1Grad[i] = s1Grad;
             }
         }
 
@@ -953,6 +1042,15 @@ namespace PokemonTCG.AI
             internal readonly Dictionary<int, float[]> Cards = new Dictionary<int, float[]>();
             public int Samples;
             public double Loss, PolicyLoss, ValueLoss, Entropy, ClipFraction;
+
+            /// <summary>Back to zero, to be used again (a Grad is 8 MB: reusing it spares the garbage collector).</summary>
+            public void Clear()
+            {
+                foreach (var a in G) Array.Clear(a, 0, a.Length);
+                Cards.Clear();
+                Samples = 0;
+                Loss = PolicyLoss = ValueLoss = Entropy = ClipFraction = 0;
+            }
 
             internal Grad(PolicyNet net)
             {
@@ -1024,20 +1122,13 @@ namespace PokemonTCG.AI
             }
         }
 
-        private static float[][] Zeros(int n, int size)
-        {
-            var a = new float[n][];
-            for (int i = 0; i < n; i++) a[i] = new float[size];
-            return a;
-        }
-
         private void BackwardLocked(IList<PolicyInput> xs, Pass[] ps, float[][] dLogits, float[] dValues, Grad g)
         {
             int n = ps.Length;
-            var dh = Zeros(n, Width);
-            var dq = Zeros(n, OptionDim);
-            var dvPre = Zeros(n, ValueHidden);
-            var dSlots = Zeros(n, PolicyInput.NumSlots * SlotDim);
+            var dh = Scratch("dh", n, Width, true);
+            var dq = Scratch("dq", n, OptionDim, true);
+            var dvPre = Scratch("dvPre", n, ValueHidden, true);
+            var dSlots = Scratch("dSlots", n, PolicyInput.NumSlots * SlotDim, true);
             float[] gS3W = G(g, score3W), gS3B = G(g, score3B), gS1W = G(g, score1W), gS1B = G(g, score1B),
                 gO2W = G(g, opt2W), gO2B = G(g, opt2B), gO0W = G(g, opt0W), gO0B = G(g, opt0B), gKind = G(g, kind), gNone = G(g, noneSlot),
                 gV2W = G(g, value2W), gV2B = G(g, value2B);
@@ -1107,10 +1198,10 @@ namespace PokemonTCG.AI
             var hs = Each(ps, p => p.H);
             LinearBackBatch(queryW.Data, OptionDim, Width, hs, dq, dh, G(g, queryW), G(g, queryB));
             LinearBackBatch(value0W.Data, ValueHidden, Width, hs, dvPre, dh, G(g, value0W), G(g, value0B));
-            var dx = Zeros(n, Width);
+            var dx = Scratch("dx", n, Width, true);
             for (int k = 0; k < n; k++) LayerNormBack(dh[k], ps[k].FinalHat, ps[k].FinalInv, finalLnG.Data, dx[k], G(g, finalLnG), G(g, finalLnB));
-            var dHAct = Zeros(n, Width);
-            var dLn = Zeros(n, Width);
+            var dHAct = Scratch("dHAct", n, Width, true);
+            var dLn = Scratch("dLn", n, Width, true);
             for (int b = Blocks - 1; b >= 0; b--)
             {
                 // x[b+1] = x[b] + W3 gelu(W1 LN(x[b])): dx passes straight through, plus the branch
@@ -1135,7 +1226,7 @@ namespace PokemonTCG.AI
                 var d = dx[k];
                 for (int j = 0; j < Width; j++) d[j] *= ig[j];
             }
-            var dState = Zeros(n, StateSize);
+            var dState = Scratch("dState", n, StateSize, true);
             float[] gInpW = G(g, inpW), gInpB = G(g, inpB);
             if (FastMath != null)
             {
@@ -1359,7 +1450,7 @@ namespace PokemonTCG.AI
                 var part = batch.GetRange(b, Math.Min(32, batch.Count - b));
                 var xs = new PolicyInput[part.Count];
                 for (int k = 0; k < part.Count; k++) xs[k] = part[k].Key;
-                var passes = ForwardMany(xs);
+                var passes = ForwardPooled(xs);
                 var dl = new float[part.Count][];
                 for (int k = 0; k < part.Count; k++)
                 {

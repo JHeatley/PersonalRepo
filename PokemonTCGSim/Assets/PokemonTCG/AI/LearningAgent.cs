@@ -178,7 +178,8 @@ namespace PokemonTCG.AI
             neural.Memory.See(r.View);
             var choices = PolicyEncoder.Choices(r, new List<int>());
             var x = PolicyEncoder.Encode(r, neural.Memory, brain.Policy, choices);
-            var logits = brain.Policy.Forward(x).Logits;
+            float value;
+            var logits = brain.Policy.Evaluate(x, out value);
             double mean = 0;
             int n = 0;
             for (int k = 0; k < choices.Count; k++)
