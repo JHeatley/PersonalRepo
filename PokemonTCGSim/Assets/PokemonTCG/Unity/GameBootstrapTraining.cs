@@ -70,7 +70,7 @@ namespace PokemonTCG.Presentation
         private AiStyle trainStyle = AiStyle.Hybrid;
         private bool confirmReset;
         private bool sessionUndone;
-        private Vector2 trainScrollA, trainScrollB, trainScrollInfo, trainScrollMatchups, trainScrollLessons;
+        private Vector2 trainScrollA, trainScrollB, trainScrollInfo, trainScrollMatchups, trainScrollLessons, trainScrollDecks;
         private GUIStyle listRowStyle;
         private float listRowHeight = 20f;
         private float nextBrainRefresh;
@@ -104,9 +104,16 @@ namespace PokemonTCG.Presentation
             public string NetOrigin;
             public AiStyle Style;
             public List<MatchupStats> Matchups = new List<MatchupStats>();
+            public List<DeckSkill> Decks = new List<DeckSkill>();
             public List<KeyValuePair<string, double>> Lessons = new List<KeyValuePair<string, double>>();
             public List<SessionRecord> History = new List<SessionRecord>();
             private string[] lessonText;
+
+            public string DeckRow(int k)
+            {
+                var d = Decks[k];
+                return "   " + d.Deck + ":  " + d.Level + " (uncertainty " + d.Uncertainty.ToString("0.00") + ") · " + d.Games.ToString("N0") + " games, won " + Pct(d.Wins, Math.Max(1, d.Games));
+            }
 
             public string MatchupRow(int k)
             {
@@ -364,6 +371,7 @@ namespace PokemonTCG.Presentation
                     NetOrigin = brain.Policy.Origin,
                     Style = brain.Style,
                     Matchups = brain.Matchups(),
+                    Decks = brain.DeckSkills(),
                     Lessons = brain.StrongestLessons(0, 5), // all of them; the Train screen shows them in a scrolling list
                     History = brain.History()
                 };
@@ -806,6 +814,13 @@ namespace PokemonTCG.Presentation
                             + " (Train as, above).", ui.Label);
             // Each list scrolls on its own (scroll with the mouse over it, or drag its scroll bar) and holds everything.
             float listMax = Mathf.Clamp(UiScale.Height * 0.3f, 150f, 360f);
+            if (b.Decks.Count > 0)
+            {
+                GUILayout.Label("How well the Neural AI knows each deck it has trained with, most games first (about 0.6 = plays it confidently, 0.9 = still "
+                                + "working it out; the deck advisor counts the decks it wins more with more) · " + b.Decks.Count.ToString("N0")
+                                + (b.Decks.Count == 1 ? " deck" : " decks"), Hint(ui));
+                trainScrollDecks = DrawScrollList(ui, trainScrollDecks, b.Decks.Count, listMax, b.DeckRow);
+            }
             if (b.Matchups.Count > 0)
             {
                 GUILayout.Label("Matchups it has played, most games first (that deck's win rate) · " + b.Matchups.Count.ToString("N0")

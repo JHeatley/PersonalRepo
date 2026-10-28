@@ -42,6 +42,9 @@ namespace PokemonTCG.AI
         public bool Greedy = true;
         public bool Record;
         public readonly List<PolicyStep> Trajectory = new List<PolicyStep>();
+        /// <summary>While recording (training): the cards it had in hand at some point, and the cards it played (for deck building).</summary>
+        public readonly HashSet<string> Drawn = new HashSet<string>(StringComparer.Ordinal);
+        public readonly HashSet<string> Played = new HashSet<string>(StringComparer.Ordinal);
         public int Seat { get { return Memory.Seat; } }
 
         /// <summary>When this returns true, the game is abandoned at the agent's next decision (training was stopped).</summary>
@@ -71,6 +74,9 @@ namespace PokemonTCG.AI
             if (r == null || r.Options.Count == 0 || r.MaxChoices <= 0) return picked;
             if (Memory.Seat < 0) Memory.Seat = r.Player;
             Memory.See(r.View);
+            if (Record && r.View != null && r.View.Me != null)
+                foreach (var c in r.View.Me.Hand)
+                    if (c != null && c.Def != null) Drawn.Add(c.Def.Name);
             bool single = !(r.MaxChoices > 1 || r.MinChoices == 0);
             while (picked.Count < r.MaxChoices)
             {
@@ -119,6 +125,11 @@ namespace PokemonTCG.AI
             int mistakes = r.Kind == DecisionKind.MainAction ? SequencingMistakes(r, choices, a) : 0;
             if (Record)
             {
+                if (r.Kind == DecisionKind.MainAction && !choices[a].Done)
+                {
+                    var played = r.Options[choices[a].Option].Card;
+                    if (played != null) Played.Add(played.Name);
+                }
                 var v = r.View;
                 int lead = v != null && v.Me != null && v.Opponent != null ? v.Opponent.PrizeCount - v.Me.PrizeCount : 0;
                 Trajectory.Add(new PolicyStep

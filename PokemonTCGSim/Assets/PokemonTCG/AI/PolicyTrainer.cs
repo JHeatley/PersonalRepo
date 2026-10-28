@@ -21,6 +21,20 @@ namespace PokemonTCG.AI
         public double CollectSeconds, LearnSeconds;
     }
 
+    /// <summary>One side the network played and learned from in a training game (for deck building: LearningBrain.RecordDeckGame).</summary>
+    public sealed class PolicySeat
+    {
+        public string Deck;
+        public List<CardDef> Cards;
+        /// <summary>Cards it had in hand at some point, and cards it played.</summary>
+        public HashSet<string> Drawn, Played;
+        /// <summary>1 won, -1 lost, 0 draw.</summary>
+        public int Outcome;
+        public int Decisions;
+        /// <summary>Sum over its decisions of how unlikely its pick was to it (-log p): how unsure it is with the deck.</summary>
+        public double Surprise;
+    }
+
     /// <summary>How one training game went (for the Train screen's deck A / deck B counts).</summary>
     public sealed class PolicyGame
     {
@@ -35,6 +49,8 @@ namespace PokemonTCG.AI
         public int Outcome;
         /// <summary>The network played both seats (and learned from both).</summary>
         public bool SelfPlay;
+        /// <summary>The sides the network played (one, or both in self-play).</summary>
+        public readonly List<PolicySeat> Seats = new List<PolicySeat>();
     }
 
     /// <summary>
@@ -245,6 +261,18 @@ namespace PokemonTCG.AI
                     samples.AddRange(Finish(a.Trajectory, outcome, finalLead));
                     r.Decisions += a.Trajectory.Count;
                     game.Decisions += a.Trajectory.Count;
+                    double surprise = 0;
+                    foreach (var step in a.Trajectory) surprise -= step.LogP;
+                    game.Seats.Add(new PolicySeat
+                    {
+                        Deck = (a == learner ? mine.Key : theirs.Key).Trim(),
+                        Cards = a == learner ? mine.Value : theirs.Value,
+                        Drawn = a.Drawn,
+                        Played = a.Played,
+                        Outcome = (int)outcome,
+                        Decisions = a.Trajectory.Count,
+                        Surprise = surprise
+                    });
                     r.LearnerSeats++;
                     foreach (var step in a.Trajectory)
                     {

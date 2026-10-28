@@ -490,6 +490,9 @@ namespace PokemonTCG.AI
                     // seats (self-play). The names are trimmed: a mirror's second deck has a space added to tell them apart.
                     brain.RecordMatchup(game.LearnerDeck.Trim(), game.OpponentDeck.Trim(), game.Outcome);
                     if (game.SelfPlay) brain.RecordMatchup(game.OpponentDeck.Trim(), game.LearnerDeck.Trim(), -game.Outcome);
+                    // For the deck advisor: which cards showed up in wins and losses, and how sure it was with each deck.
+                    foreach (var seat in game.Seats)
+                        brain.RecordDeckGame(seat.Deck, seat.Cards, seat.Drawn, seat.Played, seat.Outcome, seat.Decisions, seat.Surprise);
                 }
             };
             try

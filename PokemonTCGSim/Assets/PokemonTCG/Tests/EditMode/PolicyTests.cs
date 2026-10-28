@@ -302,6 +302,84 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
+        public void Neural_Training_Games_Teach_The_Deck_Advisor()
+        {
+            var brain = new LearningBrain();
+            brain.Policy.Reset();
+            brain.Policy.GamesTrained = 1;
+            var decks = ThreeDecks();
+            new TrainingSession(StandardCards.CreateRegistry(), brain, "All decks", decks[0].Value, "All decks", decks[0].Value, 12, 0, 7171)
+            {
+                Style = AiStyle.Neural,
+                DeckPool = decks
+            }.RunBlocking();
+
+            var skills = brain.DeckSkills();
+            Assert.Greater(skills.Count, 1);
+            Assert.GreaterOrEqual(skills.Sum(k => k.Games), 12, "every game, both sides in self-play");
+            foreach (var k in skills)
+            {
+                Assert.IsTrue(decks.Any(d => d.Key == k.Deck), k.Deck);
+                Assert.Greater(k.Decisions, 0);
+                Assert.That(k.Uncertainty, Is.GreaterThan(0).And.LessThan(5));
+                Assert.AreNotEqual("not played yet", k.Level);
+            }
+            var cards = brain.CardResultsOf(skills[0].Deck);
+            Assert.Greater(cards.Count, 5);
+            Assert.IsTrue(cards.All(r => r.Games == skills[0].Games && r.Drawn <= r.Games && r.Wins <= r.Games && r.DrawnWins <= r.Drawn));
+            Assert.IsTrue(cards.Any(r => r.Drawn > 0) && cards.Any(r => r.Played > 0));
+            Assert.IsFalse(cards.Any(r => r.Card.EndsWith(" Energy") && decks.First(d => d.Key == skills[0].Deck).Value.Any(c => c.Name == r.Card && c.IsBasicEnergy)),
+                "Basic Energy isn't rated");
+
+            // Kept in the brain's file, and gone after a reset.
+            var copy = new LearningBrain();
+            copy.LoadText(brain.Serialize());
+            Assert.AreEqual(skills.Sum(k => k.Games), copy.DeckSkills().Sum(k => k.Games));
+            Assert.AreEqual(skills[0].Uncertainty, copy.SkillOf(skills[0].Deck).Uncertainty, 1e-6);
+            Assert.AreEqual(cards.Sum(r => r.Drawn), copy.CardResultsOf(skills[0].Deck).Sum(r => r.Drawn));
+            brain.Reset();
+            Assert.AreEqual(0, brain.DeckSkills().Count);
+            Assert.AreEqual(0, brain.CardResultsOf(null).Count);
+        }
+
+        [Test]
+        public void The_Deck_Advisor_Rates_Cards_By_How_Often_The_Deck_Wins_When_They_Show_Up()
+        {
+            var brain = new LearningBrain();
+            var dragapult = Dragapult();
+            var trainers = dragapult.Where(c => c.IsTrainer).Select(c => c.Name).Distinct().ToList();
+            string good = trainers[0], bad = trainers[1];
+            // A variant of the Dragapult list (similar, not the same), trained 300 games: it wins much more often when it draws
+            // the first card, and less often when it draws the second.
+            var variant = dragapult.Take(58).Concat(dragapult.Where(c => c.IsBasicEnergy).Take(2)).ToList();
+            for (int i = 0; i < 300; i++)
+            {
+                bool drewGood = i % 2 == 0, drewBad = i % 3 == 0;
+                bool won = drewBad ? i % 4 == 0 : drewGood ? i % 5 != 0 : i % 10 < 4;
+                var drawn = new HashSet<string>();
+                if (drewGood) drawn.Add(good);
+                if (drewBad) drawn.Add(bad);
+                brain.RecordDeckGame("My Dragapult", variant, drawn, drawn, won ? 1 : -1, 80, 80 * 0.6);
+                brain.RecordDeckGame("Dragapult", dragapult, new HashSet<string>(), new HashSet<string>(), i % 5 < 3 ? 1 : -1, 80, 80 * 0.7);
+            }
+            var results = brain.CardResultsOf("My Dragapult");
+            Assert.Greater(results.Single(r => r.Card == good).Lift, 0.2);
+            Assert.Less(results.Single(r => r.Card == bad).Lift, -0.1);
+            var opinions = brain.CardOpinions("My Dragapult", null);
+            Assert.Greater(opinions[good].Value, 0.3);
+            Assert.Less(opinions[bad].Value, -0.2);
+            Assert.AreEqual("well learned", brain.SkillOf("My Dragapult").Level);
+
+            var library = new List<AdvisorDeck> { new AdvisorDeck("Dragapult", dragapult), new AdvisorDeck("Zoroark", Zoroark()) };
+            var advice = new DeckAdvisor(db, DeckFormat.Standard, library, brain).SuggestChanges("My Dragapult", variant, 4);
+            string notes = string.Join("\n", advice.Notes.ToArray());
+            StringAssert.Contains("Neural AI training with this deck: 300 games", notes);
+            StringAssert.Contains("wins more often when it draws " + good, notes);
+            StringAssert.Contains("less often when it draws " + bad, notes);
+            StringAssert.Contains("the AI wins 60% with it", notes, "the similar library deck it has trained with enough");
+        }
+
+        [Test]
         public void Skipping_CPU_Threads_Leaves_Every_Other_Thread()
         {
             CollectionAssert.AreEqual(new[] { 2, 3 }, CpuThreads.Parse("2, 3"));
