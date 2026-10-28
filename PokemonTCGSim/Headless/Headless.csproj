@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Command-line trainer for the sim's Neural AI (see README.md). Builds the sim's Core, Cards and AI code without Unity. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <NoWarn>CS0414;CS0169;CS0649;CS0219;CS0168;CS0162;CS8321</NoWarn>
+    <Optimize>true</Optimize>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <AssemblyName>sim-train</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../Assets/PokemonTCG/Core/**/*.cs" />
+    <Compile Include="../Assets/PokemonTCG/Cards/**/*.cs" />
+    <Compile Include="../Assets/PokemonTCG/AI/**/*.cs" />
+    <Compile Include="Program.cs" />
+  </ItemGroup>
+</Project>
