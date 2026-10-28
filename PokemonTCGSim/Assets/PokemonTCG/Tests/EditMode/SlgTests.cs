@@ -59,7 +59,9 @@ namespace PokemonTCG.Tests
         {
             var own = db.Cards.Where(d => d.SetCode == "SLG" && !d.IsAlternatePrint).ToList();
             Assert.AreEqual(59, own.Count);
-            Assert.IsTrue(own.All(d => Formats.CategoryOf(d) == CardCategory.Expanded), "no regulation mark: Expanded");
+            // Cards banned in Expanded are Unlimited only, and basic Energy is Standard as always.
+            Assert.IsTrue(own.All(d => Formats.CategoryOf(d) == (Formats.IsExpandedBanned(d) ? CardCategory.Unlimited
+                : d.IsBasicEnergy ? CardCategory.Standard : CardCategory.Expanded)), "no regulation mark: Expanded");
             Assert.AreEqual("Shining Legends", C(Venusaur).PrintSetName);
             Assert.AreEqual("HIF-SV59", C("SLG-39").BaseKey, "Mewtwo-GX was already in the pool (Hidden Fates Shiny Vault)");
             Assert.AreEqual("UPR-125", C("SLG-62").BaseKey, "Lillie was already in the pool");
