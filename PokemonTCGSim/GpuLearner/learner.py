@@ -5,7 +5,8 @@ round's decisions here; this learns from them on the graphics card with PyTorch 
 CPU) and sends the new weights back. Learning is most of the training time, so this roughly doubles or triples
 the games per second, and takes the heaviest maths off the CPU.
 
-    pip install torch --index-url https://download.pytorch.org/whl/cu121     (once: PyTorch with CUDA)
+    pip uninstall -y torch                                                   (once: the CPU-only build can't use the card)
+    pip install torch --index-url https://download.pytorch.org/whl/cu128     (PyTorch with CUDA; cu126 if there's no match)
     python learner.py                       # waits for the sim on 127.0.0.1:5577, learns on the GPU
     python learner.py --device cpu          # no NVIDIA card: PyTorch on the CPU (still faster than the sim's own)
 

@@ -7,12 +7,16 @@ overall and keeps the heaviest maths off the CPU.
 ## Set up (once)
 
 1. Install Python 3.10 or newer from python.org (tick "Add python.exe to PATH").
-2. Install PyTorch with CUDA (the RTX 20-, 30- and 40-series work with this one):
+2. Install PyTorch **with CUDA**. A plain `pip install torch` on Windows gets the CPU-only build, which can't use the
+   card; if you have that one, uninstall it first (pip won't replace it otherwise):
 
    ```
-   pip install torch --index-url https://download.pytorch.org/whl/cu121
+   pip uninstall -y torch
+   pip install torch --index-url https://download.pytorch.org/whl/cu128
    pip install numpy
    ```
+
+   If pip finds no match, try `cu126` instead of `cu128` (pytorch.org's "Get Started" page lists the current ones).
 
 3. Check it sees the card:
 
@@ -20,7 +24,8 @@ overall and keeps the heaviest maths off the CPU.
    python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"
    ```
 
-   It should print `True` and the card's name.
+   It should print `True` and the card's name. `AssertionError: Torch not compiled with CUDA enabled` means the
+   CPU-only build is still installed (step 2); `False` usually means the NVIDIA driver needs updating.
 
 ## Use
 
