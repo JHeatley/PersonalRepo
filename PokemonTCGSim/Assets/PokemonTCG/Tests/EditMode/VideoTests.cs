@@ -381,6 +381,55 @@ namespace PokemonTCG.Tests
             Assert.AreEqual(0, attack.Player);
         }
 
+        // ------------------------------------------------------------------ YouTube links
+
+        [Test]
+        public void A_YouTube_Link_Is_Recognised_In_Its_Usual_Forms()
+        {
+            Assert.AreEqual("dQw4w9WgXcQ", VideoDownload.YouTubeId("https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
+            Assert.AreEqual("dQw4w9WgXcQ", VideoDownload.YouTubeId("  youtube.com/watch?feature=share&v=dQw4w9WgXcQ&t=42s "));
+            Assert.AreEqual("dQw4w9WgXcQ", VideoDownload.YouTubeId("https://youtu.be/dQw4w9WgXcQ?si=abc"));
+            Assert.AreEqual("dQw4w9WgXcQ", VideoDownload.YouTubeId("https://m.youtube.com/shorts/dQw4w9WgXcQ"));
+            Assert.AreEqual("dQw4w9WgXcQ", VideoDownload.YouTubeId("https://www.youtube.com/live/dQw4w9WgXcQ?feature=shared"));
+            Assert.AreEqual("dQw4w9WgXcQ", VideoDownload.YouTubeId("https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PL123&index=2"));
+            Assert.IsFalse(VideoDownload.IsYouTubeLink("C:\\videos\\CL final.mp4"), "a file is opened as a file");
+            Assert.IsFalse(VideoDownload.IsYouTubeLink("https://www.youtube.com/@PokemonTCG"));
+            Assert.IsFalse(VideoDownload.IsYouTubeLink("https://youtu.be/short"));
+            Assert.IsFalse(VideoDownload.IsYouTubeLink(""));
+        }
+
+        [Test]
+        public void YouTube_Downloads_Ask_For_A_Playable_Mp4_And_Show_Their_Progress()
+        {
+            string args = VideoDownload.Arguments("dQw4w9WgXcQ", "C:\\AI\\Videos\\Downloads");
+            StringAssert.Contains("https://www.youtube.com/watch?v=dQw4w9WgXcQ", args);
+            StringAssert.Contains("--no-playlist", args);
+            StringAssert.Contains("vcodec^=avc1", args, "H.264, which Unity's VideoPlayer plays");
+            StringAssert.Contains("height<=1080", args);
+            StringAssert.Contains("[%(id)s].%(ext)s", args, "the id in the file name, to find it again");
+            Assert.AreEqual(42.5, VideoDownload.ParseProgress("[download]  42.5% of ~ 120.00MiB at  5.00MiB/s ETA 00:20"), 1e-9);
+            Assert.AreEqual(100, VideoDownload.ParseProgress("[download] 100% of 120.00MiB in 00:24"), 1e-9);
+            Assert.AreEqual(-1, VideoDownload.ParseProgress("[youtube] dQw4w9WgXcQ: Downloading webpage"));
+            StringAssert.Contains("H.264", VideoDownload.Explain("[youtube] dQw4w9WgXcQ: Requested format is not available."));
+            StringAssert.Contains("private", VideoDownload.Explain("[youtube] x: Private video. Sign in if you've been granted access"));
+
+            string folder = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "ptcg video " + Guid.NewGuid().ToString("N"));
+            System.IO.Directory.CreateDirectory(folder);
+            try
+            {
+                Assert.IsNull(VideoDownload.FindDownloaded(folder, "dQw4w9WgXcQ"));
+                string saved = System.IO.Path.Combine(folder, "Regionals Top 8 [dQw4w9WgXcQ].mp4");
+                System.IO.File.WriteAllText(saved, "x");
+                Assert.AreEqual(saved, VideoDownload.FindDownloaded(folder, "dQw4w9WgXcQ"), "downloaded once, opened from the folder after that");
+                Assert.IsNull(VideoDownload.FindDownloaded(folder, "aaaaaaaaaaa"));
+                Assert.IsNull(VideoDownload.FindTool(folder));
+            }
+            finally
+            {
+                System.IO.Directory.Delete(folder, true);
+            }
+        }
+
         // ------------------------------------------------------------------ Studying a video
 
         [Test]

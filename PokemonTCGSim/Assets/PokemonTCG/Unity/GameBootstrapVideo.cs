@@ -32,6 +32,9 @@ namespace PokemonTCG.Presentation
         // Read on the main thread (SavePaths uses PlayerPrefs).
         private static string VideoFolder { get { return Path.Combine(SavePaths.BrainFolder, "Videos"); } }
         private static string LayoutFolder { get { return Path.Combine(VideoFolder, "Layouts"); } }
+        /// <summary>Videos downloaded from YouTube links, and the downloader (yt-dlp).</summary>
+        private static string DownloadFolder { get { return Path.Combine(VideoFolder, "Downloads"); } }
+        private static string ToolsFolder { get { return Path.Combine(VideoFolder, "Tools"); } }
 
         private GameObject videoObject;
         private VideoPlayer videoPlayer;
@@ -52,6 +55,11 @@ namespace PokemonTCG.Presentation
         private List<KeyValuePair<string, int>> videoUnknown = new List<KeyValuePair<string, int>>();
         private readonly Dictionary<string, string> videoNameFixes = new Dictionary<string, string>();
         private volatile bool videoStudyRunning;
+        // A YouTube link: the download in progress, the downloader being fetched, and the link waiting for it.
+        private VideoDownload youTube;
+        private UnityWebRequest youTubeToolDownload;
+        private string youTubeWaiting;
+        private bool youTubeNeedsTool;
         private string videoStudyResult = "";
 
         // Card recognition: fingerprints of the card images, built a few at a time and saved.
@@ -89,6 +97,7 @@ namespace PokemonTCG.Presentation
         {
             if (videoJob != null) videoJob.Cancelled = true;
             videoJob = null;
+            if (youTube != null) youTube.Cancel();
             SaveVideoSession();
             if (videoLayoutDirty && !VideoLayoutNow.BuiltIn) SaveVideoLayout(VideoLayoutNow);
             StopVideo();
@@ -110,6 +119,7 @@ namespace PokemonTCG.Presentation
                 }
             }
             UpdateNamesDownload();
+            UpdateYouTube();
             if (mode != Mode.Video) return;
             UpdateArtIndex();
             if (videoPlayer != null && videoReady && videoPlayer.texture != null && (videoPlayer.isPlaying || videoNeedsCopy))
@@ -118,6 +128,114 @@ namespace PokemonTCG.Presentation
                 videoNeedsCopy = false;
             }
             if (videoJob != null) StepVideoJob();
+        }
+
+        // ------------------------------------------------------------------ A file or a YouTube link
+
+        /// <summary>The Open button: a video file, or a YouTube link (downloaded first, then opened).</summary>
+        private void OpenVideoInput(string text)
+        {
+            if (VideoDownload.IsYouTubeLink(text)) OpenYouTube(text);
+            else OpenVideo(text);
+        }
+
+        private bool YouTubeBusy { get { return youTube != null || youTubeToolDownload != null; } }
+
+        private void OpenYouTube(string link)
+        {
+            if (YouTubeBusy) return;
+            string id = VideoDownload.YouTubeId(link);
+            string already = VideoDownload.FindDownloaded(DownloadFolder, id);
+            if (already != null)
+            {
+                OpenVideo(already);
+                return;
+            }
+            if (!OcrAvailable)
+            {
+                videoMessage = "YouTube links work on Windows (the video reading does too). Download the video yourself and open the file.";
+                return;
+            }
+            string tool = VideoDownload.FindTool(ToolsFolder);
+            if (tool == null)
+            {
+                youTubeWaiting = link;
+                youTubeNeedsTool = true;
+                videoMessage = "YouTube links need yt-dlp, a free downloader (about 18 MB, from its GitHub page). Click \"Get yt-dlp\" once and the video downloads after it.";
+                return;
+            }
+            youTubeNeedsTool = false;
+            youTube = new VideoDownload(id, DownloadFolder);
+            youTube.Start(tool);
+            videoMessage = youTube.Status;
+        }
+
+        /// <summary>"Get yt-dlp": downloads it into the Videos folder's Tools folder.</summary>
+        private void StartYouTubeToolDownload()
+        {
+            if (youTubeToolDownload != null) return;
+            if (Application.internetReachability == NetworkReachability.NotReachable)
+            {
+                videoMessage = "This computer isn't connected to the internet. You can also save " + VideoDownload.ToolFileName + " from yt-dlp's GitHub page into " + ToolsFolder + " yourself.";
+                return;
+            }
+            Directory.CreateDirectory(ToolsFolder);
+            string target = Path.Combine(ToolsFolder, VideoDownload.ToolFileName + ".download");
+            youTubeToolDownload = new UnityWebRequest(VideoDownload.ToolUrl, UnityWebRequest.kHttpVerbGET)
+            {
+                downloadHandler = new DownloadHandlerFile(target) { removeFileOnAbort = true }
+            };
+            youTubeToolDownload.SendWebRequest();
+            videoMessage = "Getting yt-dlp...";
+        }
+
+        /// <summary>Called from Update: the downloader's download, then the video's.</summary>
+        private void UpdateYouTube()
+        {
+            var request = youTubeToolDownload;
+            if (request != null && request.isDone)
+            {
+                youTubeToolDownload = null;
+                string target = Path.Combine(ToolsFolder, VideoDownload.ToolFileName);
+                string part = target + ".download";
+                try
+                {
+                    if (request.result != UnityWebRequest.Result.Success)
+                        videoMessage = "Couldn't get yt-dlp: " + request.error;
+                    else if (!File.Exists(part) || new FileInfo(part).Length < 1000000)
+                        videoMessage = "The yt-dlp download didn't look right, so it wasn't kept.";
+                    else
+                    {
+                        if (File.Exists(target)) File.Delete(target);
+                        File.Move(part, target);
+                        youTubeNeedsTool = false;
+                        string link = youTubeWaiting;
+                        youTubeWaiting = null;
+                        if (link != null) OpenYouTube(link);
+                        else videoMessage = "yt-dlp is ready.";
+                    }
+                }
+                catch (Exception e)
+                {
+                    videoMessage = "Couldn't keep yt-dlp: " + e.Message;
+                }
+                finally
+                {
+                    request.Dispose();
+                    try { if (File.Exists(part)) File.Delete(part); }
+                    catch (Exception) { }
+                }
+            }
+            var download = youTube;
+            if (download == null) return;
+            if (!download.Done)
+            {
+                videoMessage = download.Status;
+                return;
+            }
+            youTube = null;
+            if (download.FilePath != null) OpenVideo(download.FilePath);
+            else videoMessage = download.Cancelled ? "The download was cancelled." : "Couldn't download the video: " + download.Error;
         }
 
         // ------------------------------------------------------------------ The video player
