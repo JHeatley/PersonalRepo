@@ -54,7 +54,7 @@ namespace PokemonTCG.AI
     }
 
     /// <summary>
-    /// Trains the learning AI: it plays deck A against deck B (seats alternate, both sides share the brain and both
+    /// Trains the learning AI: it plays deck A against deck B, or all decks in random pairs (seats alternate, both sides share the brain and both
     /// learn), then optionally measures itself against the classic bot before and after with the same games, so you
     /// can see whether it actually got better. Runs on its own thread; Cancel() stops it after the current game.
     /// </summary>
@@ -94,6 +94,40 @@ namespace PokemonTCG.AI
         /// <summary>The decks' format rules and Prize cards (custom formats, v123). Set before Start.</summary>
         public GameRules Rules = GameRules.Default;
         public int PrizeCount = 6;
+
+        /// <summary>
+        /// All decks against all decks: every game plays two decks picked at random from these, a new pair each game (as the
+        /// Python bot trains). Set before Start; DeckA and DeckB are only labels then.
+        /// </summary>
+        public List<KeyValuePair<string, List<CardDef>>> AllDecks;
+
+        public bool AllDecksMode { get { return AllDecks != null && AllDecks.Count > 0; } }
+
+        /// <summary>What the games are: "Deck A vs Deck B", or all decks.</summary>
+        public string MatchLabel
+        {
+            get { return AllDecksMode ? "all " + AllDecks.Count + " decks, a random pair every game" : DeckA + " vs " + DeckB; }
+        }
+
+        /// <summary>The two decks for the game with this seed: deck A and deck B, or a random pair in All decks mode (the same for the same seed).</summary>
+        private void Pair(int seed, out string nameA, out List<CardDef> deckA, out string nameB, out List<CardDef> deckB)
+        {
+            if (!AllDecksMode)
+            {
+                nameA = DeckA;
+                deckA = cardsA;
+                nameB = DeckB;
+                deckB = cardsB;
+                return;
+            }
+            var rng = new Rng(seed ^ 0x2C1B3C6D);
+            var a = AllDecks[rng.Next(AllDecks.Count)];
+            var b = AllDecks[rng.Next(AllDecks.Count)];
+            nameA = a.Key;
+            deckA = a.Value;
+            nameB = b.Key;
+            deckB = b.Value;
+        }
 
         /// <summary>"Learning AI", "Neural AI" or "Hybrid AI" for the style this session plays.</summary>
         public string StyleLabel
@@ -210,7 +244,7 @@ namespace PokemonTCG.AI
                     record.ScoreBefore = before;
                 }
 
-                SetPhase("Training the " + StyleLabel + ": " + DeckA + " vs " + DeckB);
+                SetPhase("Training the " + StyleLabel + ": " + MatchLabel);
                 if ((Style.HasValue ? Style.Value : brain.Style) == AiStyle.Neural && brain.Policy.Trained) TrainNeural();
                 else
                 {
@@ -283,8 +317,11 @@ namespace PokemonTCG.AI
         {
             int seed = seedBase + g;
             int seatA = g % 2;
-            var agentA = new LearningAgent(brain, seed * 2 + 1, DeckA, DeckB) { Training = true, Style = Style };
-            var agentB = new LearningAgent(brain, seed * 2 + 2, DeckB, DeckA) { Training = true, Style = Style };
+            string nameA, nameB;
+            List<CardDef> cardsA, cardsB;
+            Pair(seed, out nameA, out cardsA, out nameB, out cardsB);
+            var agentA = new LearningAgent(brain, seed * 2 + 1, nameA, nameB) { Training = true, Style = Style };
+            var agentB = new LearningAgent(brain, seed * 2 + 2, nameB, nameA) { Training = true, Style = Style };
             int winner = -2;
             int turns = 0;
             string error = null;
@@ -356,14 +393,17 @@ namespace PokemonTCG.AI
         /// </summary>
         private void TrainNeural()
         {
-            var decks = new List<KeyValuePair<string, List<CardDef>>>
-            {
-                new KeyValuePair<string, List<CardDef>>(DeckA, cardsA),
-                new KeyValuePair<string, List<CardDef>>(DeckB == DeckA ? DeckB + " " : DeckB, cardsB)
-            };
+            var decks = AllDecksMode
+                ? AllDecks
+                : new List<KeyValuePair<string, List<CardDef>>>
+                {
+                    new KeyValuePair<string, List<CardDef>>(DeckA, cardsA),
+                    new KeyValuePair<string, List<CardDef>>(DeckB == DeckA ? DeckB + " " : DeckB, cardsB)
+                };
             var trainer = new PolicyTrainer(brain.Policy, scripts, decks, seedBase)
             {
-                Matchup = true,
+                // Deck A against deck B, or (All decks) a random deck for each side in every game.
+                Matchup = !AllDecksMode,
                 Rules = Rules ?? GameRules.Default,
                 PrizeCount = PrizeCount,
                 GamesPerRound = Math.Max(8, Math.Min(64, Games)),
@@ -392,7 +432,7 @@ namespace PokemonTCG.AI
                         status.LastError = game.Error;
                         block.Errors++;
                     }
-                    else if (game.WinnerDeck == DeckA)
+                    else if (game.WinnerDeck == (AllDecksMode ? game.LearnerDeck : DeckA))
                     {
                         status.WinsA++;
                         block.WinsA++;
@@ -430,7 +470,7 @@ namespace PokemonTCG.AI
             long skippedBefore = brain.Policy.SkippedSteps;
             // Progress, shown on the status line: sequencing mistakes per game (they should fall), and, when measuring is on,
             // a check against the classic bot every fifth of the session on the same games each time (it should rise).
-            string basePhase = "Training the " + StyleLabel + ": " + DeckA + " vs " + DeckB;
+            string basePhase = "Training the " + StyleLabel + ": " + MatchLabel;
             double firstMistakes = -1, recentMistakes = -1;
             var checks = new List<string>();
             int checkEvery = Math.Max(250, Games / 5), nextCheck = checkEvery;
@@ -494,7 +534,10 @@ namespace PokemonTCG.AI
                 int seed = seed0 + k;
                 bool learningPlaysA = k % 2 == 0;
                 int learningSeat = (k / 2) % 2;
-                var learning = new LearningAgent(brain, seed * 2 + 1, learningPlaysA ? DeckA : DeckB, learningPlaysA ? DeckB : DeckA) { Training = false, Record = false, Style = Style };
+                string nameA, nameB;
+                List<CardDef> cardsA, cardsB;
+                Pair(seed, out nameA, out cardsA, out nameB, out cardsB);
+                var learning = new LearningAgent(brain, seed * 2 + 1, learningPlaysA ? nameA : nameB, learningPlaysA ? nameB : nameA) { Training = false, Record = false, Style = Style };
                 var classic = new HeuristicAgent(seed * 2 + 2);
                 var learningCards = learningPlaysA ? cardsA : cardsB;
                 var classicCards = learningPlaysA ? cardsB : cardsA;
