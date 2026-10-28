@@ -608,6 +608,11 @@ namespace PokemonTCG.Presentation
             }
             bool newMeasure = GUILayout.Toggle(trainMeasure, " Measure it against the classic bot before and after (+" + (MeasureGames * 2) + " games)");
             if (newMeasure != trainMeasure) actions.Add(() => trainMeasure = newMeasure);
+            if (trainMeasure)
+                GUILayout.Label("A test it takes twice: before training it plays " + MeasureGames + " games against the classic bot (the sim's original AI, which never "
+                                + "learns); after training it replays the same " + MeasureGames + " games (same decks, seats and shuffles), so the difference "
+                                + "comes from what it learned, not luck. It doesn't learn from these games. 50% = as good as the classic bot"
+                                + (trainStyle == AiStyle.Neural ? "; the Neural AI is also checked (100 games) every fifth of the session." : "."), Hint(ui));
             GUILayout.Label("Train as", ui.Label);
             int newStyle = GUILayout.Toolbar((int)trainStyle, new[] { OpponentChoices[0], OpponentChoices[1], OpponentChoices[2] });
             if (newStyle != (int)trainStyle)
@@ -721,11 +726,15 @@ namespace PokemonTCG.Presentation
             {
                 string before = st.ScoreBefore >= 0 ? (st.ScoreBefore * 100).ToString("0") + "%" : "-";
                 string after = st.ScoreAfter >= 0 ? (st.ScoreAfter * 100).ToString("0") + "%" : (st.Running ? "measuring..." : "-");
-                GUILayout.Label("Against the classic bot (same " + MeasureGames + " games each time, " + (all ? "random decks" : focus ? training.FocusDeck + " against random decks" : "both decks") + "): " + before + " before, " + after + " after.", ui.Title);
+                GUILayout.Label("Test against the classic bot: won " + before + " before training, " + after + " after", ui.Title);
+                GUILayout.Label("The same " + MeasureGames + " games both times (" + (all ? "random decks" : focus ? training.FocusDeck + " against random decks" : "half with each deck")
+                                + ", same seats and shuffles), so the change comes from what it learned. 50% = as good as the classic bot; unfinished games count as half a win.", Hint(ui));
                 if (st.ScoreBefore >= 0 && st.ScoreAfter >= 0)
                 {
                     double delta = (st.ScoreAfter - st.ScoreBefore) * 100;
-                    string verdict = delta >= 5 ? "It got better." : delta <= -5 ? "It got worse this time: you can undo the session below." : "No clear change (differences under about 5 points are noise).";
+                    string verdict = delta >= 5 ? "It got better."
+                        : delta <= -5 ? "It got worse this time: you can undo the session below."
+                        : "No clear change: with " + MeasureGames + " games, differences under about 5 points are mostly luck.";
                     GUILayout.Label((delta >= 0 ? "+" : "") + delta.ToString("0") + " points. " + verdict, delta <= -5 ? ui.Error : ui.Good);
                 }
             }
