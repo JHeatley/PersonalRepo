@@ -448,6 +448,8 @@ namespace PokemonTCG.AI
                         block.WinsB++;
                     }
                     if (game.Error == null) block.TotalTurns += game.Turns;
+                    block.Decisions += game.Decisions;
+                    block.Explored += game.Explored;
                     if (g + 1 == block.To)
                     {
                         status.Blocks.Add(block);
@@ -504,10 +506,6 @@ namespace PokemonTCG.AI
                 long skipped = brain.Policy.SkippedSteps - skippedBefore;
                 if (skipped > 0)
                     lock (gate) status.LastError = skipped + " learning step" + (skipped == 1 ? " was" : "s were") + " skipped (numbers out of range); the network is unharmed.";
-                lock (gate)
-                {
-                    if (block != null) block.Decisions += round.Decisions;
-                }
                 SafeSave();
                 if (round.Games == 0) break;
             }

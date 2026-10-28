@@ -15,6 +15,8 @@ namespace PokemonTCG.AI
         public int PrizeLead;
         /// <summary>Sequencing mistakes this choice made (see PolicyAgent.SequencingMistakes).</summary>
         public int Mistakes;
+        /// <summary>Sampled a move other than its top-rated one (it tried something new, for the Train screen).</summary>
+        public bool Explored;
     }
 
     /// <summary>
@@ -97,11 +99,9 @@ namespace PokemonTCG.AI
             float value;
             var logits = Net.Evaluate(x, out value);
             var p = PolicyNet.Softmax(logits);
-            int a = 0;
-            if (Greedy)
-            {
-                for (int i = 1; i < p.Length; i++) if (logits[i] > logits[a]) a = i;
-            }
+            int a = 0, top = 0;
+            for (int i = 1; i < p.Length; i++) if (logits[i] > logits[top]) top = i;
+            if (Greedy) a = top;
             else
             {
                 double u = (rng.NextULong() >> 11) * (1.0 / 9007199254740992.0), acc = 0;
@@ -128,7 +128,8 @@ namespace PokemonTCG.AI
                     LogP = (float)Math.Log(Math.Max(1e-12, p[a])),
                     Value = value,
                     PrizeLead = lead,
-                    Mistakes = mistakes
+                    Mistakes = mistakes,
+                    Explored = a != top
                 });
             }
             return a;

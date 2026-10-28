@@ -137,6 +137,9 @@ namespace PokemonTCG.Tests
             Assert.AreEqual(10, st.Done);
             Assert.AreEqual(10, st.WinsA + st.WinsB + st.Draws);
             Assert.Greater(brain.Policy.Steps, 0, "the network learned");
+            int explored = st.Blocks.Sum(b => b.Explored), decisions = st.Blocks.Sum(b => b.Decisions);
+            Assert.Greater(explored, 0, "it tries moves other than its favourite while training (the Train screen's \"tried something new\")");
+            Assert.Less(explored, decisions);
             Assert.AreEqual(11, brain.Policy.GamesTrained);
             Assert.AreEqual(10, brain.GamesTrained);
 

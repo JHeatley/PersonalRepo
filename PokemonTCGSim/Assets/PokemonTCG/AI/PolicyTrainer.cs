@@ -11,6 +11,8 @@ namespace PokemonTCG.AI
         public int Games, LearnerWins, Draws, Errors, Decisions, Turns;
         public int VsPool, PoolWins;
         public int Mistakes;
+        /// <summary>Decisions where it sampled a move other than its top-rated one (Decisions counts them all).</summary>
+        public int Explored;
         /// <summary>Seats the network played and learned from (2 in a game against itself).</summary>
         public int LearnerSeats;
         public double PolicyLoss, ValueLoss, Entropy, ClipFraction;
@@ -27,6 +29,8 @@ namespace PokemonTCG.AI
         public string WinnerDeck;
         public int Turns;
         public string Error;
+        /// <summary>The network's decisions in this game, and how many of them weren't its top-rated move.</summary>
+        public int Decisions, Explored;
     }
 
     /// <summary>
@@ -172,6 +176,7 @@ namespace PokemonTCG.AI
             into.VsPool += one.VsPool;
             into.PoolWins += one.PoolWins;
             into.Mistakes += one.Mistakes;
+            into.Explored += one.Explored;
             into.LearnerSeats += one.LearnerSeats;
             if (one.LastError != null) into.LastError = one.LastError;
         }
@@ -234,8 +239,17 @@ namespace PokemonTCG.AI
                     int finalLead = s.Players[1 - me].Prizes.Count - s.Players[me].Prizes.Count;
                     samples.AddRange(Finish(a.Trajectory, outcome, finalLead));
                     r.Decisions += a.Trajectory.Count;
+                    game.Decisions += a.Trajectory.Count;
                     r.LearnerSeats++;
-                    foreach (var step in a.Trajectory) r.Mistakes += step.Mistakes;
+                    foreach (var step in a.Trajectory)
+                    {
+                        r.Mistakes += step.Mistakes;
+                        if (step.Explored)
+                        {
+                            r.Explored++;
+                            game.Explored++;
+                        }
+                    }
                 }
             }
             catch (OperationCanceledException)
