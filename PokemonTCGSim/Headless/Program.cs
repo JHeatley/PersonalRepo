@@ -157,7 +157,9 @@ public static class Program
             SequencePenalty = Dbl(o, "sequence-penalty", 0.02),
             PrizeReward = Dbl(o, "prize-reward", 0.05),
             FocusDeck = o.TryGetValue("focus-deck", out var focus) ? focus : null,
-            Minibatch = Int(o, "minibatch", 1024)
+            Minibatch = Int(o, "minibatch", 1024),
+            SearchShare = Dbl(o, "search-share", 0),
+            SearchDecisions = Dbl(o, "search-decisions", 0.3)
         };
         net.LearningRate = Dbl(o, "lr", 2e-4);
         if (o.TryGetValue("gpu", out var gpu))
@@ -189,7 +191,7 @@ public static class Program
             done += r.Games;
             Console.WriteLine($"games {done,8:N0} | {r.Decisions / Math.Max(1, r.Games),4} decisions/game | seq mistakes/game {r.Mistakes / (double)Math.Max(1, r.Games),4:F1}"
                               + $" | vs pool/classic {(r.VsPool > 0 ? (r.PoolWins / (double)r.VsPool).ToString("F2") : " -  ")} | pi {r.PolicyLoss:+0.000;-0.000} v {r.ValueLoss:F3}"
-                              + $" H {r.Entropy:F2} clip {r.ClipFraction:F2}" + (r.Errors > 0 || (r.LastError ?? "").StartsWith("GPU") ? $" | {r.Errors} errors: {r.LastError}" : "")
+                              + $" H {r.Entropy:F2} clip {r.ClipFraction:F2}" + (r.Searched > 0 ? $" | look-ahead {r.Searched} decisions, match {r.DistillLoss:F2}" : "") + (r.Errors > 0 || (r.LastError ?? "").StartsWith("GPU") ? $" | {r.Errors} errors: {r.LastError}" : "")
                               + (r.LearnedOn.Length > 0 ? $" | learned on {r.LearnedOn} in {r.LearnSeconds:F1}s" : $" | learned in {r.LearnSeconds:F1}s")
                               + $" | {done / clock.Elapsed.TotalSeconds:F1} games/s");
             Save(net, outPath);
@@ -301,7 +303,8 @@ public static class Program
                 GpuAddress = J("gpu", null),
                 GamesPerSecond = JD("rate", 0),
                 PrizeCount = JI("prizes", 6),
-                ChampionDecks = championDecks.Count > 0 ? championDecks : null
+                ChampionDecks = championDecks.Count > 0 ? championDecks : null,
+                LearnFromLookAhead = JD("lookahead", 0)
             };
             Console.WriteLine($"background training: {session.MatchLabel}, {session.Games:N0} games as the {session.StyleLabel}; brain {brain.FilePath}");
             session.Start();

@@ -13,6 +13,9 @@ namespace PokemonTCG.AI
         public int Mistakes;
         /// <summary>Decisions where it sampled a move other than its top-rated one (Decisions counts them all).</summary>
         public int Explored;
+        /// <summary>Decisions the look-ahead made (training from the look-ahead), and how far the network was from its choices.</summary>
+        public int Searched;
+        public double DistillLoss;
         /// <summary>Seats the network played and learned from (2 in a game against itself).</summary>
         public int LearnerSeats;
         public double PolicyLoss, ValueLoss, Entropy, ClipFraction;
@@ -75,6 +78,15 @@ namespace PokemonTCG.AI
         public double PrizeReward = 0.05;
         public double SequencePenalty = 0.02;
         public double SelfShare = 0.6, PoolShare = 0.3, ClassicShare = 0.1;
+        /// <summary>
+        /// Training from the look-ahead (expert roadmap step 2): in this share of the games, the network's seats look ahead
+        /// (PolicySearch, SearchSettings) before SearchDecisions of the main actions they aren't sure of, play the move it found,
+        /// and learn to match its improved choice (DistillCoef: how much that counts beside PPO). 0: off.
+        /// </summary>
+        public double SearchShare;
+        public double SearchDecisions = 0.3;
+        public double DistillCoef = 1.0;
+        public SearchSettings TrainingSearch = SearchSettings.Training();
         public int PoolSize = 8;
         public int SnapshotEvery = 10;
         /// <summary>Games played at once (one thread each), and threads for the learning step.</summary>
@@ -119,6 +131,8 @@ namespace PokemonTCG.AI
             public PolicyInput Input;
             public int Action;
             public float LogP, Adv, Ret;
+            /// <summary>The look-ahead's improved choice to match (cross-entropy), or null: an ordinary PPO decision.</summary>
+            public float[] Target;
         }
 
         // ------------------------------------------------------------------ One round
@@ -201,6 +215,7 @@ namespace PokemonTCG.AI
             into.PoolWins += one.PoolWins;
             into.Mistakes += one.Mistakes;
             into.Explored += one.Explored;
+            into.Searched += one.Searched;
             into.LearnerSeats += one.LearnerSeats;
             if (one.LastError != null) into.LastError = one.LastError;
         }
@@ -235,6 +250,18 @@ namespace PokemonTCG.AI
             if (mode == 0) other = otherLearner = new PolicyAgent(Net, seed + 2, 1 - seat, theirs.Value) { Greedy = false, Record = true, Abort = Abort };
             else if (mode == 1) other = new PolicyAgent(poolNow[rng.Next(poolNow.Length)], seed + 2, 1 - seat, theirs.Value) { Greedy = false, Abort = Abort };
             else other = new HeuristicAgent(seed + 2);
+            // Training from the look-ahead: in some games the network's seats look ahead before some of their decisions.
+            if (SearchShare > 0 && rng.Next(1000000) < (int)(SearchShare * 1000000))
+            {
+                foreach (var a in new[] { learner, otherLearner })
+                {
+                    if (a == null) continue;
+                    var search = new PolicySearch(Net, TrainingSearch) { PrizeReward = PrizeReward };
+                    foreach (var d in decks) search.KnownDecks.Add(d.Value);
+                    a.Search = search;
+                    a.LearnFromSearch = SearchDecisions;
+                }
+            }
             try
             {
                 var engine = new GameEngine(scripts, seat == 0 ? (IPlayerAgent)learner : other, seat == 0 ? other : learner);
@@ -278,6 +305,7 @@ namespace PokemonTCG.AI
                         Surprise = surprise
                     });
                     r.LearnerSeats++;
+                    r.Searched += a.Searched;
                     foreach (var step in a.Trajectory)
                     {
                         r.Mistakes += step.Mistakes;
@@ -326,7 +354,11 @@ namespace PokemonTCG.AI
                 adv[t] = last;
             }
             for (int t = 0; t < n; t++)
-                list.Add(new Sample { Input = traj[t].Input, Action = traj[t].Action, LogP = traj[t].LogP, Adv = (float)adv[t], Ret = (float)(adv[t] + traj[t].Value) });
+                list.Add(new Sample
+                {
+                    Input = traj[t].Input, Action = traj[t].Action, LogP = traj[t].LogP, Adv = (float)adv[t], Ret = (float)(adv[t] + traj[t].Value),
+                    Target = traj[t].Target
+                });
             return list;
         }
 
@@ -334,6 +366,11 @@ namespace PokemonTCG.AI
 
         private void Learn(List<Sample> samples, PolicyRound round)
         {
+            lock (distillGate)
+            {
+                distillLoss = 0;
+                distillCount = 0;
+            }
             double mean = 0, sq = 0;
             foreach (var s in samples) mean += s.Adv;
             mean /= samples.Count;
@@ -383,6 +420,7 @@ namespace PokemonTCG.AI
                 Net.AverageLoss = Net.Steps <= batches ? round.PolicyLoss + ValueCoef * round.ValueLoss
                     : Net.AverageLoss + 0.1 * (round.PolicyLoss + ValueCoef * round.ValueLoss - Net.AverageLoss);
             }
+            lock (distillGate) round.DistillLoss = distillCount > 0 ? distillLoss / distillCount : 0;
         }
 
         /// <summary>Summed PPO gradients of a minibatch, computed on several threads.</summary>
@@ -421,6 +459,9 @@ namespace PokemonTCG.AI
         }
 
         private PolicyNet.Grad[] gradPool = new PolicyNet.Grad[0];
+        private readonly object distillGate = new object();
+        private double distillLoss;
+        private int distillCount;
 
         /// <summary>Where progress messages go (the Unity console in the app); null: nowhere.</summary>
         public static Action<string> LogTo;
@@ -565,6 +606,7 @@ namespace PokemonTCG.AI
                 var logp = new float[n];
                 var adv = new float[n];
                 var ret = new float[n];
+                var targets = new float[n][];
                 for (int i = 0; i < n; i++)
                 {
                     inputs[i] = samples[i].Input;
@@ -572,8 +614,11 @@ namespace PokemonTCG.AI
                     logp[i] = samples[i].LogP;
                     adv[i] = samples[i].Adv;
                     ret[i] = samples[i].Ret;
+                    targets[i] = samples[i].Target;
                 }
-                var r = Gpu.Train(Net, inputs, actions, logp, adv, ret, Epochs, Minibatch, rounds * 31 + 7, Clip, DualClip, ValueCoef, EntropyCoef);
+                var r = Gpu.Train(Net, inputs, actions, logp, adv, ret, Epochs, Minibatch, rounds * 31 + 7, Clip, DualClip, ValueCoef, EntropyCoef,
+                    targets, DistillCoef);
+                round.DistillLoss = r.DistillLoss;
                 round.PolicyLoss = r.PolicyLoss;
                 round.ValueLoss = r.ValueLoss;
                 round.Entropy = r.Entropy;
@@ -619,6 +664,30 @@ namespace PokemonTCG.AI
                     logp[i] = Math.Log(Math.Max(1e-12, p[i]));
                     entropy -= p[i] * logp[i];
                 }
+                var d = new float[n];
+                if (s.Target != null && s.Target.Length == n)
+                {
+                    // A decision the look-ahead made: learn to match its improved choice (cross-entropy), not PPO (its move
+                    // wasn't sampled from the network). Its value still learns from the game.
+                    double ce = 0;
+                    for (int i = 0; i < n; i++)
+                    {
+                        ce -= s.Target[i] * logp[i];
+                        d[i] = (float)(DistillCoef * (p[i] - s.Target[i]) + EntropyCoef * p[i] * (logp[i] + entropy));
+                    }
+                    dLogits[k] = d;
+                    double retT = Math.Max(-1.5, Math.Min(1.5, s.Ret));
+                    double vErrT = pass.Value - retT;
+                    dValues[k] = (float)(2 * ValueCoef * vErrT);
+                    g.ValueLoss += vErrT * vErrT;
+                    g.Entropy += entropy;
+                    lock (distillGate)
+                    {
+                        distillLoss += ce;
+                        distillCount++;
+                    }
+                    continue;
+                }
                 double ratio = Math.Exp(logp[s.Action] - s.LogP);
                 double clipped = Math.Max(1 - Clip, Math.Min(1 + Clip, ratio));
                 double pg = -Math.Min(ratio * a, clipped * a);
@@ -628,7 +697,6 @@ namespace PokemonTCG.AI
                 bool flat = (a > 0 && ratio > 1 + Clip) || (a < 0 && ratio < 1 - Clip) || (a < 0 && ratio > DualClip);
                 if (a < 0 && ratio > DualClip) pg = -DualClip * a;
                 double dLogpA = flat ? 0 : -a * ratio;
-                var d = new float[n];
                 for (int i = 0; i < n; i++)
                 {
                     double v = dLogpA * ((i == s.Action ? 1 : 0) - p[i]);

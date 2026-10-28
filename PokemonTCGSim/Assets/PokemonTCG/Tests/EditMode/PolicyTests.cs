@@ -308,6 +308,90 @@ namespace PokemonTCG.Tests
             Assert.IsFalse(double.IsNaN(second.PolicyLoss) || double.IsNaN(second.ValueLoss));
         }
 
+        [Test]
+        public void Training_Can_Learn_From_The_Look_Ahead()
+        {
+            var net = new PolicyNet();
+            var decks = new List<KeyValuePair<string, List<CardDef>>>
+            {
+                new KeyValuePair<string, List<CardDef>>("Dragapult", Dragapult()),
+                new KeyValuePair<string, List<CardDef>>("Zoroark", Zoroark())
+            };
+            var trainer = new PolicyTrainer(net, StandardCards.CreateRegistry(), decks, 9)
+            {
+                GamesPerRound = 4, Threads = 2, Minibatch = 256, SearchShare = 1, SearchDecisions = 1,
+                TrainingSearch = new SearchSettings { Playouts = 4, MaxCandidates = 2, SkipAbove = 1.01, Threads = 1, MaxSeconds = 1 }
+            };
+            var before = net.ToBytes();
+            var round = trainer.Round();
+            trainer.Dispose();
+            Assert.AreEqual(0, round.Errors, round.LastError);
+            Assert.Greater(round.Searched, 0, "some decisions were made by the look-ahead");
+            Assert.Less(round.Searched, round.Decisions, "the others are the network's own (only main actions look ahead)");
+            Assert.Greater(round.DistillLoss, 0, "how far the network was from the look-ahead's choices");
+            Assert.IsFalse(double.IsNaN(round.PolicyLoss) || double.IsNaN(round.ValueLoss) || double.IsNaN(round.DistillLoss));
+            CollectionAssert.AreNotEqual(before, net.ToBytes(), "it learned");
+            Assert.IsTrue(net.AllFinite());
+        }
+
+        [Test]
+        public void The_Look_Ahead_Gives_An_Improved_Choice_To_Learn_From()
+        {
+            var net = new PolicyNet();
+            var search = new PolicySearch(net, new SearchSettings { Playouts = 8, MaxCandidates = 3, SkipAbove = 1.01, Threads = 1, MaxSeconds = 2 });
+            search.KnownDecks.Add(Dragapult());
+            search.KnownDecks.Add(Zoroark());
+            var probe = new TargetProbe(net, search);
+            new GameEngine(StandardCards.CreateRegistry(), probe, new HeuristicAgent(4)) { MaxTurns = 8 }.Run(Dragapult(), Zoroark(), 51);
+            Assert.Greater(probe.Targets, 0);
+            Assert.AreEqual(0, probe.Bad, "every target is a probability over the same options");
+        }
+
+        /// <summary>Plays with the network and, at each main action, asks the look-ahead for its improved choice.</summary>
+        private sealed class TargetProbe : IPlayerAgent, IGameObserver
+        {
+            private readonly PolicyAgent inner;
+            private readonly PolicySearch search;
+            private GameEngine engine;
+            public int Targets, Bad;
+
+            public TargetProbe(PolicyNet net, PolicySearch search)
+            {
+                inner = new PolicyAgent(net, 3, 0);
+                this.search = search;
+            }
+
+            public List<int> Decide(DecisionRequest r)
+            {
+                if (r.Kind == DecisionKind.MainAction && engine != null)
+                {
+                    inner.Memory.See(r.View);
+                    var choices = PolicyEncoder.Choices(r, new List<int>());
+                    if (choices.Count >= 2)
+                    {
+                        float v;
+                        var p = PolicyNet.Softmax(inner.Net.Evaluate(PolicyEncoder.Encode(r, inner.Memory, inner.Net, choices), out v));
+                        int top = 0;
+                        for (int i = 1; i < p.Length; i++) if (p[i] > p[top]) top = i;
+                        double[] target;
+                        search.Pick(engine, r, inner.Memory, choices, p, top, out target);
+                        if (target != null)
+                        {
+                            Targets++;
+                            if (target.Length != choices.Count || Math.Abs(target.Sum() - 1) > 1e-6 || target.Any(t => t < 0 || double.IsNaN(t))) Bad++;
+                        }
+                    }
+                }
+                return inner.Decide(r);
+            }
+
+            public void OnEvent(GameEngine e, GameEvent ev)
+            {
+                engine = e;
+                inner.OnEvent(e, ev);
+            }
+        }
+
         private List<KeyValuePair<string, List<CardDef>>> ThreeDecks()
         {
             return new List<KeyValuePair<string, List<CardDef>>>

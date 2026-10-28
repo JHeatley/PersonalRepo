@@ -187,6 +187,7 @@ namespace PokemonTCG.Presentation
                 sb.Append("rest=").Append(trainFast ? "0" : "0.25").Append('\n');
                 sb.Append("rate=").Append(TrainRate.ToString(CultureInfo.InvariantCulture)).Append('\n');
                 if (trainGpu) sb.Append("gpu=").Append(trainGpuAddress).Append('\n');
+                sb.Append("lookahead=").Append(TrainLookAheadShares[trainLookAhead].ToString(CultureInfo.InvariantCulture)).Append('\n');
                 sb.Append("prizes=").Append(format.PrizeCount).Append('\n');
                 sb.Append("seed=").Append((Environment.TickCount & 0x0FFFFFFF) | 1).Append('\n');
                 File.WriteAllText(Path.Combine(dir, "job.txt"), sb.ToString(), new UTF8Encoding(false));

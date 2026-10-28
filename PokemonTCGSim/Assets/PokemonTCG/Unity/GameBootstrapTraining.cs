@@ -37,6 +37,11 @@ namespace PokemonTCG.Presentation
         private const string PrefTrainFast = "PokemonTCG.TrainFast";
         /// <summary>Neural AI training learns on the GPU learner (GpuLearner/learner.py), and where it listens.</summary>
         private const string PrefTrainGpu = "PokemonTCG.TrainGpu";
+        private const string PrefTrainLookAhead = "PokemonTCG.TrainLookAhead";
+        private static readonly string[] TrainLookAheadNames = { "Off", "10% of games", "25% of games" };
+        private static readonly double[] TrainLookAheadShares = { 0, 0.1, 0.25 };
+        /// <summary>Learn from the look-ahead: 0 off, 1 in 10% of the Neural AI's training games, 2 in 25%.</summary>
+        private int trainLookAhead;
         private const string PrefTrainGpuAddress = "PokemonTCG.TrainGpuAddress";
         private const string PrefTrainRandomB = "PokemonTCG.TrainRandomB";
         /// <summary>The most games one session can be set to play (typed in).</summary>
@@ -406,6 +411,7 @@ namespace PokemonTCG.Presentation
             trainRandomA = PlayerPrefs.GetInt(PrefTrainRandomA, all ? 1 : 0) == 1;
             trainFast = PlayerPrefs.GetInt(PrefTrainFast, 0) == 1;
             trainGpu = PlayerPrefs.GetInt(PrefTrainGpu, 0) == 1;
+            trainLookAhead = Mathf.Clamp(PlayerPrefs.GetInt(PrefTrainLookAhead, 0), 0, TrainLookAheadNames.Length - 1);
             trainRateText = PlayerPrefs.GetString(PrefTrainRate, "") ?? "";
             trainGpuAddress = PlayerPrefs.GetString(PrefTrainGpuAddress, GpuLearner.DefaultAddress) ?? GpuLearner.DefaultAddress;
             trainRandomB = PlayerPrefs.GetInt(PrefTrainRandomB, all ? 1 : 0) == 1;
@@ -497,6 +503,7 @@ namespace PokemonTCG.Presentation
             session.NeuralRest = trainFast ? 0 : 0.25;
             session.GpuAddress = trainGpu ? trainGpuAddress : null;
             session.GamesPerSecond = TrainRate;
+            session.LearnFromLookAhead = TrainLookAheadShares[trainLookAhead];
         }
 
         /// <summary>The typed games-a-second limit (0: none).</summary>
@@ -805,6 +812,21 @@ namespace PokemonTCG.Presentation
                     PlayerPrefs.SetInt(PrefTrainGpu, trainGpu ? 1 : 0);
                     PlayerPrefs.SetString(PrefTrainGpuAddress, trainGpuAddress ?? "");
                 });
+            // Expert roadmap step 2: learning from the look-ahead.
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Learn from look-ahead", GUILayout.Width(150));
+            int newLookAhead = GUILayout.Toolbar(trainLookAhead, TrainLookAheadNames);
+            GUILayout.EndHorizontal();
+            if (newLookAhead != trainLookAhead)
+                actions.Add(() =>
+                {
+                    trainLookAhead = newLookAhead;
+                    PlayerPrefs.SetInt(PrefTrainLookAhead, trainLookAhead);
+                });
+            GUILayout.Label("Neural AI only. In these games the network looks ahead before some of the moves it isn't sure of, plays the move the "
+                            + "look-ahead found, and learns to judge moves the way the look-ahead did. Slower: 10% of games trains about 40% "
+                            + "slower, 25% about twice as slow. The champion checks show whether it's paying off."
+                            + (trainGpu ? " Learning on the GPU needs the updated learner.py for this." : ""), Hint(ui));
             if (trainGpu)
                 GUILayout.Label("Neural AI training plays its games here and learns on the graphics card: start PokemonTCGSim/GpuLearner/learner.py first "
                                 + "(see its README). Learning is most of the training time, so this is about 2 to 3 times as fast and keeps that work off the CPU. "

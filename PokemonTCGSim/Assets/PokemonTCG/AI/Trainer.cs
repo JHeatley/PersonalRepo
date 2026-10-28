@@ -105,6 +105,11 @@ namespace PokemonTCG.AI
         public double GamesPerSecond;
         /// <summary>Neural AI training learns on the GPU learner at this address ("127.0.0.1:5577"; null or "": on the CPU).</summary>
         public string GpuAddress;
+        /// <summary>
+        /// Training from the look-ahead (expert roadmap step 2): the share of Neural AI training games where the network looks
+        /// ahead before some of its decisions and learns to match what it found (PolicyTrainer.SearchShare). 0: off.
+        /// </summary>
+        public double LearnFromLookAhead;
 
         /// <summary>
         /// The decks a random side picks from, a new one every game (set before Start). With RandomA and RandomB both on (the
@@ -474,6 +479,7 @@ namespace PokemonTCG.AI
             int gpuPort;
             if (!string.IsNullOrEmpty(GpuAddress) && GpuLearner.TryParse(GpuAddress, out gpuHost, out gpuPort)) trainer.Gpu = new GpuLearner(gpuHost, gpuPort);
             if (GamesPerSecond > 0) trainer.Pace = new GamePace(GamesPerSecond);
+            trainer.SearchShare = Math.Max(0, Math.Min(1, LearnFromLookAhead));
             int played = 0;
             trainer.ShouldStop = () => cancel || Volatile.Read(ref played) >= Games;
             trainer.Abort = () => cancel; // Stop: leave the games in progress and don't learn from the unfinished batch
@@ -578,6 +584,9 @@ namespace PokemonTCG.AI
                     progress += " · sequencing mistakes per game " + recentMistakes.ToString("0.0", CultureInfo.InvariantCulture)
                                 + " (first round " + firstMistakes.ToString("0.0", CultureInfo.InvariantCulture) + "; lower is better)";
                 if (round.LearnedOn.Length > 0) progress += " · learning on the GPU (" + round.LearnedOn + ")";
+                if (round.Searched > 0)
+                    progress += " · learned from " + round.Searched + " look-ahead decisions this round (how far it was from them: "
+                                + round.DistillLoss.ToString("0.00", CultureInfo.InvariantCulture) + ", lower is closer)";
                 if (checks.Count > 0) progress += " · vs the classic bot: " + string.Join(" → ", checks.ToArray()) + " games";
                 else if (EvalGames == 0) progress += " · tick \"Measure it against the classic bot\" to see it checked as it trains";
                 if (!string.IsNullOrEmpty(ChampionNote)) progress += " · " + ChampionNote;

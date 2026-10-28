@@ -35,6 +35,8 @@ games. Ctrl+C stops it after the current round.
 | `--gpu 127.0.0.1:5577` | | learn on the graphics card: start `../GpuLearner/learner.py` first (see its README) |
 | `--games-per-second N` | | play at most N games a second (room to spare for the CPU) |
 | `--skip-cpu 2,3` | | keep off these CPU threads (a faulty core; Windows only; train and eval) |
+| `--search-share X` | 0 | learn from the look-ahead in this share of the games (0.1 = 10%): the network looks ahead before some of its moves, plays what it found and learns to judge moves that way (slower) |
+| `--search-decisions X` | 0.3 | in those games, the share of the main actions it isn't sure of that it looks ahead on |
 
 ## The champion (background training)
 
