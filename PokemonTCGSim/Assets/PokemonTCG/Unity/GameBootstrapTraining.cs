@@ -39,6 +39,9 @@ namespace PokemonTCG.Presentation
         private const string PrefTrainGpu = "PokemonTCG.TrainGpu";
         private const string PrefTrainLookAhead = "PokemonTCG.TrainLookAhead";
         private const string PrefTrainGpuMoves = "PokemonTCG.TrainGpuMoves";
+        private const string PrefTrainExploiters = "PokemonTCG.TrainExploiters";
+        /// <summary>Train exploiters for the league (TrainingSession.Exploiters).</summary>
+        private bool trainExploiters = true;
         /// <summary>Choose the Neural AI's moves on the GPU learner too (many games at once), with "Learn on the GPU".</summary>
         private bool trainGpuMoves;
         private static readonly string[] TrainLookAheadNames = { "Off", "10% of games", "25% of games" };
@@ -134,7 +137,24 @@ namespace PokemonTCG.Presentation
             public int ChampionVersion;
             /// <summary>The checks against the champion, newest first.</summary>
             public List<ChampionCheck> ChampionChecks = new List<ChampionCheck>();
+            public List<LeagueMember> League = new List<LeagueMember>();
+            public double[] LeagueShares = new double[0];
+            /// <summary>What happened in the league, newest first.</summary>
+            public List<string> LeagueEvents = new List<string>();
             private string[] lessonText;
+
+            /// <summary>The league's members, then its history.</summary>
+            public string LeagueRow(int k)
+            {
+                if (k < League.Count)
+                {
+                    var m = League[k];
+                    return "   " + m.Name + " · joined at " + m.AddedAt.ToString("N0") + " games · "
+                           + (m.Games < 1 ? "not played yet" : "it scores " + Math.Round(m.WinRate * 100) + "% against it lately")
+                           + " · picked for " + Math.Round(LeagueShares[k] * 100) + "% of the league's games";
+                }
+                return "   " + LeagueEvents[k - League.Count];
+            }
 
             public string ChampionRow(int k)
             {
@@ -417,6 +437,7 @@ namespace PokemonTCG.Presentation
             trainGpu = PlayerPrefs.GetInt(PrefTrainGpu, 0) == 1;
             trainLookAhead = Mathf.Clamp(PlayerPrefs.GetInt(PrefTrainLookAhead, 0), 0, TrainLookAheadNames.Length - 1);
             trainGpuMoves = PlayerPrefs.GetInt(PrefTrainGpuMoves, 0) == 1;
+            trainExploiters = PlayerPrefs.GetInt(PrefTrainExploiters, 1) == 1;
             trainRateText = PlayerPrefs.GetString(PrefTrainRate, "") ?? "";
             trainGpuAddress = PlayerPrefs.GetString(PrefTrainGpuAddress, GpuLearner.DefaultAddress) ?? GpuLearner.DefaultAddress;
             trainRandomB = PlayerPrefs.GetInt(PrefTrainRandomB, all ? 1 : 0) == 1;
@@ -452,8 +473,11 @@ namespace PokemonTCG.Presentation
                     Lessons = brain.StrongestLessons(0, 5), // all of them; the Train screen shows them in a scrolling list
                     History = brain.History(),
                     ChampionVersion = brain.ChampionVersion,
-                    ChampionChecks = Enumerable.Reverse(brain.ChampionChecks).ToList()
+                    ChampionChecks = Enumerable.Reverse(brain.ChampionChecks).ToList(),
+                    League = brain.League.Members(),
+                    LeagueEvents = Enumerable.Reverse(brain.League.Events()).ToList()
                 };
+                brainView.LeagueShares = League.PickShares(brainView.League);
             }
         }
 
@@ -511,6 +535,7 @@ namespace PokemonTCG.Presentation
             session.GamesPerSecond = TrainRate;
             session.LearnFromLookAhead = TrainLookAheadShares[trainLookAhead];
             session.GpuMoves = trainGpu && trainGpuMoves;
+            session.Exploiters = trainExploiters;
         }
 
         /// <summary>The typed games-a-second limit (0: none).</summary>
@@ -847,6 +872,19 @@ namespace PokemonTCG.Presentation
                             + "look-ahead found, and learns to judge moves the way the look-ahead did. Slower: 10% of games trains about 40% "
                             + "slower, 25% about twice as slow. The champion checks show whether it's paying off."
                             + (trainGpu ? " Learning on the GPU needs the updated learner.py for this." : ""), Hint(ui));
+            // Expert roadmap step 6: the league's exploiters.
+            bool newExploiters = GUILayout.Toggle(trainExploiters, " Train exploiters for the league");
+            if (newExploiters != trainExploiters)
+                actions.Add(() =>
+                {
+                    trainExploiters = newExploiters;
+                    PlayerPrefs.SetInt(PrefTrainExploiters, trainExploiters ? 1 : 0);
+                });
+            GUILayout.Label("Neural AI only. Every " + ExploiterEveryText + " training games, a copy of the network trains "
+                            + TrainingSession.DefaultExploiterGames.ToString("N0") + " games learning only to beat it; if it then wins " + Math.Round(ChampionGate.PromoteAt * 100)
+                            + "% or more, it found a weakness and joins the league (the past versions it trains against, under What the AI knows), so "
+                            + "the network learns to cover it. About 5% more training time (around 10 to 15% when choosing moves on the GPU: an "
+                            + "exploiter's moves are chosen on the CPU).", Hint(ui));
             if (trainGpu)
             {
                 bool newGpuMoves = GUILayout.Toggle(trainGpuMoves, " Choose moves on the GPU too (many games at once)");
@@ -1033,6 +1071,9 @@ namespace PokemonTCG.Presentation
 
         private const string GrowCostText = "On the CPU, training is about 25% slower with it (learning takes about 40% longer); learning on the GPU, with Choose moves on the GPU too, it hardly matters. Against you, each move still takes a moment.";
 
+        private Vector2 trainScrollLeague;
+        private static string ExploiterEveryText { get { return TrainingSession.DefaultExploiterEvery.ToString("N0"); } }
+
         private void DrawBrainPanel(UiStyles ui, List<Action> actions, bool running)
         {
             var b = brainView;
@@ -1076,6 +1117,18 @@ namespace PokemonTCG.Presentation
             else
                 GUILayout.Label("Champion: none yet. The next Neural AI training session keeps the network as it is as the first champion, the yardstick it "
                                 + "has to beat later.", Hint(ui));
+            // The league (League): past versions it trains against, and what happened there.
+            if (b.League.Count > 0 || b.LeagueEvents.Count > 0)
+            {
+                GUILayout.Label("League: past versions it trains against besides itself (in 15 to 30% of its training games, the ones it does worst against "
+                                + "most often). A champion it replaces joins, a snapshot every " + TrainingSession.LeagueSnapshotEvery.ToString("N0")
+                                + " games, and exploiters that find a weakness; at most " + League.Capacity + ", the easiest leaves first · "
+                                + b.League.Count + (b.League.Count == 1 ? " past version" : " past versions"), Hint(ui));
+                trainScrollLeague = DrawScrollList(ui, trainScrollLeague, b.League.Count + b.LeagueEvents.Count, Mathf.Min(listMax, 180f), b.LeagueRow);
+            }
+            else
+                GUILayout.Label("League: none yet. The next Neural AI training session starts it with the champion, a past version it keeps "
+                                + "training against as it moves on.", Hint(ui));
             if (b.Decks.Count > 0)
             {
                 GUILayout.Label("How well the Neural AI knows each deck it has trained with, most games first (about 0.6 = plays it confidently, 0.9 = still "

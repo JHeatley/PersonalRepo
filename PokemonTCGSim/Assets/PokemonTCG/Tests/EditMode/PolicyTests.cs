@@ -292,6 +292,136 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
+        public void The_League_Picks_The_Past_Versions_It_Does_Worst_Against_Most_And_Keeps_The_Hardest()
+        {
+            var league = new League();
+            var easy = league.Add(new PolicyNet(), "snapshot", "easy", 100, "");
+            var hard = league.Add(new PolicyNet(), "champion", "hard", 200, "");
+            for (int i = 0; i < 100; i++)
+            {
+                league.Record(easy.Id, 1); // the network always beats it
+                league.Record(hard.Id, i % 4 == 0 ? 1 : 0); // and mostly loses to this one
+            }
+            var members = league.Members();
+            Assert.Greater(members[0].WinRate, 0.9);
+            Assert.Less(members[1].WinRate, 0.35);
+            var rng = new Rng(3);
+            int hardPicks = 0;
+            for (int i = 0; i < 1000; i++) if (league.Pick(rng).Id == hard.Id) hardPicks++;
+            Assert.Greater(hardPicks, 850, "the hard one is picked most");
+            Assert.Less(hardPicks, 1000, "the easy one still now and then");
+
+            // Full: the easiest leaves (once it has played enough), never the one joining.
+            for (int i = 0; i < League.Capacity - 1; i++) league.Add(new PolicyNet(), "snapshot", "new " + i, 300 + i, "");
+            Assert.AreEqual(League.Capacity, league.Count);
+            Assert.IsFalse(league.Members().Any(m => m.Name == "easy"), "the one it beats most easily left");
+            Assert.IsTrue(league.Members().Any(m => m.Name == "hard"));
+            Assert.IsTrue(league.Members().Any(m => m.Name == "new " + (League.Capacity - 2)));
+            Assert.IsTrue(league.Events().Any(e => e.Contains("easy left")));
+            Assert.AreEqual(300 + League.Capacity - 2, league.NewestAddedAt);
+        }
+
+        [Test]
+        public void The_League_Is_Saved_With_The_AI_Undone_With_A_Session_And_Forgotten_On_Reset()
+        {
+            var brain = new LearningBrain();
+            brain.Policy.Reset();
+            var a = new PolicyNet { GamesTrained = 11 };
+            var b = new PolicyNet(PolicyNet.BigBlocks) { GamesTrained = 22 };
+            var ma = brain.League.Add(a, "champion", "champion v1", 1000, "2026-01-01 10:00");
+            brain.League.Record(ma.Id, 1);
+            brain.League.LastExploiterAt = 1000;
+            brain.League.ExploitersTried = 2;
+            string path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "league_test_" + Guid.NewGuid().ToString("N") + ".txt");
+            try
+            {
+                brain.FilePath = path;
+                string before = brain.Serialize();
+                brain.League.Add(b, "exploiter", "exploiter 2", 2000, "");
+                brain.Save();
+                Assert.AreEqual(2, System.IO.Directory.GetFiles(LearningBrain.LeaguePath(path)).Length, "a file per member");
+
+                var back = LearningBrain.Load(path);
+                var members = back.League.Members();
+                Assert.AreEqual(2, members.Count);
+                Assert.AreEqual("champion v1", members[0].Name);
+                Assert.AreEqual(1000, members[0].AddedAt);
+                Assert.AreEqual(1, members[0].Games, 1e-9);
+                Assert.AreEqual(11, members[0].Net.GamesTrained);
+                Assert.AreEqual(PolicyNet.BigBlocks, members[1].Net.Blocks);
+                Assert.AreEqual(2, back.League.ExploitersTried);
+                Assert.AreEqual(1000, back.League.LastExploiterAt);
+                Assert.IsTrue(back.League.Events().Any(e => e.Contains("champion v1 joined")));
+
+                // Undo this session: the member it added leaves, and its file goes with the next save.
+                brain.LoadText(before);
+                Assert.AreEqual(1, brain.League.Count);
+                Assert.AreSame(a, brain.League.Members()[0].Net, "the network it remembers");
+                brain.Save();
+                Assert.AreEqual(1, System.IO.Directory.GetFiles(LearningBrain.LeaguePath(path)).Length);
+
+                brain.Reset();
+                Assert.AreEqual(0, brain.League.Count);
+                brain.Save();
+                Assert.IsFalse(System.IO.Directory.Exists(LearningBrain.LeaguePath(path)), "no league after a reset");
+                // A member added after the reset never takes an old one's file.
+                Assert.Greater(brain.League.Add(new PolicyNet(), "snapshot", "after", 1, "").Id, ma.Id + 1);
+            }
+            finally
+            {
+                foreach (var f in new[] { path, LearningBrain.NeuralPath(path), LearningBrain.ChampionPath(path) })
+                    if (System.IO.File.Exists(f)) System.IO.File.Delete(f);
+                if (System.IO.Directory.Exists(LearningBrain.LeaguePath(path))) System.IO.Directory.Delete(LearningBrain.LeaguePath(path), true);
+            }
+        }
+
+        [Test]
+        public void Training_Plays_The_League_And_Keeps_Its_Results()
+        {
+            var net = new PolicyNet();
+            var league = new League();
+            var past = league.Add(new PolicyNet(), "snapshot", "past", 0, "");
+            var trainer = SmallTrainer(net);
+            trainer.League = league;
+            trainer.SelfShare = 0;
+            trainer.PoolShare = 1;
+            trainer.ClassicShare = 0;
+            var round = trainer.Round();
+            trainer.Dispose();
+            Assert.AreEqual(round.Games, round.VsLeague, "every game against the league (no snapshots yet)");
+            Assert.Greater(round.VsLeague, 0);
+            var m = league.Members()[0];
+            Assert.AreEqual(round.VsLeague, m.Games, 0.1);
+            Assert.AreEqual(round.LeaguePoints, m.Points, 0.1);
+        }
+
+        [Test]
+        public void Exploiters_Train_To_Beat_The_Network_And_Join_The_League_Only_When_They_Do()
+        {
+            var brain = new LearningBrain();
+            brain.Policy.Reset();
+            brain.Policy.GamesTrained = 1;
+            var session = new TrainingSession(StandardCards.CreateRegistry(), brain, "Dragapult", Dragapult(), "Zoroark", Zoroark(), 72, 0, 778)
+            {
+                // Two rounds (64 games, then 8): the exploiter comes between them.
+                Style = AiStyle.Neural,
+                ChampionEvery = 8,
+                ChampionMinGames = 8,
+                ChampionGames = 10,
+                ExploiterEvery = 8,
+                ExploiterGames = 8
+            };
+            session.RunBlocking();
+            Assert.GreaterOrEqual(brain.League.ExploitersTried, 1);
+            Assert.IsTrue(brain.League.Events().Any(e => e.Contains("exploiter 1 won")), string.Join(" | ", brain.League.Events()));
+            bool kept = brain.League.Members().Any(x => x.Kind == "exploiter");
+            Assert.AreEqual(kept, brain.League.Events().Any(e => e.Contains("found a weakness")));
+            Assert.IsTrue(brain.League.Members().Any(x => x.Kind == "champion"), "the league starts with the champion");
+            Assert.AreEqual(72, brain.GamesTrained, "the exploiter's games aren't the network's training");
+            StringAssert.Contains("exploiter", session.LeagueNote);
+        }
+
+        [Test]
         public void A_Network_With_Broken_Numbers_Is_Never_Loaded_Or_Learned_Into()
         {
             var net = new PolicyNet { GamesTrained = 5 };

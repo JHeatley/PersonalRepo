@@ -135,6 +135,23 @@ namespace PokemonTCG.AI
         /// <summary>What the last check against the champion found ("" before one).</summary>
         public string ChampionNote { get; private set; }
 
+        /// <summary>
+        /// The league (expert roadmap step 6): Neural AI training also plays past versions kept with the AI (League), the ones it
+        /// does worst against most. A champion it replaces joins, and a snapshot of it every LeagueSnapshotEvery games.
+        /// </summary>
+        public bool UseLeague = true;
+        public const int LeagueSnapshotEvery = 25000;
+        /// <summary>
+        /// Exploiters: every ExploiterEvery training games, a copy of the network trains ExploiterGames games only against the
+        /// network as it is, then plays it ChampionGames games; if it wins ChampionGate.PromoteAt or more, it found a weakness and
+        /// joins the league, so the network trains against it. Needs UseLeague.
+        /// </summary>
+        public bool Exploiters = true;
+        public int ExploiterEvery = DefaultExploiterEvery, ExploiterGames = DefaultExploiterGames;
+        public const int DefaultExploiterEvery = 50000, DefaultExploiterGames = 2000;
+        /// <summary>The latest from the league ("" before anything happened this session).</summary>
+        public string LeagueNote { get; private set; }
+
         private bool HasPool { get { return DeckPool != null && DeckPool.Count > 0; } }
         /// <summary>Both sides random: all decks against all decks.</summary>
         public bool AllDecksMode { get { return HasPool && RandomA && RandomB; } }
@@ -482,6 +499,7 @@ namespace PokemonTCG.AI
             if (!string.IsNullOrEmpty(GpuAddress) && GpuLearner.TryParse(GpuAddress, out gpuHost, out gpuPort)) trainer.Gpu = new GpuLearner(gpuHost, gpuPort);
             if (GamesPerSecond > 0) trainer.Pace = new GamePace(GamesPerSecond);
             trainer.SearchShare = Math.Max(0, Math.Min(1, LearnFromLookAhead));
+            if (UseLeague) trainer.League = brain.League;
             trainer.GpuMoves = GpuMoves && trainer.Gpu != null;
             int played = 0;
             trainer.ShouldStop = () => cancel || Volatile.Read(ref played) >= Games;
@@ -555,6 +573,9 @@ namespace PokemonTCG.AI
                 var first = ChampionGate.Run(brain, scripts, championDecks, ChampionGames, trainer.Threads, () => cancel);
                 if (first != null) ChampionNote = "champion: " + ChampionGate.Describe(first);
             }
+            // The league starts with the champion (a past version once the network moves on).
+            if (UseLeague && brain.League.Count == 0 && brain.Champion != null)
+                brain.League.Add(brain.Champion.Clone(), "champion", "champion v" + brain.ChampionVersion, brain.GamesTrained, Now());
             long skippedBefore = brain.Policy.SkippedSteps;
             // Progress, shown on the status line: sequencing mistakes per game (they should fall), and, when measuring is on,
             // a check against the classic bot every fifth of the session on the same games each time (it should rise).
@@ -596,6 +617,10 @@ namespace PokemonTCG.AI
                 if (checks.Count > 0) progress += " · vs the classic bot: " + string.Join(" → ", checks.ToArray()) + " games";
                 else if (EvalGames == 0) progress += " · tick \"Measure it against the classic bot\" to see it checked as it trains";
                 if (!string.IsNullOrEmpty(ChampionNote)) progress += " · " + ChampionNote;
+                if (round.VsLeague > 0)
+                    progress += " · against the league (" + brain.League.Count + " past versions): "
+                                + Math.Round(100.0 * round.LeaguePoints / round.VsLeague) + "% of " + round.VsLeague + " games this round";
+                if (!string.IsNullOrEmpty(LeagueNote)) progress += " · " + LeagueNote;
                 SetPhase(progress);
                 if (ChampionEvery > 0 && done >= nextChampion && done < Games && !cancel)
                 {
@@ -603,6 +628,8 @@ namespace PokemonTCG.AI
                     CheckChampion(basePhase, trainer.Threads, championDecks);
                     lastChampion = done;
                 }
+                if (UseLeague && Exploiters && ExploiterGames > 0 && brain.GamesTrained - brain.League.LastExploiterAt >= ExploiterEvery && done < Games && !cancel)
+                    TrainExploiter(basePhase, trainer, championDecks);
                 long skipped = brain.Policy.SkippedSteps - skippedBefore;
                 if (skipped > 0)
                     lock (gate) status.LastError = skipped + " learning step" + (skipped == 1 ? " was" : "s were") + " skipped (numbers out of range); the network is unharmed.";
@@ -620,11 +647,98 @@ namespace PokemonTCG.AI
         private void CheckChampion(string basePhase, int threads, List<KeyValuePair<string, List<CardDef>>> decks)
         {
             SetPhase(basePhase + " · checking against the champion (" + ChampionGames + " games)...");
+            var old = brain.Champion;
+            int oldVersion = brain.ChampionVersion;
             var check = ChampionGate.Run(brain, scripts, decks, ChampionGames, threads, () => cancel);
             if (check == null) return;
             ChampionNote = "champion: " + ChampionGate.Describe(check);
+            if (UseLeague)
+            {
+                // The champion it replaced is a past version now; otherwise a snapshot every so often.
+                if (check.Promoted && old != null)
+                    brain.League.Add(old, "champion", "champion v" + oldVersion, brain.GamesTrained, Now());
+                else if (!check.Promoted && brain.GamesTrained - brain.League.NewestAddedAt >= LeagueSnapshotEvery)
+                    brain.League.Add(brain.Policy.Clone(), "snapshot", "the network at " + brain.GamesTrained.ToString("N0", CultureInfo.InvariantCulture) + " games",
+                        brain.GamesTrained, Now());
+            }
             SetPhase(basePhase + " · " + ChampionNote);
             SafeSave();
+        }
+
+        private static string Now()
+        {
+            return DateTime.Now.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// An exploiter: a copy of the network trains ExploiterGames games only against the network as it is now (it learns, the
+        /// network doesn't), then the two play ChampionGames games. Winning ChampionGate.PromoteAt or more means it found a
+        /// weakness: it joins the league, and the network trains against it until it isn't one. The network's own training
+        /// waits meanwhile; these games don't count as its training.
+        /// </summary>
+        private void TrainExploiter(string basePhase, PolicyTrainer main, List<KeyValuePair<string, List<CardDef>>> decks)
+        {
+            int number = brain.League.ExploitersTried + 1;
+            string name = "exploiter " + number;
+            var target = brain.Policy.Clone();
+            var exploiter = brain.Policy.Clone();
+            var against = new League();
+            against.Add(target, "target", "the network", brain.GamesTrained, "");
+            int played = 0;
+            var t = new PolicyTrainer(exploiter, scripts, decks, seedBase + 900000 + number * 7919)
+            {
+                Matchup = false,
+                SelfShare = 0, PoolShare = 1, ClassicShare = 0, SnapshotEvery = 0, League = against,
+                Rules = main.Rules, PrizeCount = main.PrizeCount, Threads = main.Threads, RestShare = main.RestShare, CollectGarbage = main.CollectGarbage,
+                GamesPerRound = Math.Max(8, Math.Min(64, ExploiterGames)), GameBudget = ExploiterGames,
+                // It learns on the GPU learner too, in a slot of its own (the network's is left as it was), its moves on the CPU.
+                Gpu = main.Gpu, OwnsGpu = false, GpuSlot = number, Pace = main.Pace
+            };
+            t.ShouldStop = () => cancel || Volatile.Read(ref played) >= ExploiterGames;
+            t.Abort = () => cancel;
+            t.GameFinished = game => Interlocked.Increment(ref played);
+            try
+            {
+                string phase = basePhase + " · training " + name + " (a copy that learns only to beat the network, " + ExploiterGames.ToString("N0", CultureInfo.InvariantCulture) + " games)";
+                SetPhase(phase + "...");
+                while (!cancel && Volatile.Read(ref played) < ExploiterGames)
+                {
+                    var round = t.Round();
+                    if (round.Games == 0) break;
+                    if (!string.IsNullOrEmpty(round.LastError) && round.LastError.StartsWith("GPU learner", StringComparison.Ordinal))
+                        lock (gate) status.LastError = name + ": " + round.LastError;
+                    SetPhase(phase + ": " + Volatile.Read(ref played).ToString("N0", CultureInfo.InvariantCulture) + " played, it won "
+                             + Math.Round(100.0 * round.LeaguePoints / Math.Max(1, round.VsLeague)) + "% this round...");
+                }
+                if (cancel) return;
+                SetPhase(basePhase + " · " + name + " against the network (" + ChampionGames + " games)...");
+                t.ShouldStop = () => cancel; // its training games are done; these aren't training
+                int w, d, l;
+                double wr = t.Evaluate(seed => new PolicyAgent(target, seed) { Greedy = true }, ChampionGames, ChampionGate.Seed + 17, out w, out d, out l);
+                if (cancel) return;
+                // Tried, whatever it found (the next one comes ExploiterEvery games later).
+                brain.League.ExploitersTried = number;
+                brain.League.LastExploiterAt = brain.GamesTrained;
+                if (wr < 0) return;
+                string at = "At " + brain.GamesTrained.ToString("N0", CultureInfo.InvariantCulture) + " games: ";
+                string result = name + " won " + Math.Round(wr * 100) + "% of " + (w + d + l) + " games against the network";
+                if (wr >= ChampionGate.PromoteAt)
+                {
+                    brain.League.Note(Now(), at + result + ": it found a weakness, so it joins the league.");
+                    brain.League.Add(exploiter, "exploiter", name, brain.GamesTrained, Now());
+                    LeagueNote = result + ": it joins the league";
+                }
+                else
+                {
+                    brain.League.Note(Now(), at + result + ": no clear weakness found (it needs " + Math.Round(ChampionGate.PromoteAt * 100) + "%), so it isn't kept.");
+                    LeagueNote = result + ": no clear weakness, not kept";
+                }
+                SafeSave();
+            }
+            finally
+            {
+                t.Dispose();
+            }
         }
 
         /// <summary>Call inside the lock.</summary>

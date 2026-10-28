@@ -317,7 +317,11 @@ public static class Program
                 GamesPerSecond = JD("rate", 0),
                 PrizeCount = JI("prizes", 6),
                 ChampionDecks = championDecks.Count > 0 ? championDecks : null,
-                LearnFromLookAhead = JD("lookahead", 0)
+                LearnFromLookAhead = JD("lookahead", 0),
+                UseLeague = J("league", "1") != "0",
+                Exploiters = J("exploiters", "1") != "0",
+                ExploiterEvery = JI("exploiterevery", TrainingSession.DefaultExploiterEvery),
+                ExploiterGames = JI("exploitergames", TrainingSession.DefaultExploiterGames)
             };
             Console.WriteLine($"background training: {session.MatchLabel}, {session.Games:N0} games as the {session.StyleLabel}; brain {brain.FilePath}");
             session.Start();

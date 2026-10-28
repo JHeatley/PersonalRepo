@@ -37,6 +37,9 @@ Version 2 (training from the look-ahead: some decisions carry the look-ahead's i
          distillation weight after max grad norm, the samples end with f32 has-target[N] and f32 targets[sum of option
          counts], and RES1 ends with f64 distillation loss. Those decisions learn to match their target (cross-entropy)
          instead of PPO. Version 1 messages work as before.
+Version 3 (another network than the AI's: an exploiter, trained only to beat the AI's network): int32 3, int32 slot,
+         then a whole version 1 or 2 message. The learner keeps a model and optimizer per slot, so the AI's own (slot 0,
+         every message without version 3) carries on where it was. Only the latest other slot is kept.
 """
 import argparse
 import io
@@ -52,6 +55,7 @@ import torch.nn.functional as F
 
 VERSION = 1
 VERSIONS = (1, 2)
+VERSION_SLOT = 3
 CARD_DIM, STATIC_SIZE = 48, 64
 NEG_INF = -1e9
 
@@ -284,6 +288,20 @@ class Learner:
         self.opt = None
         self.lr = None
         self.inferred = 0
+        self.slot = 0
+        self.slots = {}
+
+    def select(self, slot):
+        """Works on slot's model and optimizer from now on (0: the AI's own network)."""
+        if slot == self.slot:
+            return
+        self.slots[self.slot] = (self.model, self.opt, self.lr)
+        if slot != 0:
+            # Only the AI's network and the latest exploiter are kept.
+            for other in [k for k in self.slots if k not in (0, slot)]:
+                del self.slots[other]
+        self.model, self.opt, self.lr = self.slots.pop(slot, (None, None, None))
+        self.slot = slot
 
     def _sync(self, tensors, learned, static, lr):
         """Puts the sim's current weights into the model, keeping the optimizer's state from round to round."""
@@ -514,6 +532,11 @@ def serve(learner, host, port):
                 r = Reader(recv_exact(conn, size))
                 try:
                     version = r.i32()
+                    slot = 0
+                    if version == VERSION_SLOT and kind == b"TRN1":
+                        slot = r.i32()
+                        version = r.i32()
+                    learner.select(slot)
                     if version not in VERSIONS:
                         raise ValueError("the sim and this learner are different versions: update both")
                     if kind == b"TRN1":

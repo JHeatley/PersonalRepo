@@ -48,6 +48,18 @@ of the network that later versions have to beat. Every 10,000 games, and at the 
 network plays 300 games against it on the same games each time (every legal deck the app sent); at 55% or more it becomes
 the new champion. The champion is saved next to the AI's file (`<AI file>.champion`), and its checks in the file itself.
 
+## The league (background training)
+
+`background` also trains against past versions of the network kept with the AI, not only itself: the league (at most 8).
+Playing only itself, a network gets good at beating itself and can forget how to beat other styles. The champion it
+replaces joins, and so does a snapshot every 25,000 games. In the games against past versions (about 30% of them), the
+ones it does worst against lately are picked most; when the league is full, the one it beats most easily leaves.
+
+Every 50,000 games it also trains an exploiter: a copy of the network that plays 2,000 games learning only to beat the
+network as it is, then 300 games against it. At 55% or more it found a weakness and joins the league, so the network
+trains against it until it isn't one. The networks are in a folder next to the AI's file (`<AI file>.league`), their
+results in the file itself. Job keys: `exploiters=0` turns exploiters off, `league=0` the whole league.
+
 ## eval
 
 Plays the network (top-rated moves) against the classic bot, or against another network

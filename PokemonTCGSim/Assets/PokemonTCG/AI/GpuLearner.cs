@@ -32,6 +32,11 @@ namespace PokemonTCG.AI
         /// targets[sum of option counts]. learner.py reads both; RES1 ends with f64 distillation loss (after the weights) for version 2.
         /// </summary>
         public const int Version = 1, VersionWithTargets = 2;
+        /// <summary>
+        /// A TRN1 for another network than the AI's (an exploiter, League): i32 3, i32 slot, then the message as above. The learner
+        /// keeps a model and optimizer for each slot, so the AI's own (slot 0, every other message) is left as it was.
+        /// </summary>
+        public const int VersionWithSlot = 3;
         public const string DefaultAddress = "127.0.0.1:5577";
 
         public readonly string Host;
@@ -119,7 +124,7 @@ namespace PokemonTCG.AI
         /// </summary>
         public GpuLearnResult Train(PolicyNet net, IList<PolicyInput> inputs, int[] actions, float[] logp, float[] adv, float[] ret,
             int epochs, int minibatch, int seed, double clip, double dualClip, double valueCoef, double entropyCoef,
-            float[][] targets = null, double distillCoef = 0)
+            float[][] targets = null, double distillCoef = 0, int slot = 0)
         {
             if (!Connected) Connect(3000);
             bool withTargets = false;
@@ -128,6 +133,11 @@ namespace PokemonTCG.AI
             var body = new MemoryStream();
             using (var w = new BinaryWriter(body, Encoding.UTF8, true))
             {
+                if (slot != 0)
+                {
+                    w.Write(VersionWithSlot);
+                    w.Write(slot);
+                }
                 w.Write(withTargets ? VersionWithTargets : Version);
                 w.Write(epochs);
                 w.Write(minibatch);
@@ -163,9 +173,13 @@ namespace PokemonTCG.AI
                 net.ReadLearnerWeights(r, result.Batches);
                 if (withTargets) result.DistillLoss = r.ReadDouble(); // after the weights
                 Device = result.Device;
-                // The learner keeps the weights it just sent back, so it can choose moves with them straight away.
-                learnerRevision = net.WeightsRevision;
-                learnerRows = sentRows;
+                // The learner keeps the weights it just sent back, so it can choose moves with them straight away (the AI's own
+                // network: it chooses moves only for that one).
+                if (slot == 0)
+                {
+                    learnerRevision = net.WeightsRevision;
+                    learnerRows = sentRows;
+                }
                 return result;
             }
         }
