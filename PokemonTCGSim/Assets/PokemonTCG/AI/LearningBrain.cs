@@ -62,6 +62,35 @@ namespace PokemonTCG.AI
         public bool HasLift(int atLeast) { return Drawn >= atLeast && NotDrawn >= atLeast; }
     }
 
+    /// <summary>
+    /// One of your play habits the Areas of Improvement review keeps track of across your games: a kind of play where the AI
+    /// would do something else (attacking before attaching Energy, picking one card over another...).
+    /// </summary>
+    public sealed class PlayHabit
+    {
+        public string Key = "";
+        public string Title = "";
+        /// <summary>Reviewed games it came up in, and how many times in all.</summary>
+        public int Games, Times;
+        /// <summary>Sum over the times of how much it seemed to matter (0..1 each: a measured loss of chance to win, or how sure the AI was).</summary>
+        public double Strength;
+        /// <summary>How often it comes up lately: an average over about the last 6 reviewed games (0..1), before and after this game.</summary>
+        public double Recent, RecentBefore;
+        /// <summary>Review number it last came up in.</summary>
+        public int LastReview;
+
+        public double AverageStrength { get { return Times == 0 ? 0 : Strength / Times; } }
+    }
+
+    /// <summary>A habit as it came up in one game (what GameAnalyzer hands to LearningBrain.RecordHabits).</summary>
+    public sealed class HabitInGame
+    {
+        public string Key = "";
+        public string Title = "";
+        public int Times;
+        public double Strength;
+    }
+
     /// <summary>How well the Neural AI knows a deck from its training games: games and results, and how unsure it is lately.</summary>
     public sealed class DeckSkill
     {
@@ -141,6 +170,9 @@ namespace PokemonTCG.AI
         private readonly List<SessionRecord> history = new List<SessionRecord>();
         private readonly Dictionary<string, CardResult> cardResults = new Dictionary<string, CardResult>(StringComparer.Ordinal);
         private readonly Dictionary<string, DeckSkill> deckSkills = new Dictionary<string, DeckSkill>(StringComparer.Ordinal);
+        private readonly Dictionary<string, PlayHabit> habits = new Dictionary<string, PlayHabit>(StringComparer.Ordinal);
+        /// <summary>Your games the Areas of Improvement review has gone through (the habits' denominator).</summary>
+        public int HabitReviews { get; private set; }
 
         /// <summary>Largest weight of one feature.</summary>
         public const double MaxWeight = 3.0;
@@ -623,6 +655,68 @@ namespace PokemonTCG.AI
                     .OrderByDescending(s => s.Games).ToList();
         }
 
+        // ------------------------------------------------------------------ Your habits (the Areas of Improvement review)
+
+        /// <summary>How fast "lately" forgets: each review counts this much of the recent rate.</summary>
+        public const double HabitRecency = 0.15;
+
+        /// <summary>
+        /// Adds one reviewed game's habits to your profile and returns them with their history (games, times, how often lately,
+        /// before and after this game). Habits that didn't come up this game become a little rarer "lately".
+        /// </summary>
+        public List<PlayHabit> RecordHabits(IList<HabitInGame> found)
+        {
+            lock (sync)
+            {
+                HabitReviews++;
+                var now = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var h in found ?? new List<HabitInGame>())
+                    if (h != null && !string.IsNullOrEmpty(h.Key) && h.Times > 0) now.Add(h.Key);
+                foreach (var h in habits.Values)
+                {
+                    h.RecentBefore = h.Recent;
+                    if (!now.Contains(h.Key)) h.Recent *= 1 - HabitRecency;
+                }
+                var result = new List<PlayHabit>();
+                foreach (var f in found ?? new List<HabitInGame>())
+                {
+                    if (f == null || !now.Contains(f.Key)) continue;
+                    PlayHabit h;
+                    if (!habits.TryGetValue(f.Key, out h))
+                    {
+                        h = new PlayHabit { Key = f.Key };
+                        habits[f.Key] = h;
+                    }
+                    if (!string.IsNullOrEmpty(f.Title)) h.Title = f.Title;
+                    if (h.LastReview != HabitReviews)
+                    {
+                        h.Games++;
+                        h.Recent = h.Recent * (1 - HabitRecency) + HabitRecency;
+                        h.LastReview = HabitReviews;
+                    }
+                    h.Times += f.Times;
+                    h.Strength += Math.Max(0, Math.Min(1, f.Strength)) * f.Times;
+                    result.Add(CopyHabit(h));
+                }
+                return result;
+            }
+        }
+
+        /// <summary>Your habits, most common lately first.</summary>
+        public List<PlayHabit> Habits()
+        {
+            lock (sync) return habits.Values.Select(CopyHabit).OrderByDescending(h => h.Recent).ThenByDescending(h => h.Games).ToList();
+        }
+
+        private static PlayHabit CopyHabit(PlayHabit h)
+        {
+            return new PlayHabit
+            {
+                Key = h.Key, Title = h.Title, Games = h.Games, Times = h.Times, Strength = h.Strength, Recent = h.Recent, RecentBefore = h.RecentBefore,
+                LastReview = h.LastReview
+            };
+        }
+
         /// <summary>Games a card's lift needs both ways (drawn and not drawn) before the advisor uses it.</summary>
         public const int LiftGames = 25;
 
@@ -815,6 +909,8 @@ namespace PokemonTCG.AI
                 history.Clear();
                 cardResults.Clear();
                 deckSkills.Clear();
+                habits.Clear();
+                HabitReviews = 0;
                 GamesTrained = 0;
                 GamesVsYou = 0;
                 YourDecisionsStudied = 0;
@@ -883,6 +979,12 @@ namespace PokemonTCG.AI
                     sb.Append("q\t").Append(k.Games).Append('\t').Append(k.Wins).Append('\t').Append(k.Losses).Append('\t').Append(k.Decisions).Append('\t')
                       .Append(D(k.Uncertainty)).Append('\t').Append(Clean(k.Deck)).Append('\n');
                 }
+                if (HabitReviews > 0) sb.Append("hr\t").Append(HabitReviews).Append('\n');
+                foreach (var h in habits.Values.OrderBy(x => x.Key, StringComparer.Ordinal))
+                {
+                    sb.Append("h\t").Append(h.Games).Append('\t').Append(h.Times).Append('\t').Append(D(h.Strength)).Append('\t').Append(D(h.Recent)).Append('\t')
+                      .Append(h.LastReview).Append('\t').Append(Clean(h.Key)).Append('\t').Append(Clean(h.Title)).Append('\n');
+                }
                 foreach (var s in history)
                 {
                     sb.Append("s\t").Append(s.Games).Append('\t').Append(s.WinsA).Append('\t').Append(s.WinsB).Append('\t')
@@ -934,6 +1036,8 @@ namespace PokemonTCG.AI
                 history.Clear();
                 cardResults.Clear();
                 deckSkills.Clear();
+                habits.Clear();
+                HabitReviews = 0;
                 GamesTrained = GamesVsYou = YourDecisionsStudied = FeedbackGiven = 0;
                 LogsStudied = LogDecisionsStudied = 0;
                 Net.Reset();
@@ -982,6 +1086,19 @@ namespace PokemonTCG.AI
                                 break;
                             case "n":
                                 if (p.Length >= 2) Net.FromBase64(p[1]);
+                                break;
+                            case "hr":
+                                if (p.Length >= 2) HabitReviews = I(p[1]);
+                                break;
+                            case "h":
+                                if (p.Length >= 8)
+                                {
+                                    habits[p[6]] = new PlayHabit
+                                    {
+                                        Games = I(p[1]), Times = I(p[2]), Strength = Dp(p[3]), Recent = Dp(p[4]), RecentBefore = Dp(p[4]),
+                                        LastReview = I(p[5]), Key = p[6], Title = p[7]
+                                    };
+                                }
                                 break;
                             case "k":
                                 if (p.Length >= 9)

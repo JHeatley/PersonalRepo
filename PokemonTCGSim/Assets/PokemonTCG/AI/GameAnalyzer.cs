@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using PokemonTCG.Core;
 
 namespace PokemonTCG.AI
@@ -58,6 +60,10 @@ namespace PokemonTCG.AI
         public int DecisionsCompared;
         public int Differences;
         public int Simulated;
+        /// <summary>The AI that judged your plays and played the positions out: "Neural AI" once it has trained, else "Learning AI".</summary>
+        public string Judge = "Learning AI";
+        /// <summary>Your games the review has gone through so far, this one included (for the habits' history).</summary>
+        public int HabitReviews;
     }
 
     /// <summary>
@@ -78,6 +84,17 @@ namespace PokemonTCG.AI
         public int RolloutTurnCap = 20;
         /// <summary>Report a better play only when it wins this much more often (0.08 = 8 percentage points).</summary>
         public double ReportThreshold = 0.08;
+        /// <summary>
+        /// The Neural AI counts your play as a different choice only when it likes its own at least this much more (in probability)
+        /// and gives yours less than NeuralKeepsYours: plays it rates about as well aren't mistakes.
+        /// </summary>
+        public double NeuralGap = 0.25, NeuralKeepsYours = 0.25;
+        /// <summary>Threads the simulations run on.</summary>
+        public int Threads = Math.Max(1, Environment.ProcessorCount / 2);
+        /// <summary>Your and your opponent's decklists (the engine's starting decks), for the Neural AI; read from the game when not set.</summary>
+        public List<CardDef> YourDeckList, TheirDeckList;
+        /// <summary>Keep this game's habits in the brain's profile of your play (off for a review that's only being checked).</summary>
+        public bool RecordHabits = true;
 
         private readonly CardScriptRegistry scripts;
         private readonly LearningBrain brain;
@@ -100,6 +117,10 @@ namespace PokemonTCG.AI
         private string error;
         private volatile bool cancel;
         private GameReview review;
+        /// <summary>The Neural AI judges and plays the positions out (it has trained), rather than the Learning AI.</summary>
+        private bool neural;
+        /// <summary>Habits found in this game, before they're added up.</summary>
+        private readonly List<HabitHit> hits = new List<HabitHit>();
 
         public GameAnalyzer(CardScriptRegistry scripts, LearningBrain brain, List<RecordedDecision> decisions, List<EventCollector.Entry> events,
             int seat, string yourDeck, string theirDeck, GameState finalState, int prizeCount, GameRules rules = null)
@@ -175,13 +196,32 @@ namespace PokemonTCG.AI
                 Summarize(result);
                 var mains = decisions.Where(d => d.Request != null && d.Request.Kind == DecisionKind.MainAction && d.Snapshot != null && d.Answer != null && d.Answer.Count == 1).ToList();
 
-                SetPhase("Comparing your plays with the AI's", mains.Count);
+                neural = brain != null && brain.Policy != null && brain.Policy.Trained;
+                result.Judge = neural ? "Neural AI" : "Learning AI";
+                if (YourDeckList == null && mains.Count > 0) YourDeckList = CardsOf(mains[0].Snapshot, seat);
+                if (TheirDeckList == null && mains.Count > 0) TheirDeckList = CardsOf(mains[0].Snapshot, 1 - seat);
+                // What you knew at each decision, for the Neural AI: the game's public events up to that turn.
+                var memory = new PolicyMemory(seat) { DeckList = YourDeckList };
+                int nextEvent = 0;
+
+                SetPhase("Comparing your plays with the " + result.Judge + "'s", mains.Count);
                 var candidates = new List<Candidate>();
                 var aiChoice = new Dictionary<RecordedDecision, Candidate>();
                 foreach (var d in mains)
                 {
                     if (cancel) break;
-                    var c = Compare(d);
+                    double[] probs = null;
+                    if (neural)
+                    {
+                        while (nextEvent < events.Count && events[nextEvent].Turn < d.Turn)
+                        {
+                            memory.Turn = events[nextEvent].Turn;
+                            memory.OnEvent(null, events[nextEvent].Event);
+                            nextEvent++;
+                        }
+                        probs = NeuralChoices(d, memory);
+                    }
+                    var c = Compare(d, probs);
                     Tick();
                     if (c == null) continue;
                     result.DecisionsCompared++;
@@ -213,6 +253,7 @@ namespace PokemonTCG.AI
 
                 SetPhase("Checking habits", 1);
                 AddHabits(result, aiChoice, simulated);
+                if (!cancel) AddHabitItems(result, aiChoice);
 
                 SetPhase("Preparing previews", result.Items.Count);
                 foreach (var item in result.Items)
@@ -325,9 +366,66 @@ namespace PokemonTCG.AI
             public double YourChance = -1;
             public double SuggestedChance = -1;
             public int Simulations;
+            /// <summary>The Neural AI's probability of your play and of its own (-1 when the Learning AI judged).</summary>
+            public double YourProb = -1, AiProb = -1;
+            /// <summary>The Neural AI's probability of each option (null when the Learning AI judged).</summary>
+            public double[] Probs;
         }
 
-        private Candidate Compare(RecordedDecision d)
+        /// <summary>
+        /// How likely the Neural AI is to make each option at this decision (0..1, by option), or null when it can't say. An
+        /// option the encoder merged with an identical one gets that one's probability.
+        /// </summary>
+        private double[] NeuralChoices(RecordedDecision d, PolicyMemory memory)
+        {
+            try
+            {
+                var r = d.Request;
+                memory.See(r.View);
+                var choices = PolicyEncoder.Choices(r, new List<int>());
+                if (choices.Count < 2) return null;
+                var x = PolicyEncoder.Encode(r, memory, brain.Policy, choices);
+                float value;
+                var logits = brain.Policy.Evaluate(x, out value);
+                var p = PolicyNet.Softmax(logits);
+                var probs = new double[r.Options.Count];
+                var listed = new bool[r.Options.Count];
+                for (int i = 0; i < choices.Count; i++)
+                {
+                    if (choices[i].Done || choices[i].Option < 0 || choices[i].Option >= probs.Length) continue;
+                    probs[choices[i].Option] += p[i];
+                    listed[choices[i].Option] = true;
+                }
+                for (int i = 0; i < probs.Length; i++)
+                {
+                    if (listed[i]) continue;
+                    foreach (var c in choices)
+                        if (!c.Done && listed[c.Option] && SamePlay(r.Options[i], r.Options[c.Option], r.View)) probs[i] = probs[c.Option];
+                }
+                return probs;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>Every card a player has anywhere in the game (their decklist, as far as the review is concerned).</summary>
+        private static List<CardDef> CardsOf(GameState s, int player)
+        {
+            if (s == null) return null;
+            var p = s.Players[player];
+            var list = new List<CardDef>();
+            foreach (var c in p.Deck) list.Add(c.Def);
+            foreach (var c in p.Hand) list.Add(c.Def);
+            foreach (var c in p.Prizes) list.Add(c.Def);
+            foreach (var c in p.Discard) list.Add(c.Def);
+            if (p.Active != null) foreach (var c in p.Active.AllCards()) list.Add(c.Def);
+            foreach (var b in p.Bench) foreach (var c in b.AllCards()) list.Add(c.Def);
+            return list;
+        }
+
+        private Candidate Compare(RecordedDecision d, double[] probs)
         {
             var r = d.Request;
             if (r.Options.Count < 2 || r.View == null) return null;
@@ -346,6 +444,17 @@ namespace PokemonTCG.AI
             }
             if (best.Count == 0) return null;
             var c = new Candidate { Decision = d, Yours = yours, Suggested = best[0], Adjusted = adjusted };
+            if (probs != null)
+            {
+                // The Neural AI's choice; your play stands when it rates it about as well.
+                int top = 0;
+                for (int i = 1; i < probs.Length; i++) if (probs[i] > probs[top]) top = i;
+                c.YourProb = probs[yours];
+                c.AiProb = probs[top];
+                c.Probs = probs;
+                c.Suggested = top;
+                if (top == yours || probs[top] - probs[yours] < NeuralGap || probs[yours] >= NeuralKeepsYours) c.Suggested = yours;
+            }
             if (c.Suggested == yours) return c;
             var y = r.Options[yours];
             var a = r.Options[c.Suggested];
@@ -405,6 +514,12 @@ namespace PokemonTCG.AI
                 c.Title = "A different play";
                 c.Why = "You chose: " + y.Label + ". The AI would have chosen: " + a.Label + ".";
             }
+            if (c.AiProb >= 0)
+            {
+                // The surer the Neural AI is, the more the moment matters.
+                c.Priority += (int)Math.Round(40 * (c.AiProb - c.YourProb));
+                c.Why += " The Neural AI would make your play " + Percent(c.YourProb) + " of the time, its own " + Percent(c.AiProb) + ".";
+            }
             return c;
         }
 
@@ -451,18 +566,24 @@ namespace PokemonTCG.AI
             double sumYours = 0, sumSuggested = 0;
             int n = 0;
             int baseSeed = 7919 * (d.Index + 1) + finalTurn;
-            for (int k = 0; k < RolloutsPerOption && !cancel; k++)
+            var sums = new object();
+            // Each play-out is independent (its own shuffle of the hidden cards), so they run on several threads.
+            System.Threading.Tasks.Parallel.For(0, RolloutsPerOption, new System.Threading.Tasks.ParallelOptions { MaxDegreeOfParallelism = Math.Max(1, Threads) }, k =>
             {
+                if (cancel) return;
                 int seed = baseSeed + k * 104729;
                 var world = Determinize(d.Snapshot, seat, seed);
                 double y = Rollout(world, yours, seed);
                 double s = y < 0 ? -1 : Rollout(world, suggested, seed);
                 Tick();
-                if (y < 0 || s < 0) continue;
-                sumYours += y;
-                sumSuggested += s;
-                n++;
-            }
+                if (y < 0 || s < 0) return;
+                lock (sums)
+                {
+                    sumYours += y;
+                    sumSuggested += s;
+                    n++;
+                }
+            });
             if (n < Math.Max(4, RolloutsPerOption / 3)) return; // too many failed: no estimate
             c.YourChance = sumYours / n;
             c.SuggestedChance = sumSuggested / n;
@@ -509,17 +630,36 @@ namespace PokemonTCG.AI
             return slots;
         }
 
+        /// <summary>
+        /// The AI for both sides of a play-out: the Neural AI (its best play every time; each side knows only its own decklist)
+        /// once it has trained, else the Learning AI.
+        /// </summary>
+        private void Agents(int seed, out IPlayerAgent mine, out IPlayerAgent theirs)
+        {
+            if (neural)
+            {
+                mine = new PolicyAgent(brain.Policy, seed * 2 + 1, seat, YourDeckList) { Greedy = true };
+                theirs = new PolicyAgent(brain.Policy, seed * 2 + 2, 1 - seat, TheirDeckList) { Greedy = true };
+                return;
+            }
+            mine = new LearningAgent(brain, seed * 2 + 1, yourDeck, theirDeck) { Record = false };
+            theirs = new LearningAgent(brain, seed * 2 + 2, theirDeck, yourDeck) { Record = false };
+        }
+
         /// <summary>Plays the position out with the AI on both sides after the given first play. 1 = you win, 0 = you lose, -1 = failed.</summary>
         private double Rollout(GameState world, DecisionOption first, int seed)
         {
             var s = world.Clone();
             s.Rng = new Rng(seed); // the same coin flips and shuffles for both plays
-            var mine = new LearningAgent(brain, seed * 2 + 1, yourDeck, theirDeck) { Record = false };
-            var theirs = new LearningAgent(brain, seed * 2 + 2, theirDeck, yourDeck) { Record = false };
+            IPlayerAgent mine, theirs;
+            Agents(seed, out mine, out theirs);
             var forced = new ForcedPlayAgent(mine, first, null);
             try
             {
                 var engine = new GameEngine(scripts, seat == 0 ? (IPlayerAgent)forced : theirs, seat == 0 ? (IPlayerAgent)theirs : forced);
+                // The wrapped agent watches the game too (the Neural AI remembers what it has seen).
+                var watcher = mine as IGameObserver;
+                if (watcher != null) engine.AddObserver(watcher);
                 engine.CheckInvariants = false;
                 engine.CardsPerPlayer = 0;
                 engine.PrizeCount = prizeCount;
@@ -583,8 +723,55 @@ namespace PokemonTCG.AI
 
         // ------------------------------------------------------------------ Habits
 
+        /// <summary>One time a habit came up in this game.</summary>
+        private sealed class HabitHit
+        {
+            public string Key = "";
+            public string Title = "";
+            public string Advice = "";
+            public int Turn;
+            public string Example = "";
+            /// <summary>0..1: the chance to win it cost when played out (Measured), else how sure the AI was.</summary>
+            public double Strength;
+            public bool Measured;
+            /// <summary>The Neural AI's probability of your play and of its own (-1 when not known).</summary>
+            public double YourProb = -1, AiProb = -1;
+
+            /// <summary>How much it counts in this game: a play-out's measured loss fully, the AI's preference alone half.</summary>
+            public double Weight { get { return Measured ? Strength : 0.5 * Strength; } }
+        }
+
+        private void Hit(string key, string title, string advice, int turn, string example, double strength, bool measured, double yourProb = -1, double aiProb = -1)
+        {
+            if (hits.Any(h => h.Key == key && h.Turn == turn)) return; // once a turn
+            hits.Add(new HabitHit
+            {
+                Key = key, Title = title, Advice = advice, Turn = turn, Example = example ?? "", Strength = strength, Measured = measured, YourProb = yourProb,
+                AiProb = aiProb
+            });
+        }
+
+        /// <summary>
+        /// Finds this game's habits: every play the AI would have made differently (sorted into kinds, like "attacking before
+        /// attaching an Energy" or "choosing Ultra Ball over Nest Ball"), plus Energy attachments and Supporters left unplayed
+        /// and a thin Bench. AddHabitItems turns them into the review's notes, with your history of each.
+        /// </summary>
         private void AddHabits(GameReview r, Dictionary<RecordedDecision, Candidate> ai, HashSet<RecordedDecision> simulated)
         {
+            // Plays the AI would have made differently.
+            foreach (var kv in ai.OrderBy(x => x.Key.Index))
+            {
+                var c = kv.Value;
+                if (c.Priority <= 0 || c.Suggested == c.Yours) continue;
+                var req = c.Decision.Request;
+                string key, title, advice;
+                Classify(req.Options[c.Yours], req.Options[c.Suggested], out key, out title, out advice);
+                bool measured = c.SuggestedChance >= 0 && c.YourChance >= 0;
+                double strength = measured ? Math.Max(0, c.SuggestedChance - c.YourChance) : c.AiProb >= 0 ? c.AiProb - c.YourProb : 0.4;
+                Hit(key, title, advice, c.Decision.Turn, "you: " + req.Options[c.Yours].Label + "; the AI: " + req.Options[c.Suggested].Label, strength, measured,
+                    c.YourProb, c.AiProb);
+            }
+
             // The last main-action decision of each of your turns (the moment you ended the turn or attacked).
             var lastOfTurn = new Dictionary<int, RecordedDecision>();
             foreach (var d in decisions)
@@ -592,11 +779,6 @@ namespace PokemonTCG.AI
                 if (d.Request == null || d.Request.Kind != DecisionKind.MainAction || d.Answer == null || d.Answer.Count != 1) continue;
                 lastOfTurn[d.Turn] = d;
             }
-
-            var noEnergy = new List<string>();
-            var noSupporter = new List<string>();
-            var thinBench = new List<int>();
-            var noAttack = new List<string>();
             foreach (var kv in lastOfTurn.OrderBy(x => x.Key))
             {
                 var d = kv.Value;
@@ -608,56 +790,209 @@ namespace PokemonTCG.AI
                 Candidate c;
                 ai.TryGetValue(d, out c);
                 double[] adjusted = c != null ? c.Adjusted : null;
+                double[] probs = c != null ? c.Probs : null;
+                string before = chosen.Action == ActionType.Attack ? "attacked" : "ended the turn";
 
                 // Energy: an attachment was still available when the turn ended (the option only exists until you attach).
                 int attach = BestIndex(req, adjusted, o => o.Action == ActionType.AttachEnergy);
-                if (attach >= 0 && (adjusted == null || adjusted[attach] >= 5))
-                    noEnergy.Add(kv.Key + " (" + req.Options[attach].Label + ")");
+                if (attach >= 0 && (probs != null ? probs[attach] >= 0.2 && probs[attach] > probs[pick] : adjusted == null || adjusted[attach] >= 5))
+                    Hit(chosen.Action == ActionType.Attack ? "attack>energy" : "end>energy", chosen.Action == ActionType.Attack ? "Attacking before you attach an Energy" : "Ending your turn without attaching an Energy",
+                        EnergyAdvice, kv.Key, "you " + before + " with " + req.Options[attach].Label + " still possible", probs != null ? probs[attach] : 0.3, false,
+                        probs != null ? probs[pick] : -1, probs != null ? probs[attach] : -1);
 
                 // Supporter: one was playable and the AI would have played it.
                 int supporter = BestIndex(req, adjusted, IsSupporter);
-                if (supporter >= 0 && adjusted != null && adjusted[supporter] >= 5)
-                    noSupporter.Add(kv.Key + " (" + req.Options[supporter].Card.Name + ")");
+                if (supporter >= 0 && (probs != null ? probs[supporter] >= 0.2 && probs[supporter] > probs[pick] : adjusted != null && adjusted[supporter] >= 5))
+                    Hit(chosen.Action == ActionType.Attack ? "attack>supporter" : "end>supporter", chosen.Action == ActionType.Attack ? "Attacking before you play your Supporter" : "Ending your turn without playing a Supporter",
+                        SupporterAdvice, kv.Key, "you " + before + " holding " + req.Options[supporter].Card.Name, probs != null ? probs[supporter] : 0.3, false,
+                        probs != null ? probs[pick] : -1, probs != null ? probs[supporter] : -1);
 
                 // Bench: one or no Benched Pokémon while a Basic could have gone down.
                 var v = req.View;
                 if (v != null && v.Me.Bench.Count <= 1 && req.Options.Any(o => o.Action == ActionType.BenchBasic && o.Card != null && o.Card.IsPokemon))
-                    thinBench.Add(kv.Key);
-
-                // Ending without attacking, when the AI would have attacked (and it wasn't simulated above).
-                if (chosen.Action == ActionType.EndTurn && !simulated.Contains(d) && c != null && c.Suggested >= 0
-                    && req.Options[c.Suggested].Action == ActionType.Attack)
-                    noAttack.Add(kv.Key + " (" + req.Options[c.Suggested].Label.Replace("Attack: ", "") + ")");
+                    Hit("thin-bench", "A thin Bench", BenchAdvice, kv.Key, (v.Me.Bench.Count == 0 ? "no" : "one") + " Benched Pokémon with a Basic you could bench", 0.2, false);
             }
+        }
 
-            if (noEnergy.Count > 0)
-                r.Items.Add(new ReviewItem
+        private const string EnergyAdvice = "One Energy attachment a turn is free tempo: even one on a Benched Pokémon gets your next attacker ready sooner.";
+        private const string SupporterAdvice = "A Supporter every turn keeps your hand and board moving, unless you're holding it for a reason (a Boss's Orders for the right moment, not wanting to discard your hand).";
+        private const string BenchAdvice = "With one or no Benched Pokémon, a Knock Out on your Active can end the game on the spot, and you have nothing ready to attack next.";
+
+        /// <summary>The kind of play an option is, for sorting habits: "attack", "end", "energy", "supporter", "item"...</summary>
+        private static string KindOf(DecisionOption o)
+        {
+            switch (o.Action)
+            {
+                case ActionType.Attack: return "attack";
+                case ActionType.EndTurn: return "end";
+                case ActionType.Retreat: return "retreat";
+                case ActionType.AttachEnergy: return "energy";
+                case ActionType.BenchBasic: return "bench";
+                case ActionType.Evolve: return "evolve";
+                case ActionType.UseAbility: return "ability";
+                case ActionType.PlayTrainer:
+                    if (o.Card == null) return "trainer";
+                    if (o.Card.IsSupporter) return "supporter";
+                    if (o.Card.IsItem) return o.Card.IsTool ? "tool" : "item";
+                    if (o.Card.IsStadium) return "stadium";
+                    return "trainer";
+                default: return o.Action.ToString().ToLowerInvariant();
+            }
+        }
+
+        /// <summary>"attach an Energy" (after "would").</summary>
+        private static string Do(string kind)
+        {
+            switch (kind)
+            {
+                case "attack": return "attack";
+                case "end": return "end the turn";
+                case "retreat": return "retreat";
+                case "energy": return "attach an Energy";
+                case "bench": return "bench a Basic";
+                case "evolve": return "evolve";
+                case "ability": return "use an Ability";
+                case "supporter": return "play your Supporter";
+                case "item": return "play an Item";
+                case "tool": return "attach a Tool";
+                case "stadium": return "play a Stadium";
+                default: return "make another play";
+            }
+        }
+
+        /// <summary>"Attaching an Energy" (to start a title).</summary>
+        private static string Doing(string kind)
+        {
+            switch (kind)
+            {
+                case "attack": return "Attacking";
+                case "end": return "Ending your turn";
+                case "retreat": return "Retreating";
+                case "energy": return "Attaching an Energy";
+                case "bench": return "Benching a Basic";
+                case "evolve": return "Evolving";
+                case "ability": return "Using an Ability";
+                case "supporter": return "Playing your Supporter";
+                case "item": return "Playing an Item";
+                case "tool": return "Attaching a Tool";
+                case "stadium": return "Playing a Stadium";
+                default: return "That play";
+            }
+        }
+
+        /// <summary>Sorts a play the AI would have made differently into a habit: its key, title and a line of advice.</summary>
+        private static void Classify(DecisionOption yours, DecisionOption ai, out string key, out string title, out string advice)
+        {
+            string ky = KindOf(yours), ka = KindOf(ai);
+            if (ky == ka)
+            {
+                string cy = yours.Card != null ? yours.Card.Name : "", ca = ai.Card != null ? ai.Card.Name : "";
+                if (cy.Length > 0 && ca.Length > 0 && cy != ca)
                 {
-                    Title = "Missed Energy attachments",
-                    Turn = FirstTurn(noEnergy),
-                    Detail = "You ended the turn without attaching an Energy on turn " + Join(noEnergy) + ". One attachment a turn is free tempo: even an Energy on a Benched Pokémon gets your next attacker ready sooner."
-                });
-            if (noSupporter.Count > 0)
-                r.Items.Add(new ReviewItem
+                    key = "card:" + ky + ":" + cy + ">" + ca;
+                    title = "Choosing " + cy + " over " + ca;
+                    advice = "In spots like this the AI would rather use " + ca + ".";
+                    return;
+                }
+                key = "target:" + ky;
+                switch (ky)
                 {
-                    Title = "Turns without a Supporter",
-                    Turn = FirstTurn(noSupporter),
-                    Detail = "You had a Supporter you could play but didn't on turn " + Join(noSupporter) + ". Unless you're holding it for a reason (saving a Boss's Orders for the right moment, not wanting to discard your hand), playing your Supporter every turn keeps your hand and board moving."
-                });
-            if (thinBench.Count > 0)
-                r.Items.Add(new ReviewItem
+                    case "energy": title = "Where you attach your Energy"; break;
+                    case "attack": title = "Which attack you use"; break;
+                    case "retreat": title = "Which Pokémon you switch in"; break;
+                    case "evolve": title = "Which Pokémon you evolve"; break;
+                    case "ability": title = "Which Ability you use"; break;
+                    case "tool": title = "Where you attach Tools"; break;
+                    case "bench": title = "Which Pokémon you bench"; break;
+                    default: title = "Which target you pick for " + Doing(ky).ToLowerInvariant(); break;
+                }
+                advice = "The same kind of play, but the AI would pick differently: think about which Pokémon needs it most over the next two turns.";
+                return;
+            }
+            key = ky + ">" + ka;
+            // Any more setting up when the AI would attack straight away is one habit, whatever the play was.
+            if (ka == "attack" && ky != "end" && ky != "retreat")
+            {
+                key = "more>attack";
+                title = "Playing on when the AI would attack right away";
+                advice = "The AI sees nothing more worth doing first: every extra play uses up cards or shows your hand for nothing, so attack now.";
+                return;
+            }
+            if (ky == "end") title = ka == "attack" ? "Ending your turn without attacking" : "Ending your turn when the AI would " + Do(ka);
+            else if (ky == "attack") title = "Attacking before you " + Do(ka);
+            else if (ka == "attack") title = Doing(ky) + " when the AI would attack right away";
+            else if (ka == "end") title = Doing(ky) + " when the AI would end the turn";
+            else if (ka == "retreat") title = Doing(ky) + " when the AI would retreat first";
+            else title = Doing(ky) + " before you " + Do(ka);
+
+            if (key == "end>attack") advice = "Unless attacking would hurt you, its damage and effects move the Prize race forward.";
+            else if (ky == "attack") advice = "Attacking ends your turn, so do everything else that helps first.";
+            else if (key == "end>energy") advice = EnergyAdvice;
+            else if (key == "end>supporter") advice = SupporterAdvice;
+            else if (ky == "end") advice = "Ending the turn early gives up a play that would have helped.";
+            else if (key == "supporter>item") advice = "Items first is usually better: they can find what the Supporter needs, and a Supporter that shuffles or discards your hand would throw them away.";
+            else if (key == "item>supporter") advice = "Here the AI would play the Supporter first, so its draw can find better targets for your Items.";
+            else if (ka == "retreat") advice = "The AI would switch your Active Pokémon first: to save it from a Knock Out, or to attack with a better one.";
+            else if (ky == "retreat") advice = "Retreating costs Energy and tempo; the AI would keep your Active Pokémon in and " + Do(ka) + ".";
+            else if (ka == "bench") advice = BenchAdvice;
+            else if (ka == "attack") advice = "The AI sees nothing more worth doing first: attack now.";
+            else if (ka == "end") advice = "The AI would stop here: that play costs you more than it gains (a card you'll want later, or a risk).";
+            else advice = "In spots like this the AI would " + Do(ka) + " first.";
+        }
+
+        /// <summary>
+        /// Adds this game's habits to your profile (in the brain) and makes the review's notes about them: when they came up
+        /// this game, what to do instead, and your history (how many of your reviewed games, more or less often lately).
+        /// </summary>
+        private void AddHabitItems(GameReview r, Dictionary<RecordedDecision, Candidate> ai)
+        {
+            var byKey = hits.GroupBy(h => h.Key).ToList();
+            var found = byKey.Select(g => new HabitInGame { Key = g.Key, Title = g.First().Title, Times = g.Count(), Strength = g.Average(h => h.Strength) }).ToList();
+            List<PlayHabit> history;
+            if (RecordHabits && brain != null)
+            {
+                history = brain.RecordHabits(found);
+                r.HabitReviews = brain.HabitReviews;
+            }
+            else
+            {
+                history = found.Select(f => new PlayHabit { Key = f.Key, Title = f.Title, Games = 1, Times = f.Times, Strength = f.Strength * f.Times, Recent = LearningBrain.HabitRecency }).ToList();
+                r.HabitReviews = brain != null ? brain.HabitReviews + 1 : 1;
+            }
+            int reviews = Math.Max(1, r.HabitReviews);
+            // The ones that matter most this game first: how much each cost, times how often it came up. A habit whose plays were
+            // played out and made no real difference (under 2 points of chance to win) isn't worth a note: the measurement beats
+            // the AI's preference.
+            var ranked = byKey.Where(g => !g.Any(h => h.Measured) || g.Where(h => h.Measured).Average(h => h.Strength) >= 0.02)
+                              .OrderByDescending(g => g.Sum(h => h.Weight)).ThenBy(g => g.Min(h => h.Turn)).Take(5).ToList();
+            foreach (var g in ranked)
+            {
+                var list = g.OrderBy(h => h.Turn).ToList();
+                var first = list[0];
+                var h = history.FirstOrDefault(x => x.Key == g.Key) ?? new PlayHabit { Key = g.Key, Games = 1 };
+                var sb = new StringBuilder();
+                sb.Append("This game: turn ").Append(first.Turn).Append(" (").Append(first.Example).Append(")");
+                var more = list.Skip(1).Select(x => x.Turn.ToString(CultureInfo.InvariantCulture)).Distinct().ToList();
+                if (more.Count > 0) sb.Append(", and turn").Append(more.Count == 1 ? " " : "s ").Append(Join(more));
+                sb.Append(". ").Append(first.Advice).Append(' ');
+                if (h.Games <= 1) sb.Append("The first time the review has seen this from you.");
+                else
                 {
-                    Title = "A thin Bench",
-                    Turn = thinBench[0],
-                    Detail = "On turn " + Join(thinBench.Select(t => t.ToString()).ToList()) + " you ended with one or no Benched Pokémon while you had a Basic Pokémon you could bench. If your Active Pokémon is Knocked Out with nothing to promote, you lose on the spot, and a thin Bench also limits your next attacker."
-                });
-            if (noAttack.Count > 0)
-                r.Items.Add(new ReviewItem
-                {
-                    Title = "Turns without an attack",
-                    Turn = FirstTurn(noAttack),
-                    Detail = "You ended your turn without attacking on turn " + Join(noAttack) + ", although the AI would have attacked. Chip damage adds up, and many attacks also have useful effects."
-                });
+                    sb.Append("It has come up in ").Append(h.Games).Append(" of your ").Append(reviews).Append(" reviewed games");
+                    double usual = (h.Games - 1) / (double)Math.Max(1, reviews - 1);
+                    if (reviews >= 5 && h.RecentBefore < usual * 0.7) sb.Append(", less often lately than it used to: you're improving here");
+                    else if (reviews >= 5 && h.RecentBefore > usual * 1.3) sb.Append(", more often lately");
+                    sb.Append('.');
+                }
+                var measured = list.Where(x => x.Measured).ToList();
+                var rated = list.FirstOrDefault(x => x.AiProb >= 0 && x.YourProb >= 0);
+                if (measured.Count > 0)
+                    sb.Append(" Played out from the position, it cost about ").Append(Percent(measured.Average(x => x.Strength))).Append(" chance to win.");
+                else if (rated != null)
+                    sb.Append(" On turn ").Append(rated.Turn).Append(" the Neural AI would have made your play ").Append(Percent(rated.YourProb))
+                      .Append(" of the time and its own ").Append(Percent(rated.AiProb)).Append('.');
+                r.Items.Add(new ReviewItem { Section = ReviewItem.Habits, Turn = first.Turn, Title = first.Title, Detail = sb.ToString() });
+            }
         }
 
         private static int BestIndex(DecisionRequest r, double[] adjusted, Func<DecisionOption, bool> match)
@@ -759,10 +1094,12 @@ namespace PokemonTCG.AI
         /// </summary>
         private PlayerView Play(GameState snapshot, DecisionOption first, Queue<RecordedDecision> replay, bool finishTurn, List<string> log, out PlayerView afterFirst)
         {
-            var mine = new LearningAgent(brain, 11, yourDeck, theirDeck) { Record = false };
-            var theirs = new LearningAgent(brain, 12, theirDeck, yourDeck) { Record = false };
+            IPlayerAgent mine, theirs;
+            Agents(5, out mine, out theirs);
             var forced = new ForcedPlayAgent(mine, first, replay);
             var engine = NewEngine(forced, theirs);
+            var watcher = mine as IGameObserver;
+            if (watcher != null) engine.AddObserver(watcher);
             var collector = new TextLog(log);
             engine.AddObserver(collector);
             engine.LoadState(snapshot.Clone());

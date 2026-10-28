@@ -170,10 +170,24 @@ namespace PokemonTCG.AI
                 double share = (double)times / n;
                 items.Add(new KeyValuePair<double, string>(share, flag + ": in " + times + " of your last " + n + " games. " + advice));
             };
-            habit("Missed Energy attachments", "Attach an Energy every turn you can, even to a Benched Pokémon, so your next attacker is ready on time.");
-            habit("Turns without a Supporter", "Play a Supporter every turn unless you're saving it on purpose; draw and search keep your turns going.");
-            habit("A thin Bench", "Keep at least two Benched Pokémon: a Knock Out with nothing to promote loses the game, and a deeper Bench gives you options.");
-            habit("Turns without an attack", "Attack whenever it doesn't cost you anything: chip damage sets up Knock Outs later.");
+            const string energy = "Attach an Energy every turn you can, even to a Benched Pokémon, so your next attacker is ready on time.";
+            const string supporter = "Play a Supporter every turn unless you're saving it on purpose; draw and search keep your turns going.";
+            const string bench = "Keep at least two Benched Pokémon: a Knock Out with nothing to promote loses the game, and a deeper Bench gives you options.";
+            const string attack = "Attack whenever it doesn't cost you anything: chip damage sets up Knock Outs later.";
+            // The review's habits (older games used the first four names).
+            var known = new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                { "Missed Energy attachments", energy }, { "Turns without a Supporter", supporter }, { "A thin Bench", bench }, { "Turns without an attack", attack },
+                { "Ending your turn without attaching an Energy", energy }, { "Attacking before you attach an Energy", energy },
+                { "Ending your turn without playing a Supporter", supporter }, { "Attacking before you play your Supporter", supporter },
+                { "Ending your turn without attacking", attack }
+            };
+            var summaryFlags = new HashSet<string> { FlagLostLead, FlagDeckedOut, FlagNoPokemon };
+            foreach (var flag in reviewed.SelectMany(g => g.Flags).Where(f => !summaryFlags.Contains(f)).Distinct())
+            {
+                string advice;
+                habit(flag, known.TryGetValue(flag, out advice) ? advice : "The review's notes after each game say when it came up and what the AI would do instead.");
+            }
             habit(FlagLostLead, "You were ahead in the Prize race and lost it: plan the last Prizes, keep a backup attacker and don't give up easy Knock Outs.");
             habit(FlagDeckedOut, "Watch how many cards your draw and search use up late in the game.");
             habit(FlagNoPokemon, "Keep a Benched Pokémon ready to replace your Active Pokémon.");

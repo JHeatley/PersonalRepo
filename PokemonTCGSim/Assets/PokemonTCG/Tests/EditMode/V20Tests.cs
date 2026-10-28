@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -246,6 +247,89 @@ namespace PokemonTCG.Tests
                 Assert.Greater(item.SuggestedChance, item.YourChance);
                 Assert.IsNotNull(item.Before, "previews were built");
             }
+        }
+
+        [Test]
+        public void Areas_Of_Improvement_Uses_The_Neural_AI_And_Keeps_Your_Habits_Across_Games()
+        {
+            var brain = new LearningBrain();
+            brain.Policy.Reset();
+            // A round of self-play, so the network has opinions (a fresh one rates every option the same) and counts as trained.
+            var decks = new List<KeyValuePair<string, List<CardDef>>>
+            {
+                new KeyValuePair<string, List<CardDef>>("Dragapult", Dragapult()),
+                new KeyValuePair<string, List<CardDef>>("Zoroark", Zoroark())
+            };
+            var trainer = new PolicyTrainer(brain.Policy, StandardCards.CreateRegistry(), decks, 8) { GamesPerRound = 6, Threads = 2, Minibatch = 256 };
+            trainer.Round();
+            trainer.Dispose();
+            brain.Policy.GamesTrained = Math.Max(1, brain.Policy.GamesTrained);
+            GameReview last = null;
+            for (int game = 0; game < 2; game++)
+            {
+                var log = new DecisionLog();
+                var events = new EventCollector();
+                var engine = new GameEngine(StandardCards.CreateRegistry(), new RecordingAgent(new RandomAgent(30 + game), log), new HeuristicAgent(40 + game));
+                engine.AddObserver(events);
+                RecordGame(engine, log, Dragapult(), Zoroark(), 303 + game);
+                var analyzer = new GameAnalyzer(StandardCards.CreateRegistry(), brain, log.Decisions(), events.Entries(), 0, "Dragapult", "Zoroark", engine.State, engine.PrizeCount)
+                {
+                    RolloutsPerOption = 4,
+                    MaxCandidates = 2,
+                    RolloutTurnCap = 10,
+                    // A barely trained network has no strong opinions yet: count any play it doesn't rank first, to exercise the habits.
+                    NeuralGap = 0,
+                    NeuralKeepsYours = 0.95,
+                    YourDeckList = engine.StartingDeck(0).ToList(),
+                    TheirDeckList = engine.StartingDeck(1).ToList()
+                };
+                last = analyzer.Run();
+                string phase, error;
+                int done, total;
+                bool finished;
+                analyzer.Progress(out phase, out done, out total, out finished, out error);
+                Assert.IsNull(error, error);
+                Assert.AreEqual("Neural AI", last.Judge);
+                Assert.Greater(last.DecisionsCompared, 0);
+                Assert.Greater(last.Differences, 0, "a random player plays differently from the network");
+                Assert.AreEqual(game + 1, last.HabitReviews);
+                foreach (var item in last.Items.Where(i => i.Section == ReviewItem.BetterPlays)) Assert.Greater(item.SuggestedChance, item.YourChance);
+            }
+            var habits = last.Items.Where(i => i.Section == ReviewItem.Habits).ToList();
+            Assert.IsNotEmpty(habits);
+            Assert.LessOrEqual(habits.Count, 5);
+            foreach (var h in habits)
+            {
+                StringAssert.StartsWith("This game: turn ", h.Detail);
+                Assert.IsTrue(h.Detail.Contains("reviewed games") || h.Detail.Contains("first time"), h.Detail);
+            }
+            Assert.AreEqual(2, brain.HabitReviews);
+            var profile = brain.Habits();
+            Assert.IsNotEmpty(profile);
+            Assert.IsTrue(profile.All(x => x.Games >= 1 && x.Games <= 2 && x.Times >= x.Games && x.Recent > 0 && !string.IsNullOrEmpty(x.Title)));
+
+            // Kept in the brain's file.
+            var copy = new LearningBrain();
+            copy.LoadText(brain.Serialize());
+            Assert.AreEqual(2, copy.HabitReviews);
+            Assert.AreEqual(profile.Count, copy.Habits().Count);
+            Assert.AreEqual(profile.Sum(x => x.Times), copy.Habits().Sum(x => x.Times));
+        }
+
+        [Test]
+        public void Habits_Get_Rarer_Lately_When_They_Stop_Coming_Up()
+        {
+            var brain = new LearningBrain();
+            var habit = new HabitInGame { Key = "end>energy", Title = "Ending your turn without attaching an Energy", Times = 2, Strength = 0.4 };
+            for (int i = 0; i < 5; i++) brain.RecordHabits(new List<HabitInGame> { habit });
+            double often = brain.Habits().Single().Recent;
+            for (int i = 0; i < 5; i++) brain.RecordHabits(new List<HabitInGame>());
+            var h = brain.Habits().Single();
+            Assert.Less(h.Recent, often / 2);
+            Assert.AreEqual(5, h.Games);
+            Assert.AreEqual(10, h.Times);
+            Assert.AreEqual(0.4, h.AverageStrength, 1e-9);
+            Assert.AreEqual(10, brain.HabitReviews);
         }
 
         [Test]

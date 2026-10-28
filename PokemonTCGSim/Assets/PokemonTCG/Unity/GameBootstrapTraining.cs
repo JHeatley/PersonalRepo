@@ -300,7 +300,11 @@ namespace PokemonTCG.Presentation
             string yourDeck = deckNames[seat] ?? "";
             string theirDeck = deckNames[1 - seat] ?? "";
             var b = brain;
-            var a = new GameAnalyzer(StandardCards.CreateRegistry(), b, decisions, events, seat, yourDeck, theirDeck, state, engine.PrizeCount, engine.Rules);
+            var a = new GameAnalyzer(StandardCards.CreateRegistry(), b, decisions, events, seat, yourDeck, theirDeck, state, engine.PrizeCount, engine.Rules)
+            {
+                YourDeckList = engine.StartingDeck(seat) != null ? engine.StartingDeck(seat).ToList() : null,
+                TheirDeckList = engine.StartingDeck(1 - seat) != null ? engine.StartingDeck(1 - seat).ToList() : null
+            };
             StartReview(a, yourDeck, theirDeck);
             BeginRatedGame(state, seat, yourDeck, theirDeck); // v157: after StartReview (it rates any earlier game left waiting)
             learnStatus = b != null && bot != null ? "The AI is learning from this game..." : null;
