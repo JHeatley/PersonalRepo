@@ -147,6 +147,31 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
+        public void Stopping_A_Neural_Training_Session_Stops_It_Quickly()
+        {
+            var brain = new LearningBrain();
+            brain.Policy.Reset();
+            brain.Policy.GamesTrained = 1;
+            var session = new TrainingSession(StandardCards.CreateRegistry(), brain, "Dragapult", Dragapult(), "Zoroark", Zoroark(), 100000, 0, 99)
+            {
+                Style = AiStyle.Neural
+            };
+            session.Start();
+            var clock = System.Diagnostics.Stopwatch.StartNew();
+            while (session.Status().Done < 2 && clock.Elapsed.TotalSeconds < 60) System.Threading.Thread.Sleep(50);
+            long steps = brain.Policy.Steps;
+            clock.Restart();
+            session.Cancel();
+            session.Join(30000);
+            var st = session.Status();
+            Assert.IsTrue(st.Finished, "stopped");
+            Assert.IsTrue(st.Cancelled);
+            Assert.Less(clock.Elapsed.TotalSeconds, 15, "games in progress are abandoned and the unfinished batch isn't learned from");
+            Assert.AreEqual(0, st.Errors, st.LastError);
+            Assert.AreEqual(steps, brain.Policy.Steps, "no learning step after Stop");
+        }
+
+        [Test]
         public void The_Trainer_Learns_From_Games_Against_Itself_Its_Past_And_The_Classic_Bot()
         {
             var net = new PolicyNet();

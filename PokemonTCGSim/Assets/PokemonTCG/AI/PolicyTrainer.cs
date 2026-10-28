@@ -55,6 +55,13 @@ namespace PokemonTCG.AI
         public int PrizeCount = 6;
         /// <summary>Called between games; return true to stop early (the round still learns from the games it finished).</summary>
         public Func<bool> ShouldStop;
+        /// <summary>
+        /// Called often; return true to stop right away (the Stop button): games in progress are abandoned and the round
+        /// doesn't learn from its unfinished batch.
+        /// </summary>
+        public Func<bool> Abort;
+
+        private bool Aborted { get { return Abort != null && Abort(); } }
         /// <summary>Called after each game (on the thread that played it).</summary>
         public Action<PolicyGame> GameFinished;
         /// <summary>
@@ -112,6 +119,7 @@ namespace PokemonTCG.AI
                         }
                         var started = DateTime.UtcNow;
                         var result = PlayOne(baseSeed + g * 3, poolNow);
+                        if (result == null) return; // stopped mid-game
                         lock (gate)
                         {
                             Merge(round, result.Item2);
@@ -121,11 +129,12 @@ namespace PokemonTCG.AI
                         if (GameFinished != null) GameFinished(result.Item3);
                         WorkThrottle.Rest(DateTime.UtcNow - started, () => ShouldStop != null && ShouldStop()); // the battery saver
                     }
-                }) { IsBackground = true, Name = "Neural AI training" };
+                }) { IsBackground = true, Name = "Neural AI training", Priority = ThreadPriority.BelowNormal };
                 workers.Add(th);
                 th.Start();
             }
             foreach (var th in workers) th.Join();
+            if (Aborted) return round;
             if (samples.Count > 0) Learn(samples, round);
             Net.GamesTrained += round.Games;
             rounds++;
@@ -179,11 +188,11 @@ namespace PokemonTCG.AI
                 theirs = decks[rng.Next(decks.Count)];
             }
             var game = new PolicyGame { LearnerDeck = mine.Key, OpponentDeck = theirs.Key };
-            var learner = new PolicyAgent(Net, seed + 1, seat, mine.Value) { Greedy = false, Record = true };
+            var learner = new PolicyAgent(Net, seed + 1, seat, mine.Value) { Greedy = false, Record = true, Abort = Abort };
             IPlayerAgent other;
             PolicyAgent otherLearner = null;
-            if (mode == 0) other = otherLearner = new PolicyAgent(Net, seed + 2, 1 - seat, theirs.Value) { Greedy = false, Record = true };
-            else if (mode == 1) other = new PolicyAgent(poolNow[rng.Next(poolNow.Length)], seed + 2, 1 - seat, theirs.Value) { Greedy = false };
+            if (mode == 0) other = otherLearner = new PolicyAgent(Net, seed + 2, 1 - seat, theirs.Value) { Greedy = false, Record = true, Abort = Abort };
+            else if (mode == 1) other = new PolicyAgent(poolNow[rng.Next(poolNow.Length)], seed + 2, 1 - seat, theirs.Value) { Greedy = false, Abort = Abort };
             else other = new HeuristicAgent(seed + 2);
             try
             {
@@ -216,8 +225,13 @@ namespace PokemonTCG.AI
                     foreach (var step in a.Trajectory) r.Mistakes += step.Mistakes;
                 }
             }
+            catch (OperationCanceledException)
+            {
+                return null;
+            }
             catch (Exception e)
             {
+                if (Aborted) return null;
                 r.Errors = 1;
                 r.LastError = "seed " + seed + ": " + e.GetType().Name + ": " + e.Message;
                 game.Error = r.LastError;
@@ -279,8 +293,10 @@ namespace PokemonTCG.AI
                 }
                 for (int start = 0; start < order.Length; start += Minibatch)
                 {
+                    if (Aborted) break;
                     int count = Math.Min(Minibatch, order.Length - start);
                     var g = Gradients(samples, adv, order, start, count);
+                    if (Aborted) break;
                     Net.Apply(g, count);
                     round.PolicyLoss += g.PolicyLoss / count;
                     round.ValueLoss += g.ValueLoss / count;
@@ -303,7 +319,7 @@ namespace PokemonTCG.AI
         /// <summary>Summed PPO gradients of a minibatch, computed on several threads.</summary>
         private PolicyNet.Grad Gradients(List<Sample> samples, float[] adv, int[] order, int start, int count)
         {
-            int threads = Math.Max(1, Math.Min(Threads, count / 16 + 1));
+            int threads = Math.Max(1, Math.Min(WorkThrottle.Threads(Threads), count / 16 + 1));
             var grads = new PolicyNet.Grad[threads];
             var workers = new Thread[threads];
             for (int t = 0; t < threads; t++)
@@ -314,11 +330,12 @@ namespace PokemonTCG.AI
                     var g = Net.NewGrad();
                     for (int k = tt; k < count; k += threads)
                     {
+                        if (Aborted) break;
                         int i = order[start + k];
                         Accumulate(samples[i], adv[i], g);
                     }
                     grads[tt] = g;
-                }) { IsBackground = true, Name = "Neural AI learning" };
+                }) { IsBackground = true, Name = "Neural AI learning", Priority = ThreadPriority.BelowNormal };
                 workers[t].Start();
             }
             foreach (var w in workers) w.Join();
@@ -415,7 +432,7 @@ namespace PokemonTCG.AI
                             else d++;
                         }
                     }
-                }) { IsBackground = true, Name = "Neural AI measuring" };
+                }) { IsBackground = true, Name = "Neural AI measuring", Priority = ThreadPriority.BelowNormal };
                 workers.Add(th);
                 th.Start();
             }

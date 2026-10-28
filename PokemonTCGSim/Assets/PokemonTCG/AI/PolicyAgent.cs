@@ -42,6 +42,9 @@ namespace PokemonTCG.AI
         public readonly List<PolicyStep> Trajectory = new List<PolicyStep>();
         public int Seat { get { return Memory.Seat; } }
 
+        /// <summary>When this returns true, the game is abandoned at the agent's next decision (training was stopped).</summary>
+        public Func<bool> Abort;
+
         /// <summary>Counts for the sequencing report.</summary>
         public int Attacks, AttacksWithResourcesLeft, Shuffles, ShufflesWithPlaysLeft, DrewThenShuffled;
         private readonly Rng rng;
@@ -61,6 +64,7 @@ namespace PokemonTCG.AI
 
         public List<int> Decide(DecisionRequest r)
         {
+            if (Abort != null && Abort()) throw new OperationCanceledException("training stopped");
             var picked = new List<int>();
             if (r == null || r.Options.Count == 0 || r.MaxChoices <= 0) return picked;
             if (Memory.Seat < 0) Memory.Seat = r.Player;

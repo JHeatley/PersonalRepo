@@ -371,6 +371,7 @@ namespace PokemonTCG.AI
             };
             int played = 0;
             trainer.ShouldStop = () => cancel || Volatile.Read(ref played) >= Games;
+            trainer.Abort = () => cancel; // Stop: leave the games in progress and don't learn from the unfinished batch
             trainer.GameFinished = game =>
             {
                 int g = Interlocked.Increment(ref played) - 1;
