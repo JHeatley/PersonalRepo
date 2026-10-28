@@ -368,7 +368,11 @@ namespace PokemonTCG.AI
                 PrizeCount = PrizeCount,
                 GamesPerRound = Math.Max(8, Math.Min(64, Games)),
                 // Leave two cores for the app itself (the screen and the garbage collector), so it stays responsive.
-                Threads = Math.Max(1, Environment.ProcessorCount - 2),
+                // Half the cores, a short rest after each learning step and the memory tidied between phases: a long session in the
+                // app shouldn't push the PC as hard as a stress test does. (The command-line trainer uses every core.)
+                Threads = Math.Max(1, Environment.ProcessorCount / 2),
+                RestShare = 0.25,
+                CollectGarbage = true,
                 GameBudget = Games
             };
             int played = 0;
@@ -411,6 +415,18 @@ namespace PokemonTCG.AI
                     }
                 }
             };
+            try
+            {
+                TrainNeuralRounds(trainer, () => Volatile.Read(ref played));
+            }
+            finally
+            {
+                trainer.Dispose();
+            }
+        }
+
+        private void TrainNeuralRounds(PolicyTrainer trainer, Func<int> playedSoFar)
+        {
             long skippedBefore = brain.Policy.SkippedSteps;
             // Progress, shown on the status line: sequencing mistakes per game (they should fall), and, when measuring is on,
             // a check against the classic bot every fifth of the session on the same games each time (it should rise).
@@ -419,7 +435,7 @@ namespace PokemonTCG.AI
             var checks = new List<string>();
             int checkEvery = Math.Max(250, Games / 5), nextCheck = checkEvery;
             int checkSeed = seedBase + 700000;
-            while (!cancel && Volatile.Read(ref played) < Games)
+            while (!cancel && playedSoFar() < Games)
             {
                 var round = trainer.Round();
                 brain.IncrementCounters(round.Games, 0, 0);
@@ -429,7 +445,7 @@ namespace PokemonTCG.AI
                     if (firstMistakes < 0) firstMistakes = m;
                     recentMistakes = recentMistakes < 0 ? m : 0.7 * recentMistakes + 0.3 * m;
                 }
-                int done = Volatile.Read(ref played);
+                int done = playedSoFar();
                 if (EvalGames > 0 && done >= nextCheck && done < Games && !cancel)
                 {
                     while (nextCheck <= done) nextCheck += checkEvery;

@@ -107,11 +107,11 @@ namespace PokemonTCG.AI
             int baseSeed = Interlocked.Add(ref seedCounter, GamesPerRound * 3);
             PolicyNet[] poolNow;
             lock (pool) poolNow = pool.ToArray();
-            var workers = new List<Thread>();
-            int threads = Math.Max(1, Math.Min(WorkThrottle.Threads(Threads), GamesPerRound));
-            for (int t = 0; t < threads; t++)
+            int threads = Math.Max(1, Math.Min(Math.Min(WorkThrottle.Threads(Threads), Pool.Count), GamesPerRound));
+            Log("[PokemonTCG] Neural AI round " + (rounds + 1) + ": playing " + GamesPerRound + " games on " + threads + " threads...");
+            Pool.Run(t =>
             {
-                var th = new Thread(() =>
+                if (t >= threads) return;
                 {
                     while (true)
                     {
@@ -134,16 +134,19 @@ namespace PokemonTCG.AI
                         if (GameFinished != null) GameFinished(result.Item3);
                         WorkThrottle.Rest(DateTime.UtcNow - started, () => ShouldStop != null && ShouldStop()); // the battery saver
                     }
-                }) { IsBackground = true, Name = "Neural AI training", Priority = ThreadPriority.BelowNormal };
-                workers.Add(th);
-                th.Start();
-            }
-            foreach (var th in workers) th.Join();
+                }
+            });
             round.CollectSeconds = clock.Elapsed.TotalSeconds;
             if (Aborted) return round;
+            if (CollectGarbage) GC.Collect();
             clock.Restart();
+            Log("[PokemonTCG] Neural AI round " + (rounds + 1) + ": played " + round.Games + " games in " + round.CollectSeconds.ToString("0.0") + "s; learning from "
+                + samples.Count + " decisions (" + PolicyNet.MathName + ", memory " + (GC.GetTotalMemory(false) / 1000000) + " MB)...");
             if (samples.Count > 0) Learn(samples, round);
             round.LearnSeconds = clock.Elapsed.TotalSeconds;
+            if (CollectGarbage) GC.Collect();
+            Log("[PokemonTCG] Neural AI round " + (rounds + 1) + ": learned in " + round.LearnSeconds.ToString("0.0") + "s (" + Net.Steps + " learning steps so far"
+                + (Net.SkippedSteps > 0 ? ", " + Net.SkippedSteps + " skipped" : "") + ").");
             Net.GamesTrained += round.Games;
             rounds++;
             if (SnapshotEvery > 0 && rounds % SnapshotEvery == 0)
@@ -305,7 +308,12 @@ namespace PokemonTCG.AI
                 {
                     if (Aborted) break;
                     int count = Math.Min(Minibatch, order.Length - start);
+                    var stepStart = DateTime.UtcNow;
                     var g = Gradients(samples, adv, order, start, count);
+                    // The battery saver and the rest setting apply to learning too (it's the heaviest work: vector maths on
+                    // every thread), not only to playing games.
+                    WorkThrottle.Rest(DateTime.UtcNow - stepStart, () => Aborted);
+                    if (RestShare > 0) Thread.Sleep((int)Math.Min(2000, (DateTime.UtcNow - stepStart).TotalMilliseconds * RestShare));
                     if (Aborted) break;
                     Net.Apply(g, count);
                     round.PolicyLoss += g.PolicyLoss / count;
@@ -329,15 +337,13 @@ namespace PokemonTCG.AI
         /// <summary>Summed PPO gradients of a minibatch, computed on several threads.</summary>
         private PolicyNet.Grad Gradients(List<Sample> samples, float[] adv, int[] order, int start, int count)
         {
-            int threads = Math.Max(1, Math.Min(WorkThrottle.Threads(Threads), count / 16 + 1));
+            int threads = Math.Max(1, Math.Min(Math.Min(WorkThrottle.Threads(Threads), Pool.Count), count / 16 + 1));
             var grads = new PolicyNet.Grad[threads];
             var failures = new Exception[threads];
             if (gradPool.Length < threads) Array.Resize(ref gradPool, threads);
-            var workers = new Thread[threads];
-            for (int t = 0; t < threads; t++)
+            Pool.Run(tt =>
             {
-                int tt = t;
-                workers[t] = new Thread(() =>
+                if (tt >= threads) return;
                 {
                     try
                     {
@@ -355,10 +361,8 @@ namespace PokemonTCG.AI
                     {
                         failures[tt] = e;
                     }
-                }) { IsBackground = true, Name = "Neural AI learning", Priority = ThreadPriority.BelowNormal };
-                workers[t].Start();
-            }
-            foreach (var w in workers) w.Join();
+                }
+            });
             // A learning thread that failed is reported on this thread (training stops with the error) instead of dying alone.
             foreach (var e in failures) if (e != null) throw new InvalidOperationException("Neural AI learning failed: " + e.Message, e);
             for (int t = 1; t < threads; t++) grads[0].Add(grads[t]);
@@ -366,6 +370,124 @@ namespace PokemonTCG.AI
         }
 
         private PolicyNet.Grad[] gradPool = new PolicyNet.Grad[0];
+
+        /// <summary>Where progress messages go (the Unity console in the app); null: nowhere.</summary>
+        public static Action<string> LogTo;
+
+        private static void Log(string message)
+        {
+            var log = LogTo;
+            if (log != null) log(message);
+        }
+
+        private Workers pool2;
+
+        /// <summary>The trainer's long-lived threads (they keep their reused working memory between rounds).</summary>
+        private Workers Pool
+        {
+            get
+            {
+                if (pool2 == null) pool2 = new Workers(Math.Max(1, Threads));
+                return pool2;
+            }
+        }
+
+        /// <summary>Ends the trainer's threads (call when done with it).</summary>
+        public void Dispose()
+        {
+            if (pool2 != null) pool2.Dispose();
+            pool2 = null;
+        }
+
+        /// <summary>
+        /// A few threads that stay alive and run the trainer's work: Run(job) calls job(0) ... job(Count - 1), one on each, and
+        /// waits for all of them. They run below normal priority so the app's own thread stays responsive.
+        /// </summary>
+        private sealed class Workers
+        {
+            private readonly Thread[] threads;
+            private readonly object sync = new object();
+            private Action<int> job;
+            private int generation, remaining;
+            private Exception failure;
+            private bool stopping;
+
+            public int Count { get { return threads.Length; } }
+
+            public Workers(int count)
+            {
+                threads = new Thread[count];
+                for (int i = 0; i < count; i++)
+                {
+                    int index = i;
+                    threads[i] = new Thread(() => Loop(index)) { IsBackground = true, Name = "Neural AI worker " + (i + 1), Priority = ThreadPriority.BelowNormal };
+                    threads[i].Start();
+                }
+            }
+
+            private void Loop(int index)
+            {
+                int seen = 0;
+                while (true)
+                {
+                    Action<int> work;
+                    lock (sync)
+                    {
+                        while (generation == seen && !stopping) Monitor.Wait(sync);
+                        if (stopping) return;
+                        seen = generation;
+                        work = job;
+                    }
+                    try
+                    {
+                        work(index);
+                    }
+                    catch (Exception e)
+                    {
+                        lock (sync) if (failure == null) failure = e;
+                    }
+                    lock (sync)
+                    {
+                        if (--remaining == 0) Monitor.PulseAll(sync);
+                    }
+                }
+            }
+
+            public void Run(Action<int> work)
+            {
+                Exception failed;
+                lock (sync)
+                {
+                    job = work;
+                    failure = null;
+                    remaining = threads.Length;
+                    generation++;
+                    Monitor.PulseAll(sync);
+                    while (remaining > 0) Monitor.Wait(sync);
+                    failed = failure;
+                    job = null;
+                }
+                if (failed != null) throw new InvalidOperationException("Neural AI training failed: " + failed.Message, failed);
+            }
+
+            public void Dispose()
+            {
+                lock (sync)
+                {
+                    stopping = true;
+                    Monitor.PulseAll(sync);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Rest after each learning step for this share of the time it took (0.25: a step of 4 seconds is followed by 1 second's
+        /// rest), so a long session doesn't keep every core at full load. 0 in the command-line trainer.
+        /// </summary>
+        public double RestShare;
+
+        /// <summary>Collect garbage between playing and learning (keeps the memory a round needs from piling up in Unity).</summary>
+        public bool CollectGarbage;
 
         /// <summary>With a negative advantage, ratios above this stop pushing (dual-clip PPO).</summary>
         public double DualClip = 3.0;
@@ -433,10 +555,10 @@ namespace PokemonTCG.AI
         {
             int w = 0, d = 0, l = 0, next = 0;
             object gate = new object();
-            var workers = new List<Thread>();
-            for (int t = 0; t < Math.Max(1, Math.Min(Threads, games)); t++)
+            int threads = Math.Max(1, Math.Min(Pool.Count, games));
+            Pool.Run(t =>
             {
-                var th = new Thread(() =>
+                if (t >= threads) return;
                 {
                     while (true)
                     {
@@ -487,11 +609,8 @@ namespace PokemonTCG.AI
                             else d++;
                         }
                     }
-                }) { IsBackground = true, Name = "Neural AI measuring", Priority = ThreadPriority.BelowNormal };
-                workers.Add(th);
-                th.Start();
-            }
-            foreach (var th in workers) th.Join();
+                }
+            });
             wins = w;
             draws = d;
             losses = l;
