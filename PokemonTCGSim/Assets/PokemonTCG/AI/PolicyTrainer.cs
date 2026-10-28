@@ -476,7 +476,8 @@ namespace PokemonTCG.AI
                     try
                     {
                         // Each thread keeps its gradient buffer (8 MB) from one learning step to the next.
-                        var g = gradPool[tt] ?? (gradPool[tt] = Net.NewGrad());
+                        var g = gradPool[tt];
+                        if (g == null || !g.Fits(Net)) gradPool[tt] = g = Net.NewGrad(); // new, or the network was made bigger
                         g.Clear();
                         // This thread's share of the minibatch, a few decisions at a time (the network is faster in batches).
                         var mine = new List<int>();

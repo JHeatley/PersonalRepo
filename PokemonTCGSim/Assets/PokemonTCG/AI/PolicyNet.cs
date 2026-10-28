@@ -108,7 +108,12 @@ namespace PokemonTCG.AI
     /// </summary>
     public sealed class PolicyNet
     {
-        public const int CardDim = 48, SlotDim = 96, Width = 384, Blocks = 3, OptionDim = 128, StaticSize = 64;
+        public const int CardDim = 48, SlotDim = 96, Width = 384, OptionDim = 128, StaticSize = 64;
+        /// <summary>
+        /// Residual blocks in the trunk: a new network has DefaultBlocks, Grow makes it deeper (BigBlocks: the Make the network bigger
+        /// button), and loading takes whatever the file has, up to MaxBlocks.
+        /// </summary>
+        public const int DefaultBlocks = 3, BigBlocks = 6, MaxBlocks = 12;
         public const int SlotIn = 2 * CardDim + PolicyInput.SlotFeatures;
         public const int BagSize = CardDim + 1;
         public const int StateSize = PolicyInput.NumSlots * SlotDim + 3 * BagSize + 2 * CardDim + PolicyInput.GlobalFeatures
@@ -161,10 +166,13 @@ namespace PokemonTCG.AI
         /// <summary>Card vectors for the current weights, by row (filled as they're needed; cleared when the weights change).</summary>
         private float[][] cardCache = new float[0][];
 
-        private readonly Param projW, projB, slot0W, slot0B, slot2W, slot2B, inpW, inpB, finalLnG, finalLnB, kind,
+        private Param projW, projB, slot0W, slot0B, slot2W, slot2B, inpW, inpB, finalLnG, finalLnB, kind,
             opt0W, opt0B, opt2W, opt2B, queryW, queryB, score1W, score1B, score3W, score3B, value0W, value0B, value2W, value2B, noneSlot;
-        private readonly Param[] lnG = new Param[Blocks], lnB = new Param[Blocks], b1W = new Param[Blocks], b1B = new Param[Blocks],
-            b3W = new Param[Blocks], b3B = new Param[Blocks];
+        private Param[] lnG, lnB, b1W, b1B, b3W, b3B;
+        private int blocks;
+
+        /// <summary>Residual blocks in the trunk (3 at first; more after Grow, or when a bigger network is loaded).</summary>
+        public int Blocks { get { return Volatile.Read(ref blocks); } }
 
         private readonly ReaderWriterLockSlim rw = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         private long steps;
@@ -217,8 +225,29 @@ namespace PokemonTCG.AI
         /// </summary>
         public bool Trained { get { return Steps > 0 || GamesTrained > 0 || !string.IsNullOrEmpty(Origin); } }
 
-        public PolicyNet()
+        public PolicyNet() : this(DefaultBlocks)
         {
+        }
+
+        /// <summary>A fresh network with this many residual blocks.</summary>
+        public PolicyNet(int blocks)
+        {
+            if (blocks < 1 || blocks > MaxBlocks) throw new ArgumentOutOfRangeException("blocks");
+            Build(blocks);
+            InitRandom(1);
+        }
+
+        /// <summary>Makes the parameters (zeros) for a network with this many blocks, in the order they're saved.</summary>
+        private void Build(int nb)
+        {
+            parameters.Clear();
+            byName.Clear();
+            lnG = new Param[nb];
+            lnB = new Param[nb];
+            b1W = new Param[nb];
+            b1B = new Param[nb];
+            b3W = new Param[nb];
+            b3B = new Param[nb];
             projW = P("cards.proj.weight", CardDim, StaticSize);
             projB = P("cards.proj.bias", CardDim);
             slot0W = P("slot.0.weight", SlotDim, SlotIn);
@@ -227,7 +256,7 @@ namespace PokemonTCG.AI
             slot2B = P("slot.2.bias", SlotDim);
             inpW = P("inp.0.weight", Width, StateSize);
             inpB = P("inp.0.bias", Width);
-            for (int b = 0; b < Blocks; b++)
+            for (int b = 0; b < nb; b++)
             {
                 lnG[b] = P("body." + b + ".net.0.weight", Width);
                 lnB[b] = P("body." + b + ".net.0.bias", Width);
@@ -236,8 +265,8 @@ namespace PokemonTCG.AI
                 b3W[b] = P("body." + b + ".net.3.weight", Width, Width);
                 b3B[b] = P("body." + b + ".net.3.bias", Width);
             }
-            finalLnG = P("body." + Blocks + ".weight", Width);
-            finalLnB = P("body." + Blocks + ".bias", Width);
+            finalLnG = P("body." + nb + ".weight", Width);
+            finalLnB = P("body." + nb + ".bias", Width);
             kind = P("kind.weight", PolicyKinds.OptionCount, CardDim);
             opt0W = P("option.0.weight", OptionDim, OptionIn);
             opt0B = P("option.0.bias", OptionDim);
@@ -254,7 +283,100 @@ namespace PokemonTCG.AI
             value2W = P("value.2.weight", 1, ValueHidden);
             value2B = P("value.2.bias", 1);
             noneSlot = P("none_slot", SlotDim);
-            InitRandom(1);
+            Volatile.Write(ref blocks, nb);
+        }
+
+        /// <summary>
+        /// Makes the network deeper (more residual blocks) without changing what it knows: the new blocks start out adding
+        /// nothing (their last layer is zeros), so it plays exactly as before, and training then puts them to use. The optimizer
+        /// keeps its state for the weights it had. Not while it's training (the trainer's buffers are sized for the network).
+        /// </summary>
+        public void Grow(int nb)
+        {
+            if (nb > MaxBlocks) throw new ArgumentOutOfRangeException("nb", "at most " + MaxBlocks + " blocks");
+            rw.EnterWriteLock();
+            try
+            {
+                int old = blocks;
+                if (nb <= old) return;
+                var kept = new Dictionary<string, Param>(byName, StringComparer.Ordinal);
+                // The last normalization layer is named after the block count: it moves to the end.
+                kept["body." + nb + ".weight"] = kept["body." + old + ".weight"];
+                kept["body." + nb + ".bias"] = kept["body." + old + ".bias"];
+                kept.Remove("body." + old + ".weight");
+                kept.Remove("body." + old + ".bias");
+                Build(nb);
+                var rng = new Rng(1000 + old);
+                foreach (var p in parameters)
+                {
+                    Param was;
+                    if (kept.TryGetValue(p.Name, out was) && was.Data.Length == p.Data.Length)
+                    {
+                        p.Data = was.Data;
+                        p.M = was.M;
+                        p.V = was.V;
+                    }
+                }
+                for (int b = old; b < nb; b++)
+                {
+                    // LayerNorm as fresh (gain 1, bias 0), the first layer random as PyTorch would make it, the last one zeros.
+                    Fill(lnG[b].Data, 1f);
+                    double bound = 1.0 / Math.Sqrt(Width);
+                    var w = b1W[b].Data;
+                    for (int i = 0; i < w.Length; i++) w[i] = (float)((Uniform01(rng) * 2 - 1) * bound);
+                }
+                cardCache = new float[0][];
+            }
+            finally
+            {
+                weightsRevision++; // the GPU learner's copy is out of date now (GpuMoves)
+                rw.ExitWriteLock();
+            }
+        }
+
+        /// <summary>The block count of saved weights (body.0, body.1, ... each with its .net.1.weight), or 0 if there are none.</summary>
+        private static int BlocksIn(Dictionary<string, float[]> data)
+        {
+            int nb = 0;
+            while (nb <= MaxBlocks && data.ContainsKey("body." + nb + ".net.1.weight")) nb++;
+            return nb;
+        }
+
+        /// <summary>
+        /// True when saved weights fit this network's layers, with nb blocks (Build(nb) makes the trunk; the rest doesn't depend
+        /// on it).
+        /// </summary>
+        private bool Fits(Dictionary<string, float[]> data, int nb)
+        {
+            if (nb < 1 || nb > MaxBlocks) return false;
+            foreach (var p in parameters)
+                if (!p.Name.StartsWith("body.", StringComparison.Ordinal) && !Has(data, p.Name, p.Data.Length)) return false;
+            for (int b = 0; b < nb; b++)
+            {
+                string pre = "body." + b + ".net.";
+                if (!Has(data, pre + "0.weight", Width) || !Has(data, pre + "0.bias", Width) || !Has(data, pre + "1.weight", Width * Width)
+                    || !Has(data, pre + "1.bias", Width) || !Has(data, pre + "3.weight", Width * Width) || !Has(data, pre + "3.bias", Width))
+                    return false;
+            }
+            return Has(data, "body." + nb + ".weight", Width) && Has(data, "body." + nb + ".bias", Width);
+        }
+
+        private static bool Has(Dictionary<string, float[]> data, string name, int length)
+        {
+            float[] a;
+            return data.TryGetValue(name, out a) && a.Length == length;
+        }
+
+        /// <summary>Takes saved weights that Fits(data, nb) (under the write lock), rebuilding the trunk if its size differs.</summary>
+        private void TakeWeights(Dictionary<string, float[]> data, int nb)
+        {
+            if (nb != blocks) Build(nb);
+            foreach (var p in parameters)
+            {
+                p.Data = data[p.Name];
+                p.M = null;
+                p.V = null;
+            }
         }
 
         /// <summary>Fresh weights (PyTorch's default initialisation), no cards.</summary>
@@ -624,12 +746,15 @@ namespace PokemonTCG.AI
             /// <summary>Parts of State whose gradient is needed (card vectors and slots; not the plain numbers).</summary>
             internal int[] GradSegments;
             internal readonly float[] InpGrad = new float[Width];
-            internal readonly float[][] X = new float[Blocks + 1][];
-            internal readonly float[][] LnHat = new float[Blocks][];
-            internal readonly float[][] LnOut = new float[Blocks][];
-            internal readonly float[] LnInv = new float[Blocks];
-            internal readonly float[][] HAct = new float[Blocks][];
-            internal readonly float[][] HGrad = new float[Blocks][];
+            // Per block (EnsureBlocks: as many as the network that last used this Pass, which threads share between networks).
+            internal float[][] X = new float[0][];
+            internal float[][] LnHat = new float[0][];
+            internal float[][] LnOut = new float[0][];
+            internal float[] LnInv = new float[0];
+            internal float[][] HAct = new float[0][];
+            internal float[][] HGrad = new float[0][];
+            /// <summary>Blocks of the network whose forward pass this holds (the backward pass checks it).</summary>
+            internal int Blocks;
             internal readonly float[] FinalHat = new float[Width];
             internal float FinalInv;
             internal readonly float[] H = new float[Width];
@@ -666,16 +791,17 @@ namespace PokemonTCG.AI
                 return b;
             }
 
-            public Pass()
+            /// <summary>Room for a network with nb blocks.</summary>
+            internal void EnsureBlocks(int nb)
             {
-                for (int b = 0; b <= Blocks; b++) X[b] = new float[Width];
-                for (int b = 0; b < Blocks; b++)
-                {
-                    LnHat[b] = new float[Width];
-                    LnOut[b] = new float[Width];
-                    HAct[b] = new float[Width];
-                    HGrad[b] = new float[Width];
-                }
+                Blocks = nb;
+                if (LnInv.Length >= nb) return;
+                X = Grow(X, nb + 1, Width);
+                LnHat = Grow(LnHat, nb, Width);
+                LnOut = Grow(LnOut, nb, Width);
+                HAct = Grow(HAct, nb, Width);
+                HGrad = Grow(HGrad, nb, Width);
+                LnInv = new float[nb];
             }
         }
 
@@ -841,12 +967,13 @@ namespace PokemonTCG.AI
 
         private Pass[] ForwardLocked(IList<PolicyInput> xs, bool pooled)
         {
-            int n = xs.Count;
+            int n = xs.Count, nb = blocks;
             var ps = new Pass[n];
             var pool = pooled ? PassPool(n) : null;
             for (int i = 0; i < n; i++)
             {
                 ps[i] = pooled ? pool[i] : new Pass();
+                ps[i].EnsureBlocks(nb);
                 Inputs(xs[i], ps[i]);
             }
 
@@ -880,7 +1007,7 @@ namespace PokemonTCG.AI
             }
             for (int i = 0; i < n; i++) GeluAll(pre[i], ps[i].X[0], ps[i].InpGrad);
             var tmp = Scratch("tmp", n, Width, false);
-            for (int b = 0; b < Blocks; b++)
+            for (int b = 0; b < nb; b++)
             {
                 for (int i = 0; i < n; i++) LayerNorm(ps[i].X[b], lnG[b].Data, lnB[b].Data, ps[i].LnHat[b], ps[i].LnOut[b], out ps[i].LnInv[b]);
                 LinearBatch(b1W[b].Data, b1B[b].Data, Width, Width, Each(ps, p => p.LnOut[b]), pre);
@@ -894,7 +1021,7 @@ namespace PokemonTCG.AI
                     for (int j = 0; j < Width; j++) xn[j] = xb[j] + t[j];
                 }
             }
-            for (int i = 0; i < n; i++) LayerNorm(ps[i].X[Blocks], finalLnG.Data, finalLnB.Data, ps[i].FinalHat, ps[i].H, out ps[i].FinalInv);
+            for (int i = 0; i < n; i++) LayerNorm(ps[i].X[nb], finalLnG.Data, finalLnB.Data, ps[i].FinalHat, ps[i].H, out ps[i].FinalInv);
             var hs = Each(ps, p => p.H);
             LinearBatch(queryW.Data, queryB.Data, OptionDim, Width, hs, Each(ps, p => p.Q));
             var vpre = Scratch("vpre", n, ValueHidden, false);
@@ -1060,6 +1187,12 @@ namespace PokemonTCG.AI
                 Loss = PolicyLoss = ValueLoss = Entropy = ClipFraction = 0;
             }
 
+            /// <summary>Sized for this network (false once it has grown).</summary>
+            public bool Fits(PolicyNet net)
+            {
+                return G.Length == net.parameters.Count;
+            }
+
             internal Grad(PolicyNet net)
             {
                 G = new float[net.parameters.Count][];
@@ -1133,6 +1266,9 @@ namespace PokemonTCG.AI
         private void BackwardLocked(IList<PolicyInput> xs, Pass[] ps, float[][] dLogits, float[] dValues, Grad g)
         {
             int n = ps.Length;
+            if (!g.Fits(this)) throw new InvalidOperationException("the gradient buffer is for a different size of network");
+            foreach (var p in ps)
+                if (p.Blocks != blocks) throw new InvalidOperationException("the network changed size between its forward and backward passes");
             var dh = Scratch("dh", n, Width, true);
             var dq = Scratch("dq", n, OptionDim, true);
             var dvPre = Scratch("dvPre", n, ValueHidden, true);
@@ -1210,7 +1346,7 @@ namespace PokemonTCG.AI
             for (int k = 0; k < n; k++) LayerNormBack(dh[k], ps[k].FinalHat, ps[k].FinalInv, finalLnG.Data, dx[k], G(g, finalLnG), G(g, finalLnB));
             var dHAct = Scratch("dHAct", n, Width, true);
             var dLn = Scratch("dLn", n, Width, true);
-            for (int b = Blocks - 1; b >= 0; b--)
+            for (int b = blocks - 1; b >= 0; b--)
             {
                 // x[b+1] = x[b] + W3 gelu(W1 LN(x[b])): dx passes straight through, plus the branch
                 for (int k = 0; k < n; k++)
@@ -1363,6 +1499,7 @@ namespace PokemonTCG.AI
         public void Apply(Grad g, int batch)
         {
             if (batch <= 0) return;
+            if (!g.Fits(this)) throw new InvalidOperationException("the gradient buffer is for a different size of network");
             float scale = 1f / batch;
             // Card-vector gradients become gradients of the card rows and the stats projection.
             var gProjW = G(g, projW);
@@ -1719,11 +1856,8 @@ namespace PokemonTCG.AI
                     for (int i = 0; i < n; i++) a[i] = Clean(r.ReadSingle());
                     data[name] = a;
                 }
-                foreach (var p in parameters)
-                {
-                    float[] a;
-                    if (!data.TryGetValue(p.Name, out a) || a.Length != p.Data.Length) return false;
-                }
+                int nb = BlocksIn(data);
+                if (!Fits(data, nb)) return false;
                 int rows = r.ReadInt32();
                 var keys = new List<string> { "" };
                 var learned = new List<float[]> { new float[CardDim] };
@@ -1745,12 +1879,7 @@ namespace PokemonTCG.AI
                 rw.EnterWriteLock();
                 try
                 {
-                    foreach (var p in parameters)
-                    {
-                        p.Data = data[p.Name];
-                        p.M = null;
-                        p.V = null;
-                    }
+                    TakeWeights(data, nb);
                     SetCards(keys, learned, statics, aliases);
                     steps = st;
                     adamT = 0;
@@ -1786,11 +1915,8 @@ namespace PokemonTCG.AI
                     for (int i = 0; i < n; i++) a[i] = Clean(r.ReadSingle());
                     data[name] = a;
                 }
-                foreach (var p in parameters)
-                {
-                    float[] a;
-                    if (!data.TryGetValue(p.Name, out a) || a.Length != p.Data.Length) return false;
-                }
+                int nb = BlocksIn(data);
+                if (!Fits(data, nb)) return false;
                 float[] ids;
                 if (!data.TryGetValue("cards.ids.weight", out ids)) return false;
                 int cards = r.ReadInt32();
@@ -1827,12 +1953,7 @@ namespace PokemonTCG.AI
                 rw.EnterWriteLock();
                 try
                 {
-                    foreach (var p in parameters)
-                    {
-                        p.Data = data[p.Name];
-                        p.M = null;
-                        p.V = null;
-                    }
+                    TakeWeights(data, nb);
                     SetCards(keys, learned, statics, aliases);
                     steps = 0;
                     adamT = 0;
@@ -1891,7 +2012,7 @@ namespace PokemonTCG.AI
         /// <summary>A copy of this network (for the opponent pool and "undo").</summary>
         public PolicyNet Clone()
         {
-            var copy = new PolicyNet();
+            var copy = new PolicyNet(Blocks);
             copy.FromBytes(ToBytes());
             return copy;
         }

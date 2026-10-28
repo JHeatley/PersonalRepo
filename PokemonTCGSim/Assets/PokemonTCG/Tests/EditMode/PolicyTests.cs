@@ -67,6 +67,65 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
+        public void Making_The_Network_Bigger_Keeps_What_It_Knows()
+        {
+            var net = new PolicyNet { GamesTrained = 40 };
+            var x = SomeDecision(net);
+            // Some learning first, so every layer holds something of its own.
+            for (int i = 0; i < 5; i++) net.Imitate(new List<KeyValuePair<PolicyInput, int>> { new KeyValuePair<PolicyInput, int>(x, 0) }, 1f);
+            var before = net.Forward(x);
+            int revision = net.WeightsRevision;
+            Assert.AreEqual(PolicyNet.DefaultBlocks, net.Blocks);
+            net.Grow(PolicyNet.BigBlocks);
+            Assert.AreEqual(PolicyNet.BigBlocks, net.Blocks);
+            Assert.AreNotEqual(revision, net.WeightsRevision, "the GPU learner's copy is out of date");
+            var after = net.Forward(x);
+            Assert.AreEqual(before.Value, after.Value, 1e-6, "it plays exactly as before");
+            for (int i = 0; i < before.Logits.Length; i++) Assert.AreEqual(before.Logits[i], after.Logits[i], 1e-6);
+            Assert.AreEqual(5, net.Steps);
+            Assert.AreEqual(40, net.GamesTrained);
+            net.Grow(PolicyNet.DefaultBlocks);
+            Assert.AreEqual(PolicyNet.BigBlocks, net.Blocks, "it never gets smaller");
+
+            // Saved and loaded (into a network that starts at the usual size), it's the bigger one.
+            var copy = new PolicyNet();
+            Assert.IsTrue(copy.FromBytes(net.ToBytes()));
+            Assert.AreEqual(PolicyNet.BigBlocks, copy.Blocks);
+            Assert.AreEqual(after.Value, copy.Forward(x).Value, 1e-6);
+            Assert.AreEqual(PolicyNet.BigBlocks, net.Clone().Blocks);
+            // And a network of the usual size still loads into a bigger one.
+            var small = new PolicyNet();
+            var y = SomeDecision(small);
+            var big = new PolicyNet(PolicyNet.BigBlocks);
+            Assert.IsTrue(big.FromBytes(small.ToBytes()));
+            Assert.AreEqual(PolicyNet.DefaultBlocks, big.Blocks);
+            Assert.AreEqual(small.Forward(y).Value, big.Forward(y).Value, 1e-6);
+
+            // It goes on learning, the new blocks too.
+            int target = x.Count - 1;
+            double p0 = PolicyNet.Softmax(net.Forward(x).Logits)[target];
+            for (int i = 0; i < 10; i++) net.Imitate(new List<KeyValuePair<PolicyInput, int>> { new KeyValuePair<PolicyInput, int>(x, target) }, 1f);
+            Assert.Greater(PolicyNet.Softmax(net.Forward(x).Logits)[target], p0);
+            Assert.AreNotEqual(Dense(copy), Dense(net));
+        }
+
+        [Test]
+        public void A_Trainer_Goes_On_Training_A_Network_Made_Bigger_Between_Rounds()
+        {
+            var net = new PolicyNet();
+            var trainer = SmallTrainer(net);
+            trainer.Round();
+            long steps = net.Steps;
+            Assert.Greater(steps, 0);
+            net.Grow(PolicyNet.BigBlocks);
+            var round = trainer.Round();
+            trainer.Dispose();
+            Assert.IsNull(round.LastError, round.LastError);
+            Assert.Greater(net.Steps, steps, "it learned with the bigger network");
+            Assert.IsTrue(net.AllFinite());
+        }
+
+        [Test]
         public void A_Learning_Step_Makes_The_Copied_Choice_More_Likely()
         {
             var net = new PolicyNet();
