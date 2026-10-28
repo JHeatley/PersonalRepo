@@ -149,6 +149,7 @@ namespace PokemonTCG.AI
                             GameBudget--;
                         }
                         var started = DateTime.UtcNow;
+                        if (Pace != null) Pace.Wait(() => Aborted || (ShouldStop != null && ShouldStop()));
                         var result = PlayOne(baseSeed + g * 3, poolNow);
                         if (result == null) return; // stopped mid-game
                         lock (gate)
@@ -548,6 +549,8 @@ namespace PokemonTCG.AI
         /// learned on the CPU and the reason is in the round's LastError; it's tried again a few rounds later.
         /// </summary>
         public GpuLearner Gpu;
+        /// <summary>Games a second at most (null: as fast as it can).</summary>
+        public GamePace Pace;
         private int gpuRetryRound = -1;
 
         /// <summary>Learns this round on the GPU learner; false when it couldn't (then Learn runs here).</summary>

@@ -101,6 +101,8 @@ namespace PokemonTCG.AI
         /// </summary>
         public int NeuralThreads;
         public double NeuralRest = 0.25;
+        /// <summary>Training plays at most this many games a second (0: as fast as it can).</summary>
+        public double GamesPerSecond;
         /// <summary>Neural AI training learns on the GPU learner at this address ("127.0.0.1:5577"; null or "": on the CPU).</summary>
         public string GpuAddress;
 
@@ -276,8 +278,10 @@ namespace PokemonTCG.AI
                 if ((Style.HasValue ? Style.Value : brain.Style) == AiStyle.Neural && brain.Policy.Trained) TrainNeural();
                 else
                 {
+                    var pace = new GamePace(GamesPerSecond);
                     for (int g = 0; g < Games && !cancel; g++)
                     {
+                        pace.Wait(() => cancel);
                         var gameStart = DateTime.UtcNow;
                         PlayTrainingGame(g);
                         if (SaveEvery > 0 && (g + 1) % SaveEvery == 0) SafeSave();
@@ -455,6 +459,7 @@ namespace PokemonTCG.AI
             string gpuHost;
             int gpuPort;
             if (!string.IsNullOrEmpty(GpuAddress) && GpuLearner.TryParse(GpuAddress, out gpuHost, out gpuPort)) trainer.Gpu = new GpuLearner(gpuHost, gpuPort);
+            if (GamesPerSecond > 0) trainer.Pace = new GamePace(GamesPerSecond);
             int played = 0;
             trainer.ShouldStop = () => cancel || Volatile.Read(ref played) >= Games;
             trainer.Abort = () => cancel; // Stop: leave the games in progress and don't learn from the unfinished batch

@@ -40,7 +40,7 @@ namespace PokemonTCG.Presentation
         private const string PrefTrainGpuAddress = "PokemonTCG.TrainGpuAddress";
         private const string PrefTrainRandomB = "PokemonTCG.TrainRandomB";
         /// <summary>The most games one session can be set to play (typed in).</summary>
-        private const int MaxTrainGames = 1000000;
+        private const int MaxTrainGames = 5000000;
         /// <summary>Keep the app off some CPU threads (a faulty core), and which ones (CpuThreads).</summary>
         private const string PrefSkipCpu = "PokemonTCG.SkipCpuThreads";
         private const string PrefSkipCpuList = "PokemonTCG.SkipCpuThreadList";
@@ -69,6 +69,9 @@ namespace PokemonTCG.Presentation
         private bool trainRandomA, trainRandomB;
         private bool trainFast;
         private bool trainGpu;
+        /// <summary>Games a second at most, as typed ("" or 0: as fast as it can).</summary>
+        private string trainRateText = "";
+        private const string PrefTrainRate = "PokemonTCG.TrainGamesPerSecond";
         private string trainGpuAddress = GpuLearner.DefaultAddress;
         private bool TrainAll { get { return trainRandomA && trainRandomB; } }
         private bool TrainFocus { get { return trainRandomA != trainRandomB; } }
@@ -358,6 +361,7 @@ namespace PokemonTCG.Presentation
             trainRandomA = PlayerPrefs.GetInt(PrefTrainRandomA, all ? 1 : 0) == 1;
             trainFast = PlayerPrefs.GetInt(PrefTrainFast, 0) == 1;
             trainGpu = PlayerPrefs.GetInt(PrefTrainGpu, 0) == 1;
+            trainRateText = PlayerPrefs.GetString(PrefTrainRate, "") ?? "";
             trainGpuAddress = PlayerPrefs.GetString(PrefTrainGpuAddress, GpuLearner.DefaultAddress) ?? GpuLearner.DefaultAddress;
             trainRandomB = PlayerPrefs.GetInt(PrefTrainRandomB, all ? 1 : 0) == 1;
             confirmReset = false;
@@ -431,6 +435,18 @@ namespace PokemonTCG.Presentation
             session.NeuralThreads = trainFast ? FastThreads : 0;
             session.NeuralRest = trainFast ? 0 : 0.25;
             session.GpuAddress = trainGpu ? trainGpuAddress : null;
+            session.GamesPerSecond = TrainRate;
+        }
+
+        /// <summary>The typed games-a-second limit (0: none).</summary>
+        private double TrainRate
+        {
+            get
+            {
+                double r;
+                return double.TryParse((trainRateText ?? "").Trim().Replace(',', '.'), System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture, out r) && r > 0 ? Math.Min(r, 1000) : 0;
+            }
         }
 
         private void SetTrainRandom(bool a, bool b)
@@ -448,7 +464,7 @@ namespace PokemonTCG.Presentation
             PlayerPrefs.SetInt(PrefTrainGames, trainGames);
         }
 
-        /// <summary>The number typed in the games box (commas and spaces allowed); up to 1,000,000.</summary>
+        /// <summary>The number typed in the games box (commas and spaces allowed); up to 5,000,000.</summary>
         private void TypeTrainGames(string text)
         {
             trainGamesText = text ?? "";
@@ -637,7 +653,7 @@ namespace PokemonTCG.Presentation
             GUILayout.BeginHorizontal();
             GUILayout.Label("Or type any number:", GUILayout.Width(140));
             string newGamesText = GUILayout.TextField(trainGamesText, GUILayout.Width(110));
-            GUILayout.Label("  " + trainGames.ToString("N0") + " games (up to 1,000,000)", Hint(ui));
+            GUILayout.Label("  " + trainGames.ToString("N0") + " games (up to 5,000,000)", Hint(ui));
             GUILayout.EndHorizontal();
             if (newGamesText != trainGamesText) actions.Add(() => TypeTrainGames(newGamesText));
             if (TrainAll)
@@ -678,6 +694,17 @@ namespace PokemonTCG.Presentation
             GUILayout.Label(trainFast
                 ? "Fast (Neural AI training): " + FastThreads + " games at once and no rests, about 1.5 to 2 times Gentle's speed. It works the CPU hard: keep \"Don't use CPU threads\" on while your CPU has a faulty core."
                 : "Gentle (Neural AI training): half the CPU's threads, with a short rest after each learning step: cooler and quieter.", Hint(ui));
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Games per second", GUILayout.Width(120));
+            string newRate = GUILayout.TextField(trainRateText, GUILayout.Width(60));
+            GUILayout.Label(TrainRate > 0 ? "  at most " + TrainRate.ToString("0.#") + " a second" : "  blank: as fast as it can", Hint(ui));
+            GUILayout.EndHorizontal();
+            if (newRate != trainRateText)
+                actions.Add(() =>
+                {
+                    trainRateText = newRate;
+                    PlayerPrefs.SetString(PrefTrainRate, trainRateText ?? "");
+                });
             GUILayout.BeginHorizontal();
             bool newGpu = GUILayout.Toggle(trainGpu, " Learn on the GPU at");
             string newGpuAddress = GUILayout.TextField(trainGpuAddress, GUILayout.Width(130));

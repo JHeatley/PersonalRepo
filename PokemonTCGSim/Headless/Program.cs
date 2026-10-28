@@ -154,6 +154,7 @@ public static class Program
             trainer.Gpu = new GpuLearner(gpuHost, gpuPort);
             Console.WriteLine($"learning on the GPU learner at {gpuHost}:{gpuPort} (start ../GpuLearner/learner.py first)");
         }
+        if (o.ContainsKey("games-per-second")) trainer.Pace = new GamePace(Dbl(o, "games-per-second", 0));
         int games = Int(o, "games", 10000);
         int reportEvery = Int(o, "report-every", 5000);
         int evalGames = Int(o, "eval-games", 200);

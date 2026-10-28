@@ -503,6 +503,38 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
+        public void Games_Per_Second_Keeps_Training_To_The_Rate_Chosen()
+        {
+            var pace = new GamePace(40);
+            int started = 0;
+            var clock = System.Diagnostics.Stopwatch.StartNew();
+            var threads = Enumerable.Range(0, 4).Select(_ => new System.Threading.Thread(() =>
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    pace.Wait(null);
+                    System.Threading.Interlocked.Increment(ref started);
+                }
+            })).ToList();
+            threads.ForEach(t => t.Start());
+            threads.ForEach(t => t.Join());
+            // 40 games at 40 a second: the first starts at once, the last a little under a second later, whatever the threads.
+            Assert.AreEqual(40, started);
+            Assert.That(clock.Elapsed.TotalSeconds, Is.GreaterThan(0.9).And.LessThan(1.6));
+
+            // A pause (learning) isn't made up afterwards with a burst.
+            System.Threading.Thread.Sleep(500);
+            clock.Restart();
+            for (int i = 0; i < 10; i++) pace.Wait(null);
+            Assert.Greater(clock.Elapsed.TotalSeconds, 0.2);
+
+            clock.Restart();
+            var none = new GamePace(0);
+            for (int i = 0; i < 1000; i++) none.Wait(null);
+            Assert.Less(clock.Elapsed.TotalSeconds, 0.5, "no limit: no waiting");
+        }
+
+        [Test]
         public void GPU_Learner_Addresses_Are_Read()
         {
             string host;
