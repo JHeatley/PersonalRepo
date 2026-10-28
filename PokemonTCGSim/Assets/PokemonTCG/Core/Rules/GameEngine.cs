@@ -899,8 +899,20 @@ namespace PokemonTCG.Core
         public int AskOne(int player, DecisionKind kind, string prompt, List<DecisionOption> options, CardDef source = null, bool autoPickSingle = true)
         {
             if (options.Count == 0) throw new InvalidOperationException("No options for decision: " + prompt);
-            if (autoPickSingle && options.Count == 1) return 0;
+            // A bot takes the only option at once; the person on screen is still asked, as in the real game (your ruling).
+            if (autoPickSingle && options.Count == 1 && !AsksEveryChoice(player)) return 0;
             return Ask(player, kind, prompt, options, 1, 1, source)[0];
+        }
+
+        /// <summary>
+        /// The person on screen is asked every question, even one with a single possible answer, as in the real game (your
+        /// ruling). Off only to play back a game recorded before that (GameRecord.AskedEveryChoice), whose answers skip them.
+        /// </summary>
+        public bool AskPersonEveryChoice = true;
+
+        private bool AsksEveryChoice(int player)
+        {
+            return AskPersonEveryChoice && IsInteractive(player);
         }
 
         /// <summary>The seat is played by a person on screen (see IInteractiveAgent).</summary>
@@ -910,15 +922,15 @@ namespace PokemonTCG.Core
         }
 
         /// <summary>
-        /// Asks for min..max of the options. When only one answer is possible (all of them), it's taken at once,
-        /// unless alwaysAsk is set (cards from a person's discard pile: they still see them and pick them).
+        /// Asks for min..max of the options. When only one answer is possible (all of them), a bot takes it at once; the person
+        /// on screen is still asked, as in the real game (your ruling), and so is anyone when alwaysAsk is set.
         /// </summary>
         public List<int> AskMany(int player, DecisionKind kind, string prompt, List<DecisionOption> options, int min, int max, CardDef source = null, bool alwaysAsk = false)
         {
             max = Math.Min(max, options.Count);
             min = Math.Max(0, Math.Min(min, max));
             if (max == 0) return new List<int>();
-            if (min == options.Count && !alwaysAsk)
+            if (min == options.Count && !alwaysAsk && !AsksEveryChoice(player))
             {
                 var all = new List<int>();
                 for (int i = 0; i < options.Count; i++) all.Add(i);
@@ -1295,6 +1307,12 @@ namespace PokemonTCG.Core
                 {
                     if (d != null && d.IsPokemon && d.Stage == Stage.Stage1 && !string.IsNullOrEmpty(d.EvolvesFrom) && !Known.ContainsKey(d.Name))
                         Known[d.Name] = d.EvolvesFrom;
+                    if (d != null && d.IsPokemon && d.Stage == Stage.Stage1 && !string.IsNullOrEmpty(d.EvolvesFrom))
+                    {
+                        HashSet<string> from;
+                        if (!AllPreEvolutions.TryGetValue(d.Name, out from)) AllPreEvolutions[d.Name] = from = new HashSet<string>();
+                        from.Add(d.EvolvesFrom);
+                    }
                     if (d != null && d.IsPokemon && !string.IsNullOrEmpty(d.EvolvesFrom) && !d.IsBreak && !d.IsLevelUp && !d.IsLegend)
                         Evolvable.Add(d.EvolvesFrom);
                     if (d != null && d.IsPokemon && d.IsBreak && !string.IsNullOrEmpty(d.EvolvesFrom))
@@ -1308,6 +1326,22 @@ namespace PokemonTCG.Core
         /// a Snorlax with no Evolution: Compendium, 2018-07-26), without looking at the deck.
         /// </summary>
         public static readonly HashSet<string> Evolvable = new HashSet<string>();
+
+        /// <summary>
+        /// Every name a Stage 1 Pokémon evolves from across its printings (Known keeps only the first): Cranidos evolves from
+        /// Unidentified Fossil, Skull Fossil or Antique Skull Fossil, depending on the card.
+        /// </summary>
+        public static readonly Dictionary<string, HashSet<string>> AllPreEvolutions = new Dictionary<string, HashSet<string>>();
+
+        /// <summary>True when some printing of this Stage 1 evolves from that Basic (any of Cranidos's Fossils for Rare Candy).</summary>
+        public static bool EvolvesFrom(string stage1, string basic)
+        {
+            lock (Known)
+            {
+                HashSet<string> from;
+                return AllPreEvolutions.TryGetValue(stage1, out from) && from.Contains(basic);
+            }
+        }
 
         /// <summary>Names of Pokémon that a BREAK Evolution card in the pool evolves from (Evosoda and Wally can find those: your ruling, v95).</summary>
         public static readonly HashSet<string> BreakEvolvable = new HashSet<string>();

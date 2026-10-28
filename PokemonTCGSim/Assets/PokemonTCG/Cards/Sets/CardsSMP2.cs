@@ -100,8 +100,7 @@ namespace PokemonTCG.Cards
                     if (ctx.Engine.BenchSpace(player) <= 0) continue;
                     var basics = p.Discard.Where(c => c.Def.IsBasicPokemon && !ctx.Engine.PutIntoPlayBlocked(player, c.Def)).ToList();
                     if (basics.Count == 0) continue;
-                    var card = basics.Count == 1 ? basics[0]
-                        : ctx.ChooseCards(basics, 1, 1, "Shadowy Echoes: put which Basic Pokémon onto " + (player == ctx.Player ? "your" : "your opponent's") + " Bench?")[0];
+                    var card = ctx.ChooseCards(basics, 1, 1, "Shadowy Echoes: put which Basic Pokémon onto " + (player == ctx.Player ? "your" : "your opponent's") + " Bench?")[0];
                     if (p.Discard.Remove(card)) ctx.Engine.PutOntoBench(player, card, false);
                 }
                 return true;
@@ -128,7 +127,7 @@ namespace PokemonTCG.Cards
                 var bench = ctx.MyBench();
                 var pile = ctx.BasicEnergyInDiscard();
                 if (bench.Count == 0 || pile.Count == 0) return true;
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Turbo Strike: attach 2 basic Energy cards to which of your Benched Pokémon?");
+                var target = ctx.ChoosePokemon(bench, "Turbo Strike: attach 2 basic Energy cards to which of your Benched Pokémon?");
                 if (target != null) ctx.AttachCardsAnyWay(pile, 2, (card, mon) => mon == target, "Turbo Strike: attach basic Energy cards to " + target.Name, false);
                 return true;
             }
@@ -142,7 +141,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Dusk Shot") return false;
                 var targets = ctx.OpponentPokemon(m => m.Def.IsGXorEX);
                 if (targets.Count == 0) return Nothing(ctx);
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Dusk Shot: choose 1 of your opponent's Pokémon-GX or Pokémon-EX");
+                var target = ctx.ChoosePokemon(targets, "Dusk Shot: choose 1 of your opponent's Pokémon-GX or Pokémon-EX");
                 if (target != null) ctx.DamageWith(target, 60, false, false, false);
                 return true;
             }

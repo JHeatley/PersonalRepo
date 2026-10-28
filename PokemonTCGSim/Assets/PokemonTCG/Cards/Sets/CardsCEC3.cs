@@ -172,7 +172,7 @@ namespace PokemonTCG.Cards
             {
                 if (atk.Name != "Dirty Throw") return false;
                 if (ctx.Me.Hand.Count == 0) return Nothing(ctx);
-                var card = ctx.Me.Hand.Count == 1 ? ctx.Me.Hand[0] : ctx.ChooseCards(ctx.Me.Hand.ToList(), 1, 1, "Dirty Throw: discard a card from your hand")[0];
+                var card = ctx.ChooseCards(ctx.Me.Hand.ToList(), 1, 1, "Dirty Throw: discard a card from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 ctx.DamageDefending(atk.Damage);
                 return true;
@@ -190,7 +190,7 @@ namespace PokemonTCG.Cards
                 TefPokemon.RevealOpponentHand(ctx);
                 var items = ctx.Opp.Hand.Where(c => c.Def.IsItem).ToList();
                 if (items.Count == 0) return true;
-                var pick = items.Count == 1 ? items[0] : ctx.ChooseCards(items, 1, 1, "Bag Slash: discard which Item card from your opponent's hand?")[0];
+                var pick = ctx.ChooseCards(items, 1, 1, "Bag Slash: discard which Item card from your opponent's hand?")[0];
                 ctx.Engine.DiscardFromHand(ctx.Opponent, pick);
                 return true;
             }
@@ -285,7 +285,7 @@ namespace PokemonTCG.Cards
                     var active = ctx.Me.Active;
                     if (energy.Count > 0 && active != null)
                     {
-                        var pick = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Growing Up: attach which basic Energy card to " + active.Name + "?")[0];
+                        var pick = ctx.ChooseCards(energy, 1, 1, "Growing Up: attach which basic Energy card to " + active.Name + "?")[0];
                         if (ctx.Me.Discard.Remove(pick)) ctx.Engine.AttachEnergyCard(pick, active);
                     }
                 }
@@ -302,7 +302,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Sneaky Pocket") return false;
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 if (ctx.Me.Hand.Count == 0) return true;
-                var card = ctx.Me.Hand.Count == 1 ? ctx.Me.Hand[0] : ctx.ChooseCards(ctx.Me.Hand.ToList(), 1, 1, "Sneaky Pocket: put which card from your hand in the Lost Zone?")[0];
+                var card = ctx.ChooseCards(ctx.Me.Hand.ToList(), 1, 1, "Sneaky Pocket: put which card from your hand in the Lost Zone?")[0];
                 if (!ctx.Me.Hand.Remove(card)) return true;
                 ctx.Me.LostZone.Add(card);
                 ctx.Log("Sneaky Pocket: " + card.Def.Name + " was put in the Lost Zone.");
@@ -464,7 +464,7 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var pokemon = ctx.Me.Hand.Where(c => c.Def.IsPokemon).ToList();
-                var card = pokemon.Count == 1 ? pokemon[0] : ctx.ChooseCards(pokemon, 1, 1, "Violent Appetite: discard which Pokémon from your hand?")[0];
+                var card = ctx.ChooseCards(pokemon, 1, 1, "Violent Appetite: discard which Pokémon from your hand?")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 if (ctx.Me.Discard.Contains(card)) ctx.Heal(ctx.Pokemon, 60);
             }
@@ -516,7 +516,7 @@ namespace PokemonTCG.Cards
                 bool bonus = false;
                 if (me.Tools.Count > 0 && ctx.AskYesNo("Scaly Uppercut: discard a Pokémon Tool from " + me.Name + " for 90 more damage?"))
                 {
-                    var tool = me.Tools.Count == 1 ? me.Tools[0] : ctx.ChooseCards(me.Tools.ToList(), 1, 1, "Scaly Uppercut: discard which Pokémon Tool?")[0];
+                    var tool = ctx.ChooseCards(me.Tools.ToList(), 1, 1, "Scaly Uppercut: discard which Pokémon Tool?")[0];
                     bonus = ctx.Engine.DiscardTool(me, tool);
                 }
                 ctx.DamageDefending(atk.Damage + (bonus ? 90 : 0));

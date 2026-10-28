@@ -814,7 +814,7 @@ namespace PokemonTCG.Cards
                     ctx.DamageDefending(atk.Damage);
                     var basic = me.Energy.Where(e => e.Def.IsBasicEnergy).ToList();
                     if (!ctx.InPlay(me) || basic.Count == 0 || ctx.Me.Bench.Count == 0) return true;
-                    var energy = basic.Count == 1 ? basic[0] : ctx.ChooseCards(basic, 1, 1, "Hurricane: move which Basic Energy?")[0];
+                    var energy = ctx.ChooseCards(basic, 1, 1, "Hurricane: move which Basic Energy?")[0];
                     var target = ctx.ChoosePokemon(ctx.MyBench(), "Hurricane: move " + energy.Def.Name + " to which Benched Pokémon?");
                     if (target != null) ctx.Engine.MoveEnergy(me, target, energy);
                     return true;

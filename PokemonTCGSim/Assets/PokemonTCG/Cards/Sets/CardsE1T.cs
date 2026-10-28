@@ -48,7 +48,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.Flip()) return;
                 var theirs = ctx.OpponentPokemon(m => m.Energy.Count > 0);
                 if (theirs.Count == 0) return;
-                var target = theirs.Count == 1 ? theirs[0] : ctx.ChoosePokemon(theirs, "Energy Removal 2: choose 1 of your opponent's Pokémon");
+                var target = ctx.ChoosePokemon(theirs, "Energy Removal 2: choose 1 of your opponent's Pokémon");
                 if (target != null) ctx.DiscardEnergyFrom(target, 1, "Energy Removal 2: discard which Energy card from " + target.Name + "?");
             }
         }
@@ -112,7 +112,7 @@ namespace PokemonTCG.Cards
             {
                 var hurt = ctx.MyPokemon(m => m.DamageCounters > 0);
                 if (hurt.Count == 0) return;
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Pokémon Nurse: remove all damage counters from which Pokémon?");
+                var target = ctx.ChoosePokemon(hurt, "Pokémon Nurse: remove all damage counters from which Pokémon?");
                 if (target == null) return;
                 ctx.Heal(target, target.DamageCounters * 10);
                 ctx.Engine.DiscardAllEnergy(target);
@@ -128,7 +128,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = ctx.GustTargets();
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Pokémon Reversal: choose 1 of your opponent's Benched Pokémon");
+                var target = ctx.ChoosePokemon(targets, "Pokémon Reversal: choose 1 of your opponent's Benched Pokémon");
                 if (target == null || !ctx.Flip()) return;
                 if (ctx.Opp.Bench.Contains(target)) ctx.Engine.SwitchActive(ctx.Opponent, target);
             }

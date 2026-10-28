@@ -257,8 +257,7 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 ctx.DamageDefending(atk.Damage);
                 if (!TefPokemon.StillDefending(ctx, defending) || !ctx.CanAffect(defending) || defending.Energy.Count == 0) return true;
-                var pick = defending.Energy.Count == 1 ? defending.Energy[0]
-                    : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Tentacular Return: put which Energy into your opponent's hand?")[0];
+                var pick = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Tentacular Return: put which Energy into your opponent's hand?")[0];
                 ctx.Engine.ReturnEnergyToHand(defending, pick);
                 return true;
             }
@@ -537,7 +536,7 @@ namespace PokemonTCG.Cards
             {
                 var energy = ctx.Me.Hand.Where(c => c.Def.IsBasicEnergy).ToList();
                 if (energy.Count == 0) return false;
-                var pick = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Cycling Road: discard which Basic Energy card to draw a card?")[0];
+                var pick = ctx.ChooseCards(energy, 1, 1, "Cycling Road: discard which Basic Energy card to draw a card?")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, pick);
                 ctx.Draw(1);
                 return false;
@@ -572,7 +571,7 @@ namespace PokemonTCG.Cards
                 var energy = ctx.Me.Discard.Where(c => c.Def.IsBasicEnergy).ToList();
                 var bench = ctx.Me.Bench.ToList();
                 if (energy.Count == 0 || bench.Count == 0) return;
-                var pick = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Energy Sticker: choose a Basic Energy card from your discard pile")[0];
+                var pick = ctx.ChooseCards(energy, 1, 1, "Energy Sticker: choose a Basic Energy card from your discard pile")[0];
                 var target = ctx.ChoosePokemon(bench, "Energy Sticker: attach " + pick.Def.Name + " to which of your Benched Pokémon?");
                 if (target != null && ctx.Me.Discard.Remove(pick)) ctx.Engine.AttachEnergyCard(pick, target);
             }
@@ -592,7 +591,7 @@ namespace PokemonTCG.Cards
                 TefPokemon.RevealOpponentHand(ctx);
                 var basics = ctx.Opp.Hand.Where(c => c.Def.IsBasicPokemon).ToList();
                 if (basics.Count == 0 || !ctx.Engine.BenchHasRoom(ctx.Opponent)) return;
-                var pick = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Erika's Invitation: put which Basic Pokémon onto your opponent's Bench?")[0];
+                var pick = ctx.ChooseCards(basics, 1, 1, "Erika's Invitation: put which Basic Pokémon onto your opponent's Bench?")[0];
                 ctx.Opp.Hand.Remove(pick);
                 // From their hand: Gapejaw Bog hits it (Compendium, 2023-09).
                 var mon = ctx.Engine.PutOntoBench(ctx.Opponent, pick, false, true);
@@ -621,8 +620,7 @@ namespace PokemonTCG.Cards
                     ctx.Log("The effect of Giovanni's Charisma on " + defending.Name + " was prevented.");
                     return;
                 }
-                var pick = defending.Energy.Count == 1 ? defending.Energy[0]
-                    : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Giovanni's Charisma: put which Energy into your opponent's hand?")[0];
+                var pick = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Giovanni's Charisma: put which Energy into your opponent's hand?")[0];
                 if (!ctx.Engine.ReturnEnergyToHand(defending, pick)) return;
                 var active = ctx.Me.Active;
                 var energy = ctx.Me.Hand.Where(c => c.Def.IsEnergy).ToList();
@@ -642,7 +640,7 @@ namespace PokemonTCG.Cards
                 TefPokemon.RevealOpponentHand(ctx);
                 var mons = ctx.Opp.Hand.Where(c => c.Def.IsPokemon).ToList();
                 if (mons.Count == 0) return;
-                var pick = mons.Count == 1 ? mons[0] : ctx.ChooseCards(mons, 1, 1, "Grabber: put which Pokémon on the bottom of your opponent's deck?")[0];
+                var pick = ctx.ChooseCards(mons, 1, 1, "Grabber: put which Pokémon on the bottom of your opponent's deck?")[0];
                 ctx.Opp.Hand.Remove(pick);
                 ctx.Opp.Deck.Add(pick);
                 ctx.Log(pick.Def.Name + " was put on the bottom of " + ctx.Engine.Their(ctx.Opponent) + " deck (Grabber).");

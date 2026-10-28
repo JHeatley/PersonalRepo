@@ -221,7 +221,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Mind Bullet") return false;
                 var all = ctx.OpponentPokemon();
                 if (all.Count == 0) return true;
-                var target = all.Count == 1 ? all[0] : ctx.ChoosePokemon(all, "Mind Bullet: choose 1 of your opponent's Pokémon (20 damage for each Energy attached to it)");
+                var target = ctx.ChoosePokemon(all, "Mind Bullet: choose 1 of your opponent's Pokémon (20 damage for each Energy attached to it)");
                 if (target == null) return true;
                 ctx.DamageTarget(target, 20 * ctx.EnergyCount(target));
                 return true;
@@ -473,7 +473,7 @@ namespace PokemonTCG.Cards
                 if (active.DamageCounters > 0) ctx.Heal(active, 30);
                 var present = All.Where(c => active.Has(c)).ToList();
                 if (present.Count == 0) return;
-                var pick = present.Count == 1 ? present[0] : present[ctx.ChooseOption("Floral Breeze: remove which Special Condition from " + active.Name + "?", present.Select(c => c.ToString()).ToArray())];
+                var pick = present[ctx.ChooseOneOption("Floral Breeze: remove which Special Condition from " + active.Name + "?", present.Select(c => c.ToString()).ToArray())];
                 ctx.Engine.RemoveCondition(active, pick);
                 ctx.Log(active.Name + " is no longer " + pick + ".");
             }

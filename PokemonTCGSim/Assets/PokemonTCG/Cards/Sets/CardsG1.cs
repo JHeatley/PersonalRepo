@@ -281,7 +281,7 @@ namespace PokemonTCG.Cards
                 if (from == null) return false;
                 var cards = from.Energy.Where(c => IsLightningCard(ctx, from, c)).ToList();
                 if (cards.Count == 0) return false;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, Charge + ": move which Lightning Energy card?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, Charge + ": move which Lightning Energy card?")[0];
                 return ctx.Engine.MoveEnergy(from, ctx.Pokemon, card);
             }
 
@@ -306,7 +306,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.AskYesNo("Flee: switch " + me.Name + " with 1 of your Benched Pokémon?")) return;
                 Announce(ctx, "Flee");
                 var bench = ctx.Me.Bench.ToList();
-                var to = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Flee: switch in which of your Benched Pokémon?");
+                var to = ctx.ChoosePokemon(bench, "Flee: switch in which of your Benched Pokémon?");
                 if (to != null) ctx.Engine.SwitchActive(ctx.Player, to);
             }
 
@@ -801,7 +801,7 @@ namespace PokemonTCG.Cards
                 var bench = ctx.Opp.Bench.ToList();
                 if (bench.Count == 0) return true;
                 int n = Math.Min(max, bench.Count);
-                var picks = max == 1 ? new List<PokemonInPlay> { bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, attack + ": choose 1 of your opponent's Benched Pokémon") }
+                var picks = max == 1 ? new List<PokemonInPlay> { ctx.ChoosePokemon(bench, attack + ": choose 1 of your opponent's Benched Pokémon") }
                                      : ctx.ChoosePokemonMany(bench, 1, n, attack + ": choose up to " + n + " of your opponent's Benched Pokémon");
                 if (flip && !ctx.Flip()) return true;
                 foreach (var mon in picks)
@@ -870,14 +870,14 @@ namespace PokemonTCG.Cards
                 if (!ctx.InPlay(me)) return true;
                 var cards = me.Energy.Where(c => IsLightningCard(ctx, me, c)).ToList();
                 if (cards.Count == 0) return true;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Electric Current: move which Lightning Energy card?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Electric Current: move which Lightning Energy card?")[0];
                 var bench = ctx.Me.Bench.ToList();
                 if (bench.Count == 0)
                 {
                     ctx.Engine.DiscardEnergy(me, card);
                     return true;
                 }
-                var to = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Electric Current: attach it to which of your Benched Pokémon?");
+                var to = ctx.ChoosePokemon(bench, "Electric Current: attach it to which of your Benched Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(me, to, card);
                 return true;
             }
@@ -1083,7 +1083,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 if (!TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || !ctx.Flip() || !ctx.CanAffect(defending)) return true;
                 var cards = defending.Energy.ToList();
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, attack + ": discard which Energy card?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, attack + ": discard which Energy card?")[0];
                 ctx.Engine.DiscardEnergy(defending, card);
                 return true;
             }
@@ -1173,7 +1173,7 @@ namespace PokemonTCG.Cards
             ctx.DamageDefending(atk.Damage);
             if (!TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || !ctx.CanAffect(defending)) return;
             var cards = defending.Energy.ToList();
-            var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Kindle: discard which Energy card from the Defending Pokémon?")[0];
+            var card = ctx.ChooseCards(cards, 1, 1, "Kindle: discard which Energy card from the Defending Pokémon?")[0];
             ctx.Engine.DiscardEnergy(defending, card);
         }
 
@@ -1293,7 +1293,7 @@ namespace PokemonTCG.Cards
                 {
                     var cards = Psychic(ctx, me);
                     if (cards.Count == 0) return Nothing(ctx);
-                    var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Energy Loop: return which Psychic Energy card to your hand?")[0];
+                    var card = ctx.ChooseCards(cards, 1, 1, "Energy Loop: return which Psychic Energy card to your hand?")[0];
                     ctx.Engine.ReturnEnergyToHand(me, card);
                 }
                 ctx.DamageDefending(atk.Damage);
@@ -1362,7 +1362,7 @@ namespace PokemonTCG.Cards
             {
                 var basics = Basics(ctx);
                 if (basics.Count == 0 || ctx.BenchSpace <= 0) return;
-                var card = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Lt. Surge: put which Basic Pokémon into play as your Active Pokémon?")[0];
+                var card = ctx.ChooseCards(basics, 1, 1, "Lt. Surge: put which Basic Pokémon into play as your Active Pokémon?")[0];
                 if (!ctx.Me.Hand.Remove(card)) return;
                 var benched = ctx.Engine.PutOntoBench(ctx.Player, card, false);
                 if (benched != null && ctx.Me.Bench.Contains(benched)) ctx.Engine.SwitchActive(ctx.Player, benched);
@@ -1408,7 +1408,7 @@ namespace PokemonTCG.Cards
             {
                 var candidates = Candidates(ctx);
                 if (candidates.Count == 0) return;
-                var pick = candidates.Count == 1 ? candidates[0] : ctx.ChooseCards(candidates, 1, 1, "Blaine's Quiz #1: put which Pokémon face down? (Your opponent guesses its length.)")[0];
+                var pick = ctx.ChooseCards(candidates, 1, 1, "Blaine's Quiz #1: put which Pokémon face down? (Your opponent guesses its length.)")[0];
                 int length = PokedexHeights.HeightOf(pick.Def);
                 ctx.Log("Blaine's Quiz #1: " + ctx.Engine.PlayerName(ctx.Player) + " put a Pokémon face down and named it " + pick.Def.Name + ".");
                 int guess = CardsLTR3.CedricJuniper.Guess(ctx, pick.Def.Name);
@@ -1505,10 +1505,10 @@ namespace PokemonTCG.Cards
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return false;
                 ctx.MarkNamedLimit(Limit);
-                var mon = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Celadon City Gym: discard an Energy card from which of your Pokémon?");
+                var mon = ctx.ChoosePokemon(targets, "Celadon City Gym: discard an Energy card from which of your Pokémon?");
                 if (mon == null) return false;
                 var cards = mon.Energy.ToList();
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Celadon City Gym: discard which Energy card?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Celadon City Gym: discard which Energy card?")[0];
                 if (!ctx.Engine.DiscardEnergy(mon, card)) return false;
                 foreach (var c in new[] { SpecialCondition.Asleep, SpecialCondition.Confused, SpecialCondition.Paralyzed, SpecialCondition.Poisoned })
                     if (mon.Has(c)) ctx.Engine.RemoveCondition(mon, c);
@@ -1688,7 +1688,7 @@ namespace PokemonTCG.Cards
                 }
                 var bench = ctx.Opp.Bench.ToList();
                 if (bench.Count == 0) return;
-                var mon = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Minion of Team Rocket: return which of your opponent's Benched Pokémon to their hand?");
+                var mon = ctx.ChoosePokemon(bench, "Minion of Team Rocket: return which of your opponent's Benched Pokémon to their hand?");
                 if (mon != null) ctx.Engine.ReturnPokemonToHand(mon);
             }
         }
@@ -1747,7 +1747,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var mon = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Sabrina's ESP: attach it to which of your Pokémon?");
+                var mon = ctx.ChoosePokemon(targets, "Sabrina's ESP: attach it to which of your Pokémon?");
                 if (mon != null) ctx.AddEffect(new EspEffect("Sabrina's ESP", ctx.Player, mon.Uid, ctx.Turn));
             }
         }

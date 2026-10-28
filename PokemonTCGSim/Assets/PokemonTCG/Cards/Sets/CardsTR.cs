@@ -182,7 +182,7 @@ namespace PokemonTCG.Cards
                 if (!TriggerOnce(ctx, Sneak, targets.Count > 0, Sneak + ": do 10 damage to 1 of your opponent's Pokémon?")) return;
                 targets = ctx.OpponentPokemon();
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, Sneak + ": choose 1 of your opponent's Pokémon");
+                var target = ctx.ChoosePokemon(targets, Sneak + ": choose 1 of your opponent's Pokémon");
                 if (target == null) return;
                 int damage = WithWeaknessAndResistance(ctx.Engine, ctx.Pokemon, target, 10);
                 ctx.Log(Sneak + " does " + damage + " damage to " + target.Name + ".");
@@ -307,7 +307,7 @@ namespace PokemonTCG.Cards
             {
                 var hand = ctx.Me.Hand.ToList();
                 if (hand.Count == 0) return;
-                var pick = hand.Count == 1 ? hand[0] : ctx.ChooseCards(hand, 1, 1, Exchange + ": discard a card from your hand to draw a card")[0];
+                var pick = ctx.ChooseCards(hand, 1, 1, Exchange + ": discard a card from your hand to draw a card")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, pick);
                 ctx.Draw(1);
             }
@@ -373,11 +373,11 @@ namespace PokemonTCG.Cards
             {
                 var holders = FireHolders(ctx);
                 if (holders.Count == 0) return;
-                var from = holders.Count == 1 ? holders[0] : ctx.ChoosePokemon(holders, Gather + ": move a Fire Energy card from which of your Pokémon?");
+                var from = ctx.ChoosePokemon(holders, Gather + ": move a Fire Energy card from which of your Pokémon?");
                 if (from == null) return;
                 var fire = FireCards(ctx, from);
                 if (fire.Count == 0) return;
-                var card = fire.Count == 1 ? fire[0] : ctx.ChooseCards(fire, 1, 1, Gather + ": move which Fire Energy card?")[0];
+                var card = ctx.ChooseCards(fire, 1, 1, Gather + ": move which Fire Energy card?")[0];
                 ctx.Engine.MoveEnergy(from, ctx.Pokemon, card);
             }
         }
@@ -398,7 +398,7 @@ namespace PokemonTCG.Cards
                 if (prizes.Count == 0 || ctx.Me.Deck.Count == 0) return;
                 // Face-down Prize cards are picked blind; face-up ones (Here Comes Team Rocket!) by name.
                 var labels = prizes.Select((c, i) => ctx.Me.FaceUpPrizeIds.Contains(c.Id) ? c.Def.Name + " (Prize card " + (i + 1) + ")" : "Prize card " + (i + 1)).ToArray();
-                int pick = prizes.Count == 1 ? 0 : ctx.ChooseOption(Trickery + ": switch which Prize card with the top card of your deck?", labels);
+                int pick = ctx.ChooseOneOption(Trickery + ": switch which Prize card with the top card of your deck?", labels);
                 if (pick < 0 || pick >= prizes.Count) pick = 0;
                 var prize = prizes[pick];
                 var top = ctx.Me.Deck[0];
@@ -445,7 +445,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != attack) return false;
                 var all = ctx.OpponentPokemon();
                 if (all.Count == 0) return true;
-                var target = all.Count == 1 ? all[0] : ctx.ChoosePokemon(all, attack + ": choose 1 of your opponent's Pokémon");
+                var target = ctx.ChoosePokemon(all, attack + ": choose 1 of your opponent's Pokémon");
                 if (target == null) return true;
                 if (flip && !ctx.Flip()) return Nothing(ctx);
                 ctx.DamageWith(target, amount, false, false, false);
@@ -464,7 +464,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Stare") return false;
                 var all = ctx.OpponentPokemon();
                 if (all.Count == 0) return true;
-                var target = all.Count == 1 ? all[0] : ctx.ChoosePokemon(all, "Stare: choose 1 of your opponent's Pokémon");
+                var target = ctx.ChoosePokemon(all, "Stare: choose 1 of your opponent's Pokémon");
                 if (target == null) return true;
                 ctx.DamageWith(target, 10, false, false, false);
                 if (ctx.InPlay(target) && target.Def.Abilities.Any(a => a.Kind == AbilityDef.PokemonPower))
@@ -582,9 +582,9 @@ namespace PokemonTCG.Cards
                 if (!TefPokemon.StillDefending(ctx, defending) || ctx.Opp.Bench.Count == 0 || !ctx.CanAffect(defending)) return true;
                 var basic = defending.Energy.Where(c => c.Def.IsEnergy && c.Def.IsBasicEnergy).ToList();
                 if (basic.Count == 0) return true;
-                var card = basic.Count == 1 ? basic[0] : ctx.ChooseCards(basic, 1, 1, "Magnetic Lines: move which basic Energy card?")[0];
+                var card = ctx.ChooseCards(basic, 1, 1, "Magnetic Lines: move which basic Energy card?")[0];
                 var bench = ctx.Opp.Bench.ToList();
-                var to = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Magnetic Lines: attach it to which of your opponent's Benched Pokémon?");
+                var to = ctx.ChoosePokemon(bench, "Magnetic Lines: attach it to which of your opponent's Benched Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(defending, to, card);
                 return true;
             }
@@ -683,7 +683,7 @@ namespace PokemonTCG.Cards
                 {
                     var bench = ctx.Me.Bench.ToList();
                     if (bench.Count == 0 || !me.Energy.Contains(card)) continue;
-                    var to = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Energy Bomb: attach " + card.Def.Name + " to which of your Benched Pokémon?");
+                    var to = ctx.ChoosePokemon(bench, "Energy Bomb: attach " + card.Def.Name + " to which of your Benched Pokémon?");
                     if (to != null) ctx.Engine.MoveEnergy(me, to, card);
                 }
                 return true;
@@ -905,7 +905,7 @@ namespace PokemonTCG.Cards
                 ctx.Engine.Reveal(ctx.Opponent, hand, "hand (Rocket's Sneak Attack)");
                 var trainers = hand.Where(c => c.Def.IsTrainer).ToList();
                 if (trainers.Count == 0) return;
-                var pick = trainers.Count == 1 ? trainers[0] : ctx.ChooseCards(trainers, 1, 1, "Rocket's Sneak Attack: your opponent shuffles which Trainer card into their deck?")[0];
+                var pick = ctx.ChooseCards(trainers, 1, 1, "Rocket's Sneak Attack: your opponent shuffles which Trainer card into their deck?")[0];
                 if (!ctx.Opp.Hand.Remove(pick)) return;
                 ctx.Opp.Deck.Add(pick);
                 ctx.Engine.ShuffleDeck(ctx.Opponent);
@@ -982,7 +982,7 @@ namespace PokemonTCG.Cards
             {
                 var others = ctx.Me.Hand.Where(c => c != ctx.Card).ToList();
                 if (others.Count == 0) return;
-                var pick = others.Count == 1 ? others[0] : ctx.ChooseCards(others, 1, 1, "Imposter Oak's Revenge: discard a card from your hand")[0];
+                var pick = ctx.ChooseCards(others, 1, 1, "Imposter Oak's Revenge: discard a card from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, pick);
                 ctx.Engine.ShuffleHandIntoDeck(ctx.Opponent);
                 ctx.Engine.DrawCards(ctx.Opponent, 4);

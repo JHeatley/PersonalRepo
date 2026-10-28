@@ -152,7 +152,7 @@ namespace PokemonTCG.Cards
             {
                 var metal = ctx.Me.Hand.Where(c => MetalCard(c.Def)).ToList();
                 if (metal.Count == 0) return;
-                var pick = metal.Count == 1 ? metal[0] : ctx.ChooseCards(metal, 1, 1, "Metal Eater: discard which Metal Pokémon?")[0];
+                var pick = ctx.ChooseCards(metal, 1, 1, "Metal Eater: discard which Metal Pokémon?")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, pick);
                 ctx.Heal(ctx.Pokemon, 100);
             }
@@ -212,7 +212,7 @@ namespace PokemonTCG.Cards
                 if (givers.Count == 0 || ctx.MyPokemon().Count < 2) return;
                 var from = RepeatableAbility.ChoosePokemonOrDone(ctx, givers, what + ": move an Energy from which Pokémon? Press Done when finished.", true);
                 if (from == null) return;
-                var energy = from.Energy.Count == 1 ? from.Energy[0] : ctx.ChooseCards(from.Energy.ToList(), 1, 1, what + ": move which Energy?")[0];
+                var energy = ctx.ChooseCards(from.Energy.ToList(), 1, 1, what + ": move which Energy?")[0];
                 var to = ctx.ChoosePokemon(ctx.MyPokemon(m => m != from), what + ": move " + energy.Def.Name + " to which Pokémon?");
                 if (to == null || !ctx.Engine.MoveEnergy(from, to, energy)) return;
             }
@@ -260,7 +260,7 @@ namespace PokemonTCG.Cards
                 var energy = ctx.Me.Hand.Where(c => c.Def.IsEnergy).ToList();
                 var bench = ctx.MyBench().Where(m => ctx.Engine.CanAttachFromHand(m)).ToList();
                 if (energy.Count == 0 || bench.Count == 0) return true;
-                var card = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Energy Present: attach which Energy card?")[0];
+                var card = ctx.ChooseCards(energy, 1, 1, "Energy Present: attach which Energy card?")[0];
                 var target = ctx.ChoosePokemon(bench, "Energy Present: attach " + card.Def.Name + " to which Benched Pokémon?");
                 if (target != null && ctx.Me.Hand.Remove(card)) ctx.Engine.AttachEnergyCard(card, target, true);
                 return true;

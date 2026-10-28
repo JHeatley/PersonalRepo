@@ -308,7 +308,7 @@ namespace PokemonTCG.Cards
                     ctx.Log(ctx.Engine.PlayerName(ctx.Player) + " has no Item card to discard, so Trash Crash did nothing.");
                     return true;
                 }
-                var pick = items.Count == 1 ? items[0] : ctx.ChooseCards(items, 1, 1, "Trash Crash: discard an Item card from your hand")[0];
+                var pick = ctx.ChooseCards(items, 1, 1, "Trash Crash: discard an Item card from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, pick);
                 ctx.DamageAnyOpponent(60, true);
                 return true;
@@ -621,7 +621,7 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var top = ctx.LookAtTop(2);
-                var pick = top.Count == 1 ? top : ctx.ChooseCards(top, 1, 1, "Air Mail: put 1 of these cards into your hand (the other goes on the bottom of your deck)");
+                var pick = ctx.ChooseCards(top, 1, 1, "Air Mail: put 1 of these cards into your hand (the other goes on the bottom of your deck)");
                 ctx.DeckToHand(pick);
                 foreach (var card in top)
                 {

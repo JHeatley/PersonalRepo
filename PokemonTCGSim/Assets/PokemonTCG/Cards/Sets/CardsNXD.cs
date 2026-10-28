@@ -445,7 +445,7 @@ namespace PokemonTCG.Cards
                     return true;
                 }
                 var energy = defending.Energy.ToList();
-                var card = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Surprise Punch: move which Energy from " + defending.Name + "?")[0];
+                var card = ctx.ChooseCards(energy, 1, 1, "Surprise Punch: move which Energy from " + defending.Name + "?")[0];
                 var to = ctx.ChoosePokemon(ctx.OpponentBench(), "Surprise Punch: move " + card.Def.Name + " to which of your opponent's Benched Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(defending, to, card);
                 return true;
@@ -495,7 +495,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = Damaged(ctx);
                 if (targets.Count == 0) return false;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Pokémon Center: heal 20 damage from which Benched Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Pokémon Center: heal 20 damage from which Benched Pokémon?");
                 if (target != null) ctx.Heal(target, 20);
                 return false;
             }

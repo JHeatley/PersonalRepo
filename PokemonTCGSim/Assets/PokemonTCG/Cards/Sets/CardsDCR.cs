@@ -138,9 +138,9 @@ namespace PokemonTCG.Cards
                 if (!ctx.InPlay(me) || ctx.Me.Bench.Count == 0) return true;
                 var basics = me.Energy.Where(en => en.Def.IsBasicEnergy).ToList();
                 if (basics.Count == 0) return true;
-                var card = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Flame Ball: move which basic Energy?")[0];
+                var card = ctx.ChooseCards(basics, 1, 1, "Flame Ball: move which basic Energy?")[0];
                 var bench = ctx.MyBench();
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Flame Ball: move " + card.Def.Name + " to which Benched Pokémon?");
+                var target = ctx.ChoosePokemon(bench, "Flame Ball: move " + card.Def.Name + " to which Benched Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(me, target, card);
                 return true;
             }
@@ -218,12 +218,12 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var cards = Movable(ctx);
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Magma Switch: move which basic Energy?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Magma Switch: move which basic Energy?")[0];
                 var giver = ctx.MyPokemon().FirstOrDefault(m => m.Energy.Contains(card));
                 if (giver == null) return;
                 var targets = ctx.MyPokemon().Where(m => m != giver && IsTeam(m, Magma)).ToList();
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Magma Switch: move " + card.Def.Name + " to which Team Magma Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Magma Switch: move " + card.Def.Name + " to which Team Magma Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(giver, target, card);
             }
 

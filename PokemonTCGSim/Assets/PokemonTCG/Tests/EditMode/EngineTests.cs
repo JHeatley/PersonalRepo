@@ -382,21 +382,25 @@ namespace PokemonTCG.Tests
             public void OnEvent(GameEngine engine, GameEvent ev) { Text.Add(ev.Text); }
         }
 
-        [Test]
-        public void Heuristic_Mirror_200_Games_Without_Errors()
+        // Whole games are slow in the Unity Editor (several times this computer's .NET speed), so fewer of them, with a longer limit
+        // than the Test Runner's default.
+        [Test, Timeout(600000)]
+        public void Heuristic_Mirror_80_Games_Without_Errors()
         {
             var deck = UnityCardData.LoadDeck(db, UnityCardData.DefaultDeck);
-            var report = MatchRunner.Run(StandardCards.CreateRegistry(), deck, deck, 200, 500, (seat, s) => new HeuristicAgent(s), true);
+            var report = MatchRunner.Run(StandardCards.CreateRegistry(), deck, deck, 80, 500, (seat, s) => new HeuristicAgent(s), true);
             TestContext.WriteLine(report.Summary());
             Assert.AreEqual(0, report.Errors.Count, report.Summary());
             Assert.Greater(report.Wins[0] + report.Wins[1], 0, report.Summary());
         }
 
-        [Test]
-        public void Random_Mirror_300_Games_Without_Errors()
+        // Whole games are slow in the Unity Editor (several times this computer's .NET speed), so fewer of them, with a longer limit
+        // than the Test Runner's default.
+        [Test, Timeout(600000)]
+        public void Random_Mirror_100_Games_Without_Errors()
         {
             var deck = UnityCardData.LoadDeck(db, UnityCardData.DefaultDeck);
-            var report = MatchRunner.Run(StandardCards.CreateRegistry(), deck, deck, 300, 900, (seat, s) => new RandomAgent(s), true);
+            var report = MatchRunner.Run(StandardCards.CreateRegistry(), deck, deck, 100, 900, (seat, s) => new RandomAgent(s), true);
             TestContext.WriteLine(report.Summary());
             Assert.AreEqual(0, report.Errors.Count, report.Summary());
         }

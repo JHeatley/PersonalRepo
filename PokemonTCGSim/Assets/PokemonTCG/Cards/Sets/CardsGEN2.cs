@@ -91,7 +91,7 @@ namespace PokemonTCG.Cards
                 {
                     var card = found[0];
                     var onto = targets.Where(m => EvolvesFromDeckOnto(ctx, m, card.Def)).ToList();
-                    var target = onto.Count == 1 ? onto[0] : ctx.ChoosePokemon(onto, what + ": evolve which Pokémon into " + card.Def.Name + "?");
+                    var target = ctx.ChoosePokemon(onto, what + ": evolve which Pokémon into " + card.Def.Name + "?");
                     if (target != null) ctx.Engine.EvolvePokemon(target, card);
                     else ctx.Me.Deck.Add(card);
                 }
@@ -269,7 +269,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.InPlay(me) || ctx.Me.Bench.Count == 0) return true;
                 var fairy = me.Energy.Where(e => CardsDRI1.ProvidesType(ctx, me, e, EnergyType.Fairy)).ToList();
                 if (fairy.Count == 0) return true;
-                var energy = fairy.Count == 1 ? fairy[0] : ctx.ChooseCards(fairy, 1, 1, "Precious Ribbon: move which Fairy Energy?")[0];
+                var energy = ctx.ChooseCards(fairy, 1, 1, "Precious Ribbon: move which Fairy Energy?")[0];
                 var target = ctx.ChoosePokemon(ctx.MyBench(), "Precious Ribbon: move " + energy.Def.Name + " to which Benched Pokémon?");
                 if (target != null && ctx.Engine.MoveEnergy(me, target, energy) && target.DamageCounters > 0) ctx.Heal(target, 50);
                 return true;
@@ -366,7 +366,7 @@ namespace PokemonTCG.Cards
             {
                 var pile = Pile(ctx);
                 if (pile.Count == 0) return;
-                var pick = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, "Max Revive: put which Pokémon on top of your deck?")[0];
+                var pick = ctx.ChooseCards(pile, 1, 1, "Max Revive: put which Pokémon on top of your deck?")[0];
                 if (!ctx.Me.Discard.Remove(pick)) return;
                 ctx.Me.Deck.Insert(0, pick);
                 ctx.Log("Max Revive: " + ctx.Engine.PlayerName(ctx.Player) + " put " + pick.Def.Name + " from the discard pile on top of the deck.");
@@ -425,7 +425,7 @@ namespace PokemonTCG.Cards
             {
                 var target = ctx.Opp.Active;
                 if (target == null || target.Energy.Count == 0) return;
-                var energy = target.Energy.Count == 1 ? target.Energy[0] : ctx.ChooseCards(target.Energy.ToList(), 1, 1, "Team Flare Grunt: discard which Energy from " + target.Name + "?")[0];
+                var energy = ctx.ChooseCards(target.Energy.ToList(), 1, 1, "Team Flare Grunt: discard which Energy from " + target.Name + "?")[0];
                 ctx.Engine.DiscardEnergy(target, energy);
             }
         }
@@ -463,6 +463,9 @@ namespace PokemonTCG.Cards
             {
                 return ctx.Me.Deck.Count > 0 && Targets(ctx).Any(m => EvolutionLines.CanEvolveAtAll(m.Name, true));
             }
+
+            // "You can use this card during your first turn": the first player's first-turn Supporter rule doesn't stop it.
+            public override bool PlayableOnFirstTurn(EffectContext ctx) { return true; }
 
             public override void ResolveTrainer(EffectContext ctx) { EvolveOneFromDeck(ctx, Targets(ctx), d => !d.IsPokemonEX, "Wally"); }
         }

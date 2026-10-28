@@ -382,7 +382,7 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var hurt = ctx.MyBench().Where(m => m.DamageCounters > 0).ToList();
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Victory Heal: heal 20 damage from which Benched Pokémon?");
+                var target = ctx.ChoosePokemon(hurt, "Victory Heal: heal 20 damage from which Benched Pokémon?");
                 if (target != null) ctx.Heal(target, 20);
             }
         }
@@ -419,7 +419,7 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var fire = ctx.Me.Hand.Where(FireCard).ToList();
-                var card = fire.Count == 1 ? fire[0] : ctx.ChooseCards(fire, 1, 1, "Flaming Shot: discard which Fire Energy card?")[0];
+                var card = ctx.ChooseCards(fire, 1, 1, "Flaming Shot: discard which Fire Energy card?")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 if (!ctx.Me.Discard.Contains(card)) return;
                 var target = ctx.ChoosePokemon(ctx.OpponentPokemon(), "Flaming Shot: put 2 damage counters on which of your opponent's Pokémon?");
@@ -677,7 +677,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var energy = ctx.Me.Hand.Where(c => c.Def.IsEnergy).ToList();
                 if (energy.Count == 0) return true;
-                var card = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Tailwind: attach which Energy card from your hand?")[0];
+                var card = ctx.ChooseCards(energy, 1, 1, "Tailwind: attach which Energy card from your hand?")[0];
                 var target = ctx.ChoosePokemon(ctx.MyPokemon(), "Tailwind: attach " + card.Def.Name + " to which of your Pokémon?");
                 if (target != null && ctx.Me.Hand.Remove(card)) ctx.Engine.AttachEnergyCard(card, target, true);
                 return true;

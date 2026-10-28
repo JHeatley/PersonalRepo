@@ -717,7 +717,7 @@ namespace PokemonTCG.Cards
             {
                 var fire = ctx.Me.Hand.Where(c => c != ctx.Card && CardsSSP1.IsBasicOf(c.Def, EnergyType.Fire)).ToList();
                 if (fire.Count == 0) return;
-                var cost = fire.Count == 1 ? fire[0] : ctx.ChooseCards(fire, 1, 1, "Blowtorch: discard a Basic Fire Energy card from your hand")[0];
+                var cost = ctx.ChooseCards(fire, 1, 1, "Blowtorch: discard a Basic Fire Energy card from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, cost);
 
                 var labels = new List<string>();
@@ -727,7 +727,7 @@ namespace PokemonTCG.Cards
                 if (specials.Count > 0) labels.Add("Discard a Special Energy");
                 if (ctx.State.Stadium != null) labels.Add("Discard " + ctx.State.Stadium.Def.Name);
                 if (labels.Count == 0) return;
-                int pick = labels.Count == 1 ? 0 : ctx.ChooseOption("Blowtorch: choose what to discard", labels.ToArray());
+                int pick = ctx.ChooseOneOption("Blowtorch: choose what to discard", labels.ToArray());
                 string choice = labels[pick];
                 if (choice == "Discard a Pokémon Tool")
                 {

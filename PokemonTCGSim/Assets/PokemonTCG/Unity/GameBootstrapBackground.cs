@@ -160,6 +160,9 @@ namespace PokemonTCG.Presentation
                 var used = new List<int>();
                 var pool = trainRandomA || trainRandomB ? (focus >= 0 ? TrainPoolFor(focus) : AllTrainDecks()) : new List<int>();
                 used.AddRange(pool);
+                // The Neural AI's checks against its champion play every legal deck, whatever is trained.
+                var champion = AllTrainDecks();
+                used.AddRange(champion);
                 if (!trainRandomA) used.Add(trainA);
                 if (!trainRandomB) used.Add(trainB);
                 var sb = new StringBuilder();
@@ -175,6 +178,7 @@ namespace PokemonTCG.Presentation
                 sb.Append("measure=").Append(trainMeasure ? MeasureGames : 0).Append('\n');
                 sb.Append("style=").Append(trainStyle == AiStyle.Learning ? "learning" : trainStyle == AiStyle.Hybrid ? "hybrid" : "neural").Append('\n');
                 sb.Append("pool=").Append(string.Join(",", pool.Select(i => i.ToString(CultureInfo.InvariantCulture)).ToArray())).Append('\n');
+                sb.Append("champion=").Append(string.Join(",", champion.Select(i => i.ToString(CultureInfo.InvariantCulture)).ToArray())).Append('\n');
                 sb.Append("a=").Append(trainRandomA ? -1 : trainA).Append('\n');
                 sb.Append("b=").Append(trainRandomB ? -1 : trainB).Append('\n');
                 sb.Append("randomA=").Append(trainRandomA ? 1 : 0).Append('\n');

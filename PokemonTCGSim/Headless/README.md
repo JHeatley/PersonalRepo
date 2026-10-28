@@ -36,10 +36,24 @@ games. Ctrl+C stops it after the current round.
 | `--games-per-second N` | | play at most N games a second (room to spare for the CPU) |
 | `--skip-cpu 2,3` | | keep off these CPU threads (a faulty core; Windows only; train and eval) |
 
+## The champion (background training)
+
+`background` (the app's Train in the background) checks the Neural AI against its champion like the Train screen does: a copy
+of the network that later versions have to beat. Every 10,000 games, and at the end of a session of 2,000 or more, the
+network plays 300 games against it on the same games each time (every legal deck the app sent); at 55% or more it becomes
+the new champion. The champion is saved next to the AI's file (`<AI file>.champion`), and its checks in the file itself.
+
 ## eval
 
 Plays the network (top-rated moves) against the classic bot, or against another network
 with `--vs FILE`, half the games on each seat, random decks.
+
+`--search quick` or `--search deep` makes the network look ahead before the main actions it
+isn't sure of (the sim's Look-ahead setting): it plays its best few moves out a turn
+(deep: two) ahead on guesses at the hidden cards, never the real ones, and makes the one
+that does best. It is much slower (about 20 seconds of CPU a game for quick);
+`--search-playouts N` and `--search-seconds S` change how much it thinks per move.
+`--vs FILE --search quick` with the same network as `--net` measures what looking ahead adds.
 
 ## Using what you trained in the sim
 

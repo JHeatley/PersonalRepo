@@ -350,7 +350,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != attack) return false;
                 var all = ctx.OpponentPokemon();
                 if (all.Count == 0) return true;
-                var target = all.Count == 1 ? all[0] : ctx.ChoosePokemon(all, attack + ": choose 1 of your opponent's Pokémon to damage");
+                var target = ctx.ChoosePokemon(all, attack + ": choose 1 of your opponent's Pokémon to damage");
                 if (target != null) ctx.DamageTarget(target, more(ctx, target) ? 40 : atk.Damage);
                 return true;
             }
@@ -563,7 +563,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Breaking Impact") return false;
                 var all = ctx.OpponentPokemon();
                 if (all.Count == 0) return true;
-                var target = all.Count == 1 ? all[0] : ctx.ChoosePokemon(all, "Breaking Impact: choose 1 of your opponent's Pokémon");
+                var target = ctx.ChoosePokemon(all, "Breaking Impact: choose 1 of your opponent's Pokémon");
                 if (target != null) ctx.DamageTarget(target, 10 * ctx.Engine.RetreatCostOf(target));
                 return true;
             }
@@ -711,7 +711,7 @@ namespace PokemonTCG.Cards
                 {
                     var from = RepeatableAbility.ChoosePokemonOrDone(ctx, Donors(ctx), Power + ": move an Energy card from which Pokémon to " + me.Name + "?" + (offerDone ? " Press Done when finished." : ""), offerDone);
                     if (from == null) return false;
-                    var card = from.Energy.Count == 1 ? from.Energy[0] : ctx.ChooseCards(from.Energy.ToList(), 1, 1, Power + ": move which Energy card?")[0];
+                    var card = ctx.ChooseCards(from.Energy.ToList(), 1, 1, Power + ": move which Energy card?")[0];
                     return ctx.Engine.MoveEnergy(from, me, card);
                 });
             }
@@ -729,7 +729,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var basics = ctx.BasicEnergyInDiscard();
                 if (basics.Count == 0 || !ctx.InPlay(me) || !ctx.Flip()) return true;
-                var card = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Energy Stream: attach which basic Energy card?")[0];
+                var card = ctx.ChooseCards(basics, 1, 1, "Energy Stream: attach which basic Energy card?")[0];
                 if (ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, me);
                 return true;
             }
@@ -804,7 +804,7 @@ namespace PokemonTCG.Cards
                 {
                     var basics = ctx.BasicEnergyInDiscard();
                     if (basics.Count == 0) break;
-                    var card = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Spiral Growth: attach which basic Energy card? (" + (i + 1) + " of " + heads + ")")[0];
+                    var card = ctx.ChooseCards(basics, 1, 1, "Spiral Growth: attach which basic Energy card? (" + (i + 1) + " of " + heads + ")")[0];
                     if (ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, me);
                 }
                 return true;
@@ -842,7 +842,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.InPlay(me) || ctx.Opp.Bench.Count == 0) return true;
                 var fire = me.Energy.Where(e => CardsHIF1.Provides(ctx, me, e, EnergyType.Fire)).ToList();
                 if (fire.Count == 0 || !ctx.AskYesNo("Flame Pillar: discard a Fire Energy card for 30 damage to 1 of your opponent's Benched Pokémon?")) return true;
-                var card = fire.Count == 1 ? fire[0] : ctx.ChooseCards(fire, 1, 1, "Flame Pillar: discard which Fire Energy card?")[0];
+                var card = ctx.ChooseCards(fire, 1, 1, "Flame Pillar: discard which Fire Energy card?")[0];
                 if (ctx.Engine.DiscardEnergy(me, card)) ctx.DamageOneBenched(30);
                 return true;
             }

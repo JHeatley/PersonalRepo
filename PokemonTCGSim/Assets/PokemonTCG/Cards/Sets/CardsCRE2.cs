@@ -223,7 +223,7 @@ namespace PokemonTCG.Cards
                 if (holders.Count == 0) return;
                 var holder = ctx.ChoosePokemon(holders, "Hidden Claw: discard a Pokémon Tool from which Pokémon?");
                 if (holder == null) return;
-                var tool = holder.Tools.Count == 1 ? holder.Tools[0] : ctx.ChooseCards(holder.Tools.ToList(), 1, 1, "Hidden Claw: discard which Pokémon Tool?")[0];
+                var tool = ctx.ChooseCards(holder.Tools.ToList(), 1, 1, "Hidden Claw: discard which Pokémon Tool?")[0];
                 ctx.Engine.DiscardTool(holder, tool);
             }
 
@@ -520,7 +520,7 @@ namespace PokemonTCG.Cards
                 {
                     var holder = ctx.ChoosePokemon(targets, "Flannery: discard a Special Energy from which of your opponent's Pokémon?");
                     var specials = holder.Energy.Where(e => e.Def.IsAttachedSpecialEnergy).ToList();
-                    var energy = specials.Count == 1 ? specials[0] : ctx.ChooseCards(specials, 1, 1, "Flannery: discard which Special Energy?")[0];
+                    var energy = ctx.ChooseCards(specials, 1, 1, "Flannery: discard which Special Energy?")[0];
                     ctx.Engine.DiscardEnergy(holder, energy);
                 }
                 if (ctx.State.Stadium != null) ctx.Engine.DiscardStadium();
@@ -656,7 +656,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var pick = targets.Count == 1 ? targets : ctx.ChoosePokemonMany(targets, 1, 2, "Siebold: heal 60 damage from up to 2 of your Rapid Strike Pokémon");
+                var pick = ctx.ChoosePokemonMany(targets, 1, 2, "Siebold: heal 60 damage from up to 2 of your Rapid Strike Pokémon");
                 foreach (var mon in pick) ctx.Heal(mon, 60);
             }
         }
@@ -727,7 +727,7 @@ namespace PokemonTCG.Cards
                 if (targets.Count == 0) return;
                 var holder = ctx.ChoosePokemon(targets, "Fan of Waves: which of your opponent's Pokémon?");
                 var specials = holder.Energy.Where(e => e.Def.IsAttachedSpecialEnergy).ToList();
-                var energy = specials.Count == 1 ? specials[0] : ctx.ChooseCards(specials, 1, 1, "Fan of Waves: put which Special Energy on the bottom of their deck?")[0];
+                var energy = ctx.ChooseCards(specials, 1, 1, "Fan of Waves: put which Special Energy on the bottom of their deck?")[0];
                 if (ctx.Engine.EnergyRemovalProtected(holder, energy))
                 {
                     ctx.Log(energy.Def.Name + " on " + holder.Name + " can't be put into the deck by Fan of Waves.");
@@ -810,7 +810,7 @@ namespace PokemonTCG.Cards
             {
                 if (!holderWasActive || attacker == null || attacker.Owner == ctx.Player || attacker.Energy.Count == 0) return;
                 if (!ctx.InPlay(attacker)) return;
-                var energy = attacker.Energy.Count == 1 ? attacker.Energy[0] : ctx.ChooseCards(attacker.Energy.ToList(), 1, 1, "Rugged Helmet: put which Energy on " + attacker.Name + " into your opponent's hand?")[0];
+                var energy = ctx.ChooseCards(attacker.Energy.ToList(), 1, 1, "Rugged Helmet: put which Energy on " + attacker.Name + " into your opponent's hand?")[0];
                 ctx.Engine.ReturnEnergyToHand(attacker, energy);
             }
         }

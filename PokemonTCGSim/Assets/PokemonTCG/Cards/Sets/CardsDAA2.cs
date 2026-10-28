@@ -78,6 +78,9 @@ namespace PokemonTCG.Cards
             r.RegisterByName("Glimwood Tangle", new GlimwoodTangle());
             r.RegisterByName("Old PC", new OldPC());
             r.RegisterByName("Pokémon Breeder's Nurturing", new BreedersNurturing());
+            // Rare Fossil's play rules are in the engine, from its card data (CardDef.IsFossil): 70 HP, no Special Conditions, a
+            // Prize card when Knocked Out, like Unidentified Fossil's.
+            r.RegisterByName("Rare Fossil", new CardScript());
             r.RegisterByName("Rose Tower", new RoseTower());
             r.RegisterByName("Spikemuth", new Spikemuth());
             r.RegisterByName("Struggle Gloves", new StruggleGloves());
@@ -231,14 +234,13 @@ namespace PokemonTCG.Cards
                 if (!TefPokemon.StillDefending(ctx, defending) || !ctx.CanAffect(defending)) return true;
                 if (defending.Tools.Count > 0)
                 {
-                    var tool = defending.Tools.Count == 1 ? defending.Tools[0]
-                        : ctx.ChooseCards(defending.Tools.ToList(), 1, 1, "Hack Off: discard which Pokémon Tool?")[0];
+                    var tool = ctx.ChooseCards(defending.Tools.ToList(), 1, 1, "Hack Off: discard which Pokémon Tool?")[0];
                     ctx.Engine.DiscardTool(defending, tool);
                 }
                 var special = defending.Energy.Where(e => e.Def.IsAttachedSpecialEnergy).ToList();
                 if (special.Count > 0)
                 {
-                    var pick = special.Count == 1 ? special[0] : ctx.ChooseCards(special, 1, 1, "Hack Off: discard which Special Energy?")[0];
+                    var pick = ctx.ChooseCards(special, 1, 1, "Hack Off: discard which Special Energy?")[0];
                     ctx.Engine.DiscardEnergy(defending, pick);
                 }
                 return true;
@@ -335,7 +337,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var pile = ctx.Me.Discard.Where(c => c.Def.IsEnergy).ToList();
                 if (pile.Count == 0 || !ctx.InPlay(me)) return true;
-                var card = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, "Energy Link: attach which Energy card to " + me.Name + "?")[0];
+                var card = ctx.ChooseCards(pile, 1, 1, "Energy Link: attach which Energy card to " + me.Name + "?")[0];
                 if (ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, me);
                 return true;
             }
@@ -531,7 +533,7 @@ namespace PokemonTCG.Cards
                 var pile = ctx.BasicEnergyInDiscard();
                 var targets = Targets(ctx);
                 if (pile.Count == 0 || targets.Count == 0) return;
-                var card = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, "Turbo Patch: attach which basic Energy card?")[0];
+                var card = ctx.ChooseCards(pile, 1, 1, "Turbo Patch: attach which basic Energy card?")[0];
                 var target = ctx.ChoosePokemon(targets, "Turbo Patch: attach " + card.Def.Name + " to which of your Basic Pokémon?");
                 if (target != null && ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, target);
             }

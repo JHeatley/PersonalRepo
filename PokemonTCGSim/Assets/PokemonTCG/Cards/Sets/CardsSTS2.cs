@@ -67,7 +67,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Shocking Light: put 3 damage counters on which of your opponent's Pokémon-EX?");
+                var target = ctx.ChoosePokemon(targets, "Shocking Light: put 3 damage counters on which of your opponent's Pokémon-EX?");
                 ctx.PlaceCounters(target, 3);
             }
 
@@ -162,8 +162,8 @@ namespace PokemonTCG.Cards
                 var hurt = ctx.MyPokemon(m => m.DamageCounters > 0);
                 var theirs = ctx.OpponentPokemon();
                 if (hurt.Count == 0 || theirs.Count == 0) return true;
-                var source = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Transfer Pain: move a damage counter from which of your Pokémon?");
-                var dest = theirs.Count == 1 ? theirs[0] : ctx.ChoosePokemon(theirs, "Transfer Pain: move it to which of your opponent's Pokémon?");
+                var source = ctx.ChoosePokemon(hurt, "Transfer Pain: move a damage counter from which of your Pokémon?");
+                var dest = ctx.ChoosePokemon(theirs, "Transfer Pain: move it to which of your opponent's Pokémon?");
                 if (source != null && dest != null) ctx.Engine.MoveDamageCounters(source, dest, 1, "Transfer Pain");
                 return true;
             }
@@ -237,7 +237,7 @@ namespace PokemonTCG.Cards
             {
                 var top = ctx.LookAtTop(2);
                 if (top.Count == 0) return;
-                var pick = top.Count == 1 ? top : ctx.ChooseCards(top, 1, 1, "Sinister Selection: put 1 of the top 2 cards of your deck into your hand");
+                var pick = ctx.ChooseCards(top, 1, 1, "Sinister Selection: put 1 of the top 2 cards of your deck into your hand");
                 ctx.DeckToHand(pick);
             }
 
@@ -355,9 +355,9 @@ namespace PokemonTCG.Cards
             {
                 var holders = WithTools(ctx);
                 if (holders.Count == 0) return;
-                var holder = holders.Count == 1 ? holders[0] : ctx.ChoosePokemon(holders, "Tear Away: take a Pokémon Tool from which of your Pokémon?");
+                var holder = ctx.ChoosePokemon(holders, "Tear Away: take a Pokémon Tool from which of your Pokémon?");
                 if (holder == null) return;
-                var tool = holder.Tools.Count == 1 ? holder.Tools[0] : ctx.ChooseCards(holder.Tools.ToList(), 1, 1, "Tear Away: which Pokémon Tool?")[0];
+                var tool = ctx.ChooseCards(holder.Tools.ToList(), 1, 1, "Tear Away: which Pokémon Tool?")[0];
                 holder.Tools.Remove(tool);
                 ctx.Me.Hand.Add(tool);
                 ctx.Log(ctx.Engine.PlayerName(ctx.Player) + " put " + tool.Def.Name + " from " + holder.Name + " into " + ctx.Engine.Their(ctx.Player) + " hand (Tear Away).");

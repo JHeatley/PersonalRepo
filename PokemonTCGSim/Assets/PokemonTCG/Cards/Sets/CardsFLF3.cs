@@ -59,7 +59,7 @@ namespace PokemonTCG.Cards
             {
                 var fire = ctx.Me.Hand.Where(c => IsFireEnergyCard(c.Def)).ToList();
                 if (fire.Count == 0) return;
-                var card = fire.Count == 1 ? fire[0] : ctx.ChooseCards(fire, 1, 1, "Fiery Torch: discard which Fire Energy card?")[0];
+                var card = ctx.ChooseCards(fire, 1, 1, "Fiery Torch: discard which Fire Energy card?")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 ctx.Draw(2);
             }

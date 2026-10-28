@@ -201,7 +201,7 @@ namespace PokemonTCG.Cards
                 var old = ctx.Pokemon;
                 var choices = Choices(ctx);
                 if (choices.Count == 0 || !ctx.InPlay(old)) return;
-                var pick = choices.Count == 1 ? choices[0] : ctx.ChooseCards(choices, 1, 1, Transform + ": choose a Stage 1 Pokémon from your discard pile")[0];
+                var pick = ctx.ChooseCards(choices, 1, 1, Transform + ": choose a Stage 1 Pokémon from your discard pile")[0];
                 bool wasActive = ctx.IsActive(old);
                 int slot = ctx.Me.Bench.IndexOf(old);
                 if (!ctx.Me.Discard.Remove(pick)) return;
@@ -651,7 +651,7 @@ namespace PokemonTCG.Cards
             {
                 var holder = ctx.ChoosePokemon(ctx.MyPokemon(m => m.Tools.Count > 0), "Shopping Center: put a Pokémon Tool from which of your Pokémon into your hand?");
                 if (holder == null || holder.Tools.Count == 0) return false;
-                var tool = holder.Tools.Count == 1 ? holder.Tools[0] : ctx.ChooseCards(holder.Tools.ToList(), 1, 1, "Shopping Center: which Pokémon Tool?")[0];
+                var tool = ctx.ChooseCards(holder.Tools.ToList(), 1, 1, "Shopping Center: which Pokémon Tool?")[0];
                 if (!holder.Tools.Remove(tool)) return false;
                 ctx.Me.Hand.Add(tool);
                 ctx.Log(tool.Def.Name + " went from " + holder.Name + " into " + ctx.Engine.Their(ctx.Player) + " hand (Shopping Center).");

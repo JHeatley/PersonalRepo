@@ -104,7 +104,7 @@ namespace PokemonTCG.Tests
         [Test]
         public void Delta_Gift_Attaches_A_Basic_Energy_To_Each_Pokemon_With_A_Cap()
         {
-            var e = Scenario(new ScriptedAgent().Then("Attack: Delta Gift"), new ScriptedAgent());
+            var e = Scenario(new ScriptedAgent().Then("Attack: Delta Gift", "Lightning Energy|Lightning Energy"), new ScriptedAgent());
             var active = e.ScenarioActive(0, C(Chansey));
             Attach(e, active, Fire, 1);
             e.ScenarioAttachTool(active, C(Cap));

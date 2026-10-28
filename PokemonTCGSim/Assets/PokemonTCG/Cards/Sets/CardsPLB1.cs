@@ -203,7 +203,7 @@ namespace PokemonTCG.Cards
                     var holder = RepeatableAbility.ChoosePokemonOrDone(ctx, holders, Reversal + ": put a Pokémon Tool from which Pokémon into your hand?" + (offerDone ? " Press Done when finished." : ""), offerDone);
                     if (holder == null) return false;
                     var tools = all.Where(kv => kv.Key == holder).Select(kv => kv.Value).ToList();
-                    var tool = tools.Count == 1 ? tools[0] : ctx.ChooseCards(tools, 1, 1, Reversal + ": put which Pokémon Tool into your hand?")[0];
+                    var tool = ctx.ChooseCards(tools, 1, 1, Reversal + ": put which Pokémon Tool into your hand?")[0];
                     if (!holder.Tools.Remove(tool)) return false;
                     ctx.Me.Hand.Add(tool);
                     ctx.Log(tool.Def.Name + " was put into " + ctx.Engine.PlayerName(ctx.Player) + "'s hand from " + holder.Name + " (Tool Reversal).");
@@ -385,7 +385,7 @@ namespace PokemonTCG.Cards
                 bool more = false;
                 if (fossils.Count > 0 && ctx.AskYesNo("Fossil Clutch: discard a Fossil card from your hand for 50 more damage?"))
                 {
-                    var pick = fossils.Count == 1 ? fossils[0] : ctx.ChooseCards(fossils, 1, 1, "Fossil Clutch: discard which Fossil card?")[0];
+                    var pick = ctx.ChooseCards(fossils, 1, 1, "Fossil Clutch: discard which Fossil card?")[0];
                     ctx.Engine.DiscardFromHand(ctx.Player, pick);
                     more = true;
                 }
@@ -468,7 +468,7 @@ namespace PokemonTCG.Cards
                     var giver = RepeatableAbility.ChoosePokemonOrDone(ctx, Givers(ctx), "Psyjamming: move a Special Energy from which of your opponent's Pokémon?" + (offerDone ? " Press Done when finished." : ""), offerDone);
                     if (giver == null) return false;
                     var specials = giver.Energy.Where(e => e.Def.IsSpecialEnergy).ToList();
-                    var card = specials.Count == 1 ? specials[0] : ctx.ChooseCards(specials, 1, 1, "Psyjamming: move which Special Energy?")[0];
+                    var card = ctx.ChooseCards(specials, 1, 1, "Psyjamming: move which Special Energy?")[0];
                     var to = RepeatableAbility.ChoosePokemonOrDone(ctx, ctx.OpponentPokemon(m => m != giver && ctx.CanAffect(m)), "Psyjamming: move " + card.Def.Name + " to which Pokémon?", offerDone);
                     return to != null && ctx.Engine.MoveEnergy(giver, to, card);
                 });

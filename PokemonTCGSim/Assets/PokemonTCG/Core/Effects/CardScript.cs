@@ -44,6 +44,11 @@ namespace PokemonTCG.Core
         public virtual void OnPlayedFromHandToBench(EffectContext ctx) { }
         /// <summary>Triggered when this card is played from hand to evolve a Pokémon (ctx.Pokemon is the evolved Pokémon).</summary>
         public virtual void OnEvolvedFromHand(EffectContext ctx) { }
+        /// <summary>
+        /// OnEvolvedFromHand is an Ability of the card underneath (Alakazam-EX's Kinesis for M Alakazam-EX): it runs although the
+        /// evolved Pokémon has no Ability of its own, and the script checks whether that Ability is blocked.
+        /// </summary>
+        public virtual bool EvolveEffectFromCardBelow { get { return false; } }
         /// <summary>Extra conditions on an attack beyond its Energy cost.</summary>
         public virtual bool CanUseAttack(EffectContext ctx, int attackIndex) { return true; }
         /// <summary>"If you go first, you can use this attack during your first turn."</summary>
@@ -1011,6 +1016,17 @@ namespace PokemonTCG.Core
 
         public bool AskYesNo(string prompt) { return Engine.AskYesNo(Player, prompt, Source); }
         public int AskNumber(int min, int max, string prompt) { return Engine.AskNumber(Player, min, max, prompt, Source); }
+
+        /// <summary>
+        /// ChooseOption where a bot takes the only choice at once (the person on screen is still asked, as in the real game). Use it
+        /// for picks among things that are there (which Special Condition to remove...), not for "do it or not" questions.
+        /// </summary>
+        public int ChooseOneOption(string prompt, params string[] labels)
+        {
+            var opts = new List<DecisionOption>();
+            for (int i = 0; i < labels.Length; i++) opts.Add(new DecisionOption { Label = labels[i], Index = i });
+            return Engine.AskOne(Player, DecisionKind.ChooseOption, prompt, opts, Source);
+        }
 
         /// <summary>Pick one of several labelled choices. Returns the index.</summary>
         public int ChooseOption(string prompt, params string[] labels)

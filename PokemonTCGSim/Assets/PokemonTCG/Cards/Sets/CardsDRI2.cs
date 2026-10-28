@@ -782,7 +782,7 @@ namespace PokemonTCG.Cards
                     if (pick == 0) break;
                     var from = holders[pick - 1];
                     var metal = from.Energy.Where(e => CardsDRI1.ProvidesType(ctx, from, e, EnergyType.Metal)).ToList();
-                    var energy = metal.Count == 1 ? metal[0] : ctx.ChooseCards(metal, 1, 1, "Iron Shake-Up: move which Energy?")[0];
+                    var energy = ctx.ChooseCards(metal, 1, 1, "Iron Shake-Up: move which Energy?")[0];
                     var to = ctx.ChoosePokemon(ctx.MyPokemon(m => m != from), "Iron Shake-Up: move " + energy.Def.Name + " to which Pokémon?");
                     if (to == null || !ctx.Engine.MoveEnergy(from, to, energy)) break;
                 }

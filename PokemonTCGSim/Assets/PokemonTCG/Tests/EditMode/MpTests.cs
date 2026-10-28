@@ -219,7 +219,7 @@ namespace PokemonTCG.Tests
         {
             foreach (bool mega in new[] { true, false })
             {
-                var e = Scenario(new ScriptedAgent().Then("Play Lida"), new ScriptedAgent());
+                var e = Scenario(new ScriptedAgent().Then("Play Lida", "Metal Energy|Metal Energy"), new ScriptedAgent());
                 e.ScenarioActive(0, C(Chansey));
                 var heatran = e.ScenarioBench(0, C(MegaHeatran));
                 e.State.Players[0].KnockOuts.Add(new KnockOutRecord(2, C(mega ? MegaDragonite : Chansey), true));

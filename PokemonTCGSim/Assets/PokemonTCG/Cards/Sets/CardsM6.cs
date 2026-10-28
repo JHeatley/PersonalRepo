@@ -158,8 +158,7 @@ namespace PokemonTCG.Cards
                         ctx.Me.Deck.Add(energy);
                         continue;
                     }
-                    var target = waiting.Count == 1 ? waiting[0]
-                        : ctx.ChoosePokemon(waiting, "Delta Gift: attach " + energy.Def.Name + " to which of your Pokémon with a Mega Rayquaza Cap?");
+                    var target = ctx.ChoosePokemon(waiting, "Delta Gift: attach " + energy.Def.Name + " to which of your Pokémon with a Mega Rayquaza Cap?");
                     if (target == null || !ctx.Engine.AttachEnergyCard(energy, target))
                     {
                         if (!ctx.Me.Deck.Contains(energy)) ctx.Me.Deck.Add(energy);

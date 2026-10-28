@@ -178,7 +178,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 foreach (var mon in ctx.OpponentPokemon(m => m.Energy.Count > 0 && ctx.CanAffect(m)))
                 {
-                    var pick = mon.Energy.Count == 1 ? mon.Energy.ToList() : ctx.ChooseCards(mon.Energy.ToList(), 1, 1, "Dread Storm-GX: discard which Energy from " + mon.Name + "?");
+                    var pick = ctx.ChooseCards(mon.Energy.ToList(), 1, 1, "Dread Storm-GX: discard which Energy from " + mon.Name + "?");
                     if (pick.Count > 0) ctx.Engine.DiscardEnergy(mon, pick[0]);
                 }
                 return true;
@@ -231,7 +231,7 @@ namespace PokemonTCG.Cards
                 int bonus = 0;
                 if (special.Count > 0 && ctx.AskYesNo("Special Artillery: discard a Special Energy from " + me.Name + " for 80 more damage?"))
                 {
-                    var pick = special.Count == 1 ? special : ctx.ChooseCards(special, 1, 1, "Special Artillery: discard which Special Energy?");
+                    var pick = ctx.ChooseCards(special, 1, 1, "Special Artillery: discard which Special Energy?");
                     if (pick.Count > 0 && ctx.Engine.DiscardEnergy(me, pick[0])) bonus = 80;
                 }
                 ctx.DamageDefending(atk.Damage + bonus);

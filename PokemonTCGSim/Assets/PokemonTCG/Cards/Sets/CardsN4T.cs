@@ -74,7 +74,7 @@ namespace PokemonTCG.Cards
                 if (!byOpponentsAttack || holder == null || mon == null || mon == holder || src.IsMyTurn || !src.IsActive(mon) || !src.InPlay(holder)) return;
                 var basics = mon.Energy.Where(e => e.Def.IsBasicEnergy).ToList();
                 if (basics.Count == 0 || !src.AskYesNo("EXP.ALL: move a basic Energy card from " + mon.Name + " to " + holder.Name + "?")) return;
-                var pick = basics.Count == 1 ? basics : src.ChooseCards(basics, 1, 1, "EXP.ALL: move which basic Energy card to " + holder.Name + "?");
+                var pick = src.ChooseCards(basics, 1, 1, "EXP.ALL: move which basic Energy card to " + holder.Name + "?");
                 if (pick.Count == 0 || !src.Engine.MoveEnergy(mon, holder, pick[0])) return;
                 if (holder.Tools.Contains(src.Card)) src.Engine.DiscardTool(holder, src.Card);
             }
@@ -166,7 +166,7 @@ namespace PokemonTCG.Cards
             {
                 var energy = Energy(ctx);
                 if (energy.Count == 0) return;
-                var pick = energy.Count == 1 ? energy : ctx.ChooseCards(energy, 1, 1, "Energy Amplifier: shuffle which Energy card into your deck?");
+                var pick = ctx.ChooseCards(energy, 1, 1, "Energy Amplifier: shuffle which Energy card into your deck?");
                 if (pick.Count == 0 || !ctx.Me.Hand.Remove(pick[0])) return;
                 ctx.Engine.ShowCards(ctx.Opponent, pick, "Energy Amplifier", "Energy Amplifier: " + ctx.Engine.PlayerName(ctx.Player) + " shuffles this card into their deck", ctx.Source);
                 ctx.Me.Deck.Add(pick[0]);
@@ -189,7 +189,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.Flip()) return false;
                 var energy = ctx.BasicEnergyInDiscard();
                 if (energy.Count == 0) return false;
-                var pick = energy.Count == 1 ? energy : ctx.ChooseCards(energy, 1, 1, "Energy Stadium: put which basic Energy card into your hand?");
+                var pick = ctx.ChooseCards(energy, 1, 1, "Energy Stadium: put which basic Energy card into your hand?");
                 ctx.DiscardToHand(pick);
                 return false;
             }
@@ -204,7 +204,7 @@ namespace PokemonTCG.Cards
             {
                 var mons = ctx.MyPokemon();
                 if (mons.Count == 0) return;
-                var target = mons.Count == 1 ? mons[0] : ctx.ChoosePokemon(mons, "Magnifier: attach it to which of your Pokémon?");
+                var target = ctx.ChoosePokemon(mons, "Magnifier: attach it to which of your Pokémon?");
                 if (target == null) return;
                 ctx.AddEffect(new MagnifierEffect(target.Name + "'s attacks don't apply Resistance this turn (Magnifier)", ctx.Player, target.Uid, ctx.Turn));
             }
@@ -236,7 +236,7 @@ namespace PokemonTCG.Cards
             {
                 var cards = Evolutions(ctx);
                 if (cards.Count == 0) return;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Pokémon Personality Test: put which Evolution card face down?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Pokémon Personality Test: put which Evolution card face down?")[0];
                 string name = card.Def.Name;
                 int truth = name.StartsWith("Light ", StringComparison.Ordinal) ? 0 : name.StartsWith("Dark ", StringComparison.Ordinal) ? 1 : 2;
                 var options = new List<DecisionOption>();

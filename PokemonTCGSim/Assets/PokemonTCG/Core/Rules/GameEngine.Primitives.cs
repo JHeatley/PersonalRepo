@@ -586,7 +586,7 @@ namespace PokemonTCG.Core
                 if (link != null) Emit(GameEventType.Info, target.Owner, link.Def.Name + ": " + PlayerName(target.Owner) + "'s turn doesn't end.", link.Id, target.Uid);
                 else RequestEndTurn();
             }
-            if (fromHand && !AbilitiesBlocked(target))
+            if (fromHand && (!AbilitiesBlocked(target) || Scripts.For(evolution.Def).EvolveEffectFromCardBelow))
             {
                 PushSource(evolution.Def.AbilitySourceKind, target.Owner, target);
                 var evolveShield = HasOldPokemonPower(evolution.Def) ? BeginDiscardShield() : null; // Allergic Pollen (v141)

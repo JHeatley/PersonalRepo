@@ -50,7 +50,7 @@ namespace PokemonTCG.Cards
                 var pile = ctx.Me.Discard.Where(c => IsType(c.Def, type) && !ctx.Engine.PutIntoPlayBlocked(ctx.Player, c.Def)).ToList();
                 if (pile.Count > 0 && ctx.BenchSpace > 0)
                 {
-                    var pick = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, ctx.SourceName + ": put which " + type + " Pokémon onto your Bench?")[0];
+                    var pick = ctx.ChooseCards(pile, 1, 1, ctx.SourceName + ": put which " + type + " Pokémon onto your Bench?")[0];
                     if (ctx.Me.Discard.Remove(pick)) ctx.Engine.PutOntoBench(ctx.Player, pick, false);
                 }
                 ctx.Draw(5);

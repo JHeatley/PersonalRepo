@@ -329,7 +329,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var me = ctx.Pokemon;
                 if (!ctx.InPlay(me) || me.Energy.Count == 0) return true;
-                var pick = me.Energy.Count == 1 ? me.Energy[0] : ctx.ChooseCards(me.Energy.ToList(), 1, 1, attack + ": put which Energy into your hand?")[0];
+                var pick = ctx.ChooseCards(me.Energy.ToList(), 1, 1, attack + ": put which Energy into your hand?")[0];
                 ctx.Engine.ReturnEnergyToHand(me, pick);
                 return true;
             }
@@ -773,7 +773,7 @@ namespace PokemonTCG.Cards
                     ctx.DamageDefending(atk.Damage);
                     if (!TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || ctx.Opp.Bench.Count == 0) return true;
                     if (!ctx.AskYesNo("Jamming Wing: move an Energy from " + defending.Name + " to 1 of your opponent's Benched Pokémon?")) return true;
-                    var energy = defending.Energy.Count == 1 ? defending.Energy[0] : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Jamming Wing: move which Energy?")[0];
+                    var energy = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Jamming Wing: move which Energy?")[0];
                     var target = ctx.ChoosePokemon(ctx.OpponentBench(), "Jamming Wing: move " + energy.Def.Name + " to which of your opponent's Benched Pokémon?");
                     if (target != null) ctx.Engine.MoveEnergy(defending, target, energy);
                     return true;

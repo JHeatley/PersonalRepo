@@ -64,7 +64,9 @@ namespace PokemonTCG.Tests
         {
             var own = db.Cards.Where(d => d.SetCode == "UPR" && !d.IsAlternatePrint).ToList();
             Assert.AreEqual(128, own.Count);
-            Assert.IsTrue(own.All(d => Formats.CategoryOf(d) == CardCategory.Expanded), "no regulation mark: Expanded");
+            // Cards banned in Expanded are Unlimited only, and basic Energy is Standard as always.
+            Assert.IsTrue(own.All(d => Formats.CategoryOf(d) == (Formats.IsExpandedBanned(d) ? CardCategory.Unlimited
+                : d.IsBasicEnergy ? CardCategory.Standard : CardCategory.Expanded)), "no regulation mark: Expanded");
             Assert.AreEqual("Ultra Prism", C(Giratina).PrintSetName);
             Assert.AreEqual("HIF-SV46", C("UPR-13").BaseKey, "Leafeon-GX was already in the pool (Hidden Fates Shiny Vault)");
             Assert.AreEqual("HIF-SV40", C("UPR-99").BaseKey, "so was Garchomp");

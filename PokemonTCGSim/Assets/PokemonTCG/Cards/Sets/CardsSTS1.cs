@@ -290,7 +290,7 @@ namespace PokemonTCG.Cards
             {
                 var fire = FireInHand(ctx);
                 if (fire.Count == 0) return;
-                var pick = fire.Count == 1 ? fire[0] : ctx.ChooseCards(fire, 1, 1, "Steam Up: discard a Fire Energy card from your hand")[0];
+                var pick = ctx.ChooseCards(fire, 1, 1, "Steam Up: discard a Fire Energy card from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, pick);
                 ctx.AddEffect(new ConditionalDamageBonusEffect("Basic Fire Pokémon do 30 more damage this turn (Steam Up)", ctx.Player, ctx.Turn, 30,
                     (engine, attacker, target) => attacker.Def.IsBasicPokemon && engine.IsType(attacker, EnergyType.Fire)));

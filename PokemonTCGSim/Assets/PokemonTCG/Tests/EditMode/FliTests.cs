@@ -57,7 +57,9 @@ namespace PokemonTCG.Tests
         {
             var own = db.Cards.Where(d => d.SetCode == "FLI" && !d.IsAlternatePrint).ToList();
             Assert.AreEqual(101, own.Count);
-            Assert.IsTrue(own.All(d => Formats.CategoryOf(d) == CardCategory.Expanded), "no regulation mark: Expanded");
+            // Cards banned in Expanded are Unlimited only, and basic Energy is Standard as always.
+            Assert.IsTrue(own.All(d => Formats.CategoryOf(d) == (Formats.IsExpandedBanned(d) ? CardCategory.Unlimited
+                : d.IsBasicEnergy ? CardCategory.Standard : CardCategory.Expanded)), "no regulation mark: Expanded");
             Assert.AreEqual("Forbidden Light", C(Palkia).PrintSetName);
             Assert.AreEqual("HIF-SV56", C("FLI-24").BaseKey, "Greninja-GX was already in the pool (Hidden Fates Shiny Vault)");
             Assert.AreEqual("DRM-78", C("FLI-95").BaseKey, "Ultra Necrozma-GX is Dragon Majesty 78's card");

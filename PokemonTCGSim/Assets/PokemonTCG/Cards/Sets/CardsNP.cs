@@ -255,7 +255,7 @@ namespace PokemonTCG.Cards
                 var others = ctx.MyPokemon(m => m != me);
                 if (typed.Count == 0 || others.Count == 0) return true;
                 if (!ctx.AskYesNo(attack + ": move a " + type + " Energy card from " + me.Name + " to another of your Pokémon?")) return true;
-                var card = typed.Count == 1 ? typed[0] : ctx.ChooseCards(typed, 1, 1, attack + ": move which Energy card?")[0];
+                var card = ctx.ChooseCards(typed, 1, 1, attack + ": move which Energy card?")[0];
                 var to = ctx.ChoosePokemon(others, attack + ": move " + card.Def.Name + " to which of your Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(me, to, card);
                 return true;

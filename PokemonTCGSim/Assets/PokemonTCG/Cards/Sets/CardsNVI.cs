@@ -184,7 +184,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var damaged = ctx.MyBench().Where(m => m.DamageCounters > 0).ToList();
                 if (damaged.Count == 0) return true;
-                var target = damaged.Count == 1 ? damaged[0] : ctx.ChoosePokemon(damaged, "Aromax: heal all damage from which Benched Pokémon?");
+                var target = ctx.ChoosePokemon(damaged, "Aromax: heal all damage from which Benched Pokémon?");
                 if (target != null) ctx.Heal(target, target.DamageCounters * 10);
                 return true;
             }
@@ -311,7 +311,7 @@ namespace PokemonTCG.Cards
                     ctx.Log("The effect of Damagriiigus on " + defending.Name + " was prevented.");
                     return true;
                 }
-                var from = damaged.Count == 1 ? damaged[0] : ctx.ChoosePokemon(damaged, "Damagriiigus: move all damage counters from which Benched Pokémon?");
+                var from = ctx.ChoosePokemon(damaged, "Damagriiigus: move all damage counters from which Benched Pokémon?");
                 if (from == null) return true;
                 int counters = from.DamageCounters;
                 from.DamageCounters = 0;

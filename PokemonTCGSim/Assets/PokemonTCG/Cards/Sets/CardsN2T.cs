@@ -38,7 +38,7 @@ namespace PokemonTCG.Cards
                     fromHand = ctx.Me.Deck.Count == 0 || ctx.ChooseOption("Fossil Egg: put a card that evolves from Mysterious Fossil onto your Bench from...", "Your deck", "Your hand") == 1;
                 if (fromHand)
                 {
-                    var pick = inHand.Count == 1 ? inHand[0] : ctx.ChooseCards(inHand, 1, 1, "Fossil Egg: put which card onto your Bench?")[0];
+                    var pick = ctx.ChooseCards(inHand, 1, 1, "Fossil Egg: put which card onto your Bench?")[0];
                     if (ctx.Me.Hand.Remove(pick)) ctx.Engine.PutOntoBench(ctx.Player, pick, false);
                     return;
                 }
@@ -70,7 +70,7 @@ namespace PokemonTCG.Cards
             {
                 var evolved = Evolved(ctx);
                 if (evolved.Count == 0) return;
-                var target = evolved.Count == 1 ? evolved[0] : ctx.ChoosePokemon(evolved, "Hyper Devolution Spray: devolve which of your Pokémon?");
+                var target = ctx.ChoosePokemon(evolved, "Hyper Devolution Spray: devolve which of your Pokémon?");
                 if (target == null) return;
                 var removed = ctx.Engine.Devolve(target, 1);
                 if (removed.Count > 0) target.CantEvolveOnTurn = ctx.Turn;

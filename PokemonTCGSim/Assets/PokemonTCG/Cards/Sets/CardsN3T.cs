@@ -67,7 +67,7 @@ namespace PokemonTCG.Cards
             {
                 var candidates = ctx.MyPokemon(CanEvolve);
                 if (candidates.Count == 0) return;
-                var chosen = candidates.Count == 1 ? candidates : ctx.ChoosePokemonMany(candidates, 1, 2, "Pokémon Breeder Fields: choose 1 or 2 of your Pokémon");
+                var chosen = ctx.ChoosePokemonMany(candidates, 1, 2, "Pokémon Breeder Fields: choose 1 or 2 of your Pokémon");
                 bool searched = false;
                 foreach (var mon in chosen)
                 {
@@ -100,7 +100,7 @@ namespace PokemonTCG.Cards
                 bool pokemon = heads == 2;
                 var cards = ctx.Me.Discard.Where(c => c != ctx.Card && (pokemon ? c.Def.IsPokemon : c.Def.IsTrainer)).ToList();
                 if (cards.Count == 0) return;
-                var pick = cards.Count == 1 ? cards : ctx.ChooseCards(cards, 1, 1, "Old Rod: put which " + (pokemon ? "Pokémon" : "Trainer") + " card into your hand?");
+                var pick = ctx.ChooseCards(cards, 1, 1, "Old Rod: put which " + (pokemon ? "Pokémon" : "Trainer") + " card into your hand?");
                 ctx.DiscardToHand(pick);
             }
         }

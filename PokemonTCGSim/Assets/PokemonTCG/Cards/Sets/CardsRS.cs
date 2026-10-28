@@ -343,7 +343,7 @@ namespace PokemonTCG.Cards
                 foreach (var card in found)
                 {
                     var mine = ctx.MyPokemon();
-                    var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Attract Current: attach " + card.Def.Name + " to which Pokémon?");
+                    var target = ctx.ChoosePokemon(mine, "Attract Current: attach " + card.Def.Name + " to which Pokémon?");
                     if (target == null) { ctx.Me.Deck.Add(card); continue; }
                     ctx.Engine.AttachEnergyCard(card, target);
                 }

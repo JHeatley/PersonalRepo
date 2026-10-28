@@ -84,7 +84,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var special = me.Energy.Where(en => en.Def.IsAttachedSpecialEnergy).ToList();
                 if (special.Count == 0) return;
-                var card = special.Count == 1 ? special[0] : ctx.ChooseCards(special, 1, 1, "Troubleshooting: discard which Special Energy?")[0];
+                var card = ctx.ChooseCards(special, 1, 1, "Troubleshooting: discard which Special Energy?")[0];
                 if (ctx.Engine.DiscardEnergy(me, card) && me.DamageCounters > 0) ctx.Heal(me, 80);
             }
 
@@ -170,7 +170,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var hurt = ctx.MyBench().Where(m => m.DamageCounters > 0).ToList();
                 if (hurt.Count == 0) return true;
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Aromax: heal all damage from which of your Benched Pokémon?");
+                var target = ctx.ChoosePokemon(hurt, "Aromax: heal all damage from which of your Benched Pokémon?");
                 if (target != null) ctx.Heal(target, target.DamageCounters * 10);
                 return true;
             }

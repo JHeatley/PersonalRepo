@@ -112,7 +112,7 @@ namespace PokemonTCG.Cards
             {
                 var supporters = ctx.Me.Discard.Where(c => c.Def.IsSupporter).ToList();
                 if (supporters.Count == 0) return;
-                var pick = supporters.Count == 1 ? supporters[0] : ctx.ChooseCards(supporters, 1, 1, "VS Seeker: put a Supporter card from your discard pile into your hand")[0];
+                var pick = ctx.ChooseCards(supporters, 1, 1, "VS Seeker: put a Supporter card from your discard pile into your hand")[0];
                 ctx.DiscardToHand(new List<CardInstance> { pick });
             }
         }

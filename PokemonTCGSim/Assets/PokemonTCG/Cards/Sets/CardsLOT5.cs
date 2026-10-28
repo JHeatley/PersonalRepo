@@ -174,7 +174,7 @@ namespace PokemonTCG.Cards
                 }
                 var present = All.Where(c => active.Has(c)).ToList();
                 if (present.Count == 0) return;
-                var pick = present.Count == 1 ? present[0] : present[ctx.ChooseOption("Mixed Herbs: remove which Special Condition from " + active.Name + "?", present.Select(c => c.ToString()).ToArray())];
+                var pick = present[ctx.ChooseOneOption("Mixed Herbs: remove which Special Condition from " + active.Name + "?", present.Select(c => c.ToString()).ToArray())];
                 if (!ctx.CanAffect(active)) return;
                 ctx.Engine.RemoveCondition(active, pick);
                 ctx.Log(active.Name + " is no longer " + pick + ".");
@@ -280,7 +280,7 @@ namespace PokemonTCG.Cards
             {
                 var fire = ctx.Me.Hand.Where(c => CardsTEU1.BasicOf(c.Def, EnergyType.Fire)).ToList();
                 if (fire.Count == 0) return false;
-                var card = fire.Count == 1 ? fire[0] : ctx.ChooseCards(fire, 1, 1, "Heat Factory: discard a Fire Energy card from your hand")[0];
+                var card = ctx.ChooseCards(fire, 1, 1, "Heat Factory: discard a Fire Energy card from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 ctx.Draw(3);
                 return false;

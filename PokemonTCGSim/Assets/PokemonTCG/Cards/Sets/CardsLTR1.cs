@@ -130,7 +130,7 @@ namespace PokemonTCG.Cards
                     if (giver == null) return false;
                     var movable = giver.Energy.Where(e => Movable(ctx, giver, e)).ToList();
                     if (movable.Count == 0) return false;
-                    var card = movable.Count == 1 ? movable[0] : ctx.ChooseCards(movable, 1, 1, attack + ": move which Energy from " + giver.Name + "?")[0];
+                    var card = ctx.ChooseCards(movable, 1, 1, attack + ": move which Energy from " + giver.Name + "?")[0];
                     var receiver = RepeatableAbility.ChoosePokemonOrDone(ctx, ctx.MyPokemon(m => m != giver), attack + ": move " + card.Def.Name + " to which Pokémon?", offerDone);
                     return receiver != null && ctx.Engine.MoveEnergy(giver, receiver, card);
                 });
@@ -277,9 +277,9 @@ namespace PokemonTCG.Cards
                 {
                     var bench = ctx.MyBench();
                     if (bench.Count == 0) { ctx.Me.Deck.Add(card); continue; }
-                    var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Turbo Energize: attach " + card.Def.Name + " to which Benched Pokémon?");
+                    var target = ctx.ChoosePokemon(bench, "Turbo Energize: attach " + card.Def.Name + " to which Benched Pokémon?");
                     // A Pokémon protected from the attack's effects (Sigilyph's Safeguard) can be chosen, but the Energy is discarded (2013-06-20).
-                    if (target != null && !ctx.CanAffect(target))
+                    if (target != null && (!ctx.CanAffect(target) || CardsLTR2.SafeguardMon.StopsOwnAttack(ctx, target)))
                     {
                         ctx.Me.Discard.Add(card);
                         ctx.Log("Turbo Energize: " + target.Name + " is protected, so " + card.Def.Name + " is discarded.");
@@ -304,7 +304,7 @@ namespace PokemonTCG.Cards
                     if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                     var pile = ctx.Me.Discard.ToList();
                     if (pile.Count == 0) return true;
-                    var pick = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, "Pull Out: put which card from your discard pile on top of your deck?")[0];
+                    var pick = ctx.ChooseCards(pile, 1, 1, "Pull Out: put which card from your discard pile on top of your deck?")[0];
                     if (!ctx.Me.Discard.Remove(pick)) return true;
                     ctx.Me.Deck.Insert(0, pick);
                     ctx.Log("Pull Out: " + ctx.Engine.PlayerName(ctx.Player) + " put " + pick.Def.Name + " from the discard pile on top of the deck.");

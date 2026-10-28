@@ -103,7 +103,7 @@ namespace PokemonTCG.Cards
             if (burn) ctx.ApplyCondition(defending, SpecialCondition.Burned);
             if (shuffle && defending.Energy.Count > 0 && ctx.CanAffect(defending))
             {
-                var card = defending.Energy.Count == 1 ? defending.Energy[0] : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Freezing Force: choose an Energy card attached to " + defending.Name)[0];
+                var card = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Freezing Force: choose an Energy card attached to " + defending.Name)[0];
                 ShuffleEnergyIntoOwnersDeck(ctx, defending, new[] { card });
             }
         }
@@ -176,7 +176,7 @@ namespace PokemonTCG.Cards
             {
                 var evolved = ctx.OpponentPokemon(m => CardsE2.IsEvolved(m) && ctx.CanAffect(m));
                 if (evolved.Count == 0) return;
-                var target = evolved.Count == 1 ? evolved[0] : ctx.ChoosePokemon(evolved, "Retro Cave: choose 1 of your opponent's Evolved Pokémon");
+                var target = ctx.ChoosePokemon(evolved, "Retro Cave: choose 1 of your opponent's Evolved Pokémon");
                 if (target != null) ctx.Engine.DevolveToBottomOfDeck(target, 1);
             }
         }
@@ -190,7 +190,7 @@ namespace PokemonTCG.Cards
             {
                 var hurt = ctx.MyPokemon(m => m.DamageCounters > 0);
                 if (hurt.Count == 0) return;
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Healing Oasis: remove all damage counters from which Pokémon?");
+                var target = ctx.ChoosePokemon(hurt, "Healing Oasis: remove all damage counters from which Pokémon?");
                 if (target != null) ctx.Heal(target, target.DamageCounters * 10);
             }
         }
@@ -270,7 +270,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Hyper Potion: choose 1 of your Pokémon");
+                var target = ctx.ChoosePokemon(targets, "Hyper Potion: choose 1 of your Pokémon");
                 if (target == null) return;
                 var basics = target.Energy.Where(e => e.Def.IsBasicEnergy).ToList();
                 var picks = ctx.ChooseCards(basics, 1, Math.Min(2, basics.Count), "Hyper Potion: discard 1 basic Energy card (3 counters off) or 2 (5 counters off)");
@@ -372,7 +372,7 @@ namespace PokemonTCG.Cards
                 if (ctx.Me.Deck.Count > 0) ctx.SearchToHand(d => d.IsBasicEnergy, 1, "Mystery Zone: choose a basic Energy card");
                 var evolutions = ctx.Me.Hand.Where(c => c.Def.IsEvolution).ToList();
                 if (evolutions.Count == 0) return false;
-                var card = evolutions.Count == 1 ? evolutions[0] : ctx.ChooseCards(evolutions, 1, 1, "Mystery Zone: put which Evolution card from your hand into your deck?")[0];
+                var card = ctx.ChooseCards(evolutions, 1, 1, "Mystery Zone: put which Evolution card from your hand into your deck?")[0];
                 ctx.Engine.ShowCards(ctx.Opponent, new List<CardInstance> { card }, "Mystery Zone", "Your opponent shuffles this card into their deck.", ctx.Source);
                 if (ctx.Me.Hand.Remove(card)) ctx.Me.Deck.Add(card);
                 ctx.ShuffleMyDeck();
@@ -397,7 +397,7 @@ namespace PokemonTCG.Cards
                 ctx.MarkNamedLimit(Limit);
                 var cards = Fossils(ctx);
                 if (cards.Count == 0 || ctx.BenchSpace <= 0) return false;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Underground Lake: put which Omanyte or Kabuto onto your Bench?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Underground Lake: put which Omanyte or Kabuto onto your Bench?")[0];
                 if (!ctx.Me.Discard.Remove(card)) return false;
                 var mon = ctx.Engine.PutOntoBench(ctx.Player, card, false);
                 if (mon != null) mon.Markers[PokemonInPlay.ConsideredBasicMarker] = 1;
@@ -419,7 +419,7 @@ namespace PokemonTCG.Cards
                 var mon = ctx.Pokemon;
                 var basics = mon == null ? new List<CardInstance>() : mon.Energy.Where(e => e.Def.IsBasicEnergy).ToList();
                 if (basics.Count == 0) return;
-                var card = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Bounce Energy: return which basic Energy card to your hand?")[0];
+                var card = ctx.ChooseCards(basics, 1, 1, "Bounce Energy: return which basic Energy card to your hand?")[0];
                 ctx.Engine.ReturnEnergyToHand(mon, card);
             }
         }

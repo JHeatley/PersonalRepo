@@ -276,6 +276,9 @@ public static class Program
             }
             foreach (var part in J("pool").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 if (int.TryParse(part, out int i) && byIndex.TryGetValue(i, out var d)) decks.Add(d);
+            var championDecks = new List<KeyValuePair<string, List<CardDef>>>();
+            foreach (var part in J("champion").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                if (int.TryParse(part, out int i) && byIndex.TryGetValue(i, out var d)) championDecks.Add(d);
             bool randomA = J("randomA") == "1", randomB = J("randomB") == "1";
             byIndex.TryGetValue(JI("a", -1), out var deckA);
             byIndex.TryGetValue(JI("b", -1), out var deckB);
@@ -297,7 +300,8 @@ public static class Program
                 NeuralRest = JD("rest", 0),
                 GpuAddress = J("gpu", null),
                 GamesPerSecond = JD("rate", 0),
-                PrizeCount = JI("prizes", 6)
+                PrizeCount = JI("prizes", 6),
+                ChampionDecks = championDecks.Count > 0 ? championDecks : null
             };
             Console.WriteLine($"background training: {session.MatchLabel}, {session.Games:N0} games as the {session.StyleLabel}; brain {brain.FilePath}");
             session.Start();
@@ -342,8 +346,24 @@ public static class Program
         {
             return other == null ? new HeuristicAgent(seed) : new PolicyAgent(other, seed) { Greedy = true };
         }
-        double wr = trainer.Evaluate(Opponent, games, Int(o, "seed", 123), out int w, out int d, out int l);
-        Console.WriteLine($"vs {Get(o, "vs", "classic bot")}: {wr:P1} ({w}-{d}-{l}) over {w + d + l} games");
+        SearchSettings search = null;
+        string lookAhead = Get(o, "search", "off");
+        if (lookAhead == "quick") search = SearchSettings.Quick(1);
+        else if (lookAhead == "deep") search = SearchSettings.Deep(1);
+        else if (lookAhead != "off") throw new ArgumentException("--search takes off, quick or deep");
+        if (search != null)
+        {
+            search.MaxSeconds = Dbl(o, "search-seconds", search.MaxSeconds);
+            search.Playouts = Int(o, "search-playouts", search.Playouts);
+        }
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+        double wr = trainer.Evaluate(Opponent, games, Int(o, "seed", 123), search, out int w, out int d, out int l);
+        Console.WriteLine($"vs {Get(o, "vs", "classic bot")}{(search != null ? " (look-ahead " + lookAhead + ")" : "")}: {wr:P1} ({w}-{d}-{l}) over {w + d + l} games"
+                          + $" in {clock.Elapsed.TotalSeconds:0}s");
+        var s = trainer.LastSearch;
+        if (s != null)
+            Console.WriteLine($"look-ahead: {s.Searches:N0} decisions looked at, {s.Changed:N0} moves changed from the network's own, "
+                              + $"{s.Playouts:N0} play-outs ({s.Failed:N0} guesses failed)");
         return 0;
     }
 }

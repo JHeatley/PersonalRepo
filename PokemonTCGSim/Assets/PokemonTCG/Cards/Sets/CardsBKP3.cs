@@ -108,7 +108,7 @@ namespace PokemonTCG.Cards
                     var picks = ctx.ChooseCards(energy, 0, 1, "Max Elixir: choose a basic Energy card to attach to a Basic Pokémon on your Bench");
                     if (picks.Count > 0)
                     {
-                        var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Max Elixir: attach " + picks[0].Def.Name + " to which Benched Basic Pokémon?");
+                        var target = ctx.ChoosePokemon(targets, "Max Elixir: attach " + picks[0].Def.Name + " to which Benched Basic Pokémon?");
                         if (target != null && ctx.Me.Deck.Remove(picks[0])) ctx.Engine.AttachEnergyCard(picks[0], target);
                     }
                 }

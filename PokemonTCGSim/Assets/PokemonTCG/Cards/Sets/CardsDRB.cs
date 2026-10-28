@@ -100,7 +100,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var hurt = ctx.MyPokemon(m => m.DamageCounters > 0);
                 if (hurt.Count == 0) return true;
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Dragon Dew: remove 2 damage counters from which Pokémon?");
+                var target = ctx.ChoosePokemon(hurt, "Dragon Dew: remove 2 damage counters from which Pokémon?");
                 if (target != null) ctx.Heal(target, 20);
                 return true;
             }
@@ -207,7 +207,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Night Attack") return false;
                 var all = ctx.OpponentPokemon();
                 if (all.Count == 0) return true;
-                var target = all.Count == 1 ? all[0] : ctx.ChoosePokemon(all, "Night Attack: put a damage counter on which Pokémon?");
+                var target = ctx.ChoosePokemon(all, "Night Attack: put a damage counter on which Pokémon?");
                 if (target != null) ctx.PlaceCounters(target, 1);
                 return true;
             }

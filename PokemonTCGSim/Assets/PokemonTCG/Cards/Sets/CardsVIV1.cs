@@ -538,7 +538,7 @@ namespace PokemonTCG.Cards
                 if (a.DamageCounters > 0) ctx.Heal(a, 20);
                 var has = All.Where(c => a.Has(c)).ToList();
                 if (has.Count == 0) return;
-                int pick = has.Count == 1 ? 0 : ctx.ChooseOption("Lunar Blessing: " + a.Name + " recovers from which Special Condition?", has.Select(c => c.ToString()).ToArray());
+                int pick = ctx.ChooseOneOption("Lunar Blessing: " + a.Name + " recovers from which Special Condition?", has.Select(c => c.ToString()).ToArray());
                 ctx.Engine.RemoveCondition(a, has[pick]);
             }
         }

@@ -49,7 +49,7 @@ namespace PokemonTCG.Cards
             {
                 if (ctx.Pokemon == null || !TriggerOnce(ctx, Power, ctx.Me.Discard.Count > 0, Power + ": put a card from your discard pile on top of your deck?")) return;
                 var pile = ctx.Me.Discard.ToList();
-                var card = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, Power + ": put which card on top of your deck?")[0];
+                var card = ctx.ChooseCards(pile, 1, 1, Power + ": put which card on top of your deck?")[0];
                 if (!ctx.Me.Discard.Remove(card)) return;
                 ctx.Me.Deck.Insert(0, card);
                 ctx.Engine.Reveal(ctx.Player, new System.Collections.Generic.List<CardInstance> { card }, "put this card from " + ctx.Engine.Their(ctx.Player) + " discard pile on top of " + ctx.Engine.Their(ctx.Player) + " deck (Time Reversal)");

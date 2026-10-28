@@ -290,7 +290,7 @@ namespace PokemonTCG.Cards
                 bool bonus = false;
                 if (fighting.Count > 0 && ctx.AskYesNo("Cinder Cannon: discard a Fighting Energy from " + me.Name + " to do 120 more damage?"))
                 {
-                    var pick = fighting.Count == 1 ? fighting[0] : ctx.ChooseCards(fighting, 1, 1, "Cinder Cannon: discard which Energy?")[0];
+                    var pick = ctx.ChooseCards(fighting, 1, 1, "Cinder Cannon: discard which Energy?")[0];
                     bonus = ctx.Engine.DiscardEnergy(me, pick);
                 }
                 ctx.DamageDefending(atk.Damage + (bonus ? 120 : 0));
@@ -330,7 +330,7 @@ namespace PokemonTCG.Cards
                 var lightning = mon.Energy.Where(e => CardsDRI1.ProvidesType(src, mon, e, EnergyType.Lightning)).ToList();
                 if (lightning.Count == 0) return;
                 if (!src.AskYesNo("Electrical Grounding: move a Lightning Energy from " + mon.Name + " to " + me.Name + "?")) return;
-                var pick = lightning.Count == 1 ? lightning[0] : src.ChooseCards(lightning, 1, 1, "Electrical Grounding: move which Energy?")[0];
+                var pick = src.ChooseCards(lightning, 1, 1, "Electrical Grounding: move which Energy?")[0];
                 Announce(src, "Electrical Grounding");
                 src.Engine.MoveEnergy(mon, me, pick);
             }

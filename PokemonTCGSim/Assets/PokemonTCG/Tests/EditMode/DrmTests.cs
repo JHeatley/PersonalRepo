@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using PokemonTCG.AI;
 using PokemonTCG.Core;
 
 namespace PokemonTCG.Tests
@@ -258,7 +259,7 @@ namespace PokemonTCG.Tests
         [Test]
         public void Fiery_Flint_Costs_2_Other_Cards()
         {
-            var e = Scenario(new ScriptedAgent().Then("Play Fiery Flint", "Psychic Energy|Psychic Energy", "Fire Energy|Fire Energy|Fire Energy|Fire Energy"), new ScriptedAgent());
+            var e = Scenario(new ScriptedAgent().Then("Play Fiery Flint", "Fire Energy|Fire Energy|Fire Energy|Fire Energy") /* the 2 other cards are the only choice: not asked */, new ScriptedAgent());
             e.ScenarioActive(0, C(Snubbull));
             e.ScenarioAddToHand(0, C(FieryFlint));
             e.ScenarioAddToHand(0, C(Psychic));
@@ -271,6 +272,37 @@ namespace PokemonTCG.Tests
             var me = e.State.Players[0];
             Assert.AreEqual(4, me.Hand.Count(c => c.Def.Name == "Fire Energy"));
             Assert.AreEqual(2, me.Discard.Count(c => c.Def.Name == "Psychic Energy"));
+        }
+
+        /// <summary>A scripted seat the engine treats as the person on screen.</summary>
+        private sealed class ScriptedPerson : IInteractiveAgent
+        {
+            public readonly ScriptedAgent Inner = new ScriptedAgent();
+            public List<int> Decide(DecisionRequest r) { return Inner.Decide(r); }
+        }
+
+        [Test]
+        public void You_Are_Asked_Even_When_Theres_Only_One_Possible_Answer()
+        {
+            // Your ruling: like the real game, the person on screen picks Fiery Flint's 2 other cards even when there are only 2.
+            var you = new ScriptedPerson();
+            you.Inner.Then("Play Fiery Flint", "Psychic Energy|Psychic Energy", "Fire Energy|Fire Energy|Fire Energy|Fire Energy");
+            var e = Scenario(new ScriptedAgent(), new ScriptedAgent());
+            e.SetAgent(0, you);
+            e.ScenarioActive(0, C(Snubbull));
+            e.ScenarioAddToHand(0, C(FieryFlint));
+            e.ScenarioAddToHand(0, C(Psychic));
+            e.ScenarioAddToHand(0, C(Psychic));
+            e.ScenarioAddToDeck(0, C(Fire), 5);
+            e.ScenarioActive(1, C(Snubbull));
+            e.ScenarioSetTurn(0, 3);
+            Step(e);
+            Assert.IsTrue(you.Inner.Seen.Any(r => r.Prompt.StartsWith("Fiery Flint: discard 2")), "asked, with only one possible answer");
+            Assert.AreEqual(2, e.State.Players[0].Discard.Count(c => c.Def.Name == "Psychic Energy"));
+
+            // A game recorded before then is played back without those questions.
+            Assert.IsFalse(GameRecord.Parse(GameRecord.Header + "\nseed\t1\n", db, null).AskedEveryChoice);
+            Assert.IsTrue(GameRecord.Parse(new GameRecord().Serialize(), db, null).AskedEveryChoice);
         }
 
         [Test]

@@ -48,7 +48,7 @@ namespace PokemonTCG.Cards
             {
                 var top = ctx.LookAtTop(2);
                 if (top.Count == 0) return;
-                var keep = top.Count == 1 ? top : ctx.ChooseCards(top, 1, 1, "Acro Bike: put which card into your hand? (The other is discarded.)");
+                var keep = ctx.ChooseCards(top, 1, 1, "Acro Bike: put which card into your hand? (The other is discarded.)");
                 if (keep.Count == 0) keep = new List<CardInstance> { top[0] };
                 ctx.DeckToHand(keep);
                 if (top.Count > 1) ctx.Engine.DiscardTopOfDeck(ctx.Player, 1);
@@ -255,7 +255,7 @@ namespace PokemonTCG.Cards
                 if (holders.Count == 0) return;
                 var mon = ctx.ChoosePokemon(holders, "Rainbow Brush: switch an Energy on which Pokémon?");
                 if (mon == null) return;
-                var old = mon.Energy.Count == 1 ? mon.Energy.ToList() : ctx.ChooseCards(mon.Energy.ToList(), 1, 1, "Rainbow Brush: switch which Energy card on " + mon.Name + "?");
+                var old = ctx.ChooseCards(mon.Energy.ToList(), 1, 1, "Rainbow Brush: switch which Energy card on " + mon.Name + "?");
                 if (old.Count == 0) return;
                 var found = ctx.SearchMyDeck(d => d.IsBasicEnergy, 1, "Rainbow Brush: choose a basic Energy card to attach to " + mon.Name);
                 if (found.Count == 0)
@@ -408,7 +408,7 @@ namespace PokemonTCG.Cards
                 if (CanDraw(ctx)) labels.Add(Draw);
                 if (CanSwitch(ctx)) labels.Add(Swap);
                 if (labels.Count == 0) return;
-                string choice = labels.Count == 1 ? labels[0] : labels[ctx.ChooseOption("Tate & Liza: choose 1", labels.ToArray())];
+                string choice = labels[ctx.ChooseOneOption("Tate & Liza: choose 1", labels.ToArray())];
                 if (choice == Swap)
                 {
                     ctx.SwitchMyActive("Tate & Liza: switch your Active Pokémon with which Benched Pokémon?");

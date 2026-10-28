@@ -36,7 +36,8 @@ namespace PokemonTCG.Tests
         public void The_Set_Is_In_The_Pool_With_Its_Prints_Linked()
         {
             var own = db.Cards.Where(d => d.SetCode == "XYP" && !d.IsAlternatePrint).ToList();
-            Assert.AreEqual(129, own.Count);
+            // Checked against the full XY Black Star Promo list: the other promos are prints of cards already in the pool.
+            Assert.AreEqual(128, own.Count);
             Assert.AreEqual("AOR-36", C("XYP-71").BaseKey, "Hoopa-EX");
             Assert.AreEqual("FCO-21", C("XYP-128").BaseKey, "White Kyurem");
             Assert.AreEqual("XYP-111", C("XYP-187").BaseKey, "the Mythical collection reprint of Celebi");

@@ -440,6 +440,7 @@ namespace PokemonTCG.Tests
             session.Events.AddRange(VideoTimeline.Build(OverlayGame(), db, new VideoTimelineOptions(), out first));
             session.FirstPlayer = first;
             session.Events.Add(new VideoEvent { Time = 22, Kind = VideoEventKind.Trainer, Player = 1, Card = "Switch", Manual = true });
+            session.SortEvents(); // as the app does after adding an event by hand
             string log = session.BuildLog();
             StringAssert.StartsWith(VideoSession.LogHeader, log);
             StringAssert.Contains("Aki's Turn 5", log);
@@ -454,7 +455,9 @@ namespace PokemonTCG.Tests
             Assert.IsNull(report.Error, report.Error);
             Assert.AreEqual("video", report.Kind);
             Assert.AreEqual(0, report.UnreadLines, string.Join("\n", report.Unread.ToArray()));
-            Assert.GreaterOrEqual(report.Matched, 3, "the attacks line up once their Energy is attached: " + report.Summary());
+            // Dragapult ex's 2 attacks line up once their Energy is attached. Team Rocket's Mewtwo ex's can't: its Power Saver
+            // needs 4 Team Rocket's Pokémon in play, and this game has 1.
+            Assert.GreaterOrEqual(report.Matched, 2, "the attacks line up once their Energy is attached: " + report.Summary());
             Assert.Greater(report.TotalStudied, 0, report.Summary());
             Assert.AreEqual(1, brain.LogsStudied);
         }

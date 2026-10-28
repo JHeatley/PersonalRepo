@@ -673,7 +673,7 @@ namespace PokemonTCG.Cards
                 if (all.Count == 0) return true;
                 int low = all.Min(m => ctx.RemainingHp(m));
                 var tied = all.Where(m => ctx.RemainingHp(m) == low).ToList();
-                var target = tied.Count == 1 ? tied[0] : ctx.ChoosePokemon(tied, "Bring Down: which of the Pokémon with the lowest remaining HP is Knocked Out?");
+                var target = ctx.ChoosePokemon(tied, "Bring Down: which of the Pokémon with the lowest remaining HP is Knocked Out?");
                 if (target != null) ctx.Engine.KnockOut(target, "Bring Down");
                 return true;
             }
@@ -701,7 +701,7 @@ namespace PokemonTCG.Cards
                     opts.Add(new DecisionOption { Label = source.Name + ": " + move.Name + (move.Damage > 0 ? " (" + move.Damage + move.DamageSuffix + ")" : ""), Card = source, Index = i });
                 }
                 if (opts.Count == 0) return true;
-                int pick = opts.Count == 1 ? 0 : ctx.Engine.AskOne(ctx.Player, DecisionKind.ChooseOption, "Hypnotic Reign: use which attack?", opts, ctx.Source);
+                int pick = ctx.Engine.AskOne(ctx.Player, DecisionKind.ChooseOption, "Hypnotic Reign: use which attack?", opts, ctx.Source);
                 UseCopiedAttack(ctx, source, opts[pick].Index);
                 return true;
             }

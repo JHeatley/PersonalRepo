@@ -13,10 +13,16 @@ namespace PokemonTCG.Core
         {
             var s = engine.State;
             var seen = new HashSet<int>();
+            // Team Flare Hyper Gear (Head Ringer, Jamming Net...) is attached to the opponent's Pokémon: it stays its owner's card.
+            var lent = new int[2];
+            for (int i = 0; i < 2; i++)
+                foreach (var mon in s.Players[i].InPlay())
+                    foreach (var t in mon.Tools)
+                        if (t.Owner != i && t.Owner >= 0 && t.Owner < 2) lent[t.Owner]++;
             for (int i = 0; i < 2; i++)
             {
                 var p = s.Players[i];
-                int count = 0;
+                int count = lent[i];
                 string err;
 
                 err = Count(p.Deck, i, "deck", seen, ref count); if (err != null) return err;
@@ -39,7 +45,16 @@ namespace PokemonTCG.Core
                     if (mon.Stack.Count == 0 || !(mon.Stack[0].Def.IsPokemon || mon.Stack[0].Def.IsFossil)) return "A Pokémon in play has no Pokémon card at the bottom of its stack.";
                     if (!s.IsActive(mon) && mon.Conditions != SpecialCondition.None) return "Benched " + mon.Name + " has a Special Condition.";
                     if (engine.PokemonToolCount(mon) > 1 && engine.PokemonToolCount(mon) > engine.MaxTools(mon)) return mon.Name + " has " + engine.PokemonToolCount(mon) + " Pokémon Tools attached.";
-                    err = Count(mon.AllCards(), i, mon.Name, seen, ref count); if (err != null) return err;
+                    var own = new List<CardInstance>();
+                    foreach (var c in mon.AllCards())
+                    {
+                        if (c.Owner != i && mon.Tools.Contains(c))
+                        {
+                            if (!seen.Add(c.Id)) return c.Def.Name + " #" + c.Id + " exists twice (found again on " + mon.Name + ").";
+                        }
+                        else own.Add(c);
+                    }
+                    err = Count(own, i, mon.Name, seen, ref count); if (err != null) return err;
                 }
 
                 if (s.Stadium != null && s.StadiumOwner == i)

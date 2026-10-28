@@ -533,8 +533,7 @@ namespace PokemonTCG.Cards
             {
                 var energy = ctx.Pokemon.Energy.Where(e => IsBasicLightning(e.Def)).ToList();
                 if (energy.Count == 0) return;
-                var pick = energy.Count == 1 ? energy[0]
-                    : ctx.ChooseCards(energy, 1, 1, "Flashing Draw: discard a Basic Lightning Energy from this Pokémon")[0];
+                var pick = ctx.ChooseCards(energy, 1, 1, "Flashing Draw: discard a Basic Lightning Energy from this Pokémon")[0];
                 if (!ctx.Engine.DiscardEnergy(ctx.Pokemon, pick)) return;
                 ctx.DrawUntil(6);
             }

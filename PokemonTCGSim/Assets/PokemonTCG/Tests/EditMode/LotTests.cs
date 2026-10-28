@@ -69,7 +69,9 @@ namespace PokemonTCG.Tests
         {
             var own = db.Cards.Where(d => d.SetCode == "LOT" && !d.IsAlternatePrint).ToList();
             Assert.AreEqual(190, own.Count);
-            Assert.IsTrue(own.All(d => Formats.CategoryOf(d) == CardCategory.Expanded), "no regulation mark: Expanded");
+            // Cards banned in Expanded are Unlimited only, and basic Energy is Standard as always.
+            Assert.IsTrue(own.All(d => Formats.CategoryOf(d) == (Formats.IsExpandedBanned(d) ? CardCategory.Unlimited
+                : d.IsBasicEnergy ? CardCategory.Standard : CardCategory.Expanded)), "no regulation mark: Expanded");
             Assert.AreEqual("Lost Thunder", C("LOT-1").PrintSetName);
             Assert.AreEqual("HIF-12", C("LOT-54").BaseKey, "Slowpoke is the card already in the pool");
             Assert.AreEqual("POR-76", C("LOT-209").BaseKey, "so is Judge");

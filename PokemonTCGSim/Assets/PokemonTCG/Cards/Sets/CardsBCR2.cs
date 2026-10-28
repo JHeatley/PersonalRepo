@@ -113,7 +113,7 @@ namespace PokemonTCG.Cards
                     ctx.Log("Assist: none of your Benched Pokémon has an attack.");
                     return true;
                 }
-                int pick = options.Count == 1 ? 0 : ctx.ChooseOption("Assist: choose 1 of your Benched Pokémon's attacks to use",
+                int pick = ctx.ChooseOneOption("Assist: choose 1 of your Benched Pokémon's attacks to use",
                     options.Select(o => o.Key.Name + ": " + o.Key.Attacks[o.Value].Name).ToArray());
                 if (pick < 0 || pick >= options.Count) return true;
                 UseCopiedAttack(ctx, options[pick].Key, options[pick].Value);
@@ -186,7 +186,7 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 if (!TefPokemon.StillDefending(ctx, defending) || defending.Tools.Count == 0 || !ctx.CanAffect(defending)) return true;
-                var tool = defending.Tools.Count == 1 ? defending.Tools[0] : ctx.ChooseCards(defending.Tools.ToList(), 1, 1, attack + ": discard which Pokémon Tool?")[0];
+                var tool = ctx.ChooseCards(defending.Tools.ToList(), 1, 1, attack + ": discard which Pokémon Tool?")[0];
                 ctx.Engine.DiscardTool(defending, tool);
                 return true;
             }
@@ -208,7 +208,7 @@ namespace PokemonTCG.Cards
             {
                 var basics = Basics(ctx);
                 if (basics.Count == 0) return;
-                var pick = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Transform: put which Basic Pokémon on top of Ditto?")[0];
+                var pick = ctx.ChooseCards(basics, 1, 1, "Transform: put which Basic Pokémon on top of Ditto?")[0];
                 if (!ctx.Me.Hand.Remove(pick)) return;
                 var mon = ctx.Pokemon;
                 mon.Stack.Add(pick);
@@ -285,7 +285,7 @@ namespace PokemonTCG.Cards
                 var has = all.Where(c => active.Has(c)).ToList();
                 if (has.Count > 0)
                 {
-                    var pick = has.Count == 1 ? has[0] : has[ctx.ChooseOption("Busybody: remove which Special Condition from " + active.Name + "?", has.Select(c => c.ToString()).ToArray())];
+                    var pick = has[ctx.ChooseOneOption("Busybody: remove which Special Condition from " + active.Name + "?", has.Select(c => c.ToString()).ToArray())];
                     ctx.Engine.RemoveCondition(active, pick);
                 }
                 if (ctx.Me.Hand.Contains(ctx.Card)) ctx.Engine.DiscardFromHand(ctx.Player, ctx.Card);

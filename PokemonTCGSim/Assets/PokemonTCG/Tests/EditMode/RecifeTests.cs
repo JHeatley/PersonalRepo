@@ -77,7 +77,8 @@ namespace PokemonTCG.Tests
             CollectionAssert.IsEmpty(errors, string.Join("\n", errors.ToArray()));
         }
 
-        [Test]
+        // Slow in the Unity Editor: a longer limit than the Test Runner's default.
+        [Test, Timeout(600000)]
         public void Every_Builtin_Deck_Survives_Random_Play()
         {
             var decks = BuiltInDecks();
@@ -419,7 +420,7 @@ namespace PokemonTCG.Tests
             e.ScenarioSetStadium(0, C("TWM-149"));
             e.ScenarioSetTurn(0, 3);
             Step(e);
-            Assert.AreEqual(4, e.State.Players[0].Hand.Count, "Rapid Draw twice");
+            Assert.AreEqual(5, e.State.Players[0].Hand.Count, "Rapid Draw twice (2 + 2), and the Prize card for Dreepy");
             Assert.AreEqual(5, e.State.Players[0].Prizes.Count, "60 + 60 Knocks Out Dreepy");
         }
 

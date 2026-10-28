@@ -722,11 +722,15 @@ namespace PokemonTCG.Core
 
             // Compendium (Insight vs Headwind; Plasma Bane vs Pokémon League Headquarters): a cost an effect sets to a fixed
             // amount ("costs nothing", "costs [D]") can't be increased by other effects. A cost only reduced isn't "set".
-            bool costIsSet = modifiers.Any(SetsAttackCost);
+            // A modifier that sets the cost itself is always applied, even to 3 or more Energy (Iron Jugulis's Baryon Beam: "costs
+            // [C][C][C]" with a Future Booster Energy Capsule): only the ones that add to a cost are skipped.
+            var sets = modifiers.Select(SetsAttackCost).ToList();
+            bool costIsSet = sets.Contains(true);
             var cost = new List<EnergyType>(attack.Cost);
-            foreach (var modify in modifiers)
+            for (int m = 0; m < modifiers.Count; m++)
             {
-                if (costIsSet && IncreasesAttackCost(modify)) continue;
+                var modify = modifiers[m];
+                if (costIsSet && !sets[m] && IncreasesAttackCost(modify)) continue;
                 modify(cost);
             }
             return cost;
@@ -1169,6 +1173,23 @@ namespace PokemonTCG.Core
             foreach (var e in ActiveEffects())
                 if (e.PreventsEffects(this, target, kind)) return true;
             return false;
+        }
+
+        /// <summary>
+        /// EffectsPrevented with that Pokémon as the source: a lasting attack effect checked later, when nothing is resolving
+        /// (Clear Vision-GX against a Keldeo-GX that came into play after it: Pure Heart looks at the attacking Pokémon).
+        /// </summary>
+        public bool EffectsPreventedFrom(PokemonInPlay target, EffectSourceKind kind, int sourceOwner, PokemonInPlay sourcePokemon)
+        {
+            sourceStack.Add(new SourceFrame { Kind = kind, Owner = sourceOwner, Pokemon = sourcePokemon });
+            try
+            {
+                return EffectsPrevented(target, kind, sourceOwner, false);
+            }
+            finally
+            {
+                sourceStack.RemoveAt(sourceStack.Count - 1);
+            }
         }
 
         /// <summary>Prevention check for whatever effect is resolving right now.</summary>

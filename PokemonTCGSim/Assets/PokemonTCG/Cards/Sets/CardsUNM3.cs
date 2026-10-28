@@ -253,7 +253,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var mine = ctx.MyPokemon();
                 if (mine.Count == 0) return true;
-                var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Shadow Impact: put 3 damage counters on which of your Pokémon?");
+                var target = ctx.ChoosePokemon(mine, "Shadow Impact: put 3 damage counters on which of your Pokémon?");
                 if (target != null) ctx.Engine.PlaceDamageCounters(target, 3, "Shadow Impact");
                 return true;
             }
@@ -478,7 +478,7 @@ namespace PokemonTCG.Cards
             {
                 var beasts = ctx.Me.Hand.Where(x => x.Def.IsUltraBeast).ToList();
                 if (beasts.Count == 0) return;
-                var card = beasts.Count == 1 ? beasts[0] : ctx.ChooseCards(beasts, 1, 1, "Ultra Conversion: discard which Ultra Beast card?")[0];
+                var card = ctx.ChooseCards(beasts, 1, 1, "Ultra Conversion: discard which Ultra Beast card?")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 if (ctx.Me.Discard.Contains(card)) ctx.Draw(3);
             }

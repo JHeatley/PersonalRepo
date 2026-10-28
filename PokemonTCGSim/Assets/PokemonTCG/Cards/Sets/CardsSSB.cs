@@ -206,7 +206,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var targets = ctx.OpponentPokemon(CardsE2.IsEvolved);
                 if (targets.Count == 0) return true;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Time Spiral: choose 1 of your opponent's Evolved Pokémon");
+                var target = ctx.ChoosePokemon(targets, "Time Spiral: choose 1 of your opponent's Evolved Pokémon");
                 if (target != null && ctx.Flip() && ctx.InPlay(target) && ctx.CanAffect(target)) ctx.Engine.Devolve(target, 1, true);
                 return true;
             }
@@ -349,7 +349,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var grass = ctx.Me.Hand.Where(c => CardsRS.BasicOf(c.Def, EnergyType.Grass)).ToList();
                 if (grass.Count == 0 || !ctx.InPlay(me)) return true;
-                var card = grass.Count == 1 ? grass[0] : ctx.ChooseCards(grass, 1, 1, "Growth Spurt: attach which Grass Energy card?")[0];
+                var card = ctx.ChooseCards(grass, 1, 1, "Growth Spurt: attach which Grass Energy card?")[0];
                 if (ctx.Me.Hand.Remove(card)) ctx.Engine.AttachEnergyCard(card, me);
                 return true;
             }
@@ -364,7 +364,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var basics = ctx.BasicEnergyInDiscard();
                 if (basics.Count == 0) return true;
-                ctx.DiscardToHand(basics.Count == 1 ? basics : ctx.ChooseCards(basics, 1, 1, "Energy Catch: put which basic Energy card into your hand?"));
+                ctx.DiscardToHand(ctx.ChooseCards(basics, 1, 1, "Energy Catch: put which basic Energy card into your hand?"));
                 return true;
             }
         }

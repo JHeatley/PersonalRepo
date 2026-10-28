@@ -182,7 +182,7 @@ namespace PokemonTCG.Cards
                 if (cards.Count == 0 || targets.Count == 0) break;
                 var picks = ctx.ChooseCards(cards, 0, 1, prompt + " (" + (i + 1) + " of up to " + max + "; choose none to stop)");
                 if (picks.Count == 0) break;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, prompt + ": attach " + picks[0].Def.Name + " to which Pokémon?");
+                var target = ctx.ChoosePokemon(targets, prompt + ": attach " + picks[0].Def.Name + " to which Pokémon?");
                 AttachFromHand(ctx, picks[0], target);
                 attached++;
             }
@@ -887,9 +887,9 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var pile = Energy(ctx);
-                var card = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, "Sun Energy: attach which Psychic Energy from your discard pile?")[0];
+                var card = ctx.ChooseCards(pile, 1, 1, "Sun Energy: attach which Psychic Energy from your discard pile?")[0];
                 var lunatones = ctx.MyPokemon(m => m.Name == "Lunatone");
-                var target = lunatones.Count == 1 ? lunatones[0] : ctx.ChoosePokemon(lunatones, "Sun Energy: attach it to which Lunatone?");
+                var target = ctx.ChoosePokemon(lunatones, "Sun Energy: attach it to which Lunatone?");
                 if (ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, target);
             }
         }
@@ -1325,7 +1325,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var bench = ctx.MyBench();
                 if (bench.Count == 0) return true;
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Overhead Throw: do 10 damage to which of your Benched Pokémon?");
+                var target = ctx.ChoosePokemon(bench, "Overhead Throw: do 10 damage to which of your Benched Pokémon?");
                 ctx.DamageTarget(target, 10);
                 return true;
             }

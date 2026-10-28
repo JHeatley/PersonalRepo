@@ -120,6 +120,7 @@ namespace PokemonTCG.AI
             engine.OrderChooser = record.OrderChooser;
             engine.OrderChooserIsHigherSeed = record.OrderChooserIsHigherSeed;
             engine.TieBreaker = record.TieBreaker;
+            engine.AskPersonEveryChoice = record.AskedEveryChoice;
             engine.PlayerNames = new[] { record.Names[0], record.Names[1] };
             engine.CardsPerPlayer = record.Decks[0].Count == record.Decks[1].Count ? record.Decks[0].Count : 0;
             logs[0].Engine = engine;

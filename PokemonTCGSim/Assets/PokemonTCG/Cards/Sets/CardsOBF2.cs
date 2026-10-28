@@ -111,7 +111,7 @@ namespace PokemonTCG.Cards
                 foreach (var card in found)
                 {
                     if (waiting.Count == 0) { ctx.Me.Deck.Add(card); continue; }
-                    var target = waiting.Count == 1 ? waiting[0] : ctx.ChoosePokemon(waiting, "Coordinated Pack: attach " + card.Def.Name + " to which Houndour?");
+                    var target = ctx.ChoosePokemon(waiting, "Coordinated Pack: attach " + card.Def.Name + " to which Houndour?");
                     waiting.Remove(target);
                     ctx.Engine.AttachEnergyCard(card, target);
                 }
@@ -204,7 +204,7 @@ namespace PokemonTCG.Cards
                 {
                     var bench = ctx.Me.Bench.Where(m => m != me).ToList();
                     if (bench.Count == 0) break;
-                    var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Night Cyclone: move " + card.Def.Name + " to which Benched Pokémon?");
+                    var target = ctx.ChoosePokemon(bench, "Night Cyclone: move " + card.Def.Name + " to which Benched Pokémon?");
                     ctx.Engine.MoveEnergy(me, target, card);
                 }
                 return true;
@@ -306,7 +306,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Cheer Up") return false;
                 var energy = ctx.Me.Hand.Where(c => c.Def.IsEnergy).ToList();
                 if (energy.Count == 0) return true;
-                var card = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, "Cheer Up: attach which Energy card from your hand?")[0];
+                var card = ctx.ChooseCards(energy, 1, 1, "Cheer Up: attach which Energy card from your hand?")[0];
                 var target = ctx.ChoosePokemon(ctx.MyPokemon(), "Cheer Up: attach " + card.Def.Name + " to which of your Pokémon?");
                 if (target == null) return true;
                 ctx.Me.Hand.Remove(card);
@@ -460,7 +460,7 @@ namespace PokemonTCG.Cards
                 TefPokemon.RevealOpponentHand(ctx);
                 var hand = ctx.Opp.Hand.ToList();
                 if (hand.Count == 0) return;
-                var pick = hand.Count == 1 ? hand[0] : ctx.ChooseCards(hand, 1, 1, "Ortega: put which card on the bottom of your opponent's deck?")[0];
+                var pick = ctx.ChooseCards(hand, 1, 1, "Ortega: put which card on the bottom of your opponent's deck?")[0];
                 ctx.Opp.Hand.Remove(pick);
                 ctx.Opp.Deck.Add(pick);
                 ctx.Log(pick.Def.Name + " was put on the bottom of " + ctx.Engine.Their(ctx.Opponent) + " deck (Ortega).");
@@ -509,7 +509,7 @@ namespace PokemonTCG.Cards
                 var from = ctx.ChoosePokemon(givers, "Poppy: move Energy from which of your Pokémon?");
                 if (from == null) return;
                 var energy = from.Energy.ToList();
-                var picks = energy.Count == 1 ? energy : ctx.ChooseCards(energy, 1, Math.Min(2, energy.Count), "Poppy: choose up to 2 Energy to move");
+                var picks = ctx.ChooseCards(energy, 1, Math.Min(2, energy.Count), "Poppy: choose up to 2 Energy to move");
                 var to = ctx.ChoosePokemon(mine.Where(m => m != from).ToList(), "Poppy: move the Energy to which Pokémon?");
                 if (to == null) return;
                 foreach (var card in picks) ctx.Engine.MoveEnergy(from, to, card);
@@ -543,8 +543,7 @@ namespace PokemonTCG.Cards
                     ctx.Log("The effect of Team Star Grunt on " + defending.Name + " was prevented.");
                     return;
                 }
-                var pick = defending.Energy.Count == 1 ? defending.Energy[0]
-                    : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Team Star Grunt: put which Energy on top of your opponent's deck?")[0];
+                var pick = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Team Star Grunt: put which Energy on top of your opponent's deck?")[0];
                 defending.Energy.Remove(pick);
                 ctx.Opp.Deck.Insert(0, pick);
                 ctx.Engine.Emit(GameEventType.Info, ctx.Opponent, pick.Def.Name + " was put on top of " + ctx.Engine.Their(ctx.Opponent) + " deck (Team Star Grunt).", pick.Id, defending.Uid);

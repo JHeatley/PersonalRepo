@@ -68,7 +68,7 @@ namespace PokemonTCG.Cards
             if (defending == null || !defending.Def.Abilities.Any(a => a.IsPokePowerOrBody)) return;
             var donors = ctx.OpponentPokemon(m => m != defending && m.Energy.Any(e => e.Def.IsBasicEnergy));
             if (donors.Count == 0) return;
-            var from = donors.Count == 1 ? donors[0] : ctx.ChoosePokemon(donors, "Steel Generator: move basic Energy cards from which of your opponent's Pokémon?");
+            var from = ctx.ChoosePokemon(donors, "Steel Generator: move basic Energy cards from which of your opponent's Pokémon?");
             if (from == null || !ctx.CanAffect(from)) return;
             var basics = from.Energy.Where(e => e.Def.IsBasicEnergy).ToList();
             foreach (var card in ctx.ChooseCards(basics, 1, Math.Min(2, basics.Count), "Steel Generator: move up to 2 basic Energy cards to " + defending.Name))

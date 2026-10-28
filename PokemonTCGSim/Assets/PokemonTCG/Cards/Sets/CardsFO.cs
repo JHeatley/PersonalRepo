@@ -103,11 +103,11 @@ namespace PokemonTCG.Cards
             {
                 var sources = ctx.OpponentPokemon(m => m.DamageCounters > 0);
                 if (sources.Count == 0) return;
-                var from = sources.Count == 1 ? sources[0] : ctx.ChoosePokemon(sources, "Curse: move a damage counter from which of your opponent's Pokémon?");
+                var from = ctx.ChoosePokemon(sources, "Curse: move a damage counter from which of your opponent's Pokémon?");
                 if (from == null) return;
                 var targets = ctx.OpponentPokemon(m => m != from);
                 if (targets.Count == 0) return;
-                var to = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Curse: move it to which of your opponent's Pokémon?");
+                var to = ctx.ChoosePokemon(targets, "Curse: move it to which of your opponent's Pokémon?");
                 if (to != null) ctx.Engine.MoveDamageCounters(from, to, 1, Curse);
             }
 
@@ -325,7 +325,7 @@ namespace PokemonTCG.Cards
             {
                 var bench = ctx.Me.Bench.ToList();
                 if (bench.Count == 0) return;
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Mr. Fuji: shuffle which of your Benched Pokémon into your deck?");
+                var target = ctx.ChoosePokemon(bench, "Mr. Fuji: shuffle which of your Benched Pokémon into your deck?");
                 if (target != null) ctx.Engine.ShufflePokemonIntoDeck(target);
             }
         }
@@ -350,7 +350,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.Flip()) return;
                 var discard = ctx.Me.Discard.Where(c => c != ctx.Card).ToList();
                 if (discard.Count == 0) return;
-                var pick = discard.Count == 1 ? discard[0] : ctx.ChooseCards(discard, 1, 1, "Recycle: put which card from your discard pile on top of your deck?")[0];
+                var pick = ctx.ChooseCards(discard, 1, 1, "Recycle: put which card from your discard pile on top of your deck?")[0];
                 if (!ctx.Me.Discard.Remove(pick)) return;
                 ctx.Me.Deck.Insert(0, pick);
                 ctx.Engine.Reveal(ctx.Player, new List<CardInstance> { pick }, "card put on top of the deck (Recycle)");

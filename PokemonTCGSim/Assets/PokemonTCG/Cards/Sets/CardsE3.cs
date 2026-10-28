@@ -154,9 +154,9 @@ namespace PokemonTCG.Cards
                 if (!TefPokemon.StillDefending(ctx, defending)) return true;
                 var cards = defending.Energy.Where(e => !basicOnly || e.Def.IsBasicEnergy).ToList();
                 if (cards.Count == 0 || !ctx.Flip() || ctx.Opp.Bench.Count == 0 || !ctx.CanAffect(defending)) return true;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, attack + ": move which Energy card from " + defending.Name + "?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, attack + ": move which Energy card from " + defending.Name + "?")[0];
                 var bench = ctx.OpponentBench();
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, attack + ": move " + card.Def.Name + " to which of your opponent's Benched Pokémon?");
+                var target = ctx.ChoosePokemon(bench, attack + ": move " + card.Def.Name + " to which of your opponent's Benched Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(defending, target, card);
                 return true;
             }
@@ -378,7 +378,7 @@ namespace PokemonTCG.Cards
                 if (!CardsBS1.CopyingWithMetronome && me != null)
                 {
                     if (me.Energy.Count == 0) return Nothing(ctx);
-                    var card = me.Energy.Count == 1 ? me.Energy[0] : ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Burn Booster: discard which Energy card? (a Fire Energy card: 10 more damage)")[0];
+                    var card = ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Burn Booster: discard which Energy card? (a Fire Energy card: 10 more damage)")[0];
                     fire = CardsDRI1.ProvidesType(ctx, me, card, EnergyType.Fire);
                     ctx.Engine.DiscardEnergy(me, card);
                 }
@@ -439,7 +439,7 @@ namespace PokemonTCG.Cards
                 CardInstance discarded = null;
                 if (cards.Count > 0 && !CardsBS1.CopyingWithMetronome && ctx.AskYesNo("Crushing Lava: discard a basic Fire (Burned) or Fighting (20 more damage) Energy card?"))
                 {
-                    var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Crushing Lava: discard which Energy card?")[0];
+                    var card = ctx.ChooseCards(cards, 1, 1, "Crushing Lava: discard which Energy card?")[0];
                     if (ctx.Engine.DiscardEnergy(me, card)) discarded = card;
                 }
                 bool fighting = discarded != null && discarded.Def.EnergyProvides == EnergyType.Fighting;
@@ -616,8 +616,8 @@ namespace PokemonTCG.Cards
                     var water = CardsE2.EnergyCardsOf(ctx, me, EnergyType.Water);
                     var bench = ctx.MyBench();
                     if (!ctx.InPlay(me) || water.Count == 0 || bench.Count == 0) break;
-                    var card = water.Count == 1 ? water[0] : ctx.ChooseCards(water, 1, 1, "Energy Splash: move which Water Energy card (" + (i + 1) + " of 2)?")[0];
-                    var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Energy Splash: move " + card.Def.Name + " to which Benched Pokémon?");
+                    var card = ctx.ChooseCards(water, 1, 1, "Energy Splash: move which Water Energy card (" + (i + 1) + " of 2)?")[0];
+                    var target = ctx.ChoosePokemon(bench, "Energy Splash: move " + card.Def.Name + " to which Benched Pokémon?");
                     if (target == null) break;
                     ctx.Engine.MoveEnergy(me, target, card);
                 }
@@ -794,11 +794,11 @@ namespace PokemonTCG.Cards
             {
                 var donors = ctx.MyPokemon(m => m.Energy.Count > 0);
                 if (donors.Count == 0) return;
-                var from = donors.Count == 1 ? donors[0] : ctx.ChoosePokemon(donors, Power + ": move an Energy card from which Pokémon?");
+                var from = ctx.ChoosePokemon(donors, Power + ": move an Energy card from which Pokémon?");
                 if (from == null) return;
-                var card = from.Energy.Count == 1 ? from.Energy[0] : ctx.ChooseCards(from.Energy.ToList(), 1, 1, Power + ": move which Energy card?")[0];
+                var card = ctx.ChooseCards(from.Energy.ToList(), 1, 1, Power + ": move which Energy card?")[0];
                 var to = ctx.MyPokemon(m => m != from);
-                var target = to.Count == 1 ? to[0] : ctx.ChoosePokemon(to, Power + ": move " + card.Def.Name + " to which Pokémon?");
+                var target = ctx.ChoosePokemon(to, Power + ": move " + card.Def.Name + " to which Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(from, target, card);
             }
 
@@ -831,7 +831,7 @@ namespace PokemonTCG.Cards
                 if (!EvolvedActive(ctx) || ctx.BenchSpace <= 0 || Basics(ctx).Count == 0) return;
                 if (!TriggerOnce(ctx, Power, true, "Use " + Power + "? Put a Basic Pokémon from your discard pile onto your Bench, then flip 3 coins to attach basic Energy to it.")) return;
                 var basics = Basics(ctx);
-                var pick = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, Power + ": put which Basic Pokémon onto your Bench?")[0];
+                var pick = ctx.ChooseCards(basics, 1, 1, Power + ": put which Basic Pokémon onto your Bench?")[0];
                 if (!ctx.Me.Discard.Remove(pick)) return;
                 var benched = ctx.Engine.PutOntoBench(ctx.Player, pick, false);
                 int heads = ctx.FlipCoins(3);
@@ -880,7 +880,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var discard = ctx.Me.Discard.ToList();
                 if (discard.Count == 0 || !ctx.Flip()) return true;
-                var pick = discard.Count == 1 ? discard[0] : ctx.ChooseCards(discard, 1, 1, "Warp Hole: put which card from your discard pile on top of your deck?")[0];
+                var pick = ctx.ChooseCards(discard, 1, 1, "Warp Hole: put which card from your discard pile on top of your deck?")[0];
                 if (ctx.Me.Discard.Remove(pick)) ctx.Me.Deck.Insert(0, pick);
                 ctx.Log("Warp Hole: " + pick.Def.Name + " went on top of " + ctx.Engine.Possessive(ctx.Player) + " deck.");
                 return true;
@@ -949,7 +949,7 @@ namespace PokemonTCG.Cards
             {
                 var me = ctx.Pokemon;
                 var basics = me.Energy.Where(e => e.Def.IsBasicEnergy).ToList();
-                var card = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, Power + ": discard which basic Energy card?")[0];
+                var card = ctx.ChooseCards(basics, 1, 1, Power + ": discard which basic Energy card?")[0];
                 if (!ctx.Engine.DiscardEnergy(me, card)) return;
                 var defending = ctx.Defending;
                 if (defending != null && ctx.CanAffect(defending)) ctx.ApplyCondition(defending, SpecialCondition.Confused);

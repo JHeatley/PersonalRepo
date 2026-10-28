@@ -62,7 +62,7 @@ namespace PokemonTCG.Cards
                 var top = opp.Deck.Take(3).ToList();
                 if (top.Count == 0) return;
                 ctx.Engine.NoteLookedAt(top, "Top " + top.Count + " cards of your opponent's deck", ctx.Player);
-                var pick = top.Count == 1 ? top[0] : ctx.ChooseCards(top, 1, 1, "Chip-Chip Ice Axe: choose the card to put on top of your opponent's deck")[0];
+                var pick = ctx.ChooseCards(top, 1, 1, "Chip-Chip Ice Axe: choose the card to put on top of your opponent's deck")[0];
                 foreach (var card in top) opp.Deck.Remove(card);
                 foreach (var card in top) if (card != pick) opp.Deck.Add(card);
                 ctx.Engine.ShuffleDeck(ctx.Opponent);
@@ -124,7 +124,7 @@ namespace PokemonTCG.Cards
                 {
                     var card = found[0];
                     var options = targets.Where(m => CardsEVS1.EvolvesOnto(ctx, m, card.Def)).ToList();
-                    var target = options.Count == 1 ? options[0] : ctx.ChoosePokemon(options, "Dusk Stone: evolve which Pokémon into " + card.Def.Name + "?");
+                    var target = ctx.ChoosePokemon(options, "Dusk Stone: evolve which Pokémon into " + card.Def.Name + "?");
                     if (target != null) ctx.Engine.EvolvePokemon(target, card);
                     else ctx.Me.Deck.Add(card);
                 }

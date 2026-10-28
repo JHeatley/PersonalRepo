@@ -262,7 +262,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var others = Others(ctx);
                 if (others.Count == 0 || me == null) return;
-                var pick = others.Count == 1 ? others[0] : ctx.ChooseCards(others, 1, 1, "Stance Change: switch with which Aegislash from your hand?")[0];
+                var pick = ctx.ChooseCards(others, 1, 1, "Stance Change: switch with which Aegislash from your hand?")[0];
                 var old = me.Top;
                 ctx.Me.Hand.Remove(pick);
                 me.Stack[me.Stack.Count - 1] = pick;
@@ -513,7 +513,7 @@ namespace PokemonTCG.Cards
             {
                 var strikers = Strikers(ctx);
                 if (strikers.Count == 0) return false;
-                var card = strikers.Count == 1 ? strikers[0] : ctx.ChooseCards(strikers, 1, 1, "Tower of Darkness: discard a Single Strike card to draw 2 cards")[0];
+                var card = ctx.ChooseCards(strikers, 1, 1, "Tower of Darkness: discard a Single Strike card to draw 2 cards")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 ctx.Draw(2);
                 return false;

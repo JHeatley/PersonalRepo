@@ -286,7 +286,7 @@ namespace PokemonTCG.Cards
                 {
                     var card = found[0];
                     var candidates = mine.Where(m => m.Name == card.Def.EvolvesFrom && ctx.InPlay(m)).ToList();
-                    var target = candidates.Count == 1 ? candidates[0] : ctx.ChoosePokemon(candidates, "Expert Nurturer: evolve which Pokémon into " + card.Def.Name + "?");
+                    var target = ctx.ChoosePokemon(candidates, "Expert Nurturer: evolve which Pokémon into " + card.Def.Name + "?");
                     if (target != null) ctx.Engine.EvolvePokemon(target, card);
                     else ctx.Me.Deck.Add(card);
                 }
@@ -375,7 +375,7 @@ namespace PokemonTCG.Cards
                 var basic = mon.Energy.Where(e => e.Def.IsBasicEnergy).ToList();
                 if (basic.Count == 0) return;
                 if (!src.AskYesNo("Exp. Share: move a basic Energy card from " + mon.Name + " to " + holder.Name + "?")) return;
-                var pick = basic.Count == 1 ? basic[0] : src.ChooseCards(basic, 1, 1, "Exp. Share: move which Energy?")[0];
+                var pick = src.ChooseCards(basic, 1, 1, "Exp. Share: move which Energy?")[0];
                 src.Engine.MoveEnergy(mon, holder, pick);
             }
         }

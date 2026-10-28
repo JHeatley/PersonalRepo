@@ -161,7 +161,7 @@ namespace PokemonTCG.Cards
                 var basics = mon.Energy.Where(e => e.Def.IsBasicEnergy).ToList();
                 if (basics.Count == 0) return;
                 if (!src.AskYesNo("Energy Grounding: move a basic Energy card from " + mon.Name + " to " + me.Name + "?")) return;
-                var pick = basics.Count == 1 ? basics : src.ChooseCards(basics, 1, 1, "Energy Grounding: move which basic Energy card to " + me.Name + "?");
+                var pick = src.ChooseCards(basics, 1, 1, "Energy Grounding: move which basic Energy card to " + me.Name + "?");
                 if (pick.Count == 0) return;
                 Announce(src, "Energy Grounding");
                 src.Engine.MoveEnergy(mon, me, pick[0]);

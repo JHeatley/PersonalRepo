@@ -107,7 +107,7 @@ namespace PokemonTCG.Cards
                 var active = ctx.Me.Active;
                 var has = All.Where(active.Has).ToList();
                 if (has.Count == 0) return;
-                var pick = has.Count == 1 ? has[0] : has[ctx.ChooseOption(Power + ": remove which Special Condition from " + active.Name + "?", has.Select(c => c.ToString()).ToArray())];
+                var pick = has[ctx.ChooseOneOption(Power + ": remove which Special Condition from " + active.Name + "?", has.Select(c => c.ToString()).ToArray())];
                 ctx.Engine.RemoveCondition(active, pick);
                 ctx.Log(Power + ": " + active.Name + " is no longer " + pick + ".");
             }
@@ -164,7 +164,7 @@ namespace PokemonTCG.Cards
                 foreach (var card in found)
                 {
                     var spots = ctx.MyPokemon(m => !m.Def.IsOldEx);
-                    var target = spots.Count == 0 ? null : spots.Count == 1 ? spots[0] : ctx.ChoosePokemon(spots, "Energy Powder: attach " + card.Def.Name + " to which Pokémon?");
+                    var target = spots.Count == 0 ? null : ctx.ChoosePokemon(spots, "Energy Powder: attach " + card.Def.Name + " to which Pokémon?");
                     if (target == null || !ctx.Engine.AttachEnergyCard(card, target)) ctx.Me.Deck.Add(card);
                 }
                 ctx.ShuffleMyDeck();
@@ -182,7 +182,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var basics = ctx.BasicEnergyInDiscard();
                 if (basics.Count == 0 || !ctx.InPlay(me)) return true;
-                var card = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Energy Stream: attach which basic Energy card?")[0];
+                var card = ctx.ChooseCards(basics, 1, 1, "Energy Stream: attach which basic Energy card?")[0];
                 if (ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, me);
                 return true;
             }
@@ -215,7 +215,7 @@ namespace PokemonTCG.Cards
                     var kind = Kinds[i];
                     var options = ctx.Me.Discard.Where(c => kind(c.Def)).ToList();
                     if (options.Count == 0) continue;
-                    var pick = options.Count == 1 ? options[0] : ctx.ChooseCards(options, 1, 1, "Pickup: choose " + Names[i])[0];
+                    var pick = ctx.ChooseCards(options, 1, 1, "Pickup: choose " + Names[i])[0];
                     if (ctx.Me.Discard.Remove(pick))
                     {
                         ctx.Me.Hand.Add(pick);

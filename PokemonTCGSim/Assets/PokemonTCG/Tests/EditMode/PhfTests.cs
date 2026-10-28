@@ -180,7 +180,7 @@ namespace PokemonTCG.Tests
         [Test]
         public void Robo_Substitute_Is_Played_Onto_The_Bench()
         {
-            var e = Scenario(new ScriptedAgent().Then("Play Robo Substitute"), new ScriptedAgent());
+            var e = Scenario(new ScriptedAgent().Then("Bench Robo Substitute"), new ScriptedAgent());
             e.ScenarioActive(0, C(LaprasGX));
             e.ScenarioAddToHand(0, C(RoboSubstitute));
             e.ScenarioActive(1, C(SnorlaxGX));
@@ -190,7 +190,12 @@ namespace PokemonTCG.Tests
             Assert.AreEqual("Robo Substitute", robo.Name);
             Assert.AreEqual(30, e.MaxHp(robo));
             Assert.AreEqual(0, e.PrizesFor(robo), "no Prize card for it");
-            Assert.IsTrue(e.ApplyCondition(robo, SpecialCondition.Poisoned), "Special Conditions affect it");
+            // Special Conditions only go on the Active Pokémon: as the Active one, it can be Poisoned (not like an Antique Fossil).
+            var e2 = Scenario(new ScriptedAgent(), new ScriptedAgent());
+            var activeRobo = e2.ScenarioActive(0, C(RoboSubstitute));
+            e2.ScenarioActive(1, C(SnorlaxGX));
+            e2.ScenarioSetTurn(0, 3);
+            Assert.IsTrue(e2.ApplyCondition(activeRobo, SpecialCondition.Poisoned), "Special Conditions affect it");
         }
 
         [Test]

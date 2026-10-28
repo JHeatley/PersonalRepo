@@ -64,7 +64,7 @@ namespace PokemonTCG.Cards
                 ctx.Draw(2);
                 var hand = ctx.Me.Hand.ToList();
                 if (hand.Count == 0) return true;
-                var card = hand.Count == 1 ? hand[0] : ctx.ChooseCards(hand, 1, 1, "Hide a Berry: put a card from your hand on the bottom of your deck")[0];
+                var card = ctx.ChooseCards(hand, 1, 1, "Hide a Berry: put a card from your hand on the bottom of your deck")[0];
                 if (ctx.Me.Hand.Remove(card))
                 {
                     ctx.Me.Deck.Add(card);
@@ -111,11 +111,11 @@ namespace PokemonTCG.Cards
             {
                 var sources = Damaged(ctx);
                 if (sources.Count == 0) return;
-                var wormadam = sources.Count == 1 ? sources[0] : ctx.ChoosePokemon(sources, "Wormadam First: move a damage counter from which Wormadam?");
+                var wormadam = ctx.ChoosePokemon(sources, "Wormadam First: move a damage counter from which Wormadam?");
                 if (wormadam == null) return;
                 var targets = ctx.MyPokemon(m => m != wormadam);
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Wormadam First: move it to which of your Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Wormadam First: move it to which of your Pokémon?");
                 if (target != null) ctx.Engine.MoveDamageCounters(wormadam, target, 1, WormadamFirst);
             }
         }
@@ -148,7 +148,7 @@ namespace PokemonTCG.Cards
                 foreach (var card in found)
                 {
                     var mine = ctx.MyPokemon();
-                    var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Flare Witch: attach " + card.Def.Name + " to which of your Pokémon?");
+                    var target = ctx.ChoosePokemon(mine, "Flare Witch: attach " + card.Def.Name + " to which of your Pokémon?");
                     if (target != null) ctx.Engine.AttachEnergyCard(card, target);
                     else ctx.Me.Deck.Add(card);
                 }
@@ -207,7 +207,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Dangerous Tentacle: switch which of your opponent's Benched Pokémon-EX into the Active Spot?");
+                var target = ctx.ChoosePokemon(targets, "Dangerous Tentacle: switch which of your opponent's Benched Pokémon-EX into the Active Spot?");
                 if (target != null) ctx.Engine.SwitchActive(ctx.Opponent, target);
             }
         }
@@ -281,18 +281,21 @@ namespace PokemonTCG.Cards
             private const string Kinesis = "Kinesis";
             private static readonly Mon Zen = new CardsMEW1.CounterBonusMon("Zen Force", 30);
 
+            // Kinesis is Alakazam-EX's Ability: M Alakazam-EX has none, so the engine runs this anyway and it checks the block here.
+            public override bool EvolveEffectFromCardBelow { get { return true; } }
+
             public override void OnEvolvedFromHand(EffectContext ctx)
             {
                 var me = ctx.Pokemon;
                 if (me == null || me.Stack.Count < 2) return;
                 var lower = me.Stack[me.Stack.Count - 2].Def;
-                if (!lower.Abilities.Any(a => a.Name == Kinesis)) return;
+                if (!lower.Abilities.Any(a => a.Name == Kinesis) || ctx.Engine.AbilityBlocked(me, Kinesis)) return;
                 bool any = ctx.Opp.Active != null || ctx.Opp.Bench.Count > 0;
                 if (!TriggerOnce(ctx, Kinesis, any, "Kinesis: put 2 damage counters on your opponent's Active Pokémon and 3 on 1 of their Benched Pokémon?")) return;
                 if (ctx.Opp.Active != null) ctx.PlaceCounters(ctx.Opp.Active, 2);
                 var bench = ctx.OpponentBench();
                 if (bench.Count == 0) return;
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Kinesis: put 3 damage counters on which of your opponent's Benched Pokémon?");
+                var target = ctx.ChoosePokemon(bench, "Kinesis: put 3 damage counters on which of your opponent's Benched Pokémon?");
                 if (target != null) ctx.PlaceCounters(target, 3);
             }
 

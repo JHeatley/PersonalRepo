@@ -396,7 +396,7 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 ctx.DamageDefending(atk.Damage);
                 if (!ctx.Flip() || !TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0) return true;
-                var card = defending.Energy.Count == 1 ? defending.Energy[0] : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Minus Energy: return which Energy card to your opponent's hand?")[0];
+                var card = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Minus Energy: return which Energy card to your opponent's hand?")[0];
                 ctx.Engine.ReturnEnergyToHand(defending, card);
                 return true;
             }
@@ -427,7 +427,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.InPlay(me) || !TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0) return true;
                 var psychic = me.Energy.Where(e => CardsHIF1.Provides(ctx, me, e, EnergyType.Psychic)).ToList();
                 if (psychic.Count == 0 || !ctx.AskYesNo("Shadow Crush: discard a Psychic Energy card so your opponent discards an Energy card from " + defending.Name + "?")) return true;
-                var card = psychic.Count == 1 ? psychic[0] : ctx.ChooseCards(psychic, 1, 1, "Shadow Crush: discard which Psychic Energy card?")[0];
+                var card = ctx.ChooseCards(psychic, 1, 1, "Shadow Crush: discard which Psychic Energy card?")[0];
                 if (!ctx.Engine.DiscardEnergy(me, card) || !ctx.CanAffect(defending)) return true;
                 var pick = ctx.Engine.ChooseCards(ctx.Opponent, defending.Energy.ToList(), 1, 1, "Shadow Crush: discard an Energy card from " + defending.Name, ctx.Source);
                 if (pick.Count > 0) ctx.Engine.DiscardEnergy(defending, pick[0]);

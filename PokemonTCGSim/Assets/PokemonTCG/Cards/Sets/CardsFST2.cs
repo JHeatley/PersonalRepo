@@ -402,7 +402,7 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var options = ctx.Me.Hand.Where(card => IsPsychicEnergyCard(card.Def)).ToList();
-                var energy = options.Count == 1 ? options[0] : ctx.ChooseCards(options, 1, 1, "Blue Assist: attach which Psychic Energy card?")[0];
+                var energy = ctx.ChooseCards(options, 1, 1, "Blue Assist: attach which Psychic Energy card?")[0];
                 var target = ctx.ChoosePokemon(ctx.MyPokemon(IsLatias), "Blue Assist: attach " + energy.Def.Name + " to which Latias?");
                 ctx.Me.Hand.Remove(energy);
                 ctx.Engine.AttachEnergyCard(energy, target, true);
@@ -579,7 +579,7 @@ namespace PokemonTCG.Cards
             {
                 var items = ctx.Me.Hand.Where(card => card.Def.IsItem).ToList();
                 if (items.Count == 0) return;
-                var cost = items.Count == 1 ? items[0] : ctx.ChooseCards(items, 1, 1, "Cram-o-matic: discard another Item card from your hand")[0];
+                var cost = ctx.ChooseCards(items, 1, 1, "Cram-o-matic: discard another Item card from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, cost);
                 if (ctx.Flip()) ctx.SearchToHand(CardsFST1.AnyCard, 1, "Cram-o-matic: choose a card to put into your hand", false);
             }
@@ -729,7 +729,7 @@ namespace PokemonTCG.Cards
             protected override bool Use(EffectContext ctx)
             {
                 var pile = ctx.BasicEnergyInDiscard();
-                var pick = pile.Count == 1 ? pile : ctx.ChooseCards(pile, 1, 1, "Training Court: put a basic Energy card into your hand");
+                var pick = ctx.ChooseCards(pile, 1, 1, "Training Court: put a basic Energy card into your hand");
                 ctx.DiscardToHand(pick);
                 return false;
             }

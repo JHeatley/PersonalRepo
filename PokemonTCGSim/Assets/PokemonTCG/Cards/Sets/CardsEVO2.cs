@@ -83,7 +83,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Buzzap Thunder: attach " + ctx.Pokemon.Name + " as Energy to which of your Lightning Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Buzzap Thunder: attach " + ctx.Pokemon.Name + " as Energy to which of your Lightning Pokémon?");
                 if (target == null) return;
                 ctx.Pokemon.Markers[TargetMarker] = target.Uid;
                 if (!ctx.Engine.KnockOut(ctx.Pokemon, Buzzap)) ctx.Pokemon.Markers.Remove(TargetMarker);
@@ -152,8 +152,7 @@ namespace PokemonTCG.Cards
                 if (!engine.IsKnockedOut(info.Target)) return;
                 var attacker = info.Attacker;
                 if (engine.State.FindPokemon(attacker.Uid) != attacker || attacker.Energy.Count == 0) return;
-                var pick = attacker.Energy.Count == 1 ? attacker.Energy[0]
-                    : engine.ChooseCards(Owner, attacker.Energy.ToList(), 1, 1, "Little Grudge: discard an Energy from " + attacker.Name, null)[0];
+                var pick = engine.ChooseCards(Owner, attacker.Energy.ToList(), 1, 1, "Little Grudge: discard an Energy from " + attacker.Name, null)[0];
                 engine.DiscardEnergy(attacker, pick);
             }
         }

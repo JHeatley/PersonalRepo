@@ -209,10 +209,9 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 ctx.DamageDefending(atk.Damage);
                 if (!TefPokemon.StillDefending(ctx, defending) || defending.Energy.Count == 0 || ctx.Opp.Bench.Count == 0 || !ctx.CanAffect(defending)) return true;
-                var energy = defending.Energy.Count == 1 ? defending.Energy[0]
-                    : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Rushing Water: move which Energy from " + defending.Name + "?")[0];
+                var energy = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Rushing Water: move which Energy from " + defending.Name + "?")[0];
                 var bench = ctx.OpponentBench();
-                var dest = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Rushing Water: move it to which of your opponent's Benched Pokémon?");
+                var dest = ctx.ChoosePokemon(bench, "Rushing Water: move it to which of your opponent's Benched Pokémon?");
                 if (dest != null) ctx.Engine.MoveEnergy(defending, dest, energy);
                 return true;
             }
@@ -309,7 +308,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.Flip()) return true;
                 var targets = ctx.OpponentPokemon(m => m.Energy.Count > 0 && ctx.CanAffect(m));
                 if (targets.Count == 0) return true;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Deleting Glare: discard an Energy from which of your opponent's Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Deleting Glare: discard an Energy from which of your opponent's Pokémon?");
                 if (target != null) ctx.DiscardEnergyFrom(target, 1, "Deleting Glare: discard an Energy from " + target.Name);
                 return true;
             }
@@ -532,7 +531,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.Flip()) return;
                 var discard = ctx.Me.Discard.Where(c => c != ctx.Card).ToList();
                 if (discard.Count == 0) return;
-                var pick = discard.Count == 1 ? discard[0] : ctx.ChooseCards(discard, 1, 1, "Recycle: put which card from your discard pile on top of your deck?")[0];
+                var pick = ctx.ChooseCards(discard, 1, 1, "Recycle: put which card from your discard pile on top of your deck?")[0];
                 if (!ctx.Me.Discard.Remove(pick)) return;
                 ctx.Me.Deck.Insert(0, pick);
                 ctx.Engine.Reveal(ctx.Player, new List<CardInstance> { pick }, "card put on top of the deck (Recycle)");

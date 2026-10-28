@@ -285,7 +285,7 @@ namespace PokemonTCG.Cards
                 if (givers.Count == 0) return;
                 var from = ctx.ChoosePokemon(givers, "Energy Antics: move an Energy card from which of your opponent's Pokémon?");
                 if (from == null) return;
-                var energy = from.Energy.Count == 1 ? from.Energy[0] : ctx.ChooseCards(from.Energy.ToList(), 1, 1, "Energy Antics: move which Energy card?")[0];
+                var energy = ctx.ChooseCards(from.Energy.ToList(), 1, 1, "Energy Antics: move which Energy card?")[0];
                 var receivers = ctx.OpponentPokemon(m => m != from && ctx.CanAffect(m));
                 if (receivers.Count == 0) return;
                 var to = ctx.ChoosePokemon(receivers, "Energy Antics: move " + energy.Def.Name + " to which of your opponent's Pokémon?");

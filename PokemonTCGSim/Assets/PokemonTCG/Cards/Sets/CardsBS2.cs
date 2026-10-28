@@ -80,7 +80,7 @@ namespace PokemonTCG.Cards
             {
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Devolution Spray: devolve which of your Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Devolution Spray: devolve which of your Pokémon?");
                 if (target == null) return;
                 var evolutions = target.Stack.Where(c => c.Def.IsEvolution).ToList();
                 int count = 1;
@@ -155,7 +155,7 @@ namespace PokemonTCG.Cards
             {
                 var mons = ctx.MyPokemon(m => ctx.Engine.CanPutIntoHand(m));
                 if (mons.Count == 0) return;
-                var target = mons.Count == 1 ? mons[0] : ctx.ChoosePokemon(mons, "Scoop Up: return which of your Pokémon's Basic Pokémon card to your hand?");
+                var target = ctx.ChoosePokemon(mons, "Scoop Up: return which of your Pokémon's Basic Pokémon card to your hand?");
                 if (target == null) return;
                 var basic = target.Stack[0];
                 var rest = target.Stack.Skip(1).Concat(target.Energy).Concat(target.Tools).ToList();
@@ -179,13 +179,13 @@ namespace PokemonTCG.Cards
                 if (!CardsG1.PayNoRemovalGymCost(ctx)) return;
                 var mine = ctx.MyPokemon(m => m.Energy.Count > 0);
                 if (mine.Count == 0) return;
-                var own = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Super Energy Removal: discard an Energy card from which of your Pokémon?");
+                var own = ctx.ChoosePokemon(mine, "Super Energy Removal: discard an Energy card from which of your Pokémon?");
                 if (own == null) return;
-                var pay = own.Energy.Count == 1 ? own.Energy.ToList() : ctx.ChooseCards(own.Energy.ToList(), 1, 1, "Super Energy Removal: discard which Energy card from " + own.Name + "?");
+                var pay = ctx.ChooseCards(own.Energy.ToList(), 1, 1, "Super Energy Removal: discard which Energy card from " + own.Name + "?");
                 foreach (var card in pay) ctx.Engine.DiscardEnergy(own, card);
                 var theirs = ctx.OpponentPokemon(m => m.Energy.Count > 0);
                 if (theirs.Count == 0) return;
-                var target = theirs.Count == 1 ? theirs[0] : ctx.ChoosePokemon(theirs, "Super Energy Removal: choose 1 of your opponent's Pokémon");
+                var target = ctx.ChoosePokemon(theirs, "Super Energy Removal: choose 1 of your opponent's Pokémon");
                 if (target == null) return;
                 var picks = ctx.ChooseCards(target.Energy.ToList(), 1, Math.Min(2, target.Energy.Count), "Super Energy Removal: discard up to 2 Energy cards from " + target.Name);
                 foreach (var card in picks) ctx.Engine.DiscardEnergy(target, card);
@@ -202,9 +202,9 @@ namespace PokemonTCG.Cards
                 if (!CardsG1.PayNoRemovalGymCost(ctx)) return;
                 var theirs = ctx.OpponentPokemon(m => m.Energy.Count > 0);
                 if (theirs.Count == 0) return;
-                var target = theirs.Count == 1 ? theirs[0] : ctx.ChoosePokemon(theirs, "Energy Removal: choose 1 of your opponent's Pokémon");
+                var target = ctx.ChoosePokemon(theirs, "Energy Removal: choose 1 of your opponent's Pokémon");
                 if (target == null) return;
-                var picks = target.Energy.Count == 1 ? target.Energy.ToList() : ctx.ChooseCards(target.Energy.ToList(), 1, 1, "Energy Removal: discard which Energy card from " + target.Name + "?");
+                var picks = ctx.ChooseCards(target.Energy.ToList(), 1, 1, "Energy Removal: discard which Energy card from " + target.Name + "?");
                 foreach (var card in picks) ctx.Engine.DiscardEnergy(target, card);
             }
         }
@@ -217,7 +217,7 @@ namespace PokemonTCG.Cards
             public override void ResolveTrainer(EffectContext ctx)
             {
                 var mons = ctx.MyPokemon();
-                var target = mons.Count == 1 ? mons[0] : ctx.ChoosePokemon(mons, "Defender: which of your Pokémon?");
+                var target = ctx.ChoosePokemon(mons, "Defender: which of your Pokémon?");
                 if (target == null) return;
                 ctx.AddEffect(new DefenderEffect(target.Name + ": attacks do 20 less damage to it until the end of your opponent's next turn (Defender)", ctx.Player, target.Uid, ctx.Turn + 1));
             }
@@ -301,7 +301,7 @@ namespace PokemonTCG.Cards
             {
                 var basics = Basics(ctx);
                 if (basics.Count == 0 || ctx.Engine.BenchSpace(1 - ctx.Player) <= 0) return;
-                var pick = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Pokémon Flute: put which Basic Pokémon onto your opponent's Bench?")[0];
+                var pick = ctx.ChooseCards(basics, 1, 1, "Pokémon Flute: put which Basic Pokémon onto your opponent's Bench?")[0];
                 if (ctx.Opp.Discard.Remove(pick)) ctx.Engine.PutOntoBench(1 - ctx.Player, pick, false);
             }
         }
@@ -332,7 +332,7 @@ namespace PokemonTCG.Cards
             {
                 var basics = Basics(ctx);
                 if (basics.Count == 0 || ctx.BenchSpace <= 0) return;
-                var pick = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Revive: put which Basic Pokémon from your discard pile onto your Bench?")[0];
+                var pick = ctx.ChooseCards(basics, 1, 1, "Revive: put which Basic Pokémon from your discard pile onto your Bench?")[0];
                 if (!ctx.Me.Discard.Remove(pick)) return;
                 var mon = ctx.Engine.PutOntoBench(ctx.Player, pick, false);
                 int counters = pick.Def.Hp / 2 / 10;
@@ -354,9 +354,9 @@ namespace PokemonTCG.Cards
             {
                 var targets = Targets(ctx);
                 if (targets.Count == 0) return;
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Super Potion: discard an Energy card from which of your Pokémon (and heal 40 damage from it)?");
+                var target = ctx.ChoosePokemon(targets, "Super Potion: discard an Energy card from which of your Pokémon (and heal 40 damage from it)?");
                 if (target == null) return;
-                var pay = target.Energy.Count == 1 ? target.Energy.ToList() : ctx.ChooseCards(target.Energy.ToList(), 1, 1, "Super Potion: discard which Energy card?");
+                var pay = ctx.ChooseCards(target.Energy.ToList(), 1, 1, "Super Potion: discard which Energy card?");
                 foreach (var card in pay) ctx.Engine.DiscardEnergy(target, card);
                 ctx.Heal(target, 40);
             }
@@ -373,7 +373,7 @@ namespace PokemonTCG.Cards
             {
                 var hurt = Hurt(ctx);
                 if (hurt.Count == 0) return;
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Potion: heal 20 damage from which of your Pokémon?");
+                var target = ctx.ChoosePokemon(hurt, "Potion: heal 20 damage from which of your Pokémon?");
                 if (target != null) ctx.Heal(target, 20);
             }
         }

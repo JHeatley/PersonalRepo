@@ -405,7 +405,7 @@ namespace PokemonTCG.Cards
                 bool bonus = water.Count > 0 && ctx.AskYesNo("Ninja Spinner: put a Water Energy from " + me.Name + " into your hand for 80 more damage?");
                 if (bonus)
                 {
-                    var e = water.Count == 1 ? water[0] : ctx.ChooseCards(water, 1, 1, "Ninja Spinner: put which Water Energy into your hand?")[0];
+                    var e = ctx.ChooseCards(water, 1, 1, "Ninja Spinner: put which Water Energy into your hand?")[0];
                     ctx.Engine.ReturnEnergyToHand(me, e);
                 }
                 ctx.DamageDefending(atk.Damage + (bonus ? 80 : 0));

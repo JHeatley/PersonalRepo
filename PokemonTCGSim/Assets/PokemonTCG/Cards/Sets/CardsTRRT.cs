@@ -62,9 +62,9 @@ namespace PokemonTCG.Cards
                 }
                 if (!ctx.CanAffect(active)) return;
                 var cards = active.Energy.ToList();
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Pow! Hand Extension: move which Energy card from " + active.Name + "?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Pow! Hand Extension: move which Energy card from " + active.Name + "?")[0];
                 var bench = ctx.OpponentBench();
-                var to = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Pow! Hand Extension: move " + card.Def.Name + " to which Pokémon?");
+                var to = ctx.ChoosePokemon(bench, "Pow! Hand Extension: move " + card.Def.Name + " to which Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(active, to, card);
             }
         }
@@ -87,7 +87,7 @@ namespace PokemonTCG.Cards
             {
                 var hand = ctx.Me.Hand.Where(c => c != ctx.Card).ToList();
                 if (hand.Count == 0) return;
-                var card = hand.Count == 1 ? hand[0] : ctx.ChooseCards(hand, 1, 1, "Rocket's Mission: discard a card from your hand")[0];
+                var card = ctx.ChooseCards(hand, 1, 1, "Rocket's Mission: discard a card from your hand")[0];
                 bool rocket = card.Def.IsPokemon && CardsTRR.DarkOrRocket(card.Def.Name);
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 ctx.Draw(rocket ? 4 : 3);
@@ -132,7 +132,7 @@ namespace PokemonTCG.Cards
             public override void ResolveTrainer(EffectContext ctx)
             {
                 var evolved = ctx.MyPokemon(CardsE2.IsEvolved);
-                var mon = evolved.Count == 1 ? evolved[0] : ctx.ChoosePokemon(evolved, "Surprise! Time Machine: devolve which of your Pokémon?");
+                var mon = ctx.ChoosePokemon(evolved, "Surprise! Time Machine: devolve which of your Pokémon?");
                 if (mon == null) return;
                 ctx.Engine.Devolve(mon, 1, true);
                 if (ctx.InPlay(mon) && ctx.Me.Deck.Count > 0)
@@ -163,7 +163,7 @@ namespace PokemonTCG.Cards
                 if (found.Count > 0)
                 {
                     var spots = Spots(ctx);
-                    var mon = spots.Count == 0 ? null : spots.Count == 1 ? spots[0] : ctx.ChoosePokemon(spots, "Swoop! Teleporter: switch " + found[0].Def.Name + " with which of your Pokémon?");
+                    var mon = spots.Count == 0 ? null : ctx.ChoosePokemon(spots, "Swoop! Teleporter: switch " + found[0].Def.Name + " with which of your Pokémon?");
                     if (mon == null) ctx.Me.Deck.Add(found[0]);
                     else
                     {
@@ -185,7 +185,7 @@ namespace PokemonTCG.Cards
                 bool heads = ctx.Flip();
                 var all = heads ? ctx.OpponentPokemon() : ctx.MyPokemon();
                 if (all.Count == 0) return;
-                var target = all.Count == 1 ? all[0] : ctx.ChoosePokemon(all, "Venture Bomb: put 1 damage counter on which Pokémon?");
+                var target = ctx.ChoosePokemon(all, "Venture Bomb: put 1 damage counter on which Pokémon?");
                 if (target != null && (!heads || ctx.CanAffect(target))) ctx.PlaceCounters(target, 1);
             }
         }

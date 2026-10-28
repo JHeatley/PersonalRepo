@@ -241,10 +241,10 @@ namespace PokemonTCG.Cards
                 var donors = Donors(ctx);
                 var active = ctx.Me.Active;
                 if (donors.Count == 0 || active == null) return;
-                var from = donors.Count == 1 ? donors[0] : ctx.ChoosePokemon(donors, Power + ": move a basic Energy card from which Benched Pokémon?");
+                var from = ctx.ChoosePokemon(donors, Power + ": move a basic Energy card from which Benched Pokémon?");
                 if (from == null) return;
                 var cards = from.Energy.Where(e => e.Def.IsBasicEnergy).ToList();
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, Power + ": move which Energy card to " + active.Name + "?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, Power + ": move which Energy card to " + active.Name + "?")[0];
                 ctx.Engine.MoveEnergy(from, active, card);
             }
 
@@ -508,11 +508,11 @@ namespace PokemonTCG.Cards
             {
                 var from = All(ctx).Where(m => m.DamageCounters > 0).ToList();
                 if (from.Count == 0) return;
-                var source = from.Count == 1 ? from[0] : ctx.ChoosePokemon(from, Power + ": move a damage counter from which Pokémon?");
+                var source = ctx.ChoosePokemon(from, Power + ": move a damage counter from which Pokémon?");
                 if (source == null) return;
                 var to = All(ctx).Where(m => m != source).ToList();
                 if (to.Count == 0) return;
-                var target = to.Count == 1 ? to[0] : ctx.ChoosePokemon(to, Power + ": move it to which Pokémon?");
+                var target = ctx.ChoosePokemon(to, Power + ": move it to which Pokémon?");
                 if (target != null) ctx.Engine.MoveDamageCounters(source, target, 1, Power);
             }
 
@@ -580,7 +580,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.Flip()) return true;
                 var energy = ctx.BasicEnergyInDiscard();
                 if (energy.Count == 0) return true;
-                ctx.DiscardToHand(energy.Count == 1 ? energy : ctx.ChooseCards(energy, 1, 1, "Energy Catch: put which basic Energy card into your hand?"));
+                ctx.DiscardToHand(ctx.ChooseCards(energy, 1, 1, "Energy Catch: put which basic Energy card into your hand?"));
                 return true;
             }
         }
@@ -611,7 +611,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Super Psywave") return false;
                 var all = ctx.OpponentPokemon();
                 if (all.Count == 0) return true;
-                var target = all.Count == 1 ? all[0] : ctx.ChoosePokemon(all, "Super Psywave: choose 1 of your opponent's Pokémon");
+                var target = ctx.ChoosePokemon(all, "Super Psywave: choose 1 of your opponent's Pokémon");
                 if (target != null && target.Energy.Count > 0) ctx.PlaceCounters(target, target.Energy.Count);
                 return true;
             }
@@ -656,12 +656,12 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var donors = ctx.MyPokemon(m => m.Energy.Any(e => e.Def.IsBasicEnergy));
                 if (donors.Count == 0 || ctx.MyPokemon().Count < 2) return true;
-                var from = donors.Count == 1 ? donors[0] : ctx.ChoosePokemon(donors, "Energy Patch: move a basic Energy card from which Pokémon?");
+                var from = ctx.ChoosePokemon(donors, "Energy Patch: move a basic Energy card from which Pokémon?");
                 if (from == null) return true;
                 var cards = from.Energy.Where(e => e.Def.IsBasicEnergy).ToList();
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Energy Patch: move which Energy card?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Energy Patch: move which Energy card?")[0];
                 var to = ctx.MyPokemon(m => m != from);
-                var target = to.Count == 1 ? to[0] : ctx.ChoosePokemon(to, "Energy Patch: attach " + card.Def.Name + " to which Pokémon?");
+                var target = ctx.ChoosePokemon(to, "Energy Patch: attach " + card.Def.Name + " to which Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(from, target, card);
                 return true;
             }
@@ -680,7 +680,7 @@ namespace PokemonTCG.Cards
             {
                 var bench = ctx.MyBench();
                 if (bench.Count == 0) return;
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Beating Wings: shuffle which Benched Pokémon into your deck?");
+                var target = ctx.ChoosePokemon(bench, "Beating Wings: shuffle which Benched Pokémon into your deck?");
                 if (target != null) ctx.Engine.ShufflePokemonIntoDeck(target);
             }
 
@@ -727,7 +727,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var cards = ctx.Me.Discard.Where(c => IsBasicEnergyOf(c.Def, EnergyType.Lightning)).ToList();
                 if (cards.Count == 0 || !ctx.InPlay(me) || !ctx.Flip()) return true;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Plasma: attach which Lightning Energy card?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Plasma: attach which Lightning Energy card?")[0];
                 if (ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, me);
                 return true;
             }
@@ -787,7 +787,7 @@ namespace PokemonTCG.Cards
                 foreach (var card in found)
                 {
                     var bench = ctx.MyBench();
-                    var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, Power + ": attach it to which Benched Pokémon?");
+                    var target = ctx.ChoosePokemon(bench, Power + ": attach it to which Benched Pokémon?");
                     if (target != null) ctx.Engine.AttachEnergyCard(card, target);
                     else ctx.Me.Deck.Add(card);
                 }
@@ -929,7 +929,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var hurt = ctx.MyPokemon(m => m.DamageCounters > 0);
                 if (hurt.Count == 0 || !ctx.Flip()) return true;
-                var target = hurt.Count == 1 ? hurt[0] : ctx.ChoosePokemon(hurt, "Bind Wound: remove 2 damage counters from which Pokémon?");
+                var target = ctx.ChoosePokemon(hurt, "Bind Wound: remove 2 damage counters from which Pokémon?");
                 if (target != null) ctx.Heal(target, 20);
                 return true;
             }
@@ -986,9 +986,9 @@ namespace PokemonTCG.Cards
                 if (!ctx.InPlay(me) || ctx.Me.Bench.Count == 0) return true;
                 var cards = me.Energy.Where(e => e.Def.IsBasicEnergy).ToList();
                 if (cards.Count == 0) return true;
-                var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Reflect Energy: move which basic Energy card?")[0];
+                var card = ctx.ChooseCards(cards, 1, 1, "Reflect Energy: move which basic Energy card?")[0];
                 var bench = ctx.MyBench();
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Reflect Energy: attach " + card.Def.Name + " to which Benched Pokémon?");
+                var target = ctx.ChoosePokemon(bench, "Reflect Energy: attach " + card.Def.Name + " to which Benched Pokémon?");
                 if (target != null) ctx.Engine.MoveEnergy(me, target, card);
                 return true;
             }

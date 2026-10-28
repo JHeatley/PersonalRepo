@@ -168,7 +168,7 @@ namespace PokemonTCG.Tests
         [Test]
         public void Energy_Connect_Moves_Basic_Energy_From_The_Bench_As_Often_As_You_Like()
         {
-            var e = Scenario(new ScriptedAgent().Then("Use Energy Connect", "Use Energy Connect"), new ScriptedAgent());
+            var e = Scenario(new ScriptedAgent().Then("Use Energy Connect", "Fighting Energy", "Use Energy Connect"), new ScriptedAgent());
             var lee = e.ScenarioActive(0, C(Hitmonlee));
             var ampharos = e.ScenarioBench(0, C(Ampharos));
             Attach(e, ampharos, Fighting, 2);

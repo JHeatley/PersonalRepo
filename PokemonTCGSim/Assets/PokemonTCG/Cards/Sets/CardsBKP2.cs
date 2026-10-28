@@ -155,7 +155,7 @@ namespace PokemonTCG.Cards
                 if (energy.Count == 0 || bench.Count == 0) return true;
                 var picks = ctx.ChooseCards(energy, 0, Math.Min(2, energy.Count), "Energy Present: attach up to 2 Energy cards from your hand to 1 of your Benched Pokémon");
                 if (picks.Count == 0) return true;
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Energy Present: attach them to which Benched Pokémon?");
+                var target = ctx.ChoosePokemon(bench, "Energy Present: attach them to which Benched Pokémon?");
                 if (target == null) return true;
                 foreach (var card in picks)
                     if (ctx.Me.Hand.Remove(card)) ctx.Engine.AttachEnergyCard(card, target, true);
@@ -258,7 +258,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Never Enough") return false;
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 if (ctx.Me.Hand.Count == 0) return true;
-                var card = ctx.Me.Hand.Count == 1 ? ctx.Me.Hand[0] : ctx.ChooseCards(ctx.Me.Hand.ToList(), 1, 1, "Never Enough: discard a card from your hand")[0];
+                var card = ctx.ChooseCards(ctx.Me.Hand.ToList(), 1, 1, "Never Enough: discard a card from your hand")[0];
                 ctx.Engine.DiscardFromHand(ctx.Player, card);
                 ctx.Draw(2);
                 return true;
@@ -275,8 +275,8 @@ namespace PokemonTCG.Cards
                 var pile = ctx.Me.Discard.Where(c => c.Def.IsEnergy).ToList();
                 var mine = ctx.MyPokemon();
                 if (pile.Count == 0 || mine.Count == 0) return true;
-                var card = pile.Count == 1 ? pile[0] : ctx.ChooseCards(pile, 1, 1, "Turbo Assault: attach which Energy card from your discard pile?")[0];
-                var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Turbo Assault: attach " + card.Def.Name + " to which of your Pokémon?");
+                var card = ctx.ChooseCards(pile, 1, 1, "Turbo Assault: attach which Energy card from your discard pile?")[0];
+                var target = ctx.ChoosePokemon(mine, "Turbo Assault: attach " + card.Def.Name + " to which of your Pokémon?");
                 if (target != null && ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, target);
                 return true;
             }
@@ -441,7 +441,7 @@ namespace PokemonTCG.Cards
                 if (energy.Count == 0 || bench.Count == 0) return true;
                 var picks = ctx.ChooseCards(energy, 0, 1, "Mighty Wind: you may attach an Energy card from your hand to 1 of your Benched Pokémon");
                 if (picks.Count == 0) return true;
-                var target = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Mighty Wind: attach " + picks[0].Def.Name + " to which Benched Pokémon?");
+                var target = ctx.ChoosePokemon(bench, "Mighty Wind: attach " + picks[0].Def.Name + " to which Benched Pokémon?");
                 if (target != null && ctx.Me.Hand.Remove(picks[0])) ctx.Engine.AttachEnergyCard(picks[0], target, true);
                 return true;
             }

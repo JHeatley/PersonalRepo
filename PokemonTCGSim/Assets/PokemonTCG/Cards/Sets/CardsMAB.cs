@@ -88,7 +88,7 @@ namespace PokemonTCG.Cards
                 {
                     var basics = me.Energy.Where(e => e.Def.IsBasicEnergy).ToList();
                     if (basics.Count == 0) return Nothing(ctx);
-                    var card = basics.Count == 1 ? basics[0] : ctx.ChooseCards(basics, 1, 1, "Dark Poison: discard which basic Energy card?")[0];
+                    var card = ctx.ChooseCards(basics, 1, 1, "Dark Poison: discard which basic Energy card?")[0];
                     if (!ctx.Engine.DiscardEnergy(me, card)) return Nothing(ctx);
                 }
                 ctx.DamageDefending(atk.Damage);

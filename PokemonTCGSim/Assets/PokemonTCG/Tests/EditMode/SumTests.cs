@@ -76,7 +76,9 @@ namespace PokemonTCG.Tests
         {
             var own = db.Cards.Where(d => d.SetCode == "SUM" && !d.IsAlternatePrint).ToList();
             Assert.AreEqual(109, own.Count, "108 new cards and the Fairy Energy already in the pool");
-            Assert.IsTrue(own.All(d => Formats.CategoryOf(d) == CardCategory.Expanded), "no regulation mark: Expanded");
+            // Cards banned in Expanded are Unlimited only, and basic Energy is Standard as always.
+            Assert.IsTrue(own.All(d => Formats.CategoryOf(d) == (Formats.IsExpandedBanned(d) ? CardCategory.Unlimited
+                : d.IsBasicEnergy ? CardCategory.Standard : CardCategory.Expanded)), "no regulation mark: Expanded");
             Assert.AreEqual("Sun & Moon", C(Pinsir).PrintSetName);
             Assert.AreEqual("HIF-SV47", C("SUM-12").BaseKey, "Decidueye-GX was already in the pool (Hidden Fates Shiny Vault)");
             Assert.AreEqual("GRI-147", C("SUM-27").BaseKey, "Incineroar-GX came with Guardians Rising");

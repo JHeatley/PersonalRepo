@@ -151,7 +151,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.InPlay(me)) return true;
                 var energy = ctx.BasicEnergyInDiscard(d => d.EnergyProvides == type);
                 if (energy.Count == 0) return true;
-                var card = energy.Count == 1 ? energy[0] : ctx.ChooseCards(energy, 1, 1, attack + ": attach which Basic " + type + " Energy to " + me.Name + "?")[0];
+                var card = ctx.ChooseCards(energy, 1, 1, attack + ": attach which Basic " + type + " Energy to " + me.Name + "?")[0];
                 if (ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, me);
                 return true;
             }

@@ -284,7 +284,7 @@ namespace PokemonTCG.Cards
             protected override void Ability(EffectContext ctx)
             {
                 var top = ctx.LookAtTop(2);
-                var keep = top.Count == 1 ? top : ctx.ChooseCards(top, 1, 1, "Flower Selecting: choose the card to put into your hand (the other goes to the Lost Zone)");
+                var keep = ctx.ChooseCards(top, 1, 1, "Flower Selecting: choose the card to put into your hand (the other goes to the Lost Zone)");
                 ctx.DeckToHand(keep);
                 foreach (var c in top)
                 {
@@ -566,7 +566,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var mine = ctx.MyPokemon();
                 if (mine.Count == 0) return true;
-                var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Dynamic Tail: do 60 damage to which of your Pokémon?");
+                var target = ctx.ChoosePokemon(mine, "Dynamic Tail: do 60 damage to which of your Pokémon?");
                 ctx.DamageTarget(target, 60);
                 return true;
             }
@@ -650,7 +650,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var mine = ctx.MyPokemon();
                 if (mine.Count == 0) return true;
-                var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Shadow Impact: put 3 damage counters on which of your Pokémon?");
+                var target = ctx.ChoosePokemon(mine, "Shadow Impact: put 3 damage counters on which of your Pokémon?");
                 ctx.PlaceCounters(target, 3);
                 return true;
             }

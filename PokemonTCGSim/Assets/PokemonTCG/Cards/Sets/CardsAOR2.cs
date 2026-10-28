@@ -120,7 +120,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 var pile = ctx.Me.Discard.ToList();
                 if (pile.Count == 0) return true;
-                var pick = pile.Count == 1 ? pile : ctx.ChooseCards(pile, 1, 1, "Trash Tentacle: put a card from your discard pile into your hand");
+                var pick = ctx.ChooseCards(pile, 1, 1, "Trash Tentacle: put a card from your discard pile into your hand");
                 ctx.DiscardToHand(pick);
                 return true;
             }
@@ -203,7 +203,7 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 var donors = ctx.Me.Bench.Where(m => m.DamageCounters > 0).ToList();
                 if (defending == null || donors.Count == 0) return true;
-                var donor = donors.Count == 1 ? donors[0] : ctx.ChoosePokemon(donors, "Windy Mischief: move all damage counters from which Benched Pokémon?");
+                var donor = ctx.ChoosePokemon(donors, "Windy Mischief: move all damage counters from which Benched Pokémon?");
                 if (donor != null) ctx.Engine.MoveDamageCounters(donor, defending, donor.DamageCounters, "Windy Mischief");
                 return true;
             }
@@ -392,7 +392,7 @@ namespace PokemonTCG.Cards
                 var bench = ctx.MyBench();
                 if (ctx.InPlay(me) && me.Energy.Count > 0 && bench.Count > 0)
                 {
-                    var receiver = bench.Count == 1 ? bench[0] : ctx.ChoosePokemon(bench, "Tidal Storm: move 2 Energy to which Benched Pokémon?");
+                    var receiver = ctx.ChoosePokemon(bench, "Tidal Storm: move 2 Energy to which Benched Pokémon?");
                     var energy = me.Energy.Count <= 2 ? me.Energy.ToList() : ctx.ChooseCards(me.Energy.ToList(), 2, 2, "Tidal Storm: move which 2 Energy?");
                     foreach (var en in energy) ctx.Engine.MoveEnergy(me, receiver, en);
                 }

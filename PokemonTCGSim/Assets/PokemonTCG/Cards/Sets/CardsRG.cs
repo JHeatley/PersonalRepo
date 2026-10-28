@@ -267,7 +267,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 var options = ctx.Me.Discard.Where(c => Fits(c.Def)).ToList();
                 if (options.Count == 0 || me == null) return;
-                var pick = options.Count == 1 ? options[0] : ctx.ChooseCards(options, 1, 1, Power + ": switch Ditto with which Basic Pokémon from your discard pile?")[0];
+                var pick = ctx.ChooseCards(options, 1, 1, Power + ": switch Ditto with which Basic Pokémon from your discard pile?")[0];
                 var old = me.Top;
                 if (!ctx.Me.Discard.Remove(pick)) return;
                 me.Stack[me.Stack.Count - 1] = pick;
@@ -381,7 +381,7 @@ namespace PokemonTCG.Cards
                 if (!ctx.InPlay(me) || others.Count == 0 || cards.Count == 0) return true;
                 var picks = ctx.ChooseCards(cards, 0, cards.Count, "Thunder Reflection: move any number of Lightning Energy cards from " + me.Name);
                 if (picks.Count == 0) return true;
-                var to = others.Count == 1 ? others[0] : ctx.ChoosePokemon(others, "Thunder Reflection: move them to which Pokémon?");
+                var to = ctx.ChoosePokemon(others, "Thunder Reflection: move them to which Pokémon?");
                 if (to != null) foreach (var card in picks) ctx.Engine.MoveEnergy(me, to, card);
                 return true;
             }
@@ -547,7 +547,7 @@ namespace PokemonTCG.Cards
                 foreach (var tool in found)
                 {
                     var spots = ctx.MyPokemon(m => m.Tools.Count == 0 && ctx.Engine.CanAttachToolTo(tool, m));
-                    var target = spots.Count == 0 ? null : spots.Count == 1 ? spots[0] : ctx.ChoosePokemon(spots, "Hoard: attach " + tool.Def.Name + " to which Pokémon?");
+                    var target = spots.Count == 0 ? null : ctx.ChoosePokemon(spots, "Hoard: attach " + tool.Def.Name + " to which Pokémon?");
                     if (target != null) ctx.Engine.AttachTool(tool, target);
                     else ctx.Me.Deck.Add(tool);
                 }

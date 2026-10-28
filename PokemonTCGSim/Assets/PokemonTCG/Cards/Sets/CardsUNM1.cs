@@ -232,7 +232,7 @@ namespace PokemonTCG.Cards
                 var grass = Grass(ctx);
                 var active = ctx.Me.Active;
                 if (grass.Count == 0 || active == null) return;
-                var card = grass.Count == 1 ? grass[0] : ctx.ChooseCards(grass, 1, 1, "Queenly Reward: attach which Grass Energy card?")[0];
+                var card = ctx.ChooseCards(grass, 1, 1, "Queenly Reward: attach which Grass Energy card?")[0];
                 if (ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, active);
             }
         }
@@ -399,7 +399,7 @@ namespace PokemonTCG.Cards
                 ctx.DamageDefending(atk.Damage);
                 if (defending == null || !ctx.InPlay(defending) || defending.Energy.Count == 0 || ctx.Opp.Bench.Count == 0 || !ctx.CanAffect(defending)) return true;
                 if (!ctx.AskYesNo("Neon Trickery: move an Energy from " + defending.Name + " to 1 of your opponent's Benched Pokémon?")) return true;
-                var energy = defending.Energy.Count == 1 ? defending.Energy[0] : ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Neon Trickery: move which Energy?")[0];
+                var energy = ctx.ChooseCards(defending.Energy.ToList(), 1, 1, "Neon Trickery: move which Energy?")[0];
                 var to = ctx.ChoosePokemon(ctx.OpponentBench(), "Neon Trickery: move " + energy.Def.Name + " to which of your opponent's Benched Pokémon?");
                 if (to != null) ctx.Engine.MoveEnergy(defending, to, energy);
                 return true;

@@ -120,9 +120,9 @@ namespace PokemonTCG.Cards
                     var giver = RepeatableAbility.ChoosePokemonOrDone(ctx, givers, "Cosmic Circle: move a Psychic Energy from which Pokémon?" + (offerDone ? " Press Done when finished." : ""), offerDone);
                     if (giver == null) return false;
                     var cards = psychic(giver);
-                    var card = cards.Count == 1 ? cards[0] : ctx.ChooseCards(cards, 1, 1, "Cosmic Circle: move which Energy?")[0];
+                    var card = ctx.ChooseCards(cards, 1, 1, "Cosmic Circle: move which Energy?")[0];
                     var others = ctx.MyPokemon().Where(m => m != giver).ToList();
-                    var receiver = others.Count == 1 ? others[0] : ctx.ChoosePokemon(others, "Cosmic Circle: move " + card.Def.Name + " to which Pokémon?");
+                    var receiver = ctx.ChoosePokemon(others, "Cosmic Circle: move " + card.Def.Name + " to which Pokémon?");
                     return receiver != null && ctx.Engine.MoveEnergy(giver, receiver, card);
                 });
                 return true;

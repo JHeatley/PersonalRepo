@@ -725,8 +725,7 @@ namespace PokemonTCG.Cards
                 var benched = ctx.Me.Bench.FirstOrDefault(b => b.Top == found[0]);
                 var me = ctx.Pokemon;
                 if (benched == null || me.Energy.Count == 0) return true;
-                var energy = me.Energy.Count == 1 ? me.Energy[0]
-                    : ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Inviting Kiss: move which Energy to " + benched.Name + "?")[0];
+                var energy = ctx.ChooseCards(me.Energy.ToList(), 1, 1, "Inviting Kiss: move which Energy to " + benched.Name + "?")[0];
                 ctx.Engine.MoveEnergy(me, benched, energy);
                 return true;
             }

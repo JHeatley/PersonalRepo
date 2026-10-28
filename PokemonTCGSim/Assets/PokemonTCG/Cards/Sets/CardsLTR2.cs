@@ -133,7 +133,7 @@ namespace PokemonTCG.Cards
                 foreach (var card in found)
                 {
                     var mine = ctx.MyPokemon();
-                    var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Energy Gift: attach " + card.Def.Name + " to which Pokémon?");
+                    var target = ctx.ChoosePokemon(mine, "Energy Gift: attach " + card.Def.Name + " to which Pokémon?");
                     if (target == null || !ctx.Engine.AttachEnergyCard(card, target)) ctx.Me.Deck.Add(card);
                 }
                 ctx.ShuffleMyDeck();
@@ -150,6 +150,16 @@ namespace PokemonTCG.Cards
             private readonly Mon attacks;
 
             public SafeguardMon(Mon attacks) { this.attacks = attacks; }
+
+            /// <summary>
+            /// Safeguard stops the attack of the player's own Pokémon-EX too, which the engine's prevention never checks (it only
+            /// looks at the opponent's attacks): true when this Pokémon-EX's attack can't affect that Pokémon of its own side.
+            /// </summary>
+            internal static bool StopsOwnAttack(EffectContext ctx, PokemonInPlay target)
+            {
+                return target != null && ctx.Pokemon != null && target != ctx.Pokemon && ctx.Pokemon.Def.IsPokemonEX
+                       && ctx.Engine.Scripts.For(target.Def) is SafeguardMon && !ctx.Engine.AbilityBlocked(target, "Safeguard");
+            }
 
             public override int ModifyDamageTaken(EffectContext src, DamageInfo info, int damage)
             {
@@ -196,7 +206,7 @@ namespace PokemonTCG.Cards
                 {
                     if (!card.Def.IsBasicEnergy || !ctx.Me.Discard.Contains(card) || !ctx.Me.HasPokemonInPlay) continue;
                     var mine = ctx.MyPokemon();
-                    var target = mine.Count == 1 ? mine[0] : ctx.ChoosePokemon(mine, "Dig Out: attach " + card.Def.Name + " to which Pokémon?");
+                    var target = ctx.ChoosePokemon(mine, "Dig Out: attach " + card.Def.Name + " to which Pokémon?");
                     if (target != null && ctx.Me.Discard.Remove(card)) ctx.Engine.AttachEnergyCard(card, target);
                 }
                 return true;
@@ -443,7 +453,7 @@ namespace PokemonTCG.Cards
                     if (!ctx.InPlay(me) || givers.Count == 0) return true;
                     var giver = ctx.ChoosePokemon(givers, "Energy Wheel: move an Energy from which Benched Pokémon?");
                     if (giver == null) return true;
-                    var card = giver.Energy.Count == 1 ? giver.Energy[0] : ctx.ChooseCards(giver.Energy.ToList(), 1, 1, "Energy Wheel: move which Energy to " + me.Name + "?")[0];
+                    var card = ctx.ChooseCards(giver.Energy.ToList(), 1, 1, "Energy Wheel: move which Energy to " + me.Name + "?")[0];
                     ctx.Engine.MoveEnergy(giver, me, card);
                     return true;
                 }

@@ -157,7 +157,7 @@ namespace PokemonTCG.Cards
                     var givers = ctx.MyBench().Where(m => m != me && m.Energy.Count > 0).ToList();
                     var giver = RepeatableAbility.ChoosePokemonOrDone(ctx, givers, "Gather Light: move an Energy from which Benched Pokémon to " + me.Name + "?" + (offerDone ? " Press Done when finished." : ""), offerDone);
                     if (giver == null) return false;
-                    var card = giver.Energy.Count == 1 ? giver.Energy[0] : ctx.ChooseCards(giver.Energy.ToList(), 1, 1, "Gather Light: move which Energy?")[0];
+                    var card = ctx.ChooseCards(giver.Energy.ToList(), 1, 1, "Gather Light: move which Energy?")[0];
                     return ctx.Engine.MoveEnergy(giver, me, card);
                 });
                 return true;

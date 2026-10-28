@@ -200,7 +200,7 @@ namespace PokemonTCG.Cards
                 if (atk.Name != "Blindside") return false;
                 var targets = ctx.OpponentPokemon(m => m.DamageCounters > 0);
                 if (targets.Count == 0) return Nothing(ctx);
-                var target = targets.Count == 1 ? targets[0] : ctx.ChoosePokemon(targets, "Blindside: do 50 damage to which of your opponent's Pokémon?");
+                var target = ctx.ChoosePokemon(targets, "Blindside: do 50 damage to which of your opponent's Pokémon?");
                 if (target != null) ctx.DamageTarget(target, 50);
                 return true;
             }
@@ -253,7 +253,7 @@ namespace PokemonTCG.Cards
                 if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
                 var items = ctx.Me.Discard.Where(c => c.Def.IsItem).ToList();
                 if (items.Count == 0) return true;
-                ctx.DiscardToHand(items.Count == 1 ? items : ctx.ChooseCards(items, 1, 1, "Pickup: put which Item card from your discard pile into your hand?"));
+                ctx.DiscardToHand(ctx.ChooseCards(items, 1, 1, "Pickup: put which Item card from your discard pile into your hand?"));
                 return true;
             }
         }
