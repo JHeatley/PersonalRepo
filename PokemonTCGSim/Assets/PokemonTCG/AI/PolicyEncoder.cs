@@ -230,6 +230,39 @@ namespace PokemonTCG.AI
                 PlayedThisTurn.Add(o.Card);
         }
 
+        /// <summary>Makes this memory the same as another (a look-ahead's copy of the player's memory, PolicySearch).</summary>
+        public void CopyFrom(PolicyMemory o)
+        {
+            Seat = o.Seat;
+            DeckList = o.DeckList;
+            Turn = o.Turn;
+            ActionsThisTurn = o.ActionsThisTurn;
+            AbilitiesThisTurn = o.AbilitiesThisTurn;
+            EnergyAttached = o.EnergyAttached;
+            SupporterPlayed = o.SupporterPlayed;
+            Retreated = o.Retreated;
+            StadiumPlayed = o.StadiumPlayed;
+            Copy(o.AbilityUidsThisTurn, AbilityUidsThisTurn);
+            Copy(o.PlayedThisTurn, PlayedThisTurn);
+            Copy(o.OppLastTurn, OppLastTurn);
+            Copy(o.oppThisTurn, oppThisTurn);
+            Copy(o.OppKnownHand, OppKnownHand);
+            Copy(o.OppSeen, OppSeen);
+            Copy(o.enteredTurn, enteredTurn);
+            Copy(o.topCard, topCard);
+            Copy(o.movedTurn, movedTurn);
+            activeUid[0] = o.activeUid[0];
+            activeUid[1] = o.activeUid[1];
+            KoTurn[0] = o.KoTurn[0];
+            KoTurn[1] = o.KoTurn[1];
+        }
+
+        private static void Copy<T>(ICollection<T> from, ICollection<T> to)
+        {
+            to.Clear();
+            foreach (var x in from) to.Add(x);
+        }
+
         public bool EnteredBefore(int uid, int turn)
         {
             int t;

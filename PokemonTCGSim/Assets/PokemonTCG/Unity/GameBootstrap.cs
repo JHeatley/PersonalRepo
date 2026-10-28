@@ -122,6 +122,7 @@ namespace PokemonTCG.Presentation
             CardVisuals.WarmIndexInBackground(); // v134.6: list the card images now, off the main thread
             SavePaths.Load();
             LoadSkipCpu();
+            lookAhead = Mathf.Clamp(PlayerPrefs.GetInt(PrefLookAhead, 0), 0, 2);
             ApplyPace(PlayerPrefs.GetInt(PrefPace, 1));
             logOpen = PlayerPrefs.GetInt(PrefLogOpen, 0) == 1;
             birthday = Mathf.Max(0, PlayerPrefs.GetInt(PrefBirthday, 0));
@@ -728,7 +729,7 @@ namespace PokemonTCG.Presentation
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical(GUILayout.Width(colW));
             GUILayout.Label(botVsBot ? "Bot 1's deck" : "Your deck", ui.Title);
-            myScroll = GUILayout.BeginScrollView(myScroll, GUILayout.Height(Mathf.Max(160f, r.height - 356f)));
+            myScroll = GUILayout.BeginScrollView(myScroll, GUILayout.Height(Mathf.Max(160f, r.height - 382f)));
             for (int i = 0; i < decks.Count; i++)
                 if (InMenuFormat(i) && GUILayout.Toggle(myDeck == i, DeckLabel(i), ui.Button) && myDeck != i) pickMine = i;
             if (!Enumerable.Range(0, decks.Count).Any(InMenuFormat)) GUILayout.Label("No decks for this format yet. Build one in the deck builder.", Hint(ui));
@@ -737,7 +738,7 @@ namespace PokemonTCG.Presentation
 
             GUILayout.BeginVertical(GUILayout.Width(colW));
             GUILayout.Label(botVsBot ? "Bot 2's deck" : "Opponent's deck (bot)", ui.Title);
-            oppScroll = GUILayout.BeginScrollView(oppScroll, GUILayout.Height(Mathf.Max(160f, r.height - 356f)));
+            oppScroll = GUILayout.BeginScrollView(oppScroll, GUILayout.Height(Mathf.Max(160f, r.height - 382f)));
             for (int i = 0; i < decks.Count; i++)
                 if (InMenuFormat(i) && GUILayout.Toggle(oppDeck == i, DeckLabel(i), ui.Button) && oppDeck != i) pickTheirs = i;
             GUILayout.EndScrollView();
@@ -751,6 +752,7 @@ namespace PokemonTCG.Presentation
             int aiPick = GUILayout.Toolbar(OpponentPick, OpponentChoices, GUILayout.Width(440));
             GUILayout.Label("  " + BrainLine(), Hint(ui));
             GUILayout.EndHorizontal();
+            DrawLookAheadRow(ui);
             // v157: your Elo rating.
             GUILayout.BeginHorizontal();
             GUILayout.Label("Your Elo", GUILayout.Width(80));

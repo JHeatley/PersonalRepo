@@ -43,6 +43,10 @@ namespace PokemonTCG.Presentation
         private const int MaxTrainGames = 5000000;
         /// <summary>Keep the app off some CPU threads (a faulty core), and which ones (CpuThreads).</summary>
         private const string PrefSkipCpu = "PokemonTCG.SkipCpuThreads";
+        private const string PrefLookAhead = "PokemonTCG.LookAhead";
+        private static readonly string[] LookAheadNames = { "Off", "Quick", "Deep" };
+        /// <summary>The Neural AI's look-ahead in games against you: 0 off, 1 quick, 2 deep (PolicySearch).</summary>
+        private int lookAhead;
         private const string PrefSkipCpuList = "PokemonTCG.SkipCpuThreadList";
         private static readonly int[] TrainCounts = { 100, 500, 1000, 5000, 10000, 15000, 20000, 25000 };
         private static readonly string[] TrainCountLabels = { "100", "500", "1,000", "5,000", "10,000", "15,000", "20,000", "25,000" };
@@ -274,7 +278,40 @@ namespace PokemonTCG.Presentation
             // style: the Regional Sim's own choice (v117); null plays the Opponent switch's style.
             var agent = new LearningAgent(brain, seed, myDeckName, oppDeckName) { Training = false, Record = learnFromGame, Style = style };
             if (learnFromGame) learningBot = agent;
+            if (lookAhead > 0 && agent.Neural != null) agent.Neural.Search = MakeSearch();
             return agent;
+        }
+
+        /// <summary>The look-ahead the menu asks for, guessing your hidden cards from the decks in this app (legal ones).</summary>
+        private PolicySearch MakeSearch()
+        {
+            int threads = Math.Max(1, Environment.ProcessorCount - 2 - (skipCpu ? CpuThreads.Parse(skipCpuText).Count : 0));
+            var search = new PolicySearch(brain.Policy, lookAhead >= 2 ? SearchSettings.Deep(threads) : SearchSettings.Quick(threads));
+            for (int i = 0; i < decks.Count; i++)
+            {
+                if (deckProblems[i].Count > 0) continue;
+                var problems = new List<string>();
+                var cards = DeckLibrary.Build(db, decks[i], problems);
+                if (problems.Count == 0 && cards.Count > 0) search.KnownDecks.Add(cards);
+            }
+            return search;
+        }
+
+        /// <summary>The menu's Look-ahead row (Neural AI only).</summary>
+        private void DrawLookAheadRow(UiStyles ui)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Look-ahead", GUILayout.Width(80));
+            int pick = GUILayout.Toolbar(lookAhead, LookAheadNames, GUILayout.Width(240));
+            GUILayout.Label("  Neural AI only: it plays its best few moves out a turn ahead (Deep: two) on guesses at your hidden cards, "
+                            + "never your real ones. Quick: under a second a move; Deep: a few seconds.", Hint(ui));
+            GUILayout.EndHorizontal();
+            if (pick != lookAhead)
+            {
+                lookAhead = pick;
+                PlayerPrefs.SetInt(PrefLookAhead, pick);
+                PlayerPrefs.Save();
+            }
         }
 
         /// <summary>One line for the menu: what the opponent is and how much it has learned.</summary>

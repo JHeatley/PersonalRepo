@@ -41,6 +41,13 @@ games. Ctrl+C stops it after the current round.
 Plays the network (top-rated moves) against the classic bot, or against another network
 with `--vs FILE`, half the games on each seat, random decks.
 
+`--search quick` or `--search deep` makes the network look ahead before the main actions it
+isn't sure of (the sim's Look-ahead setting): it plays its best few moves out a turn
+(deep: two) ahead on guesses at the hidden cards, never the real ones, and makes the one
+that does best. It is much slower (about 20 seconds of CPU a game for quick);
+`--search-playouts N` and `--search-seconds S` change how much it thinks per move.
+`--vs FILE --search quick` with the same network as `--net` measures what looking ahead adds.
+
 ## Using what you trained in the sim
 
 The sim keeps the Neural AI's network next to the AI's file (the Save Folders screen

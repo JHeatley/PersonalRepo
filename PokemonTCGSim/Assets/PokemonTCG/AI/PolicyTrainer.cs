@@ -649,12 +649,28 @@ namespace PokemonTCG.AI
 
         // ------------------------------------------------------------------ Measuring
 
+        /// <summary>The look-ahead of the last Evaluate that used one (its counts), or null.</summary>
+        public PolicySearch LastSearch;
+
         /// <summary>
         /// Win rate (0..1) of the network (top-rated moves) against another player, half the games on each seat, with random
         /// decks from the pool (or the focus deck for the network).
         /// </summary>
         public double Evaluate(Func<int, IPlayerAgent> opponent, int games, int seed0, out int wins, out int draws, out int losses)
         {
+            return Evaluate(opponent, games, seed0, null, out wins, out draws, out losses);
+        }
+
+        /// <summary>Evaluate with the network looking ahead (PolicySearch with these settings, guessing from the pool's decks); null: no look-ahead.</summary>
+        public double Evaluate(Func<int, IPlayerAgent> opponent, int games, int seed0, SearchSettings search, out int wins, out int draws, out int losses)
+        {
+            PolicySearch searcher = null;
+            if (search != null)
+            {
+                searcher = new PolicySearch(Net, search) { PrizeReward = PrizeReward };
+                foreach (var deck in decks) searcher.KnownDecks.Add(deck.Value);
+            }
+            LastSearch = searcher;
             int w = 0, d = 0, l = 0, next = 0;
             object gate = new object();
             int threads = Math.Max(1, Math.Min(Pool.Count, games));
@@ -687,7 +703,7 @@ namespace PokemonTCG.AI
                             if (mine.Value == null) mine = decks[rng.Next(decks.Count)];
                             theirs = decks[rng.Next(decks.Count)];
                         }
-                        var bot = new PolicyAgent(Net, seed + 1, seat, mine.Value) { Greedy = true };
+                        var bot = new PolicyAgent(Net, seed + 1, seat, mine.Value) { Greedy = true, Search = searcher };
                         var opp = opponent(seed + 2);
                         int outcome = 0;
                         try

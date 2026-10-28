@@ -550,6 +550,111 @@ namespace PokemonTCG.Tests
             Assert.IsFalse(GpuLearner.TryParse("", out host, out port));
         }
 
+        /// <summary>Plays the Neural AI (seat 0) against the classic bot and keeps the position and its memory at its first main action from that turn on.</summary>
+        private sealed class PositionGrabber : IPlayerAgent, IGameObserver
+        {
+            public readonly PolicyAgent Inner;
+            private readonly int fromTurn;
+            private GameEngine engine;
+            public GameState Position;
+            public PolicyMemory Memory;
+
+            public PositionGrabber(PolicyNet net, int fromTurn)
+            {
+                Inner = new PolicyAgent(net, 1, 0);
+                this.fromTurn = fromTurn;
+            }
+
+            public List<int> Decide(DecisionRequest r)
+            {
+                var picks = Inner.Decide(r);
+                if (Position == null && r.Kind == DecisionKind.MainAction && r.View.TurnNumber >= fromTurn)
+                {
+                    Position = engine.State.Clone();
+                    Memory = new PolicyMemory(0);
+                    Memory.CopyFrom(Inner.Memory);
+                }
+                return picks;
+            }
+
+            public void OnEvent(GameEngine e, GameEvent ev)
+            {
+                engine = e;
+                Inner.OnEvent(e, ev);
+            }
+        }
+
+        private static List<string> Names(IEnumerable<CardInstance> cards)
+        {
+            return cards.Select(c => c.Def.Name).ToList();
+        }
+
+        [Test]
+        public void Look_Ahead_Never_Uses_The_Opponents_Hidden_Cards()
+        {
+            var grab = new PositionGrabber(new PolicyNet(), 5);
+            var engine = new GameEngine(StandardCards.CreateRegistry(), grab, new HeuristicAgent(3));
+            engine.Run(Dragapult(), Zoroark(), 31);
+            Assert.NotNull(grab.Position, "a main action on turn 5 or later");
+            var real = grab.Position;
+            var opp = real.Players[1];
+
+            // The same position with the opponent's hand, deck and face-down Prize cards swapped for other cards (same counts).
+            var other = real.Clone();
+            var o = other.Players[1];
+            var swap = Dragapult();
+            int id = 100000, k = 0;
+            Func<CardInstance> next = () => new CardInstance(id++, swap[k++ % swap.Count], 1);
+            o.Hand = o.Hand.Select(c => next()).ToList();
+            o.Deck = o.Deck.Select(c => next()).ToList();
+            for (int i = 0; i < o.Prizes.Count; i++) if (!o.FaceUpPrizeIds.Contains(o.Prizes[i].Id)) o.Prizes[i] = next();
+
+            var search = new PolicySearch(new PolicyNet(), new SearchSettings());
+            search.KnownDecks.Add(Dragapult());
+            search.KnownDecks.Add(Zoroark());
+            for (int seed = 1; seed <= 5; seed++)
+            {
+                List<CardDef> guessA, guessB;
+                var a = search.Guess(real, 0, grab.Memory, seed, out guessA).Players[1];
+                var b = search.Guess(other, 0, grab.Memory, seed, out guessB).Players[1];
+                Assert.AreSame(guessA, guessB, "the same deck guessed");
+                CollectionAssert.AreEqual(Names(a.Hand), Names(b.Hand), "the guessed hand doesn't depend on the real one");
+                CollectionAssert.AreEqual(Names(a.Deck), Names(b.Deck));
+                CollectionAssert.AreEqual(Names(a.Prizes), Names(b.Prizes));
+                Assert.AreEqual(opp.Hand.Count, a.Hand.Count);
+                Assert.AreEqual(opp.Deck.Count, a.Deck.Count);
+                Assert.AreEqual(opp.Prizes.Count, a.Prizes.Count);
+                // The player's own side keeps its hand and holds the same cards, only the hidden order changes.
+                CollectionAssert.AreEqual(Names(real.Players[0].Hand), Names(search.Guess(real, 0, grab.Memory, seed, out guessA).Players[0].Hand));
+            }
+            List<CardDef> guess;
+            search.Guess(real, 0, grab.Memory, 1, out guess);
+            Assert.AreEqual(Zoroark().Count, guess.Count);
+            CollectionAssert.AreEquivalent(Zoroark().Select(c => c.Name).ToList(), guess.Select(c => c.Name).ToList(),
+                "after a few turns the cards Zoroark has shown point to the Zoroark deck");
+        }
+
+        [Test]
+        public void The_Neural_AI_Plays_Whole_Games_Looking_Ahead()
+        {
+            var net = new PolicyNet();
+            var settings = new SearchSettings { Playouts = 8, MaxCandidates = 3, SkipAbove = 1.01, Threads = 2, MaxSeconds = 2 };
+            var search = new PolicySearch(net, settings);
+            search.KnownDecks.Add(Dragapult());
+            search.KnownDecks.Add(Zoroark());
+            var bot = new PolicyAgent(net, 1, 0, Dragapult()) { Greedy = true, Search = search };
+            var engine = new GameEngine(StandardCards.CreateRegistry(), bot, new HeuristicAgent(4)) { MaxTurns = 12 };
+            engine.Run(Dragapult(), Zoroark(), 41);
+            Assert.Greater(search.Searches, 3, "it looked ahead at its main actions");
+            Assert.Greater(search.Playouts, search.Searches * 4);
+            Assert.Less(search.Failed, Math.Max(2, search.Playouts / 20), "almost every guess plays out");
+
+            // Training and recording games never look ahead (they learn from the network's own choices).
+            var learner = new PolicyAgent(net, 2, 0, Dragapult()) { Greedy = false, Record = true, Search = new PolicySearch(net, settings) };
+            new GameEngine(StandardCards.CreateRegistry(), learner, new HeuristicAgent(5)) { MaxTurns = 8 }.Run(Dragapult(), Zoroark(), 42);
+            Assert.AreEqual(0, learner.Search.Searches);
+        }
+
         [Test]
         public void Skipping_CPU_Threads_Leaves_Every_Other_Thread()
         {

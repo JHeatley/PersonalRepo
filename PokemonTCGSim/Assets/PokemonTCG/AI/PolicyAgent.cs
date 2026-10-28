@@ -49,6 +49,9 @@ namespace PokemonTCG.AI
 
         /// <summary>When this returns true, the game is abandoned at the agent's next decision (training was stopped).</summary>
         public Func<bool> Abort;
+        /// <summary>Look-ahead at main actions (playing for real, not while training or recording); null plays on the network alone.</summary>
+        public PolicySearch Search;
+        private GameEngine engine;
 
         /// <summary>Counts for the sequencing report.</summary>
         public int Attacks, AttacksWithResourcesLeft, Shuffles, ShufflesWithPlaysLeft, DrewThenShuffled;
@@ -64,7 +67,20 @@ namespace PokemonTCG.AI
 
         public void OnEvent(GameEngine engine, GameEvent ev)
         {
+            if (engine != null) this.engine = engine;
             Memory.OnEvent(engine, ev);
+        }
+
+        /// <summary>The network's value of the position at this decision (how likely it thinks it is to win, -1 to 1).</summary>
+        public float ValueOf(DecisionRequest r)
+        {
+            if (Memory.Seat < 0) Memory.Seat = r.Player;
+            Memory.See(r.View);
+            var choices = PolicyEncoder.Choices(r, new List<int>());
+            if (choices.Count == 0) return 0;
+            float value;
+            Net.Evaluate(PolicyEncoder.Encode(r, Memory, Net, choices), out value);
+            return value;
         }
 
         public List<int> Decide(DecisionRequest r)
@@ -107,7 +123,9 @@ namespace PokemonTCG.AI
             var p = PolicyNet.Softmax(logits);
             int a = 0, top = 0;
             for (int i = 1; i < p.Length; i++) if (logits[i] > logits[top]) top = i;
-            if (Greedy) a = top;
+            if (Greedy && Search != null && !Record && r.Kind == DecisionKind.MainAction && engine != null)
+                a = Search.Pick(engine, r, Memory, choices, p, top);
+            else if (Greedy) a = top;
             else
             {
                 double u = (rng.NextULong() >> 11) * (1.0 / 9007199254740992.0), acc = 0;
