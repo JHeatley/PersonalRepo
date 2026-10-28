@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using PokemonTCG.AI;
 using UnityEngine;
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
 using System.Runtime.InteropServices;
@@ -58,6 +59,8 @@ namespace PokemonTCG.Presentation
         /// <summary>Games played here are saved in "Game logs" in the AI's folder; TCG Live battle logs can go there too (v76).</summary>
         public const string GameLogFolderName = "Game logs";
         public static string GameLogFolder { get { return Path.Combine(BrainFolder, GameLogFolderName); } }
+        /// <summary>In Game logs: the logs the AI has studied (GameBootstrapLogs).</summary>
+        public const string StudiedLogsFileName = "studied.txt";
 
         public static bool BrainFolderIsDefault { get { return SamePath(BrainFolder, DefaultBrainFolder); } }
         public static bool DeckFolderIsDefault { get { return SamePath(DeckFolder, DefaultDeckFolder); } }
@@ -78,8 +81,12 @@ namespace PokemonTCG.Presentation
         // ------------------------------------------------------------------ Changing folders
 
         /// <summary>
-        /// Points the learning AI's files at a new folder. brain.txt and feedback.txt are copied from the current folder
-        /// when the new one doesn't have them yet. Save the brain first so the copy is up to date, and reload it after.
+        /// Points the learning AI's files at a new folder. brain.txt, feedback.txt and rating.txt are copied from the current
+        /// folder when the new one doesn't have them yet. When brain.txt is copied, the files saved beside it go too: the
+        /// Neural AI's network (.neural), its champion (.champion) and the league's networks (.league folder); a brain already
+        /// in the new folder keeps its own. Your game logs (Game logs) are copied too, each one the new folder doesn't have; the
+        /// list of the ones the AI has studied goes only with its brain. Save the brain first so the copy is up to date, and
+        /// reload it after.
         /// </summary>
         public static bool ChangeBrainFolder(string folder, out string message)
         {
@@ -92,6 +99,18 @@ namespace PokemonTCG.Presentation
             {
                 foreach (var name in new[] { BrainFileName, FeedbackFileName, RatingFileName })
                     CopyIfMissing(Path.Combine(old, name), Path.Combine(full, name), name, copied, kept);
+                // The brain's own files go with it (never mixed with another brain's).
+                if (copied.Contains(BrainFileName))
+                {
+                    string from = Path.Combine(old, BrainFileName), to = Path.Combine(full, BrainFileName);
+                    CopyIfMissing(LearningBrain.NeuralPath(from), LearningBrain.NeuralPath(to), "the neural network", copied, kept);
+                    CopyIfMissing(LearningBrain.ChampionPath(from), LearningBrain.ChampionPath(to), "its champion", copied, kept);
+                    CopyFolderIfMissing(LearningBrain.LeaguePath(from), LearningBrain.LeaguePath(to), "its league", copied, kept);
+                }
+                // Your game logs, whichever brain uses them; which ones were studied belongs to the brain that studied them.
+                int logs = CopyMissingFiles(Path.Combine(old, GameLogFolderName), Path.Combine(full, GameLogFolderName),
+                    copied.Contains(BrainFileName) ? null : StudiedLogsFileName);
+                if (logs > 0) copied.Add(logs + (logs == 1 ? " game log" : " game logs"));
             }
             catch (Exception e)
             {
@@ -102,9 +121,11 @@ namespace PokemonTCG.Presentation
             brainFolder = full;
 
             message = "The AI now saves to " + full + ".";
-            if (copied.Count > 0) message += " Copied " + string.Join(" and ", copied.ToArray()) + " from " + old + " (the originals are still there).";
+            if (copied.Count > 0) message += " Copied " + List(copied) + " from " + old + " (the originals are still there).";
+            var keptBeside = kept.FindAll(k => k != BrainFileName && k != FeedbackFileName && k != RatingFileName);
+            if (keptBeside.Count > 0) message += " That folder already had " + List(keptBeside) + " with no brain.txt beside it; kept as is.";
             if (kept.Contains(BrainFileName)) message += " That folder already had a brain.txt, so the AI now uses that one; the brain from " + old + " wasn't copied over it.";
-            else if (copied.Count == 0) message += " There was no brain in " + old + " yet, so the AI starts fresh here.";
+            else if (!copied.Contains(BrainFileName)) message += " There was no brain in " + old + " yet, so the AI starts fresh here.";
             return true;
         }
 
@@ -198,6 +219,50 @@ namespace PokemonTCG.Presentation
                 return;
             }
             File.Copy(from, to);
+            copied.Add(name);
+        }
+
+        /// <summary>"a", "a and b", "a, b and c".</summary>
+        private static string List(List<string> items)
+        {
+            if (items.Count <= 1) return items.Count == 1 ? items[0] : "";
+            return string.Join(", ", items.GetRange(0, items.Count - 1).ToArray()) + " and " + items[items.Count - 1];
+        }
+
+        /// <summary>
+        /// Copies every file under from (subfolders too) that isn't at the same place under to yet, except skip (a file name in
+        /// from itself, or null). Returns how many it copied.
+        /// </summary>
+        private static int CopyMissingFiles(string from, string to, string skip)
+        {
+            if (!Directory.Exists(from)) return 0;
+            int n = 0;
+            foreach (var file in Directory.GetFiles(from, "*", SearchOption.AllDirectories))
+            {
+                string rel = file.Substring(from.Length).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                if (skip != null && string.Equals(rel, skip, StringComparison.OrdinalIgnoreCase)) continue;
+                if (rel.EndsWith(".tmp", StringComparison.OrdinalIgnoreCase)) continue;
+                string target = Path.Combine(to, rel);
+                if (File.Exists(target)) continue;
+                Directory.CreateDirectory(Path.GetDirectoryName(target));
+                File.Copy(file, target);
+                if (!string.Equals(rel, StudiedLogsFileName, StringComparison.OrdinalIgnoreCase)) n++;
+            }
+            return n;
+        }
+
+        /// <summary>A whole folder (the league's networks), when the new place doesn't have it yet.</summary>
+        private static void CopyFolderIfMissing(string from, string to, string name, List<string> copied, List<string> kept)
+        {
+            if (!Directory.Exists(from)) return;
+            if (Directory.Exists(to))
+            {
+                kept.Add(name);
+                return;
+            }
+            Directory.CreateDirectory(to);
+            foreach (var file in Directory.GetFiles(from))
+                if (!file.EndsWith(".tmp", StringComparison.OrdinalIgnoreCase)) File.Copy(file, Path.Combine(to, Path.GetFileName(file)));
             copied.Add(name);
         }
 

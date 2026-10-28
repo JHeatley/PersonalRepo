@@ -19,7 +19,7 @@ namespace PokemonTCG.Presentation
     /// </summary>
     public sealed partial class GameBootstrap
     {
-        private const string StudiedListName = "studied.txt";
+        private const string StudiedListName = SavePaths.StudiedLogsFileName;
         private const int MaxStudyRows = 200;
 
         private GameRecord gameRecord;
