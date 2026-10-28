@@ -390,5 +390,19 @@ namespace PokemonTCG.Tests
             Step(e);
             Assert.AreEqual("Rampardos ex", fossil.Name);
         }
+
+        [Test]
+        public void Quick_Ripening_Herb_Works_On_An_Antique_Fossil_In_Play()
+        {
+            // Meganium's Quick-Ripening Herb skips the Stage 1 like Rare Candy: any Cranidos card's line counts.
+            var e = Scenario(new ScriptedAgent().Then("Use Quick-Ripening Herb"), new ScriptedAgent());
+            e.ScenarioActive(0, C("LOT-8"));
+            var fossil = e.ScenarioBench(0, C(SkullFossil));
+            e.ScenarioActive(1, C(Dreepy));
+            e.ScenarioAddToHand(0, C(RampardosEx));
+            e.ScenarioSetTurn(0, 3);
+            Step(e);
+            Assert.AreEqual("Rampardos ex", fossil.Name);
+        }
     }
 }
