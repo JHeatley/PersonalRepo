@@ -43,6 +43,8 @@ namespace PokemonTCG.Presentation
         /// </summary>
         public static void LoadPolicyStart()
         {
+            // The Neural AI's training reports each round in the console.
+            PokemonTCG.AI.PolicyTrainer.LogTo = message => Debug.Log(message);
             if (PokemonTCG.AI.LearningBrain.PolicyStart != null) return;
             var asset = Resources.Load<TextAsset>("AI/policy_start");
             if (asset != null) PokemonTCG.AI.LearningBrain.PolicyStart = asset.bytes;
