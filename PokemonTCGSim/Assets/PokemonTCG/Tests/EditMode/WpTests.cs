@@ -104,8 +104,8 @@ namespace PokemonTCG.Tests
             {
                 var d = db.Get("WP-" + n);
                 Assert.IsNotNull(d, "WP " + n + " is missing");
-                // Flying Pikachu (WP 25) was reprinted later, so it's Expanded legal (your ruling).
-                if (n == 25) Assert.IsFalse(d.UnlimitedOnly, "Flying Pikachu was reprinted: Expanded");
+                // Flying Pikachu (WP 25) and Surfing Pikachu (WP 28) were reprinted later, so they're Expanded legal (your ruling).
+                if (n == 25 || n == 28) Assert.IsFalse(d.UnlimitedOnly, d.Name + " was reprinted: Expanded");
                 else Assert.IsTrue(d.UnlimitedOnly, d.Name + " came out before Black & White");
             }
             Assert.AreEqual(DevolutionMew, db.MainPrinting(C("WP-9")).Key, "the second Mew print");
