@@ -1,0 +1,411 @@
+{
+ "format": "Dragon Vault (DRV, 2012): cards not already in the pool (6 and 7 are prints of Plasma Blast's Bagon and Shelgon, 11 of Legendary Treasures' Rayquaza, 18 Exp. Share and 20 Super Rod were already linked). No regulation mark: Expanded.",
+ "cards": [
+  {
+   "set": "DRV",
+   "number": "1",
+   "name": "Dratini",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Dragon",
+   "weakness": "Dragon",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Wrap",
+     "cost": "GL",
+     "damage": 20,
+     "text": "Flip a coin. On heads, the Defending Pokémon becomes Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "DRV",
+   "number": "2",
+   "name": "Dratini",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Dragon",
+   "weakness": "Dragon",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Hypnotic Gaze",
+     "cost": "G",
+     "damage": 0,
+     "text": "The Defending Pokémon becomes Asleep."
+    },
+    {
+     "name": "Tail Whap",
+     "cost": "L",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "DRV",
+   "number": "3",
+   "name": "Dragonair",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Dratini",
+   "hp": 70,
+   "type": "Dragon",
+   "weakness": "Dragon",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Tail Whap",
+     "cost": "CC",
+     "damage": 20
+    },
+    {
+     "name": "Dragon Pulse",
+     "cost": "GLC",
+     "damage": 70,
+     "text": "Discard the top card of your deck."
+    }
+   ]
+  },
+  {
+   "set": "DRV",
+   "number": "4",
+   "name": "Dragonair",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Dratini",
+   "hp": 70,
+   "type": "Dragon",
+   "weakness": "Dragon",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Healing Melody",
+     "cost": "G",
+     "damage": 0,
+     "text": "Heal 10 damage from each of your Pokémon."
+    },
+    {
+     "name": "Slam",
+     "cost": "LC",
+     "damage": 30,
+     "damageSuffix": "x",
+     "text": "Flip 2 coins. This attack does 30 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "DRV",
+   "number": "5",
+   "name": "Dragonite",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Dragonair",
+   "hp": 150,
+   "type": "Dragon",
+   "weakness": "Dragon",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Hyper Beam",
+     "cost": "LCC",
+     "damage": 50,
+     "text": "Flip a coin. On heads, discard an Energy attached to the Defending Pokémon."
+    },
+    {
+     "name": "Hurricane Tail",
+     "cost": "GCCC",
+     "damage": 60,
+     "damageSuffix": "x",
+     "text": "Flip 4 coins. This attack does 60 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "DRV",
+   "number": "8",
+   "name": "Salamence",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Shelgon",
+   "hp": 140,
+   "type": "Dragon",
+   "weakness": "Dragon",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Scornful Storm",
+     "text": "Once during your turn (before your attack), you may have your opponent discard cards from their hand until they have 4 cards in their hand."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Shred",
+     "cost": "RWCC",
+     "damage": 90,
+     "text": "This attack's damage isn't affected by any effects on the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DRV",
+   "number": "9",
+   "name": "Latias",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Dragon",
+   "weakness": "Dragon",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Energy Assist",
+     "cost": "C",
+     "damage": 0,
+     "text": "Attach a basic Energy card from your discard pile to 1 of your Benched Pokémon."
+    },
+    {
+     "name": "Sky Heal",
+     "cost": "RP",
+     "damage": 40,
+     "text": "If Latios is on your Bench, heal 20 damage from this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DRV",
+   "number": "10",
+   "name": "Latios",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Dragon",
+   "weakness": "Dragon",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sky Blade",
+     "cost": "WC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "If Latias is on your Bench, this attack does 20 more damage."
+    },
+    {
+     "name": "Speed Wing",
+     "cost": "PCC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "DRV",
+   "number": "12",
+   "name": "Axew",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Dragon",
+   "weakness": "Dragon",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Signs of Evolution",
+     "cost": "F",
+     "damage": 0,
+     "text": "Flip a coin. On heads, search your deck for Fraxure, reveal it, and put it into your hand. Shuffle your deck afterward."
+    },
+    {
+     "name": "Scratch",
+     "cost": "M",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "DRV",
+   "number": "13",
+   "name": "Axew",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Dragon",
+   "weakness": "Dragon",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Lunge",
+     "cost": "FM",
+     "damage": 30,
+     "text": "Flip a coin. On tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "DRV",
+   "number": "14",
+   "name": "Fraxure",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Axew",
+   "hp": 70,
+   "type": "Dragon",
+   "weakness": "Dragon",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Grit",
+     "text": "If this Pokémon has any Special Conditions, each of its attacks does 40 more damage (before applying Weakness and Resistance)."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Dragon Claw",
+     "cost": "FMC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "DRV",
+   "number": "15",
+   "name": "Fraxure",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Axew",
+   "hp": 80,
+   "type": "Dragon",
+   "weakness": "Dragon",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Scratch",
+     "cost": "MC",
+     "damage": 20
+    },
+    {
+     "name": "Sharp Fang",
+     "cost": "FCC",
+     "damage": 40
+    }
+   ]
+  },
+  {
+   "set": "DRV",
+   "number": "16",
+   "name": "Haxorus",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Fraxure",
+   "hp": 140,
+   "type": "Dragon",
+   "weakness": "Dragon",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Axe Slugger",
+     "cost": "CC",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "If the Defending Pokémon is a [C] Pokémon, this attack does 60 more damage."
+    },
+    {
+     "name": "Dragon Pulse",
+     "cost": "FMCC",
+     "damage": 100,
+     "text": "Discard the top card of your deck."
+    }
+   ]
+  },
+  {
+   "set": "DRV",
+   "number": "17",
+   "name": "Druddigon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 110,
+   "type": "Dragon",
+   "weakness": "Dragon",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Tight Jaw",
+     "cost": "CC",
+     "damage": 20,
+     "text": "Flip a coin. On heads, the Defending Pokémon becomes Paralyzed."
+    },
+    {
+     "name": "Dragon Tail",
+     "cost": "RWC",
+     "damage": 80,
+     "damageSuffix": "x",
+     "text": "Flip 2 coins. This attack does 80 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "DRV",
+   "number": "19",
+   "name": "First Ticket",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Item",
+   "text": "Before you flip a coin to decide who goes first, you may play this card. If you do, don't flip; you go first. If both players play First Ticket, flip the coin as usual. You can't play more than 1 First Ticket before that coin flip."
+  },
+  {
+   "set": "DRV",
+   "number": "21",
+   "name": "Kyurem",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 130,
+   "type": "Dragon",
+   "weakness": "Dragon",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Dragon Claw",
+     "cost": "CCC",
+     "damage": 60
+    },
+    {
+     "name": "Blizzard",
+     "cost": "WPCC",
+     "damage": 90,
+     "text": "Does 10 damage to each of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  }
+ ]
+}

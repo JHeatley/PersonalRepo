@@ -1,0 +1,699 @@
+{
+ "format": "HGSS Black Star Promos (HSP HGSS01-HGSS25, 2010-2011): every card came out before Black & White, so the set is Unlimited only. Feraligatr, Meganium and Typhlosion are Pokémon Prime (no special rules).",
+ "cards": [
+  {
+   "set": "HSP",
+   "number": "1",
+   "name": "Ho-Oh",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Fire",
+   "weakness": "Water",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Combustion",
+     "cost": "R",
+     "damage": 20
+    },
+    {
+     "name": "Sacred Fire",
+     "cost": "RRCC",
+     "damage": 0,
+     "text": "Flip a coin. If heads, this attack does 80 damage to 1 of your opponent's Pokémon. This damage isn't affected by Weakness or Resistance."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "2",
+   "name": "Lugia",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Water",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Wave Splash",
+     "cost": "W",
+     "damage": 20
+    },
+    {
+     "name": "Aeroblast",
+     "cost": "WWCC",
+     "damage": 50,
+     "damageSuffix": "+",
+     "text": "Flip 2 coins. This attack does 20 more damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "3",
+   "name": "Pikachu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "weaknessAmount": 10,
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Recharge",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. If heads, search your deck for a Lightning Energy card and attach it to this Pokémon. Shuffle your deck afterward."
+    },
+    {
+     "name": "Thunderbolt",
+     "cost": "LLCC",
+     "damage": 100,
+     "text": "Discard all Energy attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "4",
+   "name": "Wobbuffet",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Tenacious Bind",
+     "text": "While this Pokémon is your Active Pokémon, your opponent's Active Pokémon's Retreat Cost is [C][C] more.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Trip Over",
+     "cost": "PC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 30 more damage."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "5",
+   "name": "Hoothoot",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Insomnia",
+     "text": "This Pokémon can't be Asleep.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Peck",
+     "cost": "C",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "6",
+   "name": "Noctowl",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Hoothoot",
+   "hp": 90,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Night Scope",
+     "text": "Once during your turn (before your attack), you may look at your opponent's hand. Not while this Pokémon has a Special Condition.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Hypnoblast",
+     "cost": "CCC",
+     "damage": 30,
+     "text": "The Defending Pokémon is now Asleep."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "7",
+   "name": "Feraligatr",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Croconaw",
+   "hp": 140,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Rain Dance",
+     "text": "As often as you like during your turn (before your attack), you may attach a Water Energy card from your hand to 1 of your Water Pokémon. Not while this Pokémon has a Special Condition.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Hydro Crunch",
+     "cost": "WWWW",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "Does 10 more damage for each damage counter on the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "8",
+   "name": "Meganium",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Bayleef",
+   "hp": 150,
+   "type": "Grass",
+   "weakness": "Fire",
+   "resistance": "Water",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Leaf Trans",
+     "text": "As often as you like during your turn (before your attack), you may move a Grass Energy attached to 1 of your Pokémon to another of your Pokémon. Not while this Pokémon has a Special Condition.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Solarbeam",
+     "cost": "GGCC",
+     "damage": 80
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "9",
+   "name": "Typhlosion",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Quilava",
+   "hp": 140,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Afterburner",
+     "text": "Once during your turn (before your attack), you may attach a Fire Energy card from your discard pile to 1 of your Pokémon. If you do, put 1 damage counter on that Pokémon. Not while this Pokémon has a Special Condition.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Flare Destroy",
+     "cost": "RRC",
+     "damage": 70,
+     "text": "Discard an Energy card attached to this Pokémon and an Energy card attached to the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "10",
+   "name": "Latias",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Colorless",
+   "weakness": "Colorless",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Energy Assist",
+     "cost": "C",
+     "damage": 10,
+     "text": "Attach a basic Energy card from your discard pile to 1 of your Benched Pokémon."
+    },
+    {
+     "name": "Infinite Wind",
+     "cost": "CCC",
+     "damage": 40,
+     "text": "If Latios is on your Bench, remove 2 damage counters from each of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "11",
+   "name": "Latios",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Colorless",
+   "weakness": "Colorless",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Luster Float",
+     "text": "If you have Latias in play, this Pokémon has no Retreat Cost.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Infinite Wing",
+     "cost": "CCCC",
+     "damage": 80,
+     "text": "Discard 2 Energy attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "12",
+   "name": "Cleffa",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 30,
+   "type": "Colorless",
+   "retreat": 0,
+   "abilities": [
+    {
+     "name": "Sweet Sleeping Face",
+     "text": "While this Pokémon is Asleep, prevent all damage done to it by attacks.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Eeeeeeek",
+     "cost": "",
+     "damage": 0,
+     "text": "Shuffle your hand into your deck, then draw 6 cards. This Pokémon is now Asleep."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "13",
+   "name": "Smoochum",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 30,
+   "type": "Psychic",
+   "retreat": 0,
+   "abilities": [
+    {
+     "name": "Sweet Sleeping Face",
+     "text": "While this Pokémon is Asleep, prevent all damage done to it by attacks.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Energy Antics",
+     "cost": "",
+     "damage": 0,
+     "text": "Move an Energy card attached to 1 of your opponent's Pokémon to another of your opponent's Pokémon. This Pokémon is now Asleep."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "14",
+   "name": "Lapras",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Water",
+   "weakness": "Metal",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Ferry",
+     "cost": "W",
+     "damage": 0,
+     "text": "Put a Supporter card from your discard pile into your hand (show it to your opponent)."
+    },
+    {
+     "name": "Surf",
+     "cost": "WWC",
+     "damage": 40
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "15",
+   "name": "Shuckle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fighting",
+   "weakness": "Water",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Fermenting Liquid",
+     "text": "Whenever you attach an Energy card from your hand to this Pokémon, draw a card.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Shell Stunner",
+     "cost": "GC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, prevent all damage done to this Pokémon by attacks during your opponent's next turn."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "16",
+   "name": "Plusle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Collect",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw 2 cards."
+    },
+    {
+     "name": "Thunder Jolt",
+     "cost": "L",
+     "damage": 20,
+     "text": "Flip a coin. If tails, this Pokémon also does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "17",
+   "name": "Minun",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Call for Family",
+     "cost": "C",
+     "damage": 0,
+     "text": "Search your deck for up to 2 Basic Pokémon and put them onto your Bench. Shuffle your deck afterward."
+    },
+    {
+     "name": "Tag Team Boost",
+     "cost": "L",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "If Plusle is on your Bench, this attack does 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "18",
+   "name": "Tropical Tidal Wave",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Flip a coin. If heads, discard all Pokémon Tools and Stadium cards your opponent has in play. If tails, discard all Pokémon Tools and Stadium cards you have in play."
+  },
+  {
+   "set": "HSP",
+   "number": "19",
+   "name": "Raikou",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Zap Cannon",
+     "cost": "LLC",
+     "damage": 70,
+     "text": "During your next turn, this Pokémon can't use Zap Cannon."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "20",
+   "name": "Entei",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Flare Blitz",
+     "cost": "RRC",
+     "damage": 80,
+     "text": "Discard all Fire Energy attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "21",
+   "name": "Suicune",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sheer Cold",
+     "cost": "WWC",
+     "damage": 50,
+     "text": "Flip a coin. If heads, the Defending Pokémon can't attack during your opponent's next turn."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "22",
+   "name": "Porygon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Stiffen",
+     "cost": "C",
+     "damage": 0,
+     "text": "During your opponent's next turn, any damage done to this Pokémon by attacks is reduced by 20 (after Weakness and Resistance)."
+    },
+    {
+     "name": "Version Update",
+     "cost": "CC",
+     "damage": 0,
+     "text": "Search your deck for a Porygon2, show it to your opponent, and put it into your hand. Shuffle your deck afterward."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "23",
+   "name": "Porygon2",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Porygon",
+   "hp": 80,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Shortcut",
+     "text": "The Retreat Cost of each Porygon, Porygon2 and Porygon-Z you have in play is [C] less.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Reckless Charge",
+     "cost": "CCC",
+     "damage": 50,
+     "text": "This Pokémon also does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "24",
+   "name": "Hitmonchan",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Detect",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. If heads, prevent all effects of attacks, including damage, done to this Pokémon during your opponent's next turn."
+    },
+    {
+     "name": "Sky Uppercut",
+     "cost": "FC",
+     "damage": 30,
+     "text": "This attack's damage isn't affected by Resistance."
+    }
+   ]
+  },
+  {
+   "set": "HSP",
+   "number": "25",
+   "name": "Hitmonlee",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Kick",
+     "cost": "F",
+     "damage": 20
+    },
+    {
+     "name": "High Jump Kick",
+     "cost": "FFC",
+     "damage": 60
+    }
+   ]
+  }
+ ]
+}

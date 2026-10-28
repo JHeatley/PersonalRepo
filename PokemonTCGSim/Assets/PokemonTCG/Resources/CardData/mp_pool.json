@@ -1,0 +1,103 @@
+{
+ "format": "Japanese M-P Promos (MP; Japan's code is M-P): cards announced in Japan, not yet out in English. H and later = Standard; G = Expanded.",
+ "cards": [
+  {
+   "set": "MP",
+   "number": "138",
+   "name": "Wimpod",
+   "kind": "Pokemon",
+   "regulationMark": "J",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Wimp Out",
+     "text": "If your opponent has any Pokémon ex in play, this Pokémon has no Retreat Cost."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Ram",
+     "cost": "G",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "MP",
+   "number": "139",
+   "name": "Mega Tatsugiri ex",
+   "kind": "Pokemon",
+   "regulationMark": "J",
+   "text": "",
+   "stage": "Basic",
+   "hp": 260,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "ex": true,
+   "megaEx": true,
+   "attacks": [
+    {
+     "name": "Triple Crown Head",
+     "cost": "WWW",
+     "damage": 150,
+     "damageSuffix": "x",
+     "text": "Flip 3 coins. This attack does 150 damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "MP",
+   "number": "143",
+   "name": "Lida",
+   "kind": "Trainer",
+   "regulationMark": "J",
+   "trainerType": "Supporter",
+   "text": "You can use this card only if any of your Mega Evolution Pokémon ex were Knocked Out during your opponent's last turn. Search your deck for up to 2 Basic Energy cards and attach them to 1 of your Mega Evolution Pokémon ex. Then, shuffle your deck."
+  },
+  {
+   "set": "MP",
+   "number": "169",
+   "name": "Mega Heatran ex",
+   "kind": "Pokemon",
+   "regulationMark": "J",
+   "text": "",
+   "stage": "Basic",
+   "hp": 300,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "retreat": 4,
+   "ex": true,
+   "megaEx": true,
+   "abilities": [
+    {
+     "name": "High Density Armor",
+     "text": "If this Pokémon has full HP, it takes 60 less damage from attacks from your opponent's Pokémon."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Gigantic Press",
+     "cost": "MMM",
+     "damage": 140,
+     "text": "During your next turn, this Pokémon's Gigantic Press does 140 more damage."
+    }
+   ]
+  },
+  {
+   "set": "MP",
+   "number": "171",
+   "name": "Lebanne",
+   "kind": "Trainer",
+   "regulationMark": "J",
+   "trainerType": "Supporter",
+   "text": "Flip a coin. If heads, heal 150 damage from your Active Pokémon. If tails, heal 30 damage from it instead."
+  }
+ ]
+}

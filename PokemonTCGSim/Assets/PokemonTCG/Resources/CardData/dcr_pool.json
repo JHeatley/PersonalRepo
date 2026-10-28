@@ -1,0 +1,715 @@
+{
+ "format": "Double Crisis (DCR, 2015): cards not already in the pool. No regulation mark: Expanded.",
+ "cards": [
+  {
+   "set": "DCR",
+   "number": "1",
+   "name": "Team Magma's Numel",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Ember",
+     "cost": "RC",
+     "damage": 30,
+     "text": "Discard an Energy attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "2",
+   "name": "Team Magma's Camerupt",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Team Magma's Numel",
+   "hp": 110,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Burning Draft",
+     "text": "Once during your turn (before your attack), you may attach a Fighting or Fire Energy card from your discard pile to this Pokémon."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Flame Ball",
+     "cost": "RCC",
+     "damage": 60,
+     "text": "Move a basic Energy attached to this Pokémon to 1 of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "3",
+   "name": "Team Aqua's Spheal",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Water",
+   "weakness": "Metal",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Water Gun",
+     "cost": "W",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "4",
+   "name": "Team Aqua's Sealeo",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Team Aqua's Spheal",
+   "hp": 90,
+   "type": "Water",
+   "weakness": "Metal",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Splatter",
+     "cost": "WC",
+     "damage": 20,
+     "text": "Does 20 damage to 1 of your opponent's Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Hail Storm",
+     "cost": "WCC",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "If your opponent's Active Pokémon is a Team Magma Pokémon, it does 60 more damage."
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "5",
+   "name": "Team Aqua's Walrein",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Team Aqua's Sealeo",
+   "hp": 140,
+   "type": "Water",
+   "weakness": "Metal",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Power Blow",
+     "cost": "C",
+     "damage": 30,
+     "damageSuffix": "x",
+     "text": "This attack does 30 damage times the amount of Energy attached to this Pokémon."
+    },
+    {
+     "name": "Dual Blizzard",
+     "cost": "WWWC",
+     "damage": 80,
+     "text": "Discard 2 Water Energy attached to this Pokémon. Does 80 damage to 2 of your opponent's Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "6",
+   "name": "Team Aqua's Kyogre-EX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "EX",
+   "text": "Pokémon-EX rule: when a Pokémon-EX has been Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Basic",
+   "hp": 190,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 4,
+   "abilities": [
+    {
+     "name": "Power Saver",
+     "text": "If there are 4 or fewer Team Aqua Pokémon in play (yours and your opponent's), this Pokémon can't attack."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Aqua Impact",
+     "cost": "WWWC",
+     "damage": 80,
+     "damageSuffix": "+",
+     "text": "Does 20 more damage for each Colorless in your opponent's Active Pokémon's Retreat Cost."
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "7",
+   "name": "Team Aqua's Grimer",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Pound",
+     "cost": "P",
+     "damage": 10
+    },
+    {
+     "name": "Mud-Slap",
+     "cost": "PCC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "8",
+   "name": "Team Aqua's Muk",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Team Aqua's Grimer",
+   "hp": 110,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Sludge Festival",
+     "text": "Each Pokémon in play, except Team Aqua Pokémon, has its Retreat Cost increased by Colorless."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Pester",
+     "cost": "PCC",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "If your opponent's Active Pokémon is affected by a Special Condition, it does 60 more damage."
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "9",
+   "name": "Team Aqua's Seviper",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Venomous Fang",
+     "cost": "P",
+     "damage": 10,
+     "text": "Flip a coin. On heads, your opponent's Active Pokémon becomes Poisoned."
+    },
+    {
+     "name": "Venom Tail",
+     "cost": "CC",
+     "damage": 30,
+     "text": "If your opponent's Active Pokémon is affected by a Special Condition, discard an Energy attached to it."
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "10",
+   "name": "Team Magma's Baltoy",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Telekinesis",
+     "cost": "PC",
+     "damage": 20,
+     "text": "Does 20 damage to 1 of your opponent's Pokémon. This attack's damage isn't affected by Weakness or Resistance."
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "11",
+   "name": "Team Magma's Claydol",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Team Magma's Baltoy",
+   "hp": 90,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Magma Switch",
+     "text": "Once during your turn (before your attack), you may move a basic Energy from 1 of your Pokémon to 1 of your Team Magma Pokémon."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Power Beam",
+     "cost": "PCC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "12",
+   "name": "Team Magma's Aron",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Gnaw",
+     "cost": "F",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "13",
+   "name": "Team Magma's Lairon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Team Magma's Aron",
+   "hp": 90,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Gnaw",
+     "cost": "FC",
+     "damage": 30
+    },
+    {
+     "name": "Take Down",
+     "cost": "FCC",
+     "damage": 60,
+     "text": "This Pokémon does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "14",
+   "name": "Team Magma's Aggron",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Team Magma's Lairon",
+   "hp": 140,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Rock Stomp",
+     "cost": "FC",
+     "damage": 40,
+     "damageSuffix": "x",
+     "text": "Discard as many Fighting Energy attached to your Pokémon as you like. Does 40 damage for each Fighting Energy you discarded."
+    },
+    {
+     "name": "Boulder Storm",
+     "cost": "FFFC",
+     "damage": 120,
+     "text": "Also does 20 damage to each of your opponent's Benched Pokémon that has any damage counters on it. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "15",
+   "name": "Team Magma's Groudon-EX",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "mechanic": "EX",
+   "text": "Pokémon-EX rule: when a Pokémon-EX has been Knocked Out, your opponent takes 2 Prize cards.",
+   "stage": "Basic",
+   "hp": 190,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 4,
+   "abilities": [
+    {
+     "name": "Power Saver",
+     "text": "If there are 4 or fewer Team Magma Pokémon in play (yours and your opponent's), this Pokémon can't attack."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Magma Quake",
+     "cost": "FFFC",
+     "damage": 80,
+     "damageSuffix": "+",
+     "text": "If your opponent's Active Pokémon already has damage counters on it, it does 80 more damage."
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "16",
+   "name": "Team Aqua's Poochyena",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Roar",
+     "cost": "C",
+     "damage": 0,
+     "text": "Your opponent switches their Active Pokémon with 1 of their Benched Pokémon."
+    },
+    {
+     "name": "Bite",
+     "cost": "WC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "17",
+   "name": "Team Magma's Poochyena",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Infiltrate",
+     "cost": "C",
+     "damage": 0,
+     "text": "Your opponent reveals their hand."
+    },
+    {
+     "name": "Bite",
+     "cost": "FC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "18",
+   "name": "Team Aqua's Mightyena",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Team Aqua's Poochyena",
+   "hp": 100,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Teampact",
+     "cost": "WC",
+     "damage": 30,
+     "damageSuffix": "x",
+     "text": "Flip a coin for each of your Team Aqua Pokémon in play. Does 30 damage for each heads."
+    },
+    {
+     "name": "Crunch",
+     "cost": "WWC",
+     "damage": 80,
+     "text": "Flip a coin. On heads, discard an Energy attached to your opponent's Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "19",
+   "name": "Team Magma's Mightyena",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Team Magma's Poochyena",
+   "hp": 100,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "FC",
+     "damage": 30
+    },
+    {
+     "name": "Hostile Fang",
+     "cost": "FFC",
+     "damage": 80,
+     "damageSuffix": "+",
+     "text": "If your opponent's Active Pokémon is a Team Aqua Pokémon, it does 40 more damage."
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "20",
+   "name": "Team Aqua's Carvanha",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Darkness",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Fin Smack",
+     "cost": "D",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Flip 2 coins. Does 10 damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "21",
+   "name": "Team Aqua's Sharpedo",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Team Aqua's Carvanha",
+   "hp": 90,
+   "type": "Darkness",
+   "weakness": "Lightning",
+   "retreat": 0,
+   "abilities": [
+    {
+     "name": "Aqua Search",
+     "text": "Once during your turn (before your attack), you may look through your deck for a Team Aqua Pokémon, show it to your opponent, and put it into your hand. Shuffle your deck afterward."
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Sharp Fang",
+     "cost": "DCC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "22",
+   "name": "Team Magma's Zangoose",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Call for Family",
+     "cost": "C",
+     "damage": 0,
+     "text": "Look through your deck for up to 2 Basic Team Magma Pokémon and put them onto your Bench. Shuffle your deck afterward."
+    },
+    {
+     "name": "Team Play",
+     "cost": "CCC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "This attack does 20 damage times the number of Team Magma Pokémon on your Bench."
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "23",
+   "name": "Aqua Diffuser",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Tool",
+   "text": "The Team Aqua Pokémon this card is attached to can use the attack on this card. (You still need the necessary Energy to use this attack.)",
+   "attacks": [
+    {
+     "name": "Aqua Diffuser",
+     "cost": "W",
+     "damage": 0,
+     "text": "Your opponent's Active Pokémon becomes Confused and Poisoned."
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "24",
+   "name": "Magma Pointer",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Tool",
+   "text": "The Team Magma Pokémon this card is attached to can use the attack on this card. (You still need the necessary Energy to use this attack.)",
+   "attacks": [
+    {
+     "name": "Magma Pointer",
+     "cost": "F",
+     "damage": 0,
+     "text": "Does 20 damage to 1 of your opponent's Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "DCR",
+   "number": "25",
+   "name": "Team Aqua Admin",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Supporter",
+   "text": "Attach a basic Energy card from your discard pile to your Active Team Aqua Pokémon."
+  },
+  {
+   "set": "DCR",
+   "number": "26",
+   "name": "Team Aqua Grunt",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Supporter",
+   "text": "Discard a card from your hand. (If you can't discard a card, you can't play this card.) Draw 3 cards. If you discarded a Team Aqua Pokémon, draw 4 cards instead."
+  },
+  {
+   "set": "DCR",
+   "number": "27",
+   "name": "Team Aqua's Great Ball",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Item",
+   "text": "Look through your deck for a Basic Team Aqua Pokémon and a basic Water Energy card, show them to your opponent, and put them into your hand. Shuffle your deck afterward."
+  },
+  {
+   "set": "DCR",
+   "number": "28",
+   "name": "Team Aqua's Secret Base",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Stadium",
+   "text": "Each Pokémon in play, except Team Aqua Pokémon, has its Retreat Cost increased by Colorless."
+  },
+  {
+   "set": "DCR",
+   "number": "29",
+   "name": "Team Magma Admin",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Supporter",
+   "text": "Put up to 3 Team Magma Pokémon from your discard pile into your hand."
+  },
+  {
+   "set": "DCR",
+   "number": "30",
+   "name": "Team Magma Grunt",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Supporter",
+   "text": "Discard a card from your hand. (If you can't discard a card, you can't play this card.) Draw 3 cards. If you discarded a Team Magma Pokémon, draw 4 cards instead."
+  },
+  {
+   "set": "DCR",
+   "number": "31",
+   "name": "Team Magma's Great Ball",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Item",
+   "text": "Look through your deck for a Basic Team Magma Pokémon and a basic Fighting Energy card, show them to your opponent, and put them into your hand. Shuffle your deck afterward."
+  },
+  {
+   "set": "DCR",
+   "number": "32",
+   "name": "Team Magma's Secret Base",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "trainerType": "Stadium",
+   "text": "Whenever any player plays a Basic Pokémon (except Team Magma Pokémon) from their hand onto their Bench, put 2 damage counters on that Pokémon."
+  },
+  {
+   "set": "DCR",
+   "number": "33",
+   "name": "Double Aqua Energy",
+   "kind": "Energy",
+   "regulationMark": "",
+   "basicEnergy": false,
+   "provides": "Colorless",
+   "text": "This card can only be attached to Team Aqua Pokémon. This card provides WaterWater Energy only while it is attached to a Team Aqua Pokémon. Discard this card at the end of the turn it was attached. (If this card is attached to anything other than a Team Aqua Pokémon, discard this card.)"
+  },
+  {
+   "set": "DCR",
+   "number": "34",
+   "name": "Double Magma Energy",
+   "kind": "Energy",
+   "regulationMark": "",
+   "basicEnergy": false,
+   "provides": "Colorless",
+   "text": "This card can only be attached to Team Magma Pokémon. This card provides FightingFighting Energy only while it is attached to a Team Magma Pokémon. Discard this card at the end of the turn it was attached. (If this card is attached to anything other than a Team Magma Pokémon, discard this card.)"
+  }
+ ]
+}
