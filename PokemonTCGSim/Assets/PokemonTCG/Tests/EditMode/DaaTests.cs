@@ -619,7 +619,8 @@ namespace PokemonTCG.Tests
             var scizor = e.ScenarioActive(0, C(ScizorV));
             Attach(e, scizor, Metal, 1);
             var tauros = e.ScenarioActive(1, C(Tauros));
-            e.ScenarioAttachTool(tauros, C(BigParasol));
+            // Not Big Parasol: in the Active Spot it prevents all effects of the opponent's attacks, Hack Off's discards included.
+            e.ScenarioAttachTool(tauros, C(StruggleGloves));
             Attach(e, tauros, PowerfulColorless, 1);
             Attach(e, tauros, Psychic, 1);
             e.ScenarioSetTurn(0, 3);
@@ -688,9 +689,10 @@ namespace PokemonTCG.Tests
             e.ScenarioSetTurn(0, 3);
             Assert.AreEqual(240, e.MaxHp(stunfisk), "200 + 2 x 20");
             Step(e);
+            int bitten = rhyperior.DamageCounters; // Trapping Bite's own 60 damage
             NextTurn(e);
             Step(e);
-            Assert.AreEqual(12, rhyperior.DamageCounters - 0, "12 counters on the Attacking Pokémon");
+            Assert.AreEqual(12, rhyperior.DamageCounters - bitten, "12 counters on the Attacking Pokémon");
         }
 
         [Test]

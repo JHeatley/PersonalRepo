@@ -179,8 +179,11 @@ namespace PokemonTCG.Cards
         {
             string stage1 = stage2.EvolvesFrom;
             string basicName;
+            // Any printing's line counts: Rampardos ex skips a Cranidos that evolves from Antique Skull Fossil, even though
+            // other Cranidos cards evolve from other Fossils.
             return stage2.IsPokemon && stage2.Stage == Stage.Stage2 && !string.IsNullOrEmpty(stage1)
-                && ctx.Engine.PreEvolutionOf.TryGetValue(stage1, out basicName) && basicName == basic.Name
+                && ((ctx.Engine.PreEvolutionOf.TryGetValue(stage1, out basicName) && basicName == basic.Name)
+                    || EvolutionLines.EvolvesFrom(stage1, basic.Name))
                 && !ctx.Engine.PokemonPlayBlocked(ctx.Player, stage2); // Potent Glare
         }
 

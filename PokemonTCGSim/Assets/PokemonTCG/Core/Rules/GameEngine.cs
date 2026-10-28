@@ -1295,6 +1295,12 @@ namespace PokemonTCG.Core
                 {
                     if (d != null && d.IsPokemon && d.Stage == Stage.Stage1 && !string.IsNullOrEmpty(d.EvolvesFrom) && !Known.ContainsKey(d.Name))
                         Known[d.Name] = d.EvolvesFrom;
+                    if (d != null && d.IsPokemon && d.Stage == Stage.Stage1 && !string.IsNullOrEmpty(d.EvolvesFrom))
+                    {
+                        HashSet<string> from;
+                        if (!AllPreEvolutions.TryGetValue(d.Name, out from)) AllPreEvolutions[d.Name] = from = new HashSet<string>();
+                        from.Add(d.EvolvesFrom);
+                    }
                     if (d != null && d.IsPokemon && !string.IsNullOrEmpty(d.EvolvesFrom) && !d.IsBreak && !d.IsLevelUp && !d.IsLegend)
                         Evolvable.Add(d.EvolvesFrom);
                     if (d != null && d.IsPokemon && d.IsBreak && !string.IsNullOrEmpty(d.EvolvesFrom))
@@ -1308,6 +1314,22 @@ namespace PokemonTCG.Core
         /// a Snorlax with no Evolution: Compendium, 2018-07-26), without looking at the deck.
         /// </summary>
         public static readonly HashSet<string> Evolvable = new HashSet<string>();
+
+        /// <summary>
+        /// Every name a Stage 1 Pokémon evolves from across its printings (Known keeps only the first): Cranidos evolves from
+        /// Unidentified Fossil, Skull Fossil or Antique Skull Fossil, depending on the card.
+        /// </summary>
+        public static readonly Dictionary<string, HashSet<string>> AllPreEvolutions = new Dictionary<string, HashSet<string>>();
+
+        /// <summary>True when some printing of this Stage 1 evolves from that Basic (any of Cranidos's Fossils for Rare Candy).</summary>
+        public static bool EvolvesFrom(string stage1, string basic)
+        {
+            lock (Known)
+            {
+                HashSet<string> from;
+                return AllPreEvolutions.TryGetValue(stage1, out from) && from.Contains(basic);
+            }
+        }
 
         /// <summary>Names of Pokémon that a BREAK Evolution card in the pool evolves from (Evosoda and Wally can find those: your ruling, v95).</summary>
         public static readonly HashSet<string> BreakEvolvable = new HashSet<string>();
