@@ -222,6 +222,42 @@ namespace PokemonTCG.Tests
             Assert.IsFalse(double.IsNaN(second.PolicyLoss) || double.IsNaN(second.ValueLoss));
         }
 
+        private List<KeyValuePair<string, List<CardDef>>> ThreeDecks()
+        {
+            return new List<KeyValuePair<string, List<CardDef>>>
+            {
+                new KeyValuePair<string, List<CardDef>>("Dragapult", Dragapult()),
+                new KeyValuePair<string, List<CardDef>>("Zoroark", Zoroark()),
+                new KeyValuePair<string, List<CardDef>>("Alakazam", UnityCardData.LoadDeck(db, "Decklists/alakazam_dusknoir"))
+            };
+        }
+
+        [Test]
+        public void All_Decks_Training_Plays_A_Random_Pair_Every_Game([Values(AiStyle.Learning, AiStyle.Neural)] AiStyle style)
+        {
+            var brain = new LearningBrain();
+            brain.Policy.Reset();
+            brain.Policy.GamesTrained = 1; // counts as trained, so the Neural AI session uses it
+            var decks = ThreeDecks();
+            var session = new TrainingSession(StandardCards.CreateRegistry(), brain, "All decks", decks[0].Value, "All decks", decks[0].Value, 12, 4, 5150)
+            {
+                Style = style,
+                AllDecks = decks
+            };
+            StringAssert.Contains("all 3 decks", session.MatchLabel);
+            session.RunBlocking();
+            var st = session.Status();
+            Assert.AreEqual(0, st.Errors, st.LastError);
+            Assert.AreEqual(12, st.Done);
+            Assert.AreEqual(12, st.WinsA + st.WinsB + st.Draws);
+            Assert.GreaterOrEqual(st.ScoreBefore, 0);
+            Assert.GreaterOrEqual(st.ScoreAfter, 0);
+            // The Learning AI's games go into the matchup table: more than one pair was played. (The Neural AI's games pick their
+            // decks in PolicyTrainer, the same way the command-line trainer does.)
+            if (style == AiStyle.Learning) Assert.Greater(brain.Matchups().Count, 1);
+            else Assert.Greater(brain.Policy.Steps, 0);
+        }
+
         [Test]
         public void Skipping_CPU_Threads_Leaves_Every_Other_Thread()
         {

@@ -1477,16 +1477,19 @@ namespace PokemonTCG.Presentation
             if (playing < tables) GUILayout.Label("  Battery saver: " + playing + " at once for now.", Hint(ui));
             else if (!withHint && tables > threads) GUILayout.Label("  More than this computer's " + threads + " processor threads: rounds won't finish sooner.", ui.Error);
             GUILayout.EndHorizontal();
-            if (!withHint) return;
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("", GUILayout.Width(150));
-            if (tables > threads)
-                GUILayout.Label("This computer has " + threads + " processor threads. More tables than that won't finish a round sooner: each game "
-                                + "just gets slower. " + suggestedTables + " keeps it busy and leaves room for the screen and your own game.", ui.Error);
-            else
-                GUILayout.Label("AI tables played at the same time in the background (1 to " + RegionalSim.MaxTablesAtOnce + "). This computer has " + threads
-                                + " processor threads, so " + suggestedTables + " is the most that helps. You can change it during the event too.", Hint(ui));
-            GUILayout.EndHorizontal();
+            if (withHint)
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("", GUILayout.Width(150));
+                if (tables > threads)
+                    GUILayout.Label("This computer has " + threads + " processor threads. More tables than that won't finish a round sooner: each game "
+                                    + "just gets slower. " + suggestedTables + " keeps it busy and leaves room for the screen and your own game.", ui.Error);
+                else
+                    GUILayout.Label("AI tables played at the same time in the background (1 to " + RegionalSim.MaxTablesAtOnce + "). This computer has " + threads
+                                    + " processor threads, so " + suggestedTables + " is the most that helps. You can change it during the event too.", Hint(ui));
+                GUILayout.EndHorizontal();
+            }
+            DrawSkipCpuRow(ui, actions, 150);
         }
 
         // ------------------------------------------------------------------ The AI players' decks (v69)

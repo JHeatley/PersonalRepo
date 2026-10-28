@@ -30,6 +30,10 @@ namespace PokemonTCG.Presentation
         private const string PrefTrainStyle = "PokemonTCG.TrainStyle";
         private const string PrefTrainA = "PokemonTCG.TrainDeckA";
         private const string PrefTrainB = "PokemonTCG.TrainDeckB";
+        private const string PrefTrainGames = "PokemonTCG.TrainGames";
+        private const string PrefTrainAll = "PokemonTCG.TrainAllDecks";
+        /// <summary>The most games one session can be set to play (typed in).</summary>
+        private const int MaxTrainGames = 1000000;
         /// <summary>Keep the app off some CPU threads (a faulty core), and which ones (CpuThreads).</summary>
         private const string PrefSkipCpu = "PokemonTCG.SkipCpuThreads";
         private const string PrefSkipCpuList = "PokemonTCG.SkipCpuThreadList";
@@ -49,7 +53,10 @@ namespace PokemonTCG.Presentation
         private TrainingSession training;
         private TrainingStatus trainView;
         private int trainA = -1, trainB = -1;
-        private int trainCountIndex = 2;
+        private int trainGames = 1000;
+        private string trainGamesText = "1,000";
+        /// <summary>All decks against all decks, a new random pair every game, instead of deck A against deck B.</summary>
+        private bool trainAll;
         private bool trainMeasure = true;
         private AiStyle trainStyle = AiStyle.Hybrid;
         private bool confirmReset;
@@ -169,6 +176,22 @@ namespace PokemonTCG.Presentation
         private void ApplySkipCpu()
         {
             skipCpuMessage = CpuThreads.Apply(skipCpu ? CpuThreads.Parse(skipCpuText) : new List<int>());
+        }
+
+        /// <summary>
+        /// The "Don't use CPU threads" switch as one row (the menu and the Regional Sim; the Train screen has its own layout).
+        /// Every place shows the same setting.
+        /// </summary>
+        private void DrawSkipCpuRow(UiStyles ui, List<Action> actions, float labelWidth)
+        {
+            if (!CpuThreads.Supported) return;
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("CPU threads", GUILayout.Width(labelWidth));
+            bool newSkip = GUILayout.Toggle(skipCpu, " Don't use", GUILayout.Width(100));
+            string newSkipText = GUILayout.TextField(skipCpuText, GUILayout.Width(90));
+            GUILayout.Label("  " + (skipCpu && skipCpuMessage != null ? skipCpuMessage : "Off: every thread is used.") + " For a faulty CPU core.", Hint(ui));
+            GUILayout.EndHorizontal();
+            if (newSkip != skipCpu || newSkipText != skipCpuText) actions.Add(() => SetSkipCpu(newSkip, newSkipText));
         }
 
         private void SetOpponentLearning(bool on)
@@ -301,6 +324,9 @@ namespace PokemonTCG.Presentation
             trainB = IndexOfDeck(PlayerPrefs.GetString(PrefTrainB, ""), oppDeck);
             // The style training plays (v78): its own choice, starting from the Opponent switch's until you pick one.
             trainStyle = (AiStyle)Mathf.Clamp(PlayerPrefs.GetInt(PrefTrainStyle, (int)opponentStyle), 0, 2);
+            trainGames = Mathf.Clamp(PlayerPrefs.GetInt(PrefTrainGames, 1000), 1, MaxTrainGames);
+            trainGamesText = trainGames.ToString("N0");
+            trainAll = PlayerPrefs.GetInt(PrefTrainAll, 0) == 1;
             confirmReset = false;
             nextBrainRefresh = 0f;
             mode = Mode.Train;
@@ -333,10 +359,39 @@ namespace PokemonTCG.Presentation
             }
         }
 
+        /// <summary>The decks All decks mode trains with: every legal deck, but not decks for a custom format (other rules and Prize cards).</summary>
+        private List<int> AllTrainDecks()
+        {
+            var list = new List<int>();
+            for (int i = 0; i < decks.Count; i++)
+                if (deckProblems[i].Count == 0 && !decks[i].IsCustomFormat) list.Add(i);
+            return list;
+        }
+
+        private void SetTrainGames(int games)
+        {
+            trainGames = Mathf.Clamp(games, 1, MaxTrainGames);
+            trainGamesText = trainGames.ToString("N0");
+            PlayerPrefs.SetInt(PrefTrainGames, trainGames);
+        }
+
+        /// <summary>The number typed in the games box (commas and spaces allowed); up to 1,000,000.</summary>
+        private void TypeTrainGames(string text)
+        {
+            trainGamesText = text ?? "";
+            var digits = new string(trainGamesText.Where(char.IsDigit).ToArray());
+            if (digits.Length == 0) return;
+            long n;
+            if (!long.TryParse(digits.Length > 9 ? "9999999999" : digits, out n) || n < 1) return;
+            trainGames = (int)Math.Min(MaxTrainGames, n);
+            PlayerPrefs.SetInt(PrefTrainGames, trainGames);
+        }
+
         private bool TrainDecksReady
         {
             get
             {
+                if (trainAll) return AllTrainDecks().Count > 0;
                 return trainA >= 0 && trainB >= 0 && trainA < decks.Count && trainB < decks.Count
                        && deckProblems[trainA].Count == 0 && deckProblems[trainB].Count == 0;
             }
@@ -346,6 +401,33 @@ namespace PokemonTCG.Presentation
         {
             if (!TrainDecksReady || brain == null) return;
             if (training != null && training.Running) return;
+            int games = Mathf.Clamp(trainGames, 1, MaxTrainGames);
+            int seed = (Environment.TickCount & 0x0FFFFFFF) | 1;
+            if (trainAll)
+            {
+                var all = new List<KeyValuePair<string, List<CardDef>>>();
+                foreach (int i in AllTrainDecks())
+                {
+                    var problems = new List<string>();
+                    var cards = DeckLibrary.Build(db, decks[i], problems);
+                    if (problems.Count == 0) all.Add(new KeyValuePair<string, List<CardDef>>(decks[i].Name, cards));
+                }
+                if (all.Count == 0)
+                {
+                    trainMessage = "There are no legal decks to train with.";
+                    return;
+                }
+                training = new TrainingSession(StandardCards.CreateRegistry(), brain, "All decks", all[0].Value, "All decks", all[0].Value,
+                    games, trainMeasure ? MeasureGames : 0, seed) { AllDecks = all };
+                training.Style = trainStyle;
+                training.Rules = GameFormat.Standard.Rules;
+                training.PrizeCount = GameFormat.Standard.PrizeCount;
+                sessionUndone = false;
+                trainMessage = null;
+                training.Start();
+                trainView = training.Status();
+                return;
+            }
             var pa = new List<string>();
             var pb = new List<string>();
             var cardsA = DeckLibrary.Build(db, decks[trainA], pa);
@@ -357,8 +439,6 @@ namespace PokemonTCG.Presentation
             }
             PlayerPrefs.SetString(PrefTrainA, decks[trainA].Name);
             PlayerPrefs.SetString(PrefTrainB, decks[trainB].Name);
-            int games = TrainCounts[Mathf.Clamp(trainCountIndex, 0, TrainCounts.Length - 1)];
-            int seed = (Environment.TickCount & 0x0FFFFFFF) | 1;
             training = new TrainingSession(StandardCards.CreateRegistry(), brain, decks[trainA].Name, cardsA, decks[trainB].Name, cardsB,
                 games, trainMeasure ? MeasureGames : 0, seed);
             training.Style = trainStyle;
@@ -418,7 +498,7 @@ namespace PokemonTCG.Presentation
 
             GUILayout.BeginVertical(GUILayout.Width(colW));
             GUILayout.Label("Deck A", ui.Title);
-            GUI.enabled = !running;
+            GUI.enabled = !running && !trainAll;
             trainScrollA = GUILayout.BeginScrollView(trainScrollA, GUILayout.Height(listH));
             for (int i = 0; i < decks.Count; i++)
             {
@@ -431,7 +511,7 @@ namespace PokemonTCG.Presentation
 
             GUILayout.BeginVertical(GUILayout.Width(colW));
             GUILayout.Label("Deck B", ui.Title);
-            GUI.enabled = !running;
+            GUI.enabled = !running && !trainAll;
             trainScrollB = GUILayout.BeginScrollView(trainScrollB, GUILayout.Height(listH));
             for (int i = 0; i < decks.Count; i++)
             {
@@ -445,8 +525,25 @@ namespace PokemonTCG.Presentation
             GUILayout.BeginVertical(GUILayout.Width(colW));
             GUILayout.Label("Games to play", ui.Title);
             GUI.enabled = !running;
-            int newCount = GUILayout.SelectionGrid(trainCountIndex, TrainCountLabels, TrainCountsPerRow);
-            if (newCount != trainCountIndex) actions.Add(() => trainCountIndex = newCount);
+            int countPick = Array.IndexOf(TrainCounts, trainGames);
+            int newCount = GUILayout.SelectionGrid(countPick, TrainCountLabels, TrainCountsPerRow);
+            if (newCount != countPick && newCount >= 0) actions.Add(() => SetTrainGames(TrainCounts[newCount]));
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Or type any number:", GUILayout.Width(140));
+            string newGamesText = GUILayout.TextField(trainGamesText, GUILayout.Width(110));
+            GUILayout.Label("  " + trainGames.ToString("N0") + " games (up to 1,000,000)", Hint(ui));
+            GUILayout.EndHorizontal();
+            if (newGamesText != trainGamesText) actions.Add(() => TypeTrainGames(newGamesText));
+            bool newAll = GUILayout.Toggle(trainAll, " All decks against all decks (a new random pair every game)");
+            if (newAll != trainAll)
+                actions.Add(() =>
+                {
+                    trainAll = newAll;
+                    PlayerPrefs.SetInt(PrefTrainAll, trainAll ? 1 : 0);
+                });
+            if (trainAll)
+                GUILayout.Label("Every game picks two of your " + AllTrainDecks().Count + " legal decks at random (mirrors too), the way the Python bot trained. "
+                                + "Decks for a custom format aren't included. Deck A and deck B are ignored.", Hint(ui));
             bool newMeasure = GUILayout.Toggle(trainMeasure, " Measure it against the classic bot before and after (+" + (MeasureGames * 2) + " games)");
             if (newMeasure != trainMeasure) actions.Add(() => trainMeasure = newMeasure);
             GUILayout.Label("Train as", ui.Label);
@@ -482,9 +579,11 @@ namespace PokemonTCG.Presentation
             if (GUILayout.Button("Back to menu", GUILayout.Height(32), GUILayout.Width(120))) actions.Add(() => { RefreshDecks(); mode = Mode.Menu; });
             GUILayout.EndHorizontal();
             if (running && PowerSaver.Active) GUILayout.Label("Battery saver on: training plays half the time and rests the other half.", Hint(ui));
-            if (!TrainDecksReady && trainA >= 0 && trainB >= 0)
+            if (!TrainDecksReady && trainAll)
+                GUILayout.Label("There are no legal decks to train with.", ui.Error);
+            else if (!TrainDecksReady && trainA >= 0 && trainB >= 0)
                 GUILayout.Label("Both decks must be legal to train with them.", ui.Error);
-            if (trainA >= 0 && trainA == trainB) GUILayout.Label("Same deck on both sides: a mirror match. The AI learns that deck's own play.", Hint(ui));
+            if (!trainAll && trainA >= 0 && trainA == trainB) GUILayout.Label("Same deck on both sides: a mirror match. The AI learns that deck's own play.", Hint(ui));
             if (trainMessage != null) GUILayout.Label(trainMessage, ui.Good);
             DrawTrainProgress(ui, st, colW);
             GUILayout.EndVertical();
@@ -529,9 +628,12 @@ namespace PokemonTCG.Presentation
         private void DrawTrainResults(UiStyles ui, TrainingStatus st, List<Action> actions)
         {
             if (st == null || training == null) return;
-            GUILayout.Label("This session: " + training.DeckA + " (A) vs " + training.DeckB + " (B), as the " + training.StyleLabel, ui.Title);
+            bool all = training.AllDecksMode;
+            GUILayout.Label("This session: " + (all ? training.MatchLabel : training.DeckA + " (A) vs " + training.DeckB + " (B)") + ", as the " + training.StyleLabel, ui.Title);
             int played = st.WinsA + st.WinsB + st.Draws;
-            if (played > 0)
+            if (played > 0 && all)
+                GUILayout.Label(played.ToString("N0") + " games played" + (st.Draws > 0 ? ", " + st.Draws + " unfinished" : "") + ".", ui.Label);
+            else if (played > 0)
                 GUILayout.Label("Deck A won " + Pct(st.WinsA, played) + " (" + st.WinsA + "), deck B won " + Pct(st.WinsB, played) + " (" + st.WinsB + ")"
                                 + (st.Draws > 0 ? ", " + st.Draws + " unfinished" : "") + ". Seats alternate, so each deck goes first half the time.", ui.Label);
             foreach (var b in st.Blocks)
@@ -539,13 +641,14 @@ namespace PokemonTCG.Presentation
                 int n = b.Played;
                 if (n == 0) continue;
                 string tried = b.Decisions > 0 ? "  ·  tried something new in " + (100.0 * b.Explored / b.Decisions).ToString("0.0") + "% of decisions" : "";
-                GUILayout.Label("Games " + b.From + "–" + b.To + ":  A " + Pct(b.WinsA, n) + "  ·  B " + Pct(b.WinsB, n) + "  ·  " + b.AverageTurns.ToString("0.0") + " turns on average" + tried, Hint(ui));
+                GUILayout.Label("Games " + b.From + "–" + b.To + ":  " + (all ? "" : "A " + Pct(b.WinsA, n) + "  ·  B " + Pct(b.WinsB, n) + "  ·  ")
+                                + b.AverageTurns.ToString("0.0") + " turns on average" + tried, Hint(ui));
             }
             if (st.ScoreBefore >= 0 || st.ScoreAfter >= 0)
             {
                 string before = st.ScoreBefore >= 0 ? (st.ScoreBefore * 100).ToString("0") + "%" : "-";
                 string after = st.ScoreAfter >= 0 ? (st.ScoreAfter * 100).ToString("0") + "%" : (st.Running ? "measuring..." : "-");
-                GUILayout.Label("Against the classic bot (same " + MeasureGames + " games each time, both decks): " + before + " before, " + after + " after.", ui.Title);
+                GUILayout.Label("Against the classic bot (same " + MeasureGames + " games each time, " + (all ? "random decks" : "both decks") + "): " + before + " before, " + after + " after.", ui.Title);
                 if (st.ScoreBefore >= 0 && st.ScoreAfter >= 0)
                 {
                     double delta = (st.ScoreAfter - st.ScoreBefore) * 100;
