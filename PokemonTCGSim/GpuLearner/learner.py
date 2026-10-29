@@ -46,6 +46,7 @@ import io
 import socket
 import struct
 import sys
+import threading
 import time
 
 import numpy as np
@@ -514,22 +515,14 @@ def recv_exact(conn, n):
     return bytes(buf)
 
 
-def serve(learner, host, port):
-    srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    srv.bind((host, port))
-    srv.listen(4)
-    print(f"GPU learner ready on {host}:{port}, learning on {learner.device}"
-          + (f" ({torch.cuda.get_device_name(learner.device)})" if learner.device.type == "cuda" else ""), flush=True)
-    while True:
-        conn, addr = srv.accept()
-        conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        print(f"sim connected from {addr[0]}", flush=True)
-        try:
-            while True:
-                head = recv_exact(conn, 12)
-                kind, size = head[:4], struct.unpack("<q", head[4:])[0]
-                r = Reader(recv_exact(conn, size))
+def handle(conn, addr, learner, gpu_lock, sims):
+    """One sim's connection: its messages in turn, with a network (and slots) of its own."""
+    try:
+        while True:
+            head = recv_exact(conn, 12)
+            kind, size = head[:4], struct.unpack("<q", head[4:])[0]
+            r = Reader(recv_exact(conn, size))
+            with gpu_lock:  # one sim's work on the card at a time
                 try:
                     version = r.i32()
                     slot = 0
@@ -559,12 +552,45 @@ def serve(learner, host, port):
                     out = io.BytesIO()
                     w_str(out, f"{type(e).__name__}: {e}")
                     reply = (b"ERR1", out.getvalue())
-                conn.sendall(reply[0] + struct.pack("<q", len(reply[1])) + reply[1])
-        except (ConnectionError, OSError) as e:
-            print(f"sim disconnected ({e}); waiting for it again", flush=True)
-        finally:
-            conn.close()
+            conn.sendall(reply[0] + struct.pack("<q", len(reply[1])) + reply[1])
+    except (ConnectionError, OSError) as e:
+        why = str(e)
+    else:
+        why = "closed"
+    finally:
+        conn.close()
+        with gpu_lock:
+            sims[0] -= 1
+            left = sims[0]
+    print(f"sim disconnected ({why}); {left} still connected" if left else f"sim disconnected ({why}); waiting for it again", flush=True)
 
+
+def serve(device, host, port):
+    """Each sim that connects gets its own thread and network, so one that's still connected (a trainer left running in the
+    background) can't hold up a new one: a learner that served one sim at a time left the new one waiting with no games."""
+    srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    srv.bind((host, port))
+    srv.listen(8)
+    first = Learner(device)
+    print(f"GPU learner ready on {host}:{port}, learning on {first.device}"
+          + (f" ({torch.cuda.get_device_name(first.device)})" if first.device.type == "cuda" else ""), flush=True)
+    gpu_lock = threading.Lock()
+    sims = [0]
+    while True:
+        conn, addr = srv.accept()
+        conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        with gpu_lock:
+            sims[0] += 1
+            count = sims[0]
+        learner = first if first is not None else Learner(device)
+        first = None
+        if count > 1:
+            print(f"sim connected from {addr[0]} ({count} sims connected now: if you didn't start another trainer, an old "
+                  f"sim-train.exe may still be running; end it in Task Manager)", flush=True)
+        else:
+            print(f"sim connected from {addr[0]}", flush=True)
+        threading.Thread(target=handle, args=(conn, addr, learner, gpu_lock, sims), daemon=True).start()
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -579,7 +605,7 @@ def main():
                  "or run with --device cpu")
     if args.threads > 0:
         torch.set_num_threads(args.threads)
-    serve(Learner(args.device), args.host, args.port)
+    serve(args.device, args.host, args.port)
 
 
 if __name__ == "__main__":

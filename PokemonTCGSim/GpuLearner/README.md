@@ -45,6 +45,12 @@ overall and keeps the heaviest maths off the CPU.
 If the learner isn't running or stops, the sim learns that round on the CPU, says why, and tries the GPU again a
 few rounds later; nothing is lost. Stop the learner with Ctrl+C when you're done.
 
+**More than one sim at once** (v170): each sim that connects gets its own network on the learner, so a trainer still
+running from earlier (a `sim-train.exe` left behind when Unity was closed) can't hold up a new one. When a second sim
+connects, the window says `2 sims connected now`: if you didn't start another trainer, end the old `sim-train.exe` in
+Task Manager. An older `learner.py` served one sim at a time, so a new trainer sat at 0 games until the old one went
+away; copy this one over yours.
+
 **Choose moves on the GPU too** (the Train screen's box under "Learn on the GPU at", `--gpu-moves` for the
 command-line trainer): running the network for each move is about half of a training game's work on the CPU. With this
 on, about 4 games per thread play at once, and the learner chooses all their moves together on the graphics card, so the
