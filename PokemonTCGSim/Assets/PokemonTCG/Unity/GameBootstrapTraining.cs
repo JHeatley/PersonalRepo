@@ -864,10 +864,10 @@ namespace PokemonTCG.Presentation
                     PlayerPrefs.SetString(PrefTrainGpuAddress, trainGpuAddress ?? "");
                 });
             // Expert roadmap step 2: learning from the look-ahead.
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Learn from look-ahead", GUILayout.Width(150));
-            int newLookAhead = GUILayout.Toolbar(trainLookAhead, TrainLookAheadNames);
-            GUILayout.EndHorizontal();
+            // The label above and the five choices in rows of three: on one line they're wider than the column, which
+            // widens everything in it past the scroll view's edge.
+            GUILayout.Label("Learn from look-ahead", ui.Label);
+            int newLookAhead = GUILayout.SelectionGrid(trainLookAhead, TrainLookAheadNames, 3);
             if (newLookAhead != trainLookAhead)
                 actions.Add(() =>
                 {
