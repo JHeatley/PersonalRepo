@@ -857,7 +857,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Rotating Claws: you may discard an Energy card from Rocket's Scizor ex; if you do, attach a different Energy card from your discard pile to it.</summary>
-        private sealed class RotatingClawsMon : Mon
+        internal sealed class RotatingClawsMon : Mon
         {
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {

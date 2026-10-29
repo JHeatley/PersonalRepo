@@ -324,7 +324,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Split Bomb: 30 to each of 2 of the opponent's Pokémon (1 if there's only 1).</summary>
-        private sealed class SplitBombMon : Mon
+        internal sealed class SplitBombMon : Mon
         {
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {

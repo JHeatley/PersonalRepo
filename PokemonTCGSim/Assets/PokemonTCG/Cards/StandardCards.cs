@@ -364,6 +364,9 @@ namespace PokemonTCG.Cards
             CardsLM.Register(r);
             CardsLMB.Register(r);
             CardsLMT.Register(r);
+            CardsHP.Register(r);
+            CardsHPB.Register(r);
+            CardsHPT.Register(r);
 
             return r;
         }
