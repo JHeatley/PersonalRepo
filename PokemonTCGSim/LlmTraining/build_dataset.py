@@ -12,7 +12,7 @@ Each line of train.jsonl is one conversation: {"messages": [system, user, assist
     python build_dataset.py --no-download       # card questions only (or reuse the pages saved in ./compendium)
 
 Every .jsonl file in ./extra (same format) is added too: extra/csharp.jsonl teaches C# and .NET, extra/python.jsonl
-Python, neural networks and Python with Unity, and build_knowledge.py writes the Pokémon video games, Thomas & Friends
+Python, neural networks and Python with Unity, extra/git.jsonl Git, GitHub and GitHub Desktop, and build_knowledge.py writes the Pokémon video games, Thomas & Friends
 and Unity files there. Every example gets the same system prompt (SYSTEM below), so the result is one model for all of
 it. --extra-limit N keeps at most N examples from each extra file (picked at random), for a quicker training run.
 
@@ -36,7 +36,8 @@ RESOURCES = os.path.join(HERE, "..", "Assets", "PokemonTCG", "Resources")
 # every subject without switching. Describe new subjects here when you add their files to ./extra.
 SYSTEM = ("You are a helpful assistant and an expert on the Pokémon Trading Card Game (its rules, official rulings and "
           "cards), the Pokémon video games, Thomas & Friends and The Railway Series, the Unity game engine, C# and .NET, "
-          "and Python, neural networks and machine learning (including connecting Python to Unity games). Answer "
+          "Python, neural networks and machine learning (including connecting Python to Unity games), and Git, GitHub and "
+          "GitHub Desktop. Answer "
           "clearly and accurately. When a Pokémon ruling comes from the Rulings Compendium, give its source and date. "
           "For code, give correct, working examples, check them before you answer, and explain why.")
 

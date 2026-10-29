@@ -7,6 +7,7 @@ Fine-tunes **Qwen3-4B** (Ollama's `qwen3:4b`) into one model that knows:
 * Thomas & Friends and The Railway Series: characters, episodes, series and places,
 * Unity 6: the Scripting API (core classes and their members, with code), the Manual and the glossary,
 * C# and .NET, and Python, neural networks and training, and connecting Python to Unity games,
+* Git, GitHub and GitHub Desktop (with Unity projects),
 
 and installs it in Ollama as `pokemon-tcg` (`--name` to call it something else). Everything here is free: the data
 comes from this project and public sites, training runs on Google Colab's free GPU (or your own), and the model runs
@@ -29,8 +30,10 @@ downloaded once), reads the card pool in `Assets/PokemonTCG/Resources/CardData`,
   answers (types, generics, LINQ, async, threading, performance, Unity, common compiler errors). `extra/python.jsonl`
   has 86 on Python (and setting it up on Windows), NumPy and PyTorch, how neural networks and reinforcement learning
   train (PPO, self-play, MCTS, LLM fine-tuning), Python talking to Unity (sockets, ML-Agents, ONNX), and porting
-  Python and trained networks to C#. Their code was run and checked; `csharp_guide.md` and `python_guide.md` are the
-  same content to read. Add your own files there in the same format: one `{"messages": [system, user, assistant]}`
+  Python and trained networks to C#. `extra/git.jsonl` has 68 on Git (commits, branches, merging and conflicts,
+  undoing and recovering, rebase, stash, LFS, Unity setup and Smart Merge), GitHub (pull requests, reviews, issues,
+  Actions, releases, rules) and GitHub Desktop. Their code and commands were run and checked; `csharp_guide.md`,
+  `python_guide.md` and `git_guide.md` are the same content to read. Add your own files there in the same format: one `{"messages": [system, user, assistant]}`
   per line.
 * Everything goes into **one model**: every example gets the same system prompt (`SYSTEM` in `build_dataset.py`,
   which `install_to_ollama.py` also gives the installed model). When you add a new subject to `extra/`, add a few
