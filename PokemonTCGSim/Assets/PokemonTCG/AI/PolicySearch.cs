@@ -37,22 +37,49 @@ namespace PokemonTCG.AI
         /// look-ahead): the target is the network's probabilities times e^(TargetScale x the move's play-out value).
         /// </summary>
         public double TargetScale = 10;
+        /// <summary>
+        /// v172: plans the rest of the turn too. After the move being tried, the turn's next main actions are chosen by a search
+        /// tree that all the play-outs of that move share (each play-out tries the most promising plan so far, or a new one), not
+        /// only by the network's single top move. So it finds whole turns (this Ball, then that evolution, then attach, then
+        /// attack) the network alone wouldn't play.
+        /// </summary>
+        public bool PlanTurn;
+        /// <summary>Main actions after the first that the plan of the turn decides; past that the network plays.</summary>
+        public int PlanDepth = 8;
+        /// <summary>
+        /// How much the plan tries moves the network likes but it hasn't tried much, against the plans that did best so far (the
+        /// c of the PUCT rule, on the value scale).
+        /// </summary>
+        public double Explore = 1.0;
+        /// <summary>
+        /// v172: how firmly it guesses the opponent's deck. Each guess draws a deck from the known decks, the ones most like the
+        /// cards seen far more often: a deck's weight is e^(DeckBelief x how well it matches). 0: always the closest one.
+        /// </summary>
+        public double DeckBelief = 1.5;
+        /// <summary>
+        /// v172: training looks at moves picked with random (Gumbel) noise on the network's chances, not always its top few, so
+        /// it also learns about moves the network underrates. For training searches only.
+        /// </summary>
+        public bool Gumbel;
 
         public static SearchSettings Quick(int threads)
         {
-            return new SearchSettings { Playouts = 32, MaxCandidates = 3, Turns = 1, Threads = Math.Max(1, threads), MaxSeconds = 2 };
+            return new SearchSettings { Playouts = 32, MaxCandidates = 3, Turns = 1, Threads = Math.Max(1, threads), MaxSeconds = 2, PlanTurn = PlanByDefault };
         }
 
         public static SearchSettings Deep(int threads)
         {
-            return new SearchSettings { Playouts = 96, MaxCandidates = 5, Turns = 2, Threads = Math.Max(1, threads), MaxSeconds = 6 };
+            return new SearchSettings { Playouts = 96, MaxCandidates = 5, Turns = 2, Threads = Math.Max(1, threads), MaxSeconds = 6, PlanTurn = PlanByDefault };
         }
 
         /// <summary>A light look-ahead for training games (learning from the look-ahead): many decisions, a little each.</summary>
         public static SearchSettings Training()
         {
-            return new SearchSettings { Playouts = 16, MaxCandidates = 3, SkipAbove = 0.85, Turns = 1, Threads = 1, MaxSeconds = 1 };
+            return new SearchSettings { Playouts = 16, MaxCandidates = 3, SkipAbove = 0.85, Turns = 1, Threads = 1, MaxSeconds = 1, PlanTurn = PlanByDefault, Gumbel = true };
         }
+
+        /// <summary>Whether the presets plan the whole turn (v172; set from the head-to-head measurement against the earlier look-ahead).</summary>
+        public static bool PlanByDefault = false;
     }
 
     /// <summary>
@@ -100,6 +127,8 @@ namespace PokemonTCG.AI
             public double Sum;
             public int N;
             public double Mean { get { return N > 0 ? Sum / N : double.NegativeInfinity; } }
+            /// <summary>The plan of the rest of the turn after this move (Settings.PlanTurn), shared by its play-outs.</summary>
+            public PlanNode Plan;
         }
 
         /// <summary>
@@ -126,13 +155,30 @@ namespace PokemonTCG.AI
             int seat = r.Player;
             var order = new List<int>();
             for (int i = 0; i < choices.Count; i++) if (!choices[i].Done) order.Add(i);
-            order.Sort((a, b) => probs[b].CompareTo(probs[a]));
+            var rank = new double[choices.Count];
+            for (int i = 0; i < rank.Length; i++) rank[i] = probs[i];
+            if (Settings.Gumbel)
+            {
+                // Gumbel-top-k: the moves to look at are drawn from the network's chances (log p + Gumbel noise), so a move it
+                // underrates still gets looked at sometimes. The noise comes from the position, so a position draws the same moves.
+                var noise = new Rng(((int)(engine.State.Rng.Clone().NextULong() & 0x3FFFFFFF)) ^ 0x6A11BE);
+                for (int i = 0; i < rank.Length; i++)
+                {
+                    double u = Math.Max(1e-12, (noise.NextULong() >> 11) * (1.0 / 9007199254740992.0));
+                    rank[i] = Math.Log(Math.Max(1e-12, probs[i])) - Math.Log(-Math.Log(u));
+                }
+            }
+            order.Sort((a, b) => rank[b].CompareTo(rank[a]));
             var cands = new List<Candidate>();
             double cover = 0;
             foreach (int i in order)
             {
                 if (cands.Count >= Math.Max(1, Settings.MaxCandidates) || (cands.Count > 0 && cover >= Settings.PriorCover)) break;
-                cands.Add(new Candidate { Choice = choices[i], Index = i, Option = r.Options[choices[i].Option], Prior = probs[i] });
+                cands.Add(new Candidate
+                {
+                    Choice = choices[i], Index = i, Option = r.Options[choices[i].Option], Prior = probs[i],
+                    Plan = Settings.PlanTurn ? new PlanNode() : null
+                });
                 cover += probs[i];
             }
             if (cands.Count < 2) return top;
@@ -162,7 +208,7 @@ namespace PokemonTCG.AI
                     scores[c, k] = double.NaN;
                     if (Settings.MaxSeconds > 0 && clock.Elapsed.TotalSeconds > Settings.MaxSeconds) return;
                     int seed = baseSeed + (first + k) * 104729;
-                    scores[c, k] = Playout(setup, alive[c].Option, seed);
+                    scores[c, k] = Playout(setup, alive[c].Option, alive[c].Plan, seed);
                 });
                 world += n;
                 bool any = false;
@@ -191,10 +237,10 @@ namespace PokemonTCG.AI
 
             lock (counts) Searches++;
             // The best of the moves still in the running; the network's own top move stays unless another clearly beats it.
-            var topCand = cands[0];
+            var topCand = cands.Find(c => c.Index == top) ?? cands[0];
             var best = alive[0].N > 0 ? alive[0] : topCand;
             if (best != topCand && alive.Contains(topCand) && best.Mean - topCand.Mean < Settings.Margin) best = topCand;
-            LastReport = Report(cands, best);
+            LastReport = Report(cands, best) + (best.Plan != null && best.Plan.N > 1 ? " | its plan for the turn: " + best.Plan.Describe(6) : "");
             target = Target(cands, probs);
             if (best != topCand) lock (counts) Changed++;
             return choices.IndexOf(best.Choice);
@@ -281,7 +327,11 @@ namespace PokemonTCG.AI
             }
         }
 
-        /// <summary>The player's side in a play-out: the first main action is the move being tried, then the network plays, until StopTurn.</summary>
+        /// <summary>
+        /// The player's side in a play-out: the first main action is the move being tried; with a plan (Settings.PlanTurn) the
+        /// turn's next main actions follow the plan tree (PlanNode.Select), until it reaches a part of the tree no play-out has
+        /// been to; then the network plays, until StopTurn.
+        /// </summary>
         private sealed class SearchSeat : IPlayerAgent, IGameObserver
         {
             private readonly PolicyAgent inner;
@@ -290,12 +340,20 @@ namespace PokemonTCG.AI
             private bool firstDone;
             public bool Made;
             public GameEngine Engine;
+            /// <summary>Where this play-out is in the plan tree (null: not planning, or past the part the tree knows).</summary>
+            private PlanNode node;
+            private readonly PolicySearch search;
+            private int turn = -1, depth;
+            /// <summary>The plan's steps this play-out took, for PlanNode.Backup.</summary>
+            public readonly List<PlanNode.Step> Path = new List<PlanNode.Step>();
 
-            public SearchSeat(PolicyAgent inner, DecisionOption first, int stopTurn)
+            public SearchSeat(PolicyAgent inner, DecisionOption first, int stopTurn, PolicySearch search = null, PlanNode plan = null)
             {
                 this.inner = inner;
                 this.first = first;
                 this.stopTurn = stopTurn;
+                this.search = search;
+                node = plan;
             }
 
             public void OnEvent(GameEngine engine, GameEvent ev)
@@ -314,17 +372,206 @@ namespace PokemonTCG.AI
                     Made = true;
                     inner.Memory.See(r.View);
                     inner.Memory.NoteMainAction(r.Options[i]);
+                    if (r.View != null) turn = r.View.TurnNumber;
                     return new List<int> { i };
                 }
                 if (firstDone && r.Kind == DecisionKind.MainAction && r.View != null && r.View.TurnNumber >= stopTurn)
                     throw new CutOff(inner.ValueOf(r));
+                if (node != null && r.Kind == DecisionKind.MainAction && r.View != null)
+                {
+                    if (r.View.TurnNumber != turn || depth >= search.Settings.PlanDepth) node = null; // the turn is over: no more plan
+                    else
+                    {
+                        inner.Memory.See(r.View);
+                        var choices = PolicyEncoder.Choices(r, new List<int>());
+                        if (choices.Count >= 2)
+                        {
+                            var probs = inner.Probabilities(r, choices);
+                            int pick = PlanNode.Select(ref node, r, choices, probs, search.Settings.Explore, Path);
+                            depth++;
+                            var c = choices[pick];
+                            if (c.Done) return new List<int>();
+                            inner.Memory.NoteMainAction(r.Options[c.Option]);
+                            return new List<int> { c.Option };
+                        }
+                    }
+                }
                 return inner.Decide(r);
             }
         }
 
-        /// <summary>One play-out of a move on one guess (the seed picks the guess and the coin flips). NaN when it failed.</summary>
-        private double Playout(Setup setup, DecisionOption move, int seed)
+        // ------------------------------------------------------------------ The plan of the turn
+
+        /// <summary>
+        /// A point in the plan of the turn (Settings.PlanTurn): the main actions tried from here, with how often each was tried
+        /// and how the play-outs that tried it ended. The guesses at the hidden cards differ between play-outs, so a move is
+        /// counted only in the play-outs it was on offer in (information-set Monte Carlo tree search); moves are told apart by
+        /// what they do (PlanKey), not by card ids, which differ between guesses for cards drawn during the turn.
+        /// </summary>
+        public sealed class PlanNode
         {
+            public sealed class Edge
+            {
+                public double Prior;
+                public int PriorCount, N, Available;
+                public double Sum;
+                public PlanNode Child;
+            }
+
+            /// <summary>One step a play-out took: the point and the move.</summary>
+            public struct Step
+            {
+                public PlanNode Node;
+                public Edge Edge;
+            }
+
+            private readonly Dictionary<string, Edge> edges = new Dictionary<string, Edge>(StringComparer.Ordinal);
+            public int N;
+            public double Sum;
+            /// <summary>The tree is shared by the play-outs running at once; one lock for all of it (the work is in the play-outs).</summary>
+            private static readonly object treeLock = new object();
+            /// <summary>Taken from a move while a play-out is on its way through it, so others running at once try something else.</summary>
+            private const double VirtualLoss = 1.0;
+
+            /// <summary>
+            /// The move to make at this point of the plan (an index into choices), and node moved on to the point after it. A
+            /// point no play-out has been to yet is where the plan ends: it takes the network's top move and node becomes null
+            /// (the network plays from there). Otherwise the PUCT rule: the move's average result so far, plus explore x its
+            /// prior x sqrt(tries here) / (1 + its tries).
+            /// </summary>
+            public static int Select(ref PlanNode node, DecisionRequest r, List<PolicyEncoder.Choice> choices, double[] probs, double explore,
+                List<Step> path)
+            {
+                lock (treeLock)
+                {
+                    var here = node;
+                    int top = 0;
+                    for (int i = 1; i < probs.Length; i++) if (probs[i] > probs[top]) top = i;
+                    var offered = new Edge[choices.Count];
+                    for (int i = 0; i < choices.Count; i++)
+                    {
+                        string key = PlanKey(r, choices[i]);
+                        Edge e;
+                        if (!here.edges.TryGetValue(key, out e)) here.edges[key] = e = new Edge();
+                        // The network's chances for it, averaged over the guesses it was offered in.
+                        e.Prior += (probs[i] - e.Prior) / (++e.PriorCount);
+                        e.Available++;
+                        offered[i] = e;
+                    }
+                    if (here.N == 0)
+                    {
+                        // The end of the known plan: this play-out finds out how good the network's way on from here is.
+                        path.Add(new Step { Node = here, Edge = null });
+                        node = null;
+                        return top;
+                    }
+                    double parent = here.Sum / here.N;
+                    int best = top;
+                    double bestScore = double.NegativeInfinity;
+                    for (int i = 0; i < choices.Count; i++)
+                    {
+                        var e = offered[i];
+                        // Not tried yet: as good as this point's average so far, a little less (first-play urgency).
+                        double q = e.N > 0 ? e.Sum / e.N : parent - 0.05;
+                        double score = q + explore * e.Prior * Math.Sqrt(Math.Max(1, e.Available)) / (1 + e.N);
+                        if (score > bestScore)
+                        {
+                            bestScore = score;
+                            best = i;
+                        }
+                    }
+                    var chosen = offered[best];
+                    chosen.N++;
+                    chosen.Sum -= VirtualLoss;
+                    if (chosen.Child == null) chosen.Child = new PlanNode();
+                    path.Add(new Step { Node = here, Edge = chosen });
+                    node = chosen.Child;
+                    return best;
+                }
+            }
+
+            /// <summary>Counts a finished play-out's result (value) along the plan it followed; NaN: it failed (only undoes the virtual loss).</summary>
+            public static void Backup(PlanNode root, List<Step> path, double value)
+            {
+                lock (treeLock)
+                {
+                    bool ok = !double.IsNaN(value);
+                    foreach (var step in path)
+                    {
+                        if (step.Edge != null)
+                        {
+                            step.Edge.Sum += VirtualLoss;
+                            if (ok) step.Edge.Sum += value;
+                            else step.Edge.N--;
+                        }
+                    }
+                    if (!ok) return;
+                    // Every point the play-out went through, the plan's start included (the move tried was made before it).
+                    root.N++;
+                    root.Sum += value;
+                    foreach (var step in path)
+                    {
+                        if (step.Node == root) continue;
+                        step.Node.N++;
+                        step.Node.Sum += value;
+                    }
+                }
+            }
+
+            /// <summary>The best plan found from here: its moves (by label) and their average results, for the report.</summary>
+            public string Describe(int maxSteps)
+            {
+                lock (treeLock)
+                {
+                    var parts = new List<string>();
+                    var n = this;
+                    while (n != null && parts.Count < maxSteps)
+                    {
+                        Edge best = null;
+                        string label = null;
+                        foreach (var kv in n.edges)
+                            if (kv.Value.N > 0 && (best == null || kv.Value.N > best.N))
+                            {
+                                best = kv.Value;
+                                label = kv.Key;
+                            }
+                        if (best == null) break;
+                        int bar = label.LastIndexOf('|');
+                        parts.Add((bar >= 0 ? label.Substring(bar + 1) : label) + " (" + best.N + "x, " + (best.Sum / best.N).ToString("0.00") + ")");
+                        n = best.Child;
+                    }
+                    return string.Join(" → ", parts);
+                }
+            }
+
+            /// <summary>What a move does, the same in every guess: its kind, card name, target and which attack or Ability.</summary>
+            public static string PlanKey(DecisionRequest r, PolicyEncoder.Choice c)
+            {
+                if (c.Done) return "done|end the turn";
+                var o = r.Options[c.Option];
+                return (int)o.Action + "|" + (o.Card != null ? o.Card.Name : "") + "|" + o.PokemonUid + "|" + o.Index + "|" + o.Label;
+            }
+        }
+
+        /// <summary>One play-out of a move on one guess (the seed picks the guess and the coin flips). NaN when it failed.</summary>
+        private double Playout(Setup setup, DecisionOption move, PlanNode plan, int seed)
+        {
+            SearchSeat me = null;
+            double value = double.NaN;
+            try
+            {
+                value = PlayoutWith(setup, move, plan, seed, out me);
+                return value;
+            }
+            finally
+            {
+                if (plan != null && me != null) PlanNode.Backup(plan, me.Path, value);
+            }
+        }
+
+        private double PlayoutWith(Setup setup, DecisionOption move, PlanNode plan, int seed, out SearchSeat me)
+        {
+            me = null;
             int seat = setup.Seat;
             List<CardDef> theirDeck;
             var s = Guess(setup, seed, out theirDeck);
@@ -333,7 +580,7 @@ namespace PokemonTCG.AI
             mine.Memory.CopyFrom(setup.Memory);
             var theirs = new PolicyAgent(Net, seed * 2 + 2, 1 - seat, theirDeck) { Greedy = true, Moves = Moves };
             theirs.Memory.Turn = setup.Root.TurnNumber;
-            var me = new SearchSeat(mine, move, setup.StopTurn);
+            me = new SearchSeat(mine, move, setup.StopTurn, this, plan);
             var engine = new GameEngine(setup.Scripts, seat == 0 ? (IPlayerAgent)me : theirs, seat == 0 ? (IPlayerAgent)theirs : me);
             engine.CheckInvariants = false;
             engine.CardsPerPlayer = 0;
@@ -485,7 +732,11 @@ namespace PokemonTCG.AI
             return s;
         }
 
-        /// <summary>The known deck most like the cards seen (ties picked at random), or null when there are none to pick from.</summary>
+        /// <summary>
+        /// A known deck for the guess, or null when there are none to pick from. v172: drawn at random, a deck's chance growing
+        /// with how well it matches the cards seen (e^(DeckBelief x its score), so a much better match is nearly certain but
+        /// near-ties share the guesses); DeckBelief 0 takes the closest one (ties at random), as before.
+        /// </summary>
         private List<CardDef> GuessDeck(Dictionary<int, CardDef> seen, Rng rng)
         {
             if (KnownDecks == null || KnownDecks.Count == 0) return null;
@@ -493,6 +744,7 @@ namespace PokemonTCG.AI
             foreach (var def in seen.Values) Add(shown, def.Name, 1);
             var best = new List<List<CardDef>>();
             int bestScore = int.MinValue;
+            var all = new List<KeyValuePair<List<CardDef>, int>>();
             foreach (var deck in KnownDecks)
             {
                 if (deck == null || deck.Count == 0) continue;
@@ -506,6 +758,7 @@ namespace PokemonTCG.AI
                     // A card it holds counts for it; a card it can't hold (or more copies than it has) counts twice against it.
                     score += Math.Min(n, kv.Value) - 2 * Math.Max(0, kv.Value - n);
                 }
+                all.Add(new KeyValuePair<List<CardDef>, int>(deck, score));
                 if (score > bestScore)
                 {
                     bestScore = score;
@@ -513,7 +766,18 @@ namespace PokemonTCG.AI
                 }
                 if (score == bestScore) best.Add(deck);
             }
-            return best.Count == 0 ? null : best[rng.Next(best.Count)];
+            if (best.Count == 0) return null;
+            double beta = Settings.DeckBelief;
+            if (beta <= 0) return best[rng.Next(best.Count)];
+            double total = 0;
+            foreach (var kv in all) total += Math.Exp(beta * (kv.Value - bestScore));
+            double u = (rng.NextULong() >> 11) * (1.0 / 9007199254740992.0) * total;
+            foreach (var kv in all)
+            {
+                u -= Math.Exp(beta * (kv.Value - bestScore));
+                if (u <= 0) return kv.Key;
+            }
+            return best[0];
         }
 
         private static void Add(Dictionary<string, int> counts, string key, int n)

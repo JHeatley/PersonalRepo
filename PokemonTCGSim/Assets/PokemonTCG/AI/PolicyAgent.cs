@@ -103,6 +103,17 @@ namespace PokemonTCG.AI
             return value;
         }
 
+        /// <summary>
+        /// The network's probability for each of these choices at this decision (the look-ahead's plan of the turn uses them as
+        /// its priors). Call Memory.See(r.View) first.
+        /// </summary>
+        public double[] Probabilities(DecisionRequest r, List<PolicyEncoder.Choice> choices)
+        {
+            if (Memory.Seat < 0) Memory.Seat = r.Player;
+            float value;
+            return PolicyNet.Softmax(Evaluate(PolicyEncoder.Encode(r, Memory, Net, choices), out value));
+        }
+
         public List<int> Decide(DecisionRequest r)
         {
             if (Abort != null && Abort()) throw new OperationCanceledException("training stopped");
