@@ -48,8 +48,12 @@ public static class Program
                 case "train": return Train(opts);
                 case "eval": return Eval(opts);
                 case "background": return Background(opts);
+                case "version":
+                    // The app checks this before a background run (an older trainer may not read the AI's file as it is now).
+                    Console.WriteLine("sim-train " + TrainerVersion.Number);
+                    return 0;
                 default:
-                    Console.WriteLine("Unknown command " + args[0] + " (train or eval; see README.md)");
+                    Console.WriteLine("Unknown command " + args[0] + " (train, eval, background or version; see README.md)");
                     return 1;
             }
         }
@@ -302,6 +306,8 @@ public static class Program
             if (deckB.Value == null) deckB = new KeyValuePair<string, List<CardDef>>("Random deck", decks[0].Value);
 
             var brain = LearningBrain.Load(J("brain"));
+            // v171: never train (and save) over a network file this trainer can't read: it would replace it with the starting network.
+            if (brain.PolicyLoadError != null) throw new InvalidDataException(brain.PolicyLoadError);
             var style = J("style", "neural").ToLowerInvariant();
             var session = new TrainingSession(StandardCards.CreateRegistry(), brain, deckA.Key, deckA.Value, deckB.Key, deckB.Value,
                 JI("games", 1000), JI("measure", 0), JI("seed", Environment.TickCount & 0x0FFFFFFF) | 1)

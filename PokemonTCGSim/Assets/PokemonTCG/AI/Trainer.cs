@@ -627,6 +627,9 @@ namespace PokemonTCG.AI
                 if (checks.Count > 0) progress += " · vs the classic bot: " + string.Join(" → ", checks.ToArray()) + " games";
                 else if (EvalGames == 0) progress += " · tick \"Measure it against the classic bot\" to see it checked as it trains";
                 if (!string.IsNullOrEmpty(ChampionNote)) progress += " · " + ChampionNote;
+                if (gpuTroubleRounds > 0)
+                    progress += " · the GPU learner had trouble in " + gpuTroubleRounds + " round" + (gpuTroubleRounds == 1 ? "" : "s")
+                                + " (last at " + lastGpuTrouble + "; the CPU covered for it" + (GpuWorking(round) ? ", and it's working again" : "") + ")";
                 if (round.VsLeague > 0)
                     progress += " · against the league (" + brain.League.Count + " past versions): "
                                 + Math.Round(100.0 * round.LeaguePoints / round.VsLeague) + "% of " + round.VsLeague + " games this round";
@@ -643,14 +646,48 @@ namespace PokemonTCG.AI
                 long skipped = brain.Policy.SkippedSteps - skippedBefore;
                 if (skipped > 0)
                     lock (gate) status.LastError = skipped + " learning step" + (skipped == 1 ? " was" : "s were") + " skipped (numbers out of range); the network is unharmed.";
-                if (!string.IsNullOrEmpty(round.LastError) && round.LastError.StartsWith("GPU learner", StringComparison.Ordinal))
-                    lock (gate) status.LastError = round.LastError;
+                NoteGpu(round.LastError, round);
                 SafeSave();
                 if (round.Games == 0) break;
             }
             // The end of a long enough session: the network against the champion, so the screen shows where it stands.
             if (!cancel && ChampionEvery > 0 && playedSoFar() - lastChampion >= ChampionMinGames)
                 CheckChampion(basePhase, trainer.Threads, championDecks);
+        }
+
+        /// <summary>Rounds this session in which the GPU learner failed (the CPU covered), and when the last one was.</summary>
+        private int gpuTroubleRounds;
+        private string lastGpuTrouble = "";
+
+        private static bool IsGpuProblem(string error)
+        {
+            return !string.IsNullOrEmpty(error) && error.Contains("GPU learner");
+        }
+
+        private static bool GpuWorking(PolicyRound round)
+        {
+            return !IsGpuProblem(round.LastError) && (round.LearnedOn.Length > 0 || round.GpuDecisions > 0);
+        }
+
+        /// <summary>
+        /// v171: a round's GPU learner problem becomes the session's error, and a round in which the GPU worked again clears it
+        /// (it used to stay on screen for the rest of the session, however long ago it was). Nothing after Stop counts: Stop
+        /// closes the learner's connection on purpose.
+        /// </summary>
+        private void NoteGpu(string error, PolicyRound round)
+        {
+            if (cancel) return;
+            lock (gate)
+            {
+                if (IsGpuProblem(error))
+                {
+                    gpuTroubleRounds++;
+                    lastGpuTrouble = DateTime.Now.ToString("HH:mm", CultureInfo.InvariantCulture);
+                    status.LastError = error;
+                }
+                else if (GpuWorking(round) && IsGpuProblem(status.LastError))
+                    status.LastError = null;
+            }
         }
 
         /// <summary>The network against its champion (the yardstick, ChampionGate), promoted if it won clearly.</summary>
@@ -715,8 +752,7 @@ namespace PokemonTCG.AI
                 {
                     var round = t.Round();
                     if (round.Games == 0) break;
-                    if (!string.IsNullOrEmpty(round.LastError) && round.LastError.StartsWith("GPU learner", StringComparison.Ordinal))
-                        lock (gate) status.LastError = name + ": " + round.LastError;
+                    NoteGpu(IsGpuProblem(round.LastError) ? name + ": " + round.LastError : null, round);
                     SetPhase(phase + ": " + Volatile.Read(ref played).ToString("N0", CultureInfo.InvariantCulture) + " played, it won "
                              + Math.Round(100.0 * round.LeaguePoints / Math.Max(1, round.VsLeague)) + "% this round...");
                 }

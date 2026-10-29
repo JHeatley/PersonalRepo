@@ -112,7 +112,9 @@ namespace PokemonTCG.AI
                 {
                     // The games choose on the CPU for a while (these decisions too), then the GPU is tried again.
                     foreach (var req in batch) req.Failed = true;
-                    LastError = "GPU learner: couldn't choose moves there: " + e.Message + " (choosing on the CPU; trying the GPU again in 30 seconds)";
+                    // v171: Stop closes the connection on purpose (GpuLearner.Abort), which fails the batch in flight; that isn't a problem.
+                    if (!gpu.Aborted)
+                        LastError = "GPU learner: couldn't choose moves there: " + e.Message + " (choosing on the CPU; trying the GPU again in 30 seconds)";
                     Interlocked.Exchange(ref retryAt, Stopwatch.GetTimestamp() + 30 * Stopwatch.Frequency);
                 }
                 foreach (var req in batch) req.Done.Set();

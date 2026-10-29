@@ -280,6 +280,12 @@ namespace PokemonTCG.AI
         /// <summary>File Save() writes to (set by whoever loads the brain).</summary>
         public string FilePath;
 
+        /// <summary>
+        /// Set by Load when the network's file exists but couldn't be read (null otherwise). While it's set, Save doesn't write
+        /// the network (the unreadable file stays as it was); Reset clears it.
+        /// </summary>
+        public string PolicyLoadError;
+
         public int FeatureCount
         {
             get { lock (sync) return weights.Count; }
@@ -943,6 +949,7 @@ namespace PokemonTCG.AI
         {
             lock (sync)
             {
+                PolicyLoadError = null; // a reset starts the network again on purpose, so it may save over the file now
                 Champion = null;
                 ChampionVersion = 0;
                 championChecks.Clear();
@@ -1246,7 +1253,22 @@ namespace PokemonTCG.AI
             brain.FilePath = path;
             if (!string.IsNullOrEmpty(path) && File.Exists(path)) brain.LoadText(File.ReadAllText(path, Encoding.UTF8));
             string neural = NeuralPath(path);
-            if (neural != null && File.Exists(neural)) brain.Policy.FromBytes(File.ReadAllBytes(neural));
+            if (neural != null && File.Exists(neural) && !brain.Policy.FromBytes(File.ReadAllBytes(neural)))
+            {
+                // v171: a network file this code can't read (one saved by a newer version, or damaged) is never replaced
+                // quietly: a copy is kept, and saving leaves the file alone until the AI is reset (see PolicyLoadError).
+                string copy = neural + ".unreadable";
+                try
+                {
+                    if (!File.Exists(copy)) File.Copy(neural, copy);
+                }
+                catch (IOException)
+                {
+                }
+                brain.PolicyLoadError = "The Neural AI's network file couldn't be read (" + neural + "), so it's using the starting network for "
+                                        + "now and won't save over that file. If this program is older than the one that last trained the AI, "
+                                        + "update it (the app's scripts and Tools/sim-train/sim-train.exe). A copy is kept as " + copy + ".";
+            }
             string champion = ChampionPath(path);
             if (champion != null && File.Exists(champion))
             {
@@ -1286,7 +1308,7 @@ namespace PokemonTCG.AI
                 File.Move(temp, FilePath);
                 // The Neural AI's network, in its own file next to the brain's (never a damaged one: the last good file stays).
                 string neural = NeuralPath(FilePath);
-                if (Policy.AllFinite())
+                if (Policy.AllFinite() && PolicyLoadError == null)
                 {
                     File.WriteAllBytes(neural + ".tmp", Policy.ToBytes());
                     if (File.Exists(neural)) File.Delete(neural);

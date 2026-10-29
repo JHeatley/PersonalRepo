@@ -79,6 +79,9 @@ namespace PokemonTCG.AI
         /// <summary>Set by Abort (the session is stopping): no more connecting, so a stop doesn't wait on the learner.</summary>
         private volatile bool aborted;
 
+        /// <summary>True once Abort was called: a failed exchange after this was caused by the stop, not by the learner.</summary>
+        public bool Aborted { get { return aborted; } }
+
         /// <summary>
         /// v170: the session is stopping. Closes the connection now, so an exchange waiting for the learner's answer (a learner that
         /// never answers: one busy with another sim) ends at once instead of after the receive timeout, and stops it reconnecting.

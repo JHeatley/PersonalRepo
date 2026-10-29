@@ -87,4 +87,13 @@ network, matchups, deck mastery, card results and the session's record) for the 
 
     sim-train background --job <folder> [--root <PokemonTCGSim folder>] [--skip-cpu 2,3]
 
+It won't train a brain whose network file it can't read (it would only save its starting network over it).
+
 A ready-built Windows copy is in `../Tools/sim-train/` (see its README for rebuilding it).
+
+## version
+
+    sim-train version
+
+Prints `sim-train <number>` (the training code's version, `TrainerVersion` in the AI folder). The app runs it before
+training in the background and refuses a trainer older than itself.

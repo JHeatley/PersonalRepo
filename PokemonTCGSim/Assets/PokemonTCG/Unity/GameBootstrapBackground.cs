@@ -143,15 +143,88 @@ namespace PokemonTCG.Presentation
             bgStopAsked = null;
             string error = BgValue("lastError");
             int done = BgInt("done");
+            int bgBlocksBefore = JobBlocks();
             LoadBrain();
             if (brain != null) brain.SavesPaused = false;
+            // v171: a background run must never come back with a smaller network (an out-of-date trainer did that once).
+            string shrunk = brain != null && bgBlocksBefore > 0 && brain.Policy.Blocks < bgBlocksBefore
+                ? " Warning: the network came back smaller (" + brain.Policy.Blocks + " blocks, it had " + bgBlocksBefore + "). The background "
+                  + "trainer is probably out of date: copy Tools/sim-train from the project as well as the scripts."
+                : "";
             if (bgForced)
                 bgMessage = "Background training was force-stopped, so it saved nothing from this session: the AI is as it was before it started.";
             else
                 bgMessage = (BgValue("cancelled") == "1" ? "Background training stopped" : "Background training finished") + " after " + done.ToString("N0") + " games"
-                            + (string.IsNullOrEmpty(error) ? "" : " (" + error + ")") + ". What it learned is loaded: see below.";
+                            + (string.IsNullOrEmpty(error) ? "" : " (" + error + ")") + ". What it learned is loaded: see below." + shrunk;
             bgForced = false;
             nextBrainRefresh = 0f;
+        }
+
+        /// <summary>The network's size when the background run started, from its job.txt (0 if it doesn't say).</summary>
+        private static int JobBlocks()
+        {
+            try
+            {
+                foreach (var line in File.ReadAllLines(Path.Combine(BackgroundJobFolder, "job.txt")))
+                {
+                    int v;
+                    if (line.StartsWith("blocks=", StringComparison.Ordinal)
+                        && int.TryParse(line.Substring(7).Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out v)) return v;
+                }
+            }
+            catch (IOException)
+            {
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Asks the background trainer its version ("sim-train version"); null if it's at least TrainerVersion.Number, otherwise
+        /// what's wrong. Trainers from before v171 don't know the command at all, which means out of date too.
+        /// </summary>
+        private static string CheckTrainerVersion()
+        {
+            string update = " Copy the Tools/sim-train folder from the project too (not only the scripts), so the background trainer matches the app.";
+            try
+            {
+                var info = new System.Diagnostics.ProcessStartInfo(BackgroundTrainerPath, "version")
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    WorkingDirectory = Path.GetDirectoryName(BackgroundTrainerPath)
+                };
+                using (var p = System.Diagnostics.Process.Start(info))
+                {
+                    if (p == null) return "Couldn't start the background trainer to check its version.";
+                    var read = p.StandardOutput.ReadToEndAsync();
+                    if (!p.WaitForExit(20000))
+                    {
+                        try { p.Kill(); } catch (InvalidOperationException) { }
+                        return "The background trainer didn't answer when asked its version (20 seconds).";
+                    }
+                    string text = read.Wait(2000) ? read.Result ?? "" : "";
+                    int found = -1;
+                    foreach (var line in text.Split('\n'))
+                    {
+                        var t = line.Trim();
+                        int v;
+                        if (t.StartsWith("sim-train ", StringComparison.Ordinal) && int.TryParse(t.Substring(10).Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out v))
+                            found = v;
+                    }
+                    if (found < 0) return "The background trainer (" + BackgroundTrainerPath + ") is older than the app, and an old one can lose what the AI learned (it can't read a bigger network)." + update;
+                    if (found < TrainerVersion.Number)
+                        return "The background trainer is version " + found + " but the app needs " + TrainerVersion.Number + " or later." + update;
+                    return null;
+                }
+            }
+            catch (Exception e)
+            {
+                return "Couldn't check the background trainer's version: " + e.Message;
+            }
         }
 
         /// <summary>Starts the Train screen's session in the background trainer.</summary>
@@ -161,6 +234,18 @@ namespace PokemonTCG.Presentation
             if (!BackgroundTrainerAvailable)
             {
                 bgMessage = "The background trainer isn't there: " + BackgroundTrainerPath + " (Windows only).";
+                return;
+            }
+            // v171: an older trainer may not read the AI's file as it is now and would save its own idea of it over the file.
+            string versionProblem = CheckTrainerVersion();
+            if (versionProblem != null)
+            {
+                bgMessage = versionProblem;
+                return;
+            }
+            if (brain.PolicyLoadError != null)
+            {
+                bgMessage = "Not training in the background: the network's file couldn't be read (see above).";
                 return;
             }
             try
@@ -208,6 +293,7 @@ namespace PokemonTCG.Presentation
                 sb.Append("exploiters=").Append(trainExploiters ? 1 : 0).Append('\n');
                 sb.Append("prizes=").Append(format.PrizeCount).Append('\n');
                 sb.Append("seed=").Append((Environment.TickCount & 0x0FFFFFFF) | 1).Append('\n');
+                sb.Append("blocks=").Append(brain.Policy.Blocks).Append('\n'); // the network's size now (checked when it comes back)
                 File.WriteAllText(Path.Combine(dir, "job.txt"), sb.ToString(), new UTF8Encoding(false));
 
                 // The trainer starts from the brain as it is now; the app stops saving it until the trainer is done.
