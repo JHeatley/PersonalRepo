@@ -290,6 +290,7 @@ namespace PokemonTCG.Presentation
                 if (trainGpu) sb.Append("gpu=").Append(trainGpuAddress).Append('\n');
                 if (trainGpu && trainGpuMoves) sb.Append("gpumoves=1\n");
                 sb.Append("lookahead=").Append(TrainLookAheadShares[trainLookAhead].ToString(CultureInfo.InvariantCulture)).Append('\n');
+                sb.Append("lookaheaddecisions=").Append(TrainLookAheadDecisions[trainLookAhead].ToString(CultureInfo.InvariantCulture)).Append('\n');
                 sb.Append("exploiters=").Append(trainExploiters ? 1 : 0).Append('\n');
                 sb.Append("prizes=").Append(format.PrizeCount).Append('\n');
                 sb.Append("seed=").Append((Environment.TickCount & 0x0FFFFFFF) | 1).Append('\n');

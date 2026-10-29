@@ -110,6 +110,11 @@ namespace PokemonTCG.AI
         /// ahead before some of its decisions and learns to match what it found (PolicyTrainer.SearchShare). 0: off.
         /// </summary>
         public double LearnFromLookAhead;
+        /// <summary>
+        /// v172: in those games, the share of the main actions the network isn't sure of that it looks ahead before
+        /// (PolicyTrainer.SearchDecisions; 1: all of them).
+        /// </summary>
+        public double LookAheadDecisions = 0.3;
         /// <summary>Choose moves on the GPU learner too (needs GpuAddress): many games at once, the network run there in batches.</summary>
         public bool GpuMoves;
 
@@ -509,6 +514,7 @@ namespace PokemonTCG.AI
             }
             if (GamesPerSecond > 0) trainer.Pace = new GamePace(GamesPerSecond);
             trainer.SearchShare = Math.Max(0, Math.Min(1, LearnFromLookAhead));
+            trainer.SearchDecisions = Math.Max(0, Math.Min(1, LookAheadDecisions));
             if (UseLeague) trainer.League = brain.League;
             trainer.GpuMoves = GpuMoves && trainer.Gpu != null;
             int played = 0;
