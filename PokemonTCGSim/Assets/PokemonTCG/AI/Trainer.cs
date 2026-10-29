@@ -277,7 +277,13 @@ namespace PokemonTCG.AI
         public void Cancel()
         {
             cancel = true;
+            // v170: let go of the GPU learner at once, so games and learning waiting for its answer stop now (Stop used to hang).
+            var gpu = activeGpu;
+            if (gpu != null) gpu.Abort();
         }
+
+        /// <summary>The GPU learner the Neural AI's training uses right now, for Cancel.</summary>
+        private volatile GpuLearner activeGpu;
 
         public void Join(int milliseconds)
         {
@@ -496,7 +502,11 @@ namespace PokemonTCG.AI
             };
             string gpuHost;
             int gpuPort;
-            if (!string.IsNullOrEmpty(GpuAddress) && GpuLearner.TryParse(GpuAddress, out gpuHost, out gpuPort)) trainer.Gpu = new GpuLearner(gpuHost, gpuPort);
+            if (!string.IsNullOrEmpty(GpuAddress) && GpuLearner.TryParse(GpuAddress, out gpuHost, out gpuPort))
+            {
+                trainer.Gpu = activeGpu = new GpuLearner(gpuHost, gpuPort);
+                if (cancel) activeGpu.Abort(); // stopped while starting
+            }
             if (GamesPerSecond > 0) trainer.Pace = new GamePace(GamesPerSecond);
             trainer.SearchShare = Math.Max(0, Math.Min(1, LearnFromLookAhead));
             if (UseLeague) trainer.League = brain.League;

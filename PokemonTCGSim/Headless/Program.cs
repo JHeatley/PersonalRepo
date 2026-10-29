@@ -325,11 +325,28 @@ public static class Program
             };
             Console.WriteLine($"background training: {session.MatchLabel}, {session.Games:N0} games as the {session.StyleLabel}; brain {brain.FilePath}");
             session.Start();
+            DateTime? stopAsked = null;
             while (session.Running || !session.Finished)
             {
                 Thread.Sleep(1000);
-                if (File.Exists(stopPath)) session.Cancel();
+                if (File.Exists(stopPath))
+                {
+                    session.Cancel();
+                    if (stopAsked == null) stopAsked = DateTime.UtcNow;
+                }
                 Progress(session.Status(), "");
+                // v170: a stop that still hasn't finished after 3 minutes (something it waits on never answers) ends the trainer anyway,
+                // so the app isn't left "Stopping" for good. What it learned since the brain was last saved is lost.
+                if (stopAsked != null && DateTime.UtcNow - stopAsked.Value > TimeSpan.FromMinutes(3))
+                {
+                    var stuck = session.Status();
+                    stuck.Running = false;
+                    stuck.Finished = true;
+                    stuck.Cancelled = true;
+                    Progress(stuck, "Stopped without saving: the trainer didn't stop within 3 minutes");
+                    Console.WriteLine("stop: the session didn't finish within 3 minutes; leaving without saving");
+                    Environment.Exit(2);
+                }
             }
             session.Join(60000);
             var final = session.Status();

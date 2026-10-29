@@ -76,10 +76,26 @@ namespace PokemonTCG.AI
             return int.TryParse(portText.Trim(), out port) && port > 0 && port < 65536 && host.Length > 0;
         }
 
+        /// <summary>Set by Abort (the session is stopping): no more connecting, so a stop doesn't wait on the learner.</summary>
+        private volatile bool aborted;
+
+        /// <summary>
+        /// v170: the session is stopping. Closes the connection now, so an exchange waiting for the learner's answer (a learner that
+        /// never answers: one busy with another sim) ends at once instead of after the receive timeout, and stops it reconnecting.
+        /// </summary>
+        public void Abort()
+        {
+            aborted = true;
+            Disconnect();
+        }
+
         public void Connect(int timeoutMs)
         {
             Disconnect();
-            var c = new TcpClient { NoDelay = true, ReceiveTimeout = 10 * 60 * 1000, SendTimeout = 60 * 1000 };
+            if (aborted) throw new IOException("the training is stopping");
+            // v170: 3 minutes for an answer (was 10): a round's learning or a batch of moves takes seconds, and a learner that doesn't
+            // answer (it's busy with another sim) shouldn't hold the games for long before they go on with the CPU.
+            var c = new TcpClient { NoDelay = true, ReceiveTimeout = 3 * 60 * 1000, SendTimeout = 60 * 1000 };
             var wait = c.BeginConnect(Host, Port, null, null);
             if (!wait.AsyncWaitHandle.WaitOne(timeoutMs))
             {
@@ -256,6 +272,12 @@ namespace PokemonTCG.AI
             {
                 Disconnect();
                 throw new IOException("lost the GPU learner: " + e.Message);
+            }
+            catch (NullReferenceException)
+            {
+                // Abort closed the connection from another thread (the training is stopping) between two steps.
+                Disconnect();
+                throw new IOException("the connection to the GPU learner was closed");
             }
         }
 

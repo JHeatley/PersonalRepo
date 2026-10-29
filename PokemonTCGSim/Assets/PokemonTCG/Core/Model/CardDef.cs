@@ -201,6 +201,13 @@ namespace PokemonTCG.Core
         /// and their turn ends on tails; it can evolve into its Basic Pokémon from the hand (your rulings, v48).
         /// </summary>
         public bool IsBaby;
+        /// <summary>v169: δ Delta Species (EX era): "Pokémon that has δ on its card". The δ isn't part of the name.</summary>
+        public bool IsDeltaSpecies;
+        /// <summary>
+        /// v169: Holon's Pokémon (Delta Species): may be attached from the hand as the Energy attachment for the turn; while attached it's
+        /// a Special Energy card (IsAttachedSpecialEnergy) providing what its script says.
+        /// </summary>
+        public bool AttachesAsEnergy;
 
         private static readonly Dictionary<string, string[]> BabyEvolutions = new Dictionary<string, string[]>
         {

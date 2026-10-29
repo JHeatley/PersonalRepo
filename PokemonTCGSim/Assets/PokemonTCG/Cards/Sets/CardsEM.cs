@@ -254,7 +254,8 @@ namespace PokemonTCG.Cards
                 var me = src.Pokemon;
                 if (me == null || !src.IsActive(me) || energy == null || target == null || target.Owner == src.Player || !src.IsActive(target)) return false;
                 var d = energy.Def;
-                return d.IsEnergy && !d.IsBasicEnergy && d.Name != "Darkness Energy" && d.Name != "Metal Energy";
+                // A Holon's Pokémon attached as Energy is a Special Energy card (Compendium: Cursed Glare, 2006-10-05; v169).
+                return (d.IsSpecialEnergy || d.AttachesAsEnergy) && d.Name != "Darkness Energy" && d.Name != "Metal Energy";
             }
 
             protected override bool Attack(EffectContext ctx, AttackDef atk) { return Attacks.HandleAttack(ctx, atk); }

@@ -27,6 +27,11 @@ namespace PokemonTCG.Presentation
         private float nextBgRead;
         private string bgMessage;
         private bool bgChecked;
+        /// <summary>v170: when Stop was asked (UTC), or null; after ForceStopAfter the Train screen offers Force stop.</summary>
+        private DateTime? bgStopAsked;
+        /// <summary>v170: the trainer was ended with Force stop (it saved nothing).</summary>
+        private bool bgForced;
+        private static readonly TimeSpan ForceStopAfter = TimeSpan.FromSeconds(60);
 
         private static string BackgroundTrainerPath
         {
@@ -118,6 +123,12 @@ namespace PokemonTCG.Presentation
                     {
                         brain.SavesPaused = true;
                         bgMessage = "Training in the background (started before the app was last closed).";
+                        var stopFile = Path.Combine(BackgroundJobFolder, "stop");
+                        if (File.Exists(stopFile))
+                        {
+                            bgStopAsked = File.GetLastWriteTimeUtc(stopFile);
+                            bgMessage = "Stopping (asked before the app was last closed): the trainer finishes its games and saves...";
+                        }
                     }
                     else bgPid = -1;
                 }
@@ -129,12 +140,17 @@ namespace PokemonTCG.Presentation
             // Done (or stopped, or failed): take the brain the trainer saved.
             bgPid = -1;
             bgProcess = null;
+            bgStopAsked = null;
             string error = BgValue("lastError");
             int done = BgInt("done");
             LoadBrain();
             if (brain != null) brain.SavesPaused = false;
-            bgMessage = (BgValue("cancelled") == "1" ? "Background training stopped" : "Background training finished") + " after " + done.ToString("N0") + " games"
-                        + (string.IsNullOrEmpty(error) ? "" : " (" + error + ")") + ". What it learned is loaded: see below.";
+            if (bgForced)
+                bgMessage = "Background training was force-stopped, so it saved nothing from this session: the AI is as it was before it started.";
+            else
+                bgMessage = (BgValue("cancelled") == "1" ? "Background training stopped" : "Background training finished") + " after " + done.ToString("N0") + " games"
+                            + (string.IsNullOrEmpty(error) ? "" : " (" + error + ")") + ". What it learned is loaded: see below.";
+            bgForced = false;
             nextBrainRefresh = 0f;
         }
 
@@ -213,6 +229,8 @@ namespace PokemonTCG.Presentation
                 bgProgress = new Dictionary<string, string>();
                 nextBgRead = 0f;
                 bgMessage = null;
+                bgStopAsked = null;
+                bgForced = false;
                 trainMessage = null;
             }
             catch (Exception e)
@@ -230,12 +248,34 @@ namespace PokemonTCG.Presentation
             try
             {
                 File.WriteAllText(Path.Combine(BackgroundJobFolder, "stop"), "stop");
+                if (bgStopAsked == null) bgStopAsked = DateTime.UtcNow;
                 bgMessage = "Stopping: the trainer finishes its games and saves...";
             }
             catch (Exception e)
             {
                 bgMessage = "Couldn't ask the trainer to stop: " + e.Message;
             }
+        }
+
+        /// <summary>
+        /// v170: Force stop. Ends the trainer program at once, for one that doesn't stop (an older sim-train.exe waiting on a GPU learner
+        /// that never answers). It saves nothing from the session, so the app reloads the AI as it was when the training started.
+        /// </summary>
+        private void ForceStopBackgroundTraining()
+        {
+            try
+            {
+                if (bgProcess == null && bgPid > 0) bgProcess = System.Diagnostics.Process.GetProcessById(bgPid);
+                if (bgProcess != null && !bgProcess.HasExited) bgProcess.Kill();
+                bgForced = true;
+                File.Delete(Path.Combine(BackgroundJobFolder, "stop"));
+                bgMessage = "Force-stopping the trainer...";
+            }
+            catch (Exception e)
+            {
+                bgMessage = "Couldn't end the trainer (end sim-train.exe in Task Manager): " + e.Message;
+            }
+            nextBgRead = 0f;
         }
 
         /// <summary>The Train screen's background-training row: the button, or the progress and Stop while it runs.</summary>
@@ -249,6 +289,12 @@ namespace PokemonTCG.Presentation
             if (GUILayout.Button("Stop it", GUILayout.Height(28), GUILayout.Width(80))) actions.Add(StopBackgroundTraining);
             GUI.enabled = true;
             GUILayout.EndHorizontal();
+            if (bg && bgStopAsked != null && DateTime.UtcNow - bgStopAsked.Value > ForceStopAfter)
+            {
+                GUILayout.Label("It hasn't stopped after " + FormatDuration((DateTime.UtcNow - bgStopAsked.Value).TotalSeconds) + ". Force stop ends the trainer now; "
+                                + "it saves nothing from this session (the AI stays as it was before it started).", ui.Error);
+                if (GUILayout.Button("Force stop", GUILayout.Height(28))) actions.Add(ForceStopBackgroundTraining);
+            }
             if (bg)
             {
                 int done = BgInt("done"), games = BgInt("games");

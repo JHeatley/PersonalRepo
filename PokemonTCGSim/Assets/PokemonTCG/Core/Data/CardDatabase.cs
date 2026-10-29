@@ -87,6 +87,8 @@ namespace PokemonTCG.Core
         public bool pokeDoll;
         /// <summary>Robo Substitute (v102): played as a Pokémon like an Antique Fossil, Special Conditions affect it, no Prize for it.</summary>
         public bool robo;
+        /// <summary>v169: Holon's Pokémon (Delta Species): "You may attach this as an Energy card from your hand" (its script says what it provides).</summary>
+        public bool attachAsEnergy;
 
         // Energy
         public bool basicEnergy;
@@ -355,6 +357,8 @@ namespace PokemonTCG.Core
                     if (string.Equals(tag, "TAG TEAM", StringComparison.OrdinalIgnoreCase)) d.HasTagTeamTag = true;
                     // Black & White labels (v108)
                     if (string.Equals(tag, "Team Plasma", StringComparison.OrdinalIgnoreCase)) d.IsTeamPlasma = true;
+                    // EX-era δ Delta Species (v169): "Pokémon that has δ on its card".
+                    if (string.Equals(tag, "Delta Species", StringComparison.OrdinalIgnoreCase)) d.IsDeltaSpecies = true;
                 }
             }
 
@@ -374,6 +378,7 @@ namespace PokemonTCG.Core
                 d.IsEx = dto.ex;
                 d.IsMegaEx = dto.megaEx;
                 d.IsTera = dto.tera;
+                d.AttachesAsEnergy = dto.attachAsEnergy;
                 if (dto.abilities != null)
                     foreach (var a in dto.abilities)
                         if (a != null && !string.IsNullOrEmpty(a.name))

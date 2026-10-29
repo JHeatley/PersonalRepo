@@ -56,7 +56,8 @@ namespace PokemonTCG.Core
                     }
                 }
 
-                if (d.IsEnergy && (!p.EnergyAttachedThisTurn || AnyNumberOfEnergyAttachments(player)) && !EnergyCardBlocked(player, c))
+                // v169: Holon's Pokémon may be attached as an Energy card instead (the attachment for the turn).
+                if ((d.IsEnergy || d.AttachesAsEnergy) && (!p.EnergyAttachedThisTurn || AnyNumberOfEnergyAttachments(player)) && !EnergyCardBlocked(player, c))
                 {
                     var script = Scripts.For(d);
                     foreach (var target in p.InPlay())
@@ -65,7 +66,7 @@ namespace PokemonTCG.Core
                         if (!CanAttachFromHand(target) || EnergyFromHandBlockedTo(c, target)) continue;
                         Add(new DecisionOption
                         {
-                            Label = "Attach " + d.Name + " to " + Describe(target),
+                            Label = "Attach " + d.Name + (d.IsPokemon ? " as Energy" : "") + " to " + Describe(target),
                             Action = ActionType.AttachEnergy, CardId = c.Id, PokemonUid = target.Uid, Card = d
                         }, "A|" + d.BaseKey + "|" + target.Uid);
                     }
@@ -890,6 +891,8 @@ namespace PokemonTCG.Core
             // Sand Attack: "if the Defending Pokémon tries to use an attack, your opponent flips a coin. If tails, that attack doesn't happen."
             int attackCoins = 0;
             foreach (var e in ActiveEffects()) attackCoins = Math.Max(attackCoins, e.AttackFlipCoins(this, attacker));
+            // v170: a Poké-Body that makes the attacker flip (Spinda's Pattern Distraction).
+            foreach (var src in Sources()) attackCoins = Math.Max(attackCoins, src.Script.AttackFlipCoins(src.Ctx, attacker));
             if (attackCoins > 0 && FlipCoins(player, attackCoins, attacker.Name + " tries to attack") < attackCoins)
             {
                 Emit(GameEventType.Info, player, OwnedName(attacker) + "'s attack didn't happen.", attacker.Top.Id, attacker.Uid);

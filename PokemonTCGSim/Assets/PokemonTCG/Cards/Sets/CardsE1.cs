@@ -1026,7 +1026,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Dream Eater: does nothing unless the Defending Pokémon is Asleep.</summary>
-        private sealed class DreamEaterMon : Mon
+        internal sealed class DreamEaterMon : Mon
         {
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {
