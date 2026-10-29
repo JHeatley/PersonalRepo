@@ -11,6 +11,9 @@ Each line of train.jsonl is one conversation: {"messages": [system, user, assist
     python build_dataset.py --cards 6000        # more card questions (default 4000 cards; 0 for none)
     python build_dataset.py --no-download       # card questions only (or reuse the pages saved in ./compendium)
 
+Every .jsonl file in ./extra (same format) is added too: extra/csharp.jsonl teaches C# and .NET. Every example gets the
+same system prompt (SYSTEM below), so the result is one model for all of it.
+
 The downloaded pages are saved in ./compendium, so running it again doesn't download them again (--refresh does).
 """
 import argparse
@@ -27,8 +30,11 @@ from html.parser import HTMLParser
 HERE = os.path.dirname(os.path.abspath(__file__))
 RESOURCES = os.path.join(HERE, "..", "Assets", "PokemonTCG", "Resources")
 
-SYSTEM = ("You are an expert on the Pokémon Trading Card Game: its rules, official rulings and cards. Answer clearly and "
-          "accurately. When a ruling comes from the Rulings Compendium, give its source and date.")
+# One instruction for every example and for the installed model (install_to_ollama.py uses it too), so one model covers
+# every subject without switching. Describe new subjects here when you add their files to ./extra.
+SYSTEM = ("You are a helpful assistant and an expert on the Pokémon Trading Card Game (its rules, official rulings and "
+          "cards) and on C#, .NET and Unity programming. Answer clearly and accurately. When a Pokémon ruling comes from "
+          "the Rulings Compendium, give its source and date. For code, give correct, idiomatic examples and explain why.")
 
 # The older Compendium pages (one per era) and the current site's list of every ruling.
 LEGACY_PAGES = {
@@ -322,11 +328,25 @@ def main():
     examples = ruling_examples(pairs)
     n_rulings = len(examples)
     examples += card_examples(args.cards, rng)
+    n_cards = len(examples) - n_rulings
+    # Any other training files (same format: one {"messages": [...]} per line) dropped into ./extra, e.g. extra/csharp.jsonl.
+    for path in sorted(glob.glob(os.path.join(HERE, "extra", "*.jsonl"))):
+        added = [json.loads(line) for line in open(path, encoding="utf-8") if line.strip()]
+        for ex in added:
+            # The same system prompt as everything else (and as the installed model), whatever the file had.
+            msgs = ex["messages"]
+            if msgs and msgs[0]["role"] == "system":
+                msgs[0]["content"] = SYSTEM
+            else:
+                msgs.insert(0, {"role": "system", "content": SYSTEM})
+        print(f"{os.path.basename(path)}: {len(added):,} examples")
+        examples += added
     rng.shuffle(examples)
     with open(args.out, "w", encoding="utf-8") as f:
         for ex in examples:
             f.write(json.dumps(ex, ensure_ascii=False) + "\n")
-    print(f"wrote {len(examples):,} examples ({n_rulings:,} rulings, {len(examples) - n_rulings:,} card questions) to {args.out}")
+    print(f"wrote {len(examples):,} examples ({n_rulings:,} rulings, {n_cards:,} card questions, "
+          f"{len(examples) - n_rulings - n_cards:,} from extra/) to {args.out}")
 
 
 if __name__ == "__main__":
