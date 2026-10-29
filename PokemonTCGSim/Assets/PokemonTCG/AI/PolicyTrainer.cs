@@ -707,6 +707,9 @@ namespace PokemonTCG.AI
             }
             catch (Exception e)
             {
+                // v171: the session is stopping (Stop closed the connection on purpose): no error, and no learning on the CPU
+                // either, which would hold up the stop; the network is unchanged (new weights only arrive with a full answer).
+                if (Gpu.Aborted) return true;
                 // Learn here this round, and try the GPU again in a few rounds (don't wait on it every round).
                 gpuRetryRound = rounds + 5;
                 round.LastError = "GPU learner: " + e.Message + " (learned on the CPU this round; trying the GPU again in 5 rounds)";

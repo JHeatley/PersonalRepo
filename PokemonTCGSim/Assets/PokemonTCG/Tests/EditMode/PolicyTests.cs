@@ -861,6 +861,61 @@ namespace PokemonTCG.Tests
             trainer.Dispose();
         }
 
+        [Test]
+        public void Stopping_While_The_GPU_Learner_Is_Used_Leaves_No_Error()
+        {
+            // v171: Stop closes the learner's connection on purpose; what was in flight then failed and showed as the session's error.
+            var fake = new FakeMoveLearner(false);
+            var net = new PolicyNet();
+            var trainer = SmallTrainer(net);
+            var gpu = new GpuLearner("127.0.0.1", fake.Port);
+            trainer.Gpu = gpu;
+            trainer.GpuMoves = true;
+            gpu.Abort(); // as Stop does
+            var round = trainer.Round();
+            trainer.Dispose();
+            Assert.AreEqual(0, round.Errors);
+            Assert.IsNull(round.LastError, "nothing failed: it was stopped");
+            Assert.AreEqual(0, net.Steps, "and it doesn't hold up the stop by learning on the CPU instead");
+        }
+
+        [Test]
+        public void A_Network_File_That_Cant_Be_Read_Is_Never_Saved_Over()
+        {
+            // v171: an out-of-date trainer couldn't read a bigger network, started from the 3-block start and saved that over it.
+            string path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "unreadable_test_" + Guid.NewGuid().ToString("N") + ".txt");
+            string neural = LearningBrain.NeuralPath(path);
+            try
+            {
+                var brain = new LearningBrain { FilePath = path };
+                brain.Policy.Grow(PolicyNet.BigBlocks);
+                brain.Save();
+                var back = LearningBrain.Load(path);
+                Assert.IsNull(back.PolicyLoadError);
+                Assert.AreEqual(PolicyNet.BigBlocks, back.Policy.Blocks, "a bigger network comes back as big");
+
+                // A file this code can't read (a later format version stands in for a network an older program doesn't know).
+                var bytes = System.IO.File.ReadAllBytes(neural);
+                BitConverter.GetBytes(99).CopyTo(bytes, 8);
+                System.IO.File.WriteAllBytes(neural, bytes);
+                var stuck = LearningBrain.Load(path);
+                Assert.IsNotNull(stuck.PolicyLoadError);
+                Assert.IsTrue(System.IO.File.Exists(neural + ".unreadable"), "a copy is kept");
+                stuck.Save();
+                CollectionAssert.AreEqual(bytes, System.IO.File.ReadAllBytes(neural), "saving leaves the network's file alone");
+
+                stuck.Reset(); // starting again on purpose may replace it
+                Assert.IsNull(stuck.PolicyLoadError);
+                stuck.Save();
+                Assert.IsNull(LearningBrain.Load(path).PolicyLoadError);
+            }
+            finally
+            {
+                foreach (var f in new[] { path, neural, neural + ".unreadable", LearningBrain.ChampionPath(path) })
+                    if (f != null && System.IO.File.Exists(f)) System.IO.File.Delete(f);
+            }
+        }
+
         private PolicyTrainer SmallTrainer(PolicyNet net)
         {
             var decks = new List<KeyValuePair<string, List<CardDef>>>

@@ -195,10 +195,12 @@ namespace PokemonTCG.Presentation
         {
             opponentLearning = PlayerPrefs.GetInt(PrefOpponentAi, 1) == 1;
             opponentStyle = (AiStyle)Mathf.Clamp(PlayerPrefs.GetInt(PrefOpponentStyle, (int)AiStyle.Hybrid), 0, 2);
+            brainError = null;
             try
             {
                 UnityCardData.LoadPolicyStart();
                 brain = LearningBrain.Load(BrainPath);
+                brainError = brain.PolicyLoadError; // v171: its network file couldn't be read (it isn't saved over)
             }
             catch (Exception e)
             {
@@ -697,6 +699,7 @@ namespace PokemonTCG.Presentation
         {
             if (training != null && training.Running) return;
             brain.Reset();
+            brainError = null;
             SaveBrainInBackground();
             confirmReset = false;
             nextBrainRefresh = 0f;
