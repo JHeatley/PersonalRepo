@@ -7,6 +7,9 @@ description of what's in it, and a Unity editor window builds that as GameObject
 picture ──► Qwen3-VL (local, in Ollama) ──► scene JSON ──► Unity: Tools → Vision → Build Scene From JSON
 ```
 
+It's the same model as your chat model: `../LlmTraining` trains one Qwen3-VL on everything (the TCG, Unity, C#, Git...)
+and these pictures together, and installs it in Ollama as `pokemon-tcg`.
+
 The model never writes Unity files or C# directly. A 4B model is unreliable at that, but it can learn a fixed format
 well, and the Unity script turns the format into a scene the same way every time.
 
@@ -28,7 +31,6 @@ well, and the Unity script turns the format into a scene the same way every time
 | `evaluate.py` | Scores a model on the held-back pictures (before and after training) |
 | `score.py` | How a scene is scored (objects found, boxes, sprite names, words, colours) |
 | `scenespec.py` | The scene format, the instruction given with each picture, and the renderer |
-| `train_vision_colab.ipynb` | Fine-tunes Qwen3-VL on Colab's free GPU with Unsloth |
 | `Unity/Editor/SceneFromJson.cs` | The Unity window that builds the scene |
 | `test_vision.py` | Tests (no model needed: a fake server answers) |
 
@@ -65,45 +67,40 @@ python make_dataset.py --sprites path/to/sprites --count 4000 --out scenes_datas
 - **Your own examples:** you can add real ones, such as screenshots with JSON you've checked, as extra lines in
   `train.jsonl` in the same format. Even 50–100 real ones help it handle real pictures.
 
-## 3. Train in Colab (free)
+## 3. Train it, with everything else (Colab, free)
 
-1. Zip the `scenes_dataset` folder and put `scenes_dataset.zip` at the top of your Google Drive.
-2. Open `train_vision_colab.ipynb` in Colab, choose *Runtime → Change runtime type → T4 GPU*, and run the cells.
-3. **What the notebook does:**
-   - scores the untrained model on a few held-back pictures;
-   - trains a LoRA (a small add-on) on the 4-bit Qwen3-VL-4B-Instruct: about 1–2 hours for 4,000 pictures;
-   - scores it again, so you can see the change;
-   - saves the result to `scenes_model` in your Drive.
-4. **If Colab disconnects:** checkpoints are saved every 100 steps. Set `RESUME = True` and run again.
-
-## 4. Run your trained model on your PC
-
-Download the result from your Drive, then pick one of these:
-
-**Ollama.** Download the `merged` folder (about 9 GB). Next to it, make a file named `Modelfile` containing
-`FROM ./merged`, then run:
+The pictures train together with all the text, in one model, from one file:
 
 ```
-ollama create scenes -f Modelfile --quantize q4_K_M
+cd ../LlmTraining
+python build_dataset.py
+```
+
+It finds `VisionTools/scenes_dataset` by itself and writes `qwen_training.zip` (the text, the pictures, and the
+held-back pictures for checking). Upload that one file and run `train_colab.ipynb`: see **2. Train it** in
+`../LlmTraining/README.md`. The notebook scores a few held-back pictures before and after training, so you can see the
+change.
+
+## 4. Put it in Ollama and use it
+
+The notebook saves two files, the model and its image part. With both in one folder:
+
+```
+python ../LlmTraining/install_to_ollama.py pokemon-tcg.Q4_K_M.gguf
 python ask_model.py screenshot.png --sprites path/to/sprites --preview preview.png
 ```
 
-`--quantize` shrinks it to about 3 GB so it fits your card. Ollama can't yet load a fine-tuned vision model from GGUF
-files (it doesn't read the separate image file, called `mmproj`), so it has to import this merged folder instead. I
-haven't been able to run that import here, so if `ollama create` refuses the folder, use llama.cpp below.
+`ask_model.py` uses `pokemon-tcg` by default. Needs Ollama 0.30 or newer.
 
-**llama.cpp.** Set `SAVE_GGUF = True` in the notebook. You get two `.gguf` files: the model, and its image part (with
-`mmproj` in the name). Download llama.cpp's Windows CUDA build from its GitHub releases page, then:
+Then measure it: `python evaluate.py scenes_dataset`. Compare that with the untrained model's score from
+`--model qwen3-vl:4b-instruct`.
+
+**Or llama.cpp** instead of Ollama: download its Windows CUDA build from its GitHub releases page, then
 
 ```
-llama-server -m scenes-Q4_K_M.gguf --mmproj mmproj-F16.gguf --jinja -ngl 99 --port 8080
+llama-server -m pokemon-tcg.Q4_K_M.gguf --mmproj pokemon-tcg.mmproj.gguf --jinja -ngl 99 --port 8080
 python ask_model.py screenshot.png --api openai --sprites path/to/sprites --preview preview.png
 ```
-
-(Use the actual file names you got.)
-
-Then measure it: `python evaluate.py scenes_dataset --model scenes`. Compare that with the untrained model's score
-from `--model qwen3-vl:4b-instruct`.
 
 Pass the same `--sprites` folder you trained with every time. The names go into the instruction in the same order as in
 training, and the schema only allows those names.
@@ -150,6 +147,11 @@ Console.
 - **Training format:** the training examples were run through Qwen3-VL's real processor and chat template. They come to
   at most about 1,100 tokens, against a 2,048 limit. A small randomly initialised Qwen3-VL ran a training step on them
   (forward, loss, backward) and generated text.
-- **Notebook:** its cells ran with stand-ins for the GPU-only parts (Unsloth, Google Drive). The real TRL 1.15, the
-  version Unsloth installs, accepted the training settings.
-- **Not checked here:** the real GPU training, the GGUF export and the Ollama import. They need a GPU and your downloads.
+- **Notebook** (`../LlmTraining/train_colab.ipynb`): every cell ran here with a tiny Qwen3-VL and stand-ins for the
+  GPU-only parts (Unsloth, Google Drive). The real TRL 1.15 trainer, the version Unsloth installs, trained on batches
+  mixing text and pictures, saved a checkpoint and resumed from it.
+- **Ollama:** checked with Ollama 0.40.13. Unsloth's own Qwen3-VL-4B-Instruct GGUF files (the same kind of export the
+  notebook makes) went in with `install_to_ollama.py`, then answered text questions and, through `ask_model.py`, rebuilt
+  pictures. Untrained, it already placed boxes well (about 70–87% overlap) but didn't know the sprite names, which is
+  what the training teaches.
+- **Not checked here:** the real GPU training run itself, which needs Colab's GPU.

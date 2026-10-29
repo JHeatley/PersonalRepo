@@ -1,6 +1,7 @@
 # Your own model for Ollama
 
-Fine-tunes **Qwen3-4B** (Ollama's `qwen3:4b`) into one model that knows:
+Fine-tunes **Qwen3-VL-4B-Instruct** (Ollama's `qwen3-vl:4b-instruct`, the Qwen that can also see pictures) into one
+model that knows:
 
 * the Pokémon TCG: its rules, every Rulings Compendium ruling, and this project's cards,
 * the Pokémon video games: every Pokémon, move and ability, the type chart, and the games themselves,
@@ -8,8 +9,10 @@ Fine-tunes **Qwen3-4B** (Ollama's `qwen3:4b`) into one model that knows:
 * Unity 6: the Scripting API (core classes and their members, with code), the Manual and the glossary,
 * C# and .NET, and Python, neural networks and training, and connecting Python to Unity games,
 * Git, GitHub and GitHub Desktop (with Unity projects),
+* Game Boy Advance and DS games (formats, extracting their data, rebuilding games like them in Unity),
+* and, if you add pictures, how to rebuild a picture as a Unity scene (with `../VisionTools`),
 
-and installs it in Ollama as `pokemon-tcg` (`--name` to call it something else). Everything here is free: the data
+and installs it in Ollama as `pokemon-tcg` (`--name` to call it something else): one model for chat and pictures. Everything here is free: the data
 comes from this project and public sites, training runs on Google Colab's free GPU (or your own), and the model runs
 offline in Ollama.
 
@@ -25,6 +28,9 @@ python build_dataset.py
 It downloads the Rulings Compendium (compendium.pokegym.net, about 9 MB, saved in `compendium/` so it's only
 downloaded once), reads the card pool in `Assets/PokemonTCG/Resources/CardData`, and writes `train.jsonl`: about
 5,500 rulings and 8,000 card questions, each a short conversation (question → answer with its source).
+
+It also writes **`qwen_training.zip`: everything for training in one file**, the only thing you upload to Colab
+(`train.jsonl`, and the pictures if there are any, below).
 
 * Every `.jsonl` file in `extra/` is added as well. `extra/csharp.jsonl` has about 100 C# and .NET questions with
   answers (types, generics, LINQ, async, threading, performance, Unity, common compiler errors). `extra/python.jsonl`
@@ -74,32 +80,56 @@ python build_dataset.py
 * With everything, `train.jsonl` has about 37,000 examples, so training takes longer (below). That's the trade-off:
   more knowledge for more training time. `--extra-limit` trims it.
 
-## 2. Train it (Google Colab, free, about 1–2 hours for the TCG data, 3–5 hours with everything)
+### Add pictures (optional: for rebuilding pictures as Unity scenes)
 
-1. Go to colab.research.google.com → *File → Upload notebook* → `train_colab.ipynb`.
-2. *Runtime → Change runtime type → T4 GPU* → *Save*.
-3. For a long run, set `SAVE_TO_DRIVE = True` in the settings cell: training saves a checkpoint to your Google Drive
-   every 250 steps, and if Colab disconnects (free sessions do, especially when the tab is left alone), *Run all*
-   again with the same `train.jsonl` and it carries on from the last checkpoint. The finished file goes to Drive too.
-4. *Runtime → Run all*. Upload `train.jsonl` when it asks.
-5. At the end it shows a few test answers (one per subject) and downloads `pokemon-tcg.Q4_K_M.gguf` (about 2.5 GB),
-   or copies it to `MyDrive` with `SAVE_TO_DRIVE`.
+Make the training pictures from your sprites first (see `../VisionTools/README.md`), into
+`VisionTools/scenes_dataset`, then build as usual:
 
-Try `MAX_STEPS = 60` first for a quick run (a few minutes) to check that everything works.
+```
+cd ../VisionTools
+python make_dataset.py --sprites path/to/your/sprites --count 4000 --out scenes_dataset
+cd ../LlmTraining
+python build_dataset.py
+```
+
+`build_dataset.py` finds `../VisionTools/scenes_dataset` by itself (`--scenes` for another folder, `--no-scenes` to leave
+pictures out) and puts the pictures, the held-back pictures it scores before and after training, and the scoring code
+into `qwen_training.zip`. 4,000 pictures add roughly 30–60 MB.
+
+## 2. Train it (Google Colab, free, about 1–2 hours for the TCG data, 4–6 hours with everything)
+
+1. Put `qwen_training.zip` at the top of your Google Drive (*My Drive*). The notebook finds it there by itself, which
+   is the reliable way for a big file. (Without Drive, it asks you to upload it.)
+2. Go to colab.research.google.com → *File → Upload notebook* → `train_colab.ipynb`.
+3. *Runtime → Change runtime type → T4 GPU* → *Save*.
+4. *Runtime → Run all*. Training saves a checkpoint to your Drive every 250 steps (`SAVE_TO_DRIVE`, on by default): if
+   Colab disconnects (free sessions do, especially when the tab is left alone), *Run all* again and it carries on from
+   the last checkpoint.
+5. At the end it shows a few test answers (one per subject), scores the held-back pictures (if any) against how it did
+   before training, and copies **two files** to your Drive: `pokemon-tcg.Q4_K_M.gguf` (the model, about 2.5 GB) and
+   `pokemon-tcg.mmproj.gguf` (its image part, about 0.8 GB).
+
+Try `MAX_STEPS = 60` first for a quick run (a few minutes) to check that everything works. With few pictures (under
+2,000), `PICTURE_REPEAT = 2` uses each twice.
 
 On your own PC instead: run the notebook with Jupyter in WSL2 (Unsloth needs Linux). It fits a 6 GB RTX 2060; close
 the GPU learner and games while it trains.
 
 ## 3. Put it in Ollama (your PC)
 
-With Ollama running and `qwen3:4b` downloaded (`ollama pull qwen3:4b`):
+Needs Ollama 0.30 or newer (it has the chat format for Qwen3-VL). Put both `.gguf` files in one folder, then:
 
 ```
 python install_to_ollama.py pokemon-tcg.Q4_K_M.gguf
 ```
 
-Then pick **pokemon-tcg** in the Ollama app (or `ollama run pokemon-tcg`). It uses an 8k context (`--ctx` to
-change it), which fits your graphics card with room to spare. `qwen3:4b` itself is left as it was.
+It finds the image part next to the model by itself. Then pick **pokemon-tcg** in the Ollama app (or
+`ollama run pokemon-tcg`): chat as usual, and add a picture to a message for it to look at. To rebuild a picture as a
+Unity scene, use `../VisionTools/ask_model.py` (it uses `pokemon-tcg` by default) and the Unity window in
+`../VisionTools`. It uses an 8k context (`--ctx` to change it), which fits your 6 GB card with room to spare.
+
+This route was checked here with Ollama 0.40.13: Unsloth's Qwen3-VL-4B-Instruct GGUF files (the same kind the notebook
+saves) installed this way answered both text questions and pictures.
 
 ## What to expect
 
@@ -109,4 +139,7 @@ change it), which fits your graphics card with room to spare. `qwen3:4b` itself 
   retrieval, RAG: the model searches the documents when you ask, instead of remembering them.)
 * About 15% of the training is general conversation, and it trains a LoRA add-on (the base model stays frozen), so it
   keeps its normal abilities.
-* To improve it: add examples (more cards, your own Q&A) to `train.jsonl` and train again from `qwen3:4b`.
+* To improve it: add examples (more cards, your own Q&A, more pictures), rebuild `qwen_training.zip` and train again
+  from the base model on everything at once.
+* Its text skills are about the same as Qwen3-4B's; it adds sight. (A model from the older Qwen3-4B notebook still
+  installs with `install_to_ollama.py`: it notices a text-only model and takes its chat format from `qwen3:4b`.)

@@ -1,6 +1,6 @@
 """Send a picture to a local vision model and save the scene it describes, for the Unity builder.
 
-    python ask_model.py screenshot.png --sprites path/to/sprites                 # Ollama, model "scenes"
+    python ask_model.py screenshot.png --sprites path/to/sprites                 # Ollama, model "pokemon-tcg"
     python ask_model.py screenshot.png --model qwen3-vl:4b-instruct               # the untrained model, for comparison
     python ask_model.py screenshot.png --api openai --url http://localhost:8080   # llama.cpp's llama-server
     python ask_model.py screenshot.png --preview preview.png                      # also draw the answer next to the picture
@@ -109,7 +109,7 @@ def side_by_side(original_path, scene, sprites, max_side=None):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("image")
-    ap.add_argument("--model", default="scenes", help="the model's name in Ollama (or llama-server)")
+    ap.add_argument("--model", default="pokemon-tcg", help="the model's name in Ollama (or llama-server)")
     ap.add_argument("--sprites", help="the sprite folder the model was trained with")
     ap.add_argument("--api", choices=("ollama", "openai"), default="ollama",
                     help="ollama, or openai for llama.cpp's llama-server and other OpenAI-style servers")
