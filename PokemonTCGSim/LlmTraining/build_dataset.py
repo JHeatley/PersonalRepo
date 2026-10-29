@@ -11,6 +11,8 @@ Each line of train.jsonl is one conversation: {"messages": [system, user, assist
     python build_dataset.py --cards 6000        # more card questions (default 4000 cards; 0 for none)
     python build_dataset.py --no-download       # card questions only (or reuse the pages saved in ./compendium)
 
+Every .jsonl file in ./extra (same format) is added too: extra/csharp.jsonl teaches C# and .NET.
+
 The downloaded pages are saved in ./compendium, so running it again doesn't download them again (--refresh does).
 """
 import argparse
@@ -322,11 +324,18 @@ def main():
     examples = ruling_examples(pairs)
     n_rulings = len(examples)
     examples += card_examples(args.cards, rng)
+    n_cards = len(examples) - n_rulings
+    # Any other training files (same format: one {"messages": [...]} per line) dropped into ./extra, e.g. extra/csharp.jsonl.
+    for path in sorted(glob.glob(os.path.join(HERE, "extra", "*.jsonl"))):
+        added = [json.loads(line) for line in open(path, encoding="utf-8") if line.strip()]
+        print(f"{os.path.basename(path)}: {len(added):,} examples")
+        examples += added
     rng.shuffle(examples)
     with open(args.out, "w", encoding="utf-8") as f:
         for ex in examples:
             f.write(json.dumps(ex, ensure_ascii=False) + "\n")
-    print(f"wrote {len(examples):,} examples ({n_rulings:,} rulings, {len(examples) - n_rulings:,} card questions) to {args.out}")
+    print(f"wrote {len(examples):,} examples ({n_rulings:,} rulings, {n_cards:,} card questions, "
+          f"{len(examples) - n_rulings - n_cards:,} from extra/) to {args.out}")
 
 
 if __name__ == "__main__":

@@ -17,6 +17,9 @@ It downloads the Rulings Compendium (compendium.pokegym.net, about 9 MB, saved i
 downloaded once), reads the card pool in `Assets/PokemonTCG/Resources/CardData`, and writes `train.jsonl`: about
 5,500 rulings and 8,000 card questions, each a short conversation (question → answer with its source).
 
+* Every `.jsonl` file in `extra/` is added as well. `extra/csharp.jsonl` has about 100 C# and .NET questions with
+  answers (types, generics, LINQ, async, threading, performance, Unity, common compiler errors). Add your own files
+  there in the same format: one `{"messages": [system, user, assistant]}` per line.
 * `--cards 6000` writes questions about more cards (default 4,000 cards; `--cards 0` for rulings only).
 * The Compendium pages and `train.jsonl` aren't kept in git (the rulings are the Compendium team's work).
 
