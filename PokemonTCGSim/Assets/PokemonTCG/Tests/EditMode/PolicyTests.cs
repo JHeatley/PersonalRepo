@@ -1234,7 +1234,7 @@ namespace PokemonTCG.Tests
                 return n;
             };
             Assert.AreEqual(40, zoroarkGuesses(0), "0: always the closest deck");
-            Assert.GreaterOrEqual(zoroarkGuesses(1.5), 36, "the usual setting: nearly always the deck the shown cards point to");
+            Assert.GreaterOrEqual(zoroarkGuesses(1.5), 36, "a firm belief: nearly always the deck the shown cards point to");
             int loose = zoroarkGuesses(0.001);
             Assert.That(loose, Is.InRange(5, 35), "a very loose belief guesses both decks");
         }

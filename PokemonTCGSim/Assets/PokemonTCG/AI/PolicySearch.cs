@@ -53,12 +53,13 @@ namespace PokemonTCG.AI
         public double Explore = 1.0;
         /// <summary>
         /// v172: how firmly it guesses the opponent's deck. Each guess draws a deck from the known decks, the ones most like the
-        /// cards seen far more often: a deck's weight is e^(DeckBelief x how well it matches). 0: always the closest one.
+        /// cards seen far more often: a deck's weight is e^(DeckBelief x how well it matches). 0: always the closest one (the
+        /// default: 1.5 measured no better, 46% in 200 games against 0, both looking ahead quick).
         /// </summary>
-        public double DeckBelief = 1.5;
+        public double DeckBelief = 0;
         /// <summary>
         /// v172: training looks at moves picked with random (Gumbel) noise on the network's chances, not always its top few, so
-        /// it also learns about moves the network underrates. For training searches only.
+        /// it also learns about moves the network underrates. For training searches only; off until a training run shows it helps.
         /// </summary>
         public bool Gumbel;
 
@@ -75,7 +76,7 @@ namespace PokemonTCG.AI
         /// <summary>A light look-ahead for training games (learning from the look-ahead): many decisions, a little each.</summary>
         public static SearchSettings Training()
         {
-            return new SearchSettings { Playouts = 16, MaxCandidates = 3, SkipAbove = 0.85, Turns = 1, Threads = 1, MaxSeconds = 1, PlanTurn = PlanByDefault, Gumbel = true };
+            return new SearchSettings { Playouts = 16, MaxCandidates = 3, SkipAbove = 0.85, Turns = 1, Threads = 1, MaxSeconds = 1, PlanTurn = PlanByDefault };
         }
 
         /// <summary>Whether the presets plan the whole turn (v172; set from the head-to-head measurement against the earlier look-ahead).</summary>
