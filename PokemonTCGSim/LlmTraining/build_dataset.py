@@ -11,8 +11,10 @@ Each line of train.jsonl is one conversation: {"messages": [system, user, assist
     python build_dataset.py --cards 6000        # more card questions (default 4000 cards; 0 for none)
     python build_dataset.py --no-download       # card questions only (or reuse the pages saved in ./compendium)
 
-Every .jsonl file in ./extra (same format) is added too: extra/csharp.jsonl teaches C# and .NET. Every example gets the
-same system prompt (SYSTEM below), so the result is one model for all of it.
+Every .jsonl file in ./extra (same format) is added too: extra/csharp.jsonl teaches C# and .NET, extra/python.jsonl
+Python, neural networks and Python with Unity, and build_knowledge.py writes the Pokémon video games, Thomas & Friends
+and Unity files there. Every example gets the same system prompt (SYSTEM below), so the result is one model for all of
+it. --extra-limit N keeps at most N examples from each extra file (picked at random), for a quicker training run.
 
 The downloaded pages are saved in ./compendium, so running it again doesn't download them again (--refresh does).
 """
@@ -33,8 +35,10 @@ RESOURCES = os.path.join(HERE, "..", "Assets", "PokemonTCG", "Resources")
 # One instruction for every example and for the installed model (install_to_ollama.py uses it too), so one model covers
 # every subject without switching. Describe new subjects here when you add their files to ./extra.
 SYSTEM = ("You are a helpful assistant and an expert on the Pokémon Trading Card Game (its rules, official rulings and "
-          "cards) and on C#, .NET and Unity programming. Answer clearly and accurately. When a Pokémon ruling comes from "
-          "the Rulings Compendium, give its source and date. For code, give correct, idiomatic examples and explain why.")
+          "cards), the Pokémon video games, Thomas & Friends and The Railway Series, the Unity game engine, C# and .NET, "
+          "and Python, neural networks and machine learning (including connecting Python to Unity games). Answer "
+          "clearly and accurately. When a Pokémon ruling comes from the Rulings Compendium, give its source and date. "
+          "For code, give correct, working examples, check them before you answer, and explain why.")
 
 # The older Compendium pages (one per era) and the current site's list of every ruling.
 LEGACY_PAGES = {
@@ -305,6 +309,8 @@ def main():
     ap.add_argument("--cards", type=int, default=4000, help="how many cards to write questions about (0: none)")
     ap.add_argument("--no-download", action="store_true", help="don't download the Compendium (use saved pages if any)")
     ap.add_argument("--refresh", action="store_true", help="download the Compendium pages again")
+    ap.add_argument("--extra-limit", type=int, default=0,
+                    help="at most this many examples from each file in ./extra (0: all of them)")
     ap.add_argument("--seed", type=int, default=7)
     args = ap.parse_args()
     rng = random.Random(args.seed)
@@ -332,6 +338,8 @@ def main():
     # Any other training files (same format: one {"messages": [...]} per line) dropped into ./extra, e.g. extra/csharp.jsonl.
     for path in sorted(glob.glob(os.path.join(HERE, "extra", "*.jsonl"))):
         added = [json.loads(line) for line in open(path, encoding="utf-8") if line.strip()]
+        if 0 < args.extra_limit < len(added):
+            added = rng.sample(added, args.extra_limit)
         for ex in added:
             # The same system prompt as everything else (and as the installed model), whatever the file had.
             msgs = ex["messages"]
