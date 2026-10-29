@@ -485,7 +485,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Silver Wind: during your next turn, attacks that damage the Defending Pokémon do 30 more (after Weakness and Resistance).</summary>
-        private sealed class SilverWindMon : Mon
+        internal sealed class SilverWindMon : Mon
         {
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {

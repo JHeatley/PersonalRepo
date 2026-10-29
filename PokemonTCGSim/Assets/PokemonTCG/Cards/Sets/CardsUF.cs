@@ -649,7 +649,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Plunder: before the damage, discard all Trainer cards attached to the Defending Pokémon.</summary>
-        private sealed class PlunderMon : Mon
+        internal sealed class PlunderMon : Mon
         {
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {

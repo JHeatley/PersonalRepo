@@ -198,7 +198,7 @@ namespace PokemonTCG.Cards
         /// Time Spiral: if the opponent has an Evolved Pokémon, choose 1 and flip a coin; heads, its highest Stage Evolution card is
         /// shuffled into their deck.
         /// </summary>
-        private sealed class TimeSpiralFlipMon : Mon
+        internal sealed class TimeSpiralFlipMon : Mon
         {
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {

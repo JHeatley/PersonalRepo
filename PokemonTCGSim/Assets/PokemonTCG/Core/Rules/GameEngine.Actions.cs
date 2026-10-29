@@ -891,6 +891,8 @@ namespace PokemonTCG.Core
             // Sand Attack: "if the Defending Pokémon tries to use an attack, your opponent flips a coin. If tails, that attack doesn't happen."
             int attackCoins = 0;
             foreach (var e in ActiveEffects()) attackCoins = Math.Max(attackCoins, e.AttackFlipCoins(this, attacker));
+            // v170: a Poké-Body that makes the attacker flip (Spinda's Pattern Distraction).
+            foreach (var src in Sources()) attackCoins = Math.Max(attackCoins, src.Script.AttackFlipCoins(src.Ctx, attacker));
             if (attackCoins > 0 && FlipCoins(player, attackCoins, attacker.Name + " tries to attack") < attackCoins)
             {
                 Emit(GameEventType.Info, player, OwnedName(attacker) + "'s attack didn't happen.", attacker.Top.Id, attacker.Uid);

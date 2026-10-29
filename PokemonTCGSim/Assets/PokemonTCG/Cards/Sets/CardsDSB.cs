@@ -56,7 +56,9 @@ namespace PokemonTCG.Cards
             r.RegisterByKey("DS-52", new ComboMon(new ConditionAttackMon("Super Singe", SpecialCondition.Burned), new FlipBonusMon("Stomp", 10)));
             r.RegisterByKey("DS-53", new ParalyzeFlipMon("Tight Jaw"));
             r.RegisterByKey("DS-54", new CardsFST1.TakeLessMon(10, null));
-            r.RegisterByKey("DS-55", new SkarmoryShiningHorn());
+            r.RegisterByKey("DS-55", new CardsLM.ShiningHornMon(new ComboMon(
+                new SearchAttackMon("Cry for Help", d => d.IsPokemon && d.HasType(EnergyType.Metal) && !d.IsOldEx, 1),
+                new ShieldAttackMon("Steel Wing", 20))));
             r.RegisterByKey("DS-56", new PartnerProtectionMon("Extra Protection", "Illumise", a => a.Def.IsOldEx, new CardsMA.SwiftMon("Swift")));
             r.RegisterByKey("DS-57", new PlainMon());
             r.RegisterByKey("DS-58", new CardsSUM1.DiscardTypeFromSelfMon("Ember", EnergyType.Fire, 1));
@@ -410,24 +412,6 @@ namespace PokemonTCG.Cards
             }
 
             protected override bool Attack(EffectContext ctx, AttackDef atk) { return Tail.HandleAttack(ctx, atk); }
-        }
-
-        /// <summary>
-        /// Shining Horn (Poké-Body): while Skarmory is the only Pokémon you have in play, the opponent's Basic Pokémon can't attack.
-        /// Cry for Help: a Metal Pokémon (not Pokémon-ex) from your deck into your hand. Steel Wing.
-        /// </summary>
-        private sealed class SkarmoryShiningHorn : Mon
-        {
-            private static readonly Mon Attacks = new ComboMon(
-                new SearchAttackMon("Cry for Help", d => d.IsPokemon && d.HasType(EnergyType.Metal) && !d.IsOldEx, 1),
-                new ShieldAttackMon("Steel Wing", 20));
-
-            public override bool PreventsAttacksOf(EffectContext src, PokemonInPlay mon)
-            {
-                return src.Pokemon != null && mon != null && mon.Owner != src.Player && mon.IsBasic && src.Me.InPlay().Count() == 1;
-            }
-
-            protected override bool Attack(EffectContext ctx, AttackDef atk) { return Attacks.HandleAttack(ctx, atk); }
         }
 
         /// <summary>Conductive Body (Poké-Body): while Beldum is your Active Pokémon, its Retreat Cost is [C] less for each Beldum on your Bench. Take Down.</summary>

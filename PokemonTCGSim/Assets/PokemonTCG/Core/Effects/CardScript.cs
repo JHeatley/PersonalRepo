@@ -583,6 +583,11 @@ namespace PokemonTCG.Core
         /// when it applies to this attack, otherwise null.
         /// </summary>
         public virtual string FlipsToDodgeAttack(EffectContext src, PokemonInPlay target) { return null; }
+        /// <summary>
+        /// v170: coins the attacking player flips when their Pokémon tries to attack, before Confusion; any tails and the attack does
+        /// nothing (Spinda's Pattern Distraction). Only working sources are asked; the most coins asked for are flipped.
+        /// </summary>
+        public virtual int AttackFlipCoins(EffectContext src, PokemonInPlay attacker) { return 0; }
         /// <summary>v146: this Energy card can't be attached from the hand to that Pokémon (Aquapolis Zapdos's Anti-Lightning).</summary>
         public virtual bool BlocksEnergyFromHandTo(EffectContext src, CardInstance energy, PokemonInPlay target) { return false; }
         /// <summary>
