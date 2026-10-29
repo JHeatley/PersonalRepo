@@ -230,8 +230,8 @@ public static class Program
     /// <summary>
     /// The app's "Train in the background": a training session on the AI's own brain file, as the Train screen would run it,
     /// but here (faster, and the app stays light). The app writes a job folder: job.txt (key=value lines: brain, games, measure,
-    /// style, deck.N names with decks/N.txt lists, pool, a, b, randomA, randomB, threads, rest, gpu, rate, prizes, seed) and the
-    /// decklists. This keeps progress.txt up to date, stops when a file named "stop" appears, and saves the brain (the
+    /// style, deck.N names with decks/N.txt lists, pool, a, b, randomA, randomB, threads, rest, gpu, rate, prizes, seed,
+    /// lookahead, lookaheaddecisions...) and the decklists. This keeps progress.txt up to date, stops when a file named "stop" appears, and saves the brain (the
     /// network, the matchups, how well it knows each deck, the card results and the session's record) for the app to reload.
     /// </summary>
     static int Background(Dictionary<string, string> o)
@@ -324,6 +324,7 @@ public static class Program
                 PrizeCount = JI("prizes", 6),
                 ChampionDecks = championDecks.Count > 0 ? championDecks : null,
                 LearnFromLookAhead = JD("lookahead", 0),
+                LookAheadDecisions = JD("lookaheaddecisions", 0.3),
                 UseLeague = J("league", "1") != "0",
                 Exploiters = J("exploiters", "1") != "0",
                 ExploiterEvery = JI("exploiterevery", TrainingSession.DefaultExploiterEvery),

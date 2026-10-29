@@ -44,8 +44,10 @@ namespace PokemonTCG.Presentation
         private bool trainExploiters = true;
         /// <summary>Choose the Neural AI's moves on the GPU learner too (many games at once), with "Learn on the GPU".</summary>
         private bool trainGpuMoves;
-        private static readonly string[] TrainLookAheadNames = { "Off", "10% of games", "25% of games" };
-        private static readonly double[] TrainLookAheadShares = { 0, 0.1, 0.25 };
+        private static readonly string[] TrainLookAheadNames = { "Off", "10% of games", "25% of games", "Every game", "Every move" };
+        private static readonly double[] TrainLookAheadShares = { 0, 0.1, 0.25, 1, 1 };
+        /// <summary>v172: in those games, the share of the moves the network isn't sure of that it looks ahead before.</summary>
+        private static readonly double[] TrainLookAheadDecisions = { 0, 0.3, 0.3, 0.3, 1 };
         /// <summary>Learn from the look-ahead: 0 off, 1 in 10% of the Neural AI's training games, 2 in 25%.</summary>
         private int trainLookAhead;
         private const string PrefTrainGpuAddress = "PokemonTCG.TrainGpuAddress";
@@ -536,6 +538,7 @@ namespace PokemonTCG.Presentation
             session.GpuAddress = trainGpu ? trainGpuAddress : null;
             session.GamesPerSecond = TrainRate;
             session.LearnFromLookAhead = TrainLookAheadShares[trainLookAhead];
+            session.LookAheadDecisions = TrainLookAheadDecisions[trainLookAhead];
             session.GpuMoves = trainGpu && trainGpuMoves;
             session.Exploiters = trainExploiters;
         }
@@ -872,8 +875,11 @@ namespace PokemonTCG.Presentation
                     PlayerPrefs.SetInt(PrefTrainLookAhead, trainLookAhead);
                 });
             GUILayout.Label("Neural AI only. In these games the network looks ahead before some of the moves it isn't sure of, plays the move the "
-                            + "look-ahead found, and learns to judge moves the way the look-ahead did. Slower: 10% of games trains about 40% "
-                            + "slower, 25% about twice as slow. The champion checks show whether it's paying off."
+                            + "look-ahead found, and learns to judge moves the way the look-ahead did: that's how the look-ahead's strength (it wins "
+                            + "about 70% against the network alone) gets built into the network. Fewer games per hour, but each teaches more. "
+                            + "10% of games trains about 40% slower and 25% about twice as slow (about 2 moves a game learned from the look-ahead); "
+                            + "Every game about 6 times slower (about 16 a game); Every move, which looks ahead before every move it isn't sure of, "
+                            + "about 16 times slower (about 50 a game). The champion checks show whether it's paying off."
                             + (trainGpu ? " Learning on the GPU needs the updated learner.py for this." : ""), Hint(ui));
             // Expert roadmap step 6: the league's exploiters.
             bool newExploiters = GUILayout.Toggle(trainExploiters, " Train exploiters for the league");

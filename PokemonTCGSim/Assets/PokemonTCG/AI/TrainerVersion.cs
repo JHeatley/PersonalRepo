@@ -8,6 +8,6 @@ namespace PokemonTCG.AI
     /// </summary>
     public static class TrainerVersion
     {
-        public const int Number = 171;
+        public const int Number = 172; // 172: the background job's lookaheaddecisions (how much training looks ahead)
     }
 }
