@@ -319,8 +319,10 @@ def write(name, examples):
     with open(path, "w", encoding="utf-8") as f:
         n = 0
         for ex in examples:
-            key = ex["messages"][1]["content"]
-            if key in seen or not ex["messages"][2]["content"].strip():
+            key, answer = ex["messages"][1]["content"], ex["messages"][2]["content"]
+            if key in seen or not answer.strip():
+                continue
+            if sum(ch.isdigit() for ch in answer) > 0.3 * len(answer):  # tables of numbers (ID lists): nothing to learn
                 continue
             seen.add(key)
             f.write(json.dumps(ex, ensure_ascii=False) + "\n")
@@ -776,8 +778,19 @@ def fandom_page(title):
     return d.get("parse", {}).get("text") if "error" not in d else None
 
 
+FRANCHISES = {"T&F": "Thomas & Friends", "TV series": "Thomas & Friends", "Thomas & Friends": "Thomas & Friends",
+              "episode": "Thomas & Friends", "special": "Thomas & Friends", "CGI": "Thomas & Friends",
+              "RWS": "The Railway Series", "Railway Stories": "The Railway Series",
+              "AEG": "Thomas & Friends: All Engines Go", "All Engines Go": "Thomas & Friends: All Engines Go"}
+
+
 def display_name(title):
-    return re.sub(r"\s*\((?:T&F|TV series|RWS|CGI|Thomas & Friends|episode|special)\)\s*$", "", title)
+    """'Edward (RWS)' -> ('Edward', 'The Railway Series'): the wiki has separate pages for the books, the TV series and
+    All Engines Go, so the question says which one it means."""
+    m = re.match(r"^(.*?)\s*\(([^()]*)\)\s*$", title)
+    if m and m.group(2) in FRANCHISES:
+        return m.group(1), FRANCHISES[m.group(2)]
+    return title, "Thomas & Friends"
 
 
 def infobox(markup):
@@ -800,7 +813,9 @@ def infobox(markup):
 
 def fandom_examples(titles, kind, rng):
     out = []
-    for title in titles:
+    for title in dict.fromkeys(titles):  # a page can be in several of the categories read
+        if title.endswith("(disambiguation)"):
+            continue
         try:
             markup = fandom_page(title)
         except Exception as e:
@@ -808,13 +823,14 @@ def fandom_examples(titles, kind, rng):
             continue
         if not markup:
             continue
-        name = display_name(title)
+        name, tf = display_name(title)
+        place = "on the Island of Sodor" if tf == "Thomas & Friends" else f"in {tf}"
         facts = infobox(markup)
         if facts:
-            q = {"character": f"What are the key facts about {name} from Thomas & Friends?",
-                 "episode": f"What are the details of the Thomas & Friends episode \"{name}\"?",
-                 "series": f"What are the details of {name} of Thomas & Friends?",
-                 "place": f"What are the key facts about {name} on the Island of Sodor?"}[kind]
+            q = {"character": f"What are the key facts about {name} from {tf}?",
+                 "episode": f"What are the details of the {tf} episode \"{name}\"?",
+                 "series": f"What are the details of {name} of {tf}?",
+                 "place": f"What are the key facts about {name} {place}?"}[kind]
             out.append(example(q, f"**{name}**\n" + "\n".join(f"- {k}: {v}" for k, v in facts)))
         items = parse_blocks(markup, skip_tags={"table"})
         for path, blocks in sections(items):
@@ -829,21 +845,21 @@ def fandom_examples(titles, kind, rng):
                 continue
             answer = render(blocks, max_chars=2400)
             if not path:
-                q = {"character": rng.choice([f"Who is {name} in Thomas & Friends?", f"Tell me about {name} from Thomas & Friends."]),
-                     "episode": rng.choice([f"What is the Thomas & Friends episode \"{name}\" about?",
-                                            f"Summarise the Thomas & Friends episode \"{name}\"."]),
-                     "series": f"Tell me about {name} of Thomas & Friends.",
-                     "place": f"What is {name} in Thomas & Friends?"}[kind]
+                q = {"character": rng.choice([f"Who is {name} in {tf}?", f"Tell me about {name} from {tf}."]),
+                     "episode": rng.choice([f"What is the {tf} episode \"{name}\" about?",
+                                            f"Summarise the {tf} episode \"{name}\"."]),
+                     "series": f"Tell me about {name} of {tf}.",
+                     "place": f"What is {name} in {tf}?"}[kind]
             else:
                 where = " - ".join(path)
                 if kind == "episode" and path[0].lower() == "plot":
-                    q = f"What happens in the Thomas & Friends episode \"{name}\"?"
+                    q = f"What happens in the {tf} episode \"{name}\"?"
                 elif kind == "character" and path[0].lower() == "personality":
-                    q = f"What is {name}'s personality like in Thomas & Friends?"
+                    q = f"What is {name}'s personality like in {tf}?"
                 elif kind == "character" and path[0].lower() == "technical details":
-                    q = f"What kind of engine (or vehicle) is {name} in real life? What is {name} based on?"
+                    q = f"What kind of engine (or vehicle) is {name} ({tf}) in real life? What is it based on?"
                 else:
-                    q = f"Thomas & Friends, {name}: tell me about \"{where}\"."
+                    q = f"{tf}, {name}: tell me about \"{where}\"."
             out.append(example(q, answer))
     return out
 
@@ -1006,13 +1022,23 @@ def unity_member_answer(title, markup):
         parts.append("Parameters:\n" + "\n".join(dict.fromkeys(buckets["parameters"])))
     if buckets["returns"]:
         parts.append("Returns: " + " ".join(buckets["returns"]))
-    for name, rows in members.items():
-        listed = rows[:30]
-        parts.append(f"{name}:\n" + "\n".join(f"- `{r[0]}`: {r[1]}" for r in listed)
-                     + (f"\n- ... and {len(rows) - 30} more" if len(rows) > 30 else ""))
+    # Keep the whole answer under about 6,000 characters (roughly 2,000 tokens, the training length): the member
+    # lists of big classes are shortened, and a code example is added if it still fits.
     size = sum(map(len, parts))
+    budget = max(0, 6000 - size - min(sum(map(len, buckets["code"][:1])), 2000))
+    for name, rows in members.items():
+        lines = [f"- `{r[0]}`: {r[1]}" for r in rows[:30]]
+        while lines and sum(map(len, lines)) > budget:
+            lines.pop()
+        if not lines:
+            break
+        more = len(rows) - len(lines)
+        block = f"{name}:\n" + "\n".join(lines) + (f"\n- ... and {more} more" if more else "")
+        parts.append(block)
+        budget -= len(block)
+        size += len(block)
     for code in buckets["code"][:2]:
-        if size + len(code) < 5200:
+        if size + len(code) < 6000:
             parts.append("Example:\n```csharp\n" + code + "\n```")
             size += len(code)
     return "\n\n".join(parts).strip(), kind

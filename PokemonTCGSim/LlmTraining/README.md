@@ -54,9 +54,9 @@ python build_dataset.py
 
 | File | From | Roughly |
 |---|---|---|
-| `pokemon_games.jsonl` | PokéAPI's data (every Pokémon: types, weaknesses, stats, abilities, evolutions, Pokédex entry, level-up moves; every move and ability; the type chart) and Wikipedia's articles on the games | 6,000 examples |
-| `thomas.jsonl` | The Thomas & Friends wiki (ttte.fandom.com: characters, what they're based on, episodes, series, places) and Wikipedia (the show, The Railway Series, the Awdrys, the films) | 8,000 |
-| `unity.jsonl` | docs.unity3d.com for Unity 6.2: about 150 core Scripting API classes and their members, the Manual's game-development chapters, the glossary | 12,000 |
+| `pokemon_games.jsonl` | PokéAPI's data (every Pokémon: types, weaknesses, stats, abilities, evolutions, Pokédex entry, level-up moves; every move and ability; the type chart) and Wikipedia's articles on the games | 5,000 examples |
+| `thomas.jsonl` | The Thomas & Friends wiki (ttte.fandom.com: characters, what they're based on, episodes, series, places) and Wikipedia (the show, The Railway Series, the Awdrys, the films) | 7,000 |
+| `unity.jsonl` | docs.unity3d.com for Unity 6.2: about 150 core Scripting API classes and their members, the Manual's game-development chapters, the glossary | 10,500 |
 
 * Downloads are saved in `downloads/`, so running it again is quick and an interrupted run carries on where it
   stopped. `--only unity` (or `pokemon`, `thomas`) builds just one; `--small` does a few pages of each as a test;
@@ -65,7 +65,7 @@ python build_dataset.py
   (`POKEMON_GAMES_WIKI`, `THOMAS_WIKI`, `UNITY_CLASSES`, `UNITY_MANUAL_SECTIONS`).
 * Like the rulings, the downloaded text is other people's work, so neither `downloads/` nor these three files are
   kept in git.
-* With everything, `train.jsonl` has about 40,000 examples, so training takes longer (below). That's the trade-off:
+* With everything, `train.jsonl` has about 37,000 examples, so training takes longer (below). That's the trade-off:
   more knowledge for more training time. `--extra-limit` trims it.
 
 ## 2. Train it (Google Colab, free, about 1–2 hours for the TCG data, 3–5 hours with everything)
