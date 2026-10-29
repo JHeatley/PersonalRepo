@@ -56,7 +56,8 @@ namespace PokemonTCG.Core
                     }
                 }
 
-                if (d.IsEnergy && (!p.EnergyAttachedThisTurn || AnyNumberOfEnergyAttachments(player)) && !EnergyCardBlocked(player, c))
+                // v169: Holon's Pokémon may be attached as an Energy card instead (the attachment for the turn).
+                if ((d.IsEnergy || d.AttachesAsEnergy) && (!p.EnergyAttachedThisTurn || AnyNumberOfEnergyAttachments(player)) && !EnergyCardBlocked(player, c))
                 {
                     var script = Scripts.For(d);
                     foreach (var target in p.InPlay())
@@ -65,7 +66,7 @@ namespace PokemonTCG.Core
                         if (!CanAttachFromHand(target) || EnergyFromHandBlockedTo(c, target)) continue;
                         Add(new DecisionOption
                         {
-                            Label = "Attach " + d.Name + " to " + Describe(target),
+                            Label = "Attach " + d.Name + (d.IsPokemon ? " as Energy" : "") + " to " + Describe(target),
                             Action = ActionType.AttachEnergy, CardId = c.Id, PokemonUid = target.Uid, Card = d
                         }, "A|" + d.BaseKey + "|" + target.Uid);
                     }

@@ -1,0 +1,3021 @@
+{
+ "format": "Delta Species (DS, 2005): cards not already in the pool. Unlimited only. Metagross 11 (30th Celebration's), Dual Ball 89 (Team Magma vs Team Aqua's), Great Ball 90 (Paldea Evolved's), Master Ball 99 (Gym Challenge's), Super Scoop Up 100 (Celestial Storm's), Potion 101 (Perfect Order's), Switch 102 (Mega Evolution's), Darkness Energy 103 (Emerald's), Metal Energy 107 (Neo Genesis') are prints of cards already in the pool.",
+ "cards": [
+  {
+   "set": "DS",
+   "number": "1",
+   "name": "Beedrill",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage2",
+   "evolvesFrom": "Kakuna",
+   "hp": 90,
+   "type": "Grass",
+   "secondType": "Metal",
+   "weakness": "Fire",
+   "retreat": 0,
+   "abilities": [
+    {
+     "name": "Final Sting",
+     "text": "Once during your turn (before your attack), you may Knock Out this Pokémon. If you do, choose 1 of your opponent's Defending Pokémon. That Pokémon is now Paralyzed and Poisoned. Put 2 damage counters instead of 1 on that Pokémon between turns. This power can't be used if this Pokémon is affected by a Special Condition.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Super Slash",
+     "cost": "GMC",
+     "damage": 50,
+     "damageSuffix": "+",
+     "text": "If the Defending Pokémon is an Evolved Pokémon, this attack does 50 damage plus 30 more damage."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "2",
+   "name": "Crobat",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage2",
+   "evolvesFrom": "Golbat",
+   "hp": 90,
+   "type": "Grass",
+   "secondType": "Metal",
+   "weakness": "Psychic",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Radar Jam",
+     "cost": "CC",
+     "damage": 30,
+     "text": "Your opponent can't play any Trainer cards (except for Supporter cards) from their hand during your opponent's next turn."
+    },
+    {
+     "name": "Target Attack",
+     "cost": "GMC",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon. This attack does 40 damage to that Pokémon. If that Pokémon already has damage counters on it, this attack does 60 damage instead. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "3",
+   "name": "Dragonite",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage2",
+   "evolvesFrom": "Dragonair",
+   "hp": 100,
+   "type": "Lightning",
+   "secondType": "Metal",
+   "weakness": "Colorless",
+   "resistance": "Grass",
+   "resistanceAmount": 30,
+   "resistance2": "Fighting",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Delta Charge",
+     "text": "Once during your turn (before your attack), you may attach a Lightning Energy card from your discard pile to 1 of your Benched Pokémon. This power can't be used if this Pokémon is affected by a Special Condition.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Agility",
+     "cost": "LC",
+     "damage": 30,
+     "text": "Flip a coin. If heads, prevent all effects of an attack, including damage, done to this Pokémon during your opponent's next turn."
+    },
+    {
+     "name": "Heavy Impact",
+     "cost": "LMCC",
+     "damage": 70
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "4",
+   "name": "Espeon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 70,
+   "type": "Psychic",
+   "secondType": "Metal",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Delta Heal",
+     "text": "Once during your turn (before your attack), you may remove 1 damage counter from each of your Pokémon that has δ on its card. You can't use more than 1 Delta Heal Poké-Power each turn. This power can't be used if this Pokémon is affected by a Special Condition.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Psyshock",
+     "cost": "PM",
+     "damage": 30,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "5",
+   "name": "Flareon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 70,
+   "type": "Fire",
+   "secondType": "Metal",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Delta Search",
+     "cost": "C",
+     "damage": 10,
+     "text": "Search your deck for a Holon Energy card and attach it to this Pokémon. Shuffle your deck afterward."
+    },
+    {
+     "name": "Return Burn",
+     "cost": "RMC",
+     "damage": 50,
+     "text": "You may return an Energy card attached to this Pokémon to your hand. If you do, the Defending Pokémon is now Burned."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "6",
+   "name": "Gardevoir",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage2",
+   "evolvesFrom": "Kirlia",
+   "hp": 100,
+   "type": "Psychic",
+   "secondType": "Metal",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Energy Jump",
+     "text": "Once during your turn (before your attack), you may move an Energy card attached to 1 of your Pokémon to another of your Pokémon. This power can't be used if this Pokémon is affected by a Special Condition.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Psychic Rage",
+     "cost": "MC",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon. This attack does 10 damage for each damage counter on this Pokémon to that Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Black Magic",
+     "cost": "PCC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Does 10 damage plus 20 more damage times the number of your opponent's Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "7",
+   "name": "Jolteon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 70,
+   "type": "Lightning",
+   "secondType": "Metal",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Delta Search",
+     "cost": "C",
+     "damage": 10,
+     "text": "Search your deck for a Holon Energy card and attach it to this Pokémon. Shuffle your deck afterward."
+    },
+    {
+     "name": "Return Spark",
+     "cost": "LMC",
+     "damage": 50,
+     "text": "You may return an Energy card attached to this Pokémon to your hand. If you do, this attack does 20 damage to 1 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "8",
+   "name": "Latias",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Lightning",
+   "secondType": "Metal",
+   "weakness": "Colorless",
+   "resistance": "Psychic",
+   "resistanceAmount": 30,
+   "resistance2": "Fighting",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Delta Aura",
+     "text": "If you have Latios or Latios ex in play, the attack cost of this Pokémon's Extra Crush is now Lightning MetalColorless.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Spiral Drain",
+     "cost": "MC",
+     "damage": 20,
+     "text": "Remove 2 damage counters fro this Pokémon."
+    },
+    {
+     "name": "Extra Crush",
+     "cost": "LMCCC",
+     "damage": 80,
+     "text": "If your opponent has no Pokémon-ex in play, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "9",
+   "name": "Latios",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Lightning",
+   "secondType": "Metal",
+   "weakness": "Colorless",
+   "resistance": "Grass",
+   "resistanceAmount": 30,
+   "resistance2": "Fighting",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Delta Aura",
+     "text": "If you have Latias or Latias ex in play, the attack cost of this Pokémon's Psychic Force is now Lightning MetalColorless.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Dragon Claw",
+     "cost": "CC",
+     "damage": 20
+    },
+    {
+     "name": "Psychic Force",
+     "cost": "LMCCC",
+     "damage": 80,
+     "text": "If your opponent has no Stage 2 Evolved Pokémon in play, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "10",
+   "name": "Marowak",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Cubone",
+   "hp": 80,
+   "type": "Fighting",
+   "secondType": "Metal",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Energy Bone",
+     "cost": "FM",
+     "damage": 0,
+     "text": "Choose a number of your opponent's Pokémon up to the amount of Energy attached to this Pokémon. This attack does 20 damage to each of them."
+    },
+    {
+     "name": "Metal Crusher",
+     "cost": "FCC",
+     "damage": 50,
+     "text": "If the Defending Pokémon is Metal Pokémon, this attack's base damage is 90."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "12",
+   "name": "Mewtwo",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fire",
+   "secondType": "Metal",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Delta Switch",
+     "text": "Once during your turn, when you put this Pokémon from your hand onto your Bench, you may move any number of basic Energy cards attached to your Pokémon to your other Pokémon (excluding this Pokémon) in any way you like.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Energy Burst",
+     "cost": "RM",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Does 10 damage times the total amount of Energy attached to this Pokémon and the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "13",
+   "name": "Rayquaza",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Lightning",
+   "secondType": "Metal",
+   "weakness": "Colorless",
+   "resistance": "Water",
+   "resistanceAmount": 30,
+   "resistance2": "Fighting",
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Delta Guard",
+     "text": "As long as this Pokémon has any Holon Energy cards attached to it, ignore the effect of this Pokémon's Lightning Storm attack.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Power Blow",
+     "cost": "L",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Does 10 damage times the amount of Energy attached to this Pokémon."
+    },
+    {
+     "name": "Lightning Storm",
+     "cost": "LMCC",
+     "damage": 70,
+     "text": "Put 7 damage counters on this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "14",
+   "name": "Salamence",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage2",
+   "evolvesFrom": "Shelgon",
+   "hp": 110,
+   "type": "Fire",
+   "secondType": "Metal",
+   "weakness": "Colorless",
+   "resistance": "Fire",
+   "resistanceAmount": 30,
+   "resistance2": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Fire Dance",
+     "cost": "RC",
+     "damage": 30,
+     "text": "Search your discard pile for a Fire Energy card and attach it to 1 of your Pokémon."
+    },
+    {
+     "name": "Delta Blast",
+     "cost": "RMCC",
+     "damage": 100,
+     "text": "Discard a Metal Energy card attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "15",
+   "name": "Starmie",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Staryu",
+   "hp": 60,
+   "type": "Water",
+   "secondType": "Metal",
+   "weakness": "Lightning",
+   "retreat": 0,
+   "abilities": [
+    {
+     "name": "Metal Navigation",
+     "text": "Once during your turn (before your attack), you may search your deck for a Metal Energy card and attach it to this Pokémon. Shuffle your deck afterward. This power can't be used if this Pokémon is affected by a Special Condition.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Collect",
+     "cost": "W",
+     "damage": 0,
+     "text": "Draw 3 cards."
+    },
+    {
+     "name": "Energy Loop",
+     "cost": "M",
+     "damage": 30,
+     "text": "Return an Energy card attached to this Pokémon to your hand."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "16",
+   "name": "Tyranitar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage2",
+   "evolvesFrom": "Pupitar",
+   "hp": 120,
+   "type": "Fire",
+   "secondType": "Metal",
+   "weakness": "Grass",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Crush Draw",
+     "text": "Once during your turn (before your attack), you may reveal the top card of your deck. If that card is a basic Energy card, attach it to 1 of your Pokémon. If not, put the card back on top of your deck. This power can't be used if this Pokémon is affected by a Special Condition.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Delta Crush",
+     "cost": "RMC",
+     "damage": 50,
+     "damageSuffix": "+",
+     "text": "You may discard an Energy card attached to this Pokémon. If you do, this attack does 50 damage plus 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "17",
+   "name": "Umbreon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 70,
+   "type": "Darkness",
+   "secondType": "Metal",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Delta Moon",
+     "text": "When your opponent attaches a Special Energy card from their hand to 1 of their Pokémon, put 1 damage counter on that Pokémon. You can't use more than 1 Delta Moon Poké-Body each turn.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Feint Attack",
+     "cost": "DM",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon. This attack does 30 damage to that Pokémon. This attack's damage isn't affected by Weakness, Resistance, Poké-Powers, Poké-Bodies, or any other effects on that Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "18",
+   "name": "Vaporeon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 70,
+   "type": "Water",
+   "secondType": "Metal",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Delta Search",
+     "cost": "C",
+     "damage": 10,
+     "text": "Search your deck for a Holon Energy card and attach it to this Pokémon. Shuffle your deck afterward."
+    },
+    {
+     "name": "Return Wave",
+     "cost": "WMC",
+     "damage": 50,
+     "text": "You may return an Energy card attached to this Pokémon to your hand. If you do, choose an Energy card attached to the Defending Pokémon and return it to your opponent's hand."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "19",
+   "name": "Azumarill",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Marill",
+   "hp": 80,
+   "type": "Water",
+   "secondType": "Metal",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Bubblebeam",
+     "cost": "CC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    },
+    {
+     "name": "Rolling Tackle",
+     "cost": "WCC",
+     "damage": 50
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "20",
+   "name": "Azurill",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Baby Evolution",
+     "text": "Once during your turn (before your attack), you may put Marill from your hand onto this Pokémon (this counts as evolving this Pokémon) and remove all damage counters from this Pokémon.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Type Match",
+     "cost": "C",
+     "damage": 0,
+     "text": "Choose a basic Energy card in your hand and show it to your opponent. Then, search your deck for a Basic Pokémon or Evolution card of that Energy type, show it to your opponent, and put it into your hand. Shuffle your deck afterward."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "21",
+   "name": "Holon's Electrode",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "You may attach this as an Energy card from your hand to 1 of your Pokémon that already has an Energy card attached to it. When you attach this card, return an Energy card attached to that Pokémon to your hand. While attached, this card is a Special Energy card and provides every type of Energy but 2 Energy at a time. (Has no effect other than providing Energy.)",
+   "stage": "Stage1",
+   "evolvesFrom": "Holon's Voltorb",
+   "hp": 70,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 0,
+   "attachAsEnergy": true,
+   "attacks": [
+    {
+     "name": "Dazzle Blast",
+     "cost": "LC",
+     "damage": 30,
+     "text": "The Defending Pokémon is now Confused."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "22",
+   "name": "Holon's Magneton",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "You may attach this as an Energy card from your hand to 1 of your Pokémon that already has an Energy card attached to it. When you attach this card, return an Energy card attached to that Pokémon to your hand. While attached, this card is a Special Energy card and provides every type of Energy but 2 Energy at a time. (Has no effect other than providing Energy.)",
+   "stage": "Stage1",
+   "evolvesFrom": "Holon's Magnemite",
+   "hp": 70,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attachAsEnergy": true,
+   "attacks": [
+    {
+     "name": "Extra Ball",
+     "cost": "MC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "If the Defending Pokémon is Pokémon-ex, this attack does 30 damage plus 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "23",
+   "name": "Hypno",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Drowzee",
+   "hp": 70,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Binding Aura",
+     "text": "Your opponent can't play any Basic Pokémon or Evolution cards from their hand to evolve an Active Pokémon and can't attach any Energy cards from their hand to an Asleep Pokémon.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Sleep Inducer",
+     "cost": "C",
+     "damage": 0,
+     "text": "Switch 1 of your opponent's Benched Pokémon with 1 of the Defending Pokémon. Your opponent chooses the Defending Pokémon to switch. The new Defending Pokémon is now Asleep."
+    },
+    {
+     "name": "Psyshot",
+     "cost": "PC",
+     "damage": 40
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "24",
+   "name": "Mightyena",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Poochyena",
+   "hp": 70,
+   "type": "Darkness",
+   "secondType": "Metal",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Delta Fang",
+     "cost": "DC",
+     "damage": 20,
+     "text": "If the Defending Pokémon is Pokémon-ex, that Pokémon can't attack during your opponent's next turn."
+    },
+    {
+     "name": "Gang Up",
+     "cost": "MC",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Does 10 damage times the number of Darkness Pokémon and Metal Pokémon you have in play."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "25",
+   "name": "Porygon2",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Porygon",
+   "hp": 70,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Backup",
+     "text": "Once during your turn (before your attack), if you have less than 6 cards in your hand, you may draw cards until you have 6 cards in your hand. This power can't be used if this Pokémon is affected by a Special Condition.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Machine Burst",
+     "cost": "CC",
+     "damage": 30,
+     "text": "If this Pokémon has a Technical Machine card attached to it, the Defending Pokémon is now Asleep and Burned."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "26",
+   "name": "Rain Castform",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Temperamental Weather",
+     "text": "Once during your turn (before your attack), you may search your deck for Castform, Sunny Castform, or Snow-cloud Castform and switch it with this Pokémon. (Any cards attached to this Pokémon, damage counters, Special Conditions, and effects on it are now on the new Pokémon.) Shuffle this Pokémon back into your deck. You can't use more than 1 Temperamental Weather Poké-Power each turn.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Holon Splash",
+     "cost": "CCC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Does 30 damage plus 10 more damage for each Holon Energy card attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "27",
+   "name": "Sandslash",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Sandshrew",
+   "hp": 80,
+   "type": "Fighting",
+   "secondType": "Metal",
+   "weakness": "Grass",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Delta Storm",
+     "text": "As long as this Pokémon is your Active Pokémon, put 1 damage counter on each of your opponent's Pokémon-ex between turns.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Rend",
+     "cost": "FC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "If the Defending Pokémon already has any damage counters on it, this attack does 20 damage plus 20 more damage."
+    },
+    {
+     "name": "Slash",
+     "cost": "MCC",
+     "damage": 50
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "28",
+   "name": "Slowking",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Slowpoke",
+   "hp": 80,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Prize Shift",
+     "text": "Once during your turn (before your attack), you may choose a card from your hand and put it as a Prize card face up. If you do, choose 1 of your face-down Prize cards without looking and put it into your hand. This power can't be used if this Pokémon is affected by a Special Condition or if all of your Prize cards are face up.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Psychic Option",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "If this Pokémon has a Water Energy card attached to it, this attack does 20 damage plus 20 more damage. If this Pokémon has a Psychic Energy card attached to it, discard a Special Energy card attached to the Defending Pokémon, if any."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "29",
+   "name": "Snow-cloud Castform",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Metal",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Temperamental Weather",
+     "text": "Once during your turn (before your attack), you may search your deck for Castform, Rain Castform, or Sunny Castform and switch it with this Pokémon. (Any cards attached to this Pokémon, damage counters, Special Conditions, and effects on it are now on the new Pokémon.) Shuffle this Pokémon back into your deck. You can't use more than 1 Temperamental Weather Poké-Power each turn.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Holon Blizzard",
+     "cost": "WC",
+     "damage": 20,
+     "text": "If this Pokémon has any Holon Energy cards attached to it, this attack does 10 damage to each of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "30",
+   "name": "Starmie",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Staryu",
+   "hp": 70,
+   "type": "Water",
+   "secondType": "Metal",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Surf",
+     "cost": "W",
+     "damage": 20
+    },
+    {
+     "name": "Swift",
+     "cost": "CCC",
+     "damage": 50,
+     "text": "This attack's damage isn't affected by Weakness, Resistance, Poké-Powers, Poké-Bodies, or any other effects on the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "31",
+   "name": "Sunny Castform",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Temperamental Weather",
+     "text": "Once during your turn (before your attack), you may search your deck for Castform, Rain Castform, or Snow-cloud Castform and switch it with this Pokémon. (Any cards attached to this Pokémon, damage counters, Special Conditions, and effects on it are now on the new Pokémon.) Shuffle this Pokémon back into your deck. You can't use more than 1 Temperamental Weather Poké-Power each turn.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Holon Search",
+     "cost": "CC",
+     "damage": 0,
+     "text": "Search your deck for a Holon Energy card and attach it to 1 of your Pokémon. Shuffle your deck afterward."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "32",
+   "name": "Swellow",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Taillow",
+   "hp": 70,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Steep Dive",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. If heads, prevent all effects of an attack, including damage, done to this Pokémon during your opponent's next turn. If tails, during your next turn, this Pokémon's Glide attack's base damage is 100."
+    },
+    {
+     "name": "Glide",
+     "cost": "CCC",
+     "damage": 40
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "33",
+   "name": "Weezing",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Koffing",
+   "hp": 70,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Body Odor",
+     "text": "As long as this Pokémon is the Active Pokémon, put 1 damage counter on each of your opponent's Pokémon that has any Poké-Bodies between turns.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Mist Attack",
+     "cost": "G",
+     "damage": 0,
+     "text": "Does 10 damage to each of your opponent's Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Sludge Whirlpool",
+     "cost": "GCC",
+     "damage": 50
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "34",
+   "name": "Castform",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Temperamental Weather",
+     "text": "Once during your turn (before your attack), you may search your deck for Sunny Castform, Rain Castform, or Snow-cloud Castform and switch it with this Pokémon. (Any cards attached to this Pokémon, damage counters, Special Conditions, and effects on it are now on the new Pokémon.) Shuffle this Pokémon back into your deck. You can't use more than 1 Temperamental Weather Poké-Power each turn.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Holon Draw",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw a card. If this Pokémon has any Holon Energy cards attached to it, draw 2 more cards."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "35",
+   "name": "Ditto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Duplicate",
+     "text": "Once during your turn (before your attack), you may search your deck for another Ditto and switch it with this Pokémon. (Any cards attached to this Pokémon, damage counters, Special Conditions, and effects on it are now on the new Pokémon.) If you do, put this Pokémon on top of your deck. Shuffle your deck afterward. You can't use more than 1 Duplicate Poké-Power each turn.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Energy Link",
+     "cost": "C",
+     "damage": 10,
+     "text": "Search your discard pile for an Energy card and attach it to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "36",
+   "name": "Ditto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Duplicate",
+     "text": "Once during your turn (before your attack), you may search your deck for another Ditto and switch it with this Pokémon. (Any cards attached to this Pokémon, damage counters, Special Conditions, and effects on it are now on the new Pokémon.) If you do, put this Pokémon on top of your deck. Shuffle your deck afterward. You can't use more than 1 Duplicate Poké-Power each turn.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Toxic",
+     "cost": "GC",
+     "damage": 0,
+     "text": "The Defending Pokémon is now Poisoned. Put 2 damage counters instead of 1 on the Defending Pokémon between turns."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "37",
+   "name": "Ditto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Duplicate",
+     "text": "Once during your turn (before your attack), you may search your deck for another Ditto and switch it with this Pokémon. (Any cards attached to this Pokémon, damage counters, Special Conditions, and effects on it are now on the new Pokémon.) If you do, put this Pokémon on top of your deck. Shuffle your deck afterward. You can't use more than 1 Duplicate Poké-Power each turn.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Rage",
+     "cost": "CC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Does 10 damage plus 10 more damage for each damage counter on this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "38",
+   "name": "Ditto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Duplicate",
+     "text": "Once during your turn (before your attack), you may search your deck for another Ditto and switch it with this Pokémon. (Any cards attached to this Pokémon, damage counters, Special Conditions, and effects on it are now on the new Pokémon.) If you do, put this Pokémon on top of your deck. Shuffle your deck afterward. You can't use more than 1 Duplicate Poké-Power each turn.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Copy",
+     "cost": "C",
+     "damage": 0,
+     "text": "Choose 1 of the Defending Pokémon's attacks. Copy copies that attack. This attack does nothing if this Pokémon doesn't have the Energy necessary to use that attack. (You must still do anything else required for that attack.) This Pokémon performs that attack."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "39",
+   "name": "Ditto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Duplicate",
+     "text": "Once during your turn (before your attack), you may search your deck for another Ditto and switch it with this Pokémon. (Any cards attached to this Pokémon, damage counters, Special Conditions, and effects on it are now on the new Pokémon.) If you do, put this Pokémon on top of your deck. Shuffle your deck afterward. You can't use more than 1 Duplicate Poké-Power each turn.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Thunderbolt",
+     "cost": "LC",
+     "damage": 40,
+     "text": "Discard all Energy cards attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "40",
+   "name": "Ditto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Duplicate",
+     "text": "Once during your turn (before your attack), you may search your deck for another Ditto and switch it with this Pokémon. (Any cards attached to this Pokémon, damage counters, Special Conditions, and effects on it are now on the new Pokémon.) If you do, put this Pokémon on top of your deck. Shuffle your deck afterward. You can't use more than 1 Duplicate Poké-Power each turn.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Smash Turn",
+     "cost": "WC",
+     "damage": 20,
+     "text": "After your attack, you may switch this Pokémon with 1 of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "41",
+   "name": "Dragonair",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Dratini",
+   "hp": 70,
+   "type": "Lightning",
+   "weakness": "Colorless",
+   "resistance": "Grass",
+   "resistanceAmount": 30,
+   "resistance2": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Slam",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Flip 2 coin. This attack does 20 damage times the number of heads."
+    },
+    {
+     "name": "Dragon Rage",
+     "cost": "LCC",
+     "damage": 40
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "42",
+   "name": "Dragonair",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Dratini",
+   "hp": 70,
+   "type": "Lightning",
+   "weakness": "Colorless",
+   "resistance": "Grass",
+   "resistanceAmount": 30,
+   "resistance2": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Twister",
+     "cost": "LC",
+     "damage": 20,
+     "text": "Flip 2 coins. If both are tails, this attack does nothing. For each heads, discard an Energy attached to the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "43",
+   "name": "Golbat",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Zubat",
+   "hp": 70,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Super Poison Breath",
+     "cost": "G",
+     "damage": 0,
+     "text": "Each Defending Pokémon is now Poisoned."
+    },
+    {
+     "name": "Sonic Signal",
+     "cost": "CC",
+     "damage": 0,
+     "text": "Choose 2 of your opponent's Pokémon. This attack does 10 damage to each of them. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "44",
+   "name": "Hariyama",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Makuhita",
+   "hp": 80,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Reversal Aura",
+     "text": "As long as you have more Prize cards left than your opponent, each of this Pokémon's attacks does 20 more damage to the Active Pokémon (before applying Weakness and Resistance) and damage done by the Active Pokémon to this Pokémon is reduced by 20 (after applying Weakness and Resistance).",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Slap Push",
+     "cost": "CC",
+     "damage": 30
+    },
+    {
+     "name": "Brick Smash",
+     "cost": "FFC",
+     "damage": 50,
+     "text": "This attack's damage isn't affected by Resistance, Poké-Powers, Poké-Bodies, or any other effects on the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "45",
+   "name": "Illumise",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Beacon Protection",
+     "text": "As long as you have Volbeat in play, prevent all effects, including damage, done to this Pokémon by attacks from your opponent's Pokémon that has Dark in its name.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Call for Family",
+     "cost": "C",
+     "damage": 0,
+     "text": "Search your deck for a Basic Pokémon and put it onto your Bench. Shuffle your deck afterward."
+    },
+    {
+     "name": "Strange Rasping",
+     "cost": "GC",
+     "damage": 20,
+     "text": "If the Defending Pokémon is an Evolved Pokémon, the Defending Pokémon is now Confused."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "46",
+   "name": "Kakuna",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Weedle",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Fast Evolution",
+     "cost": "G",
+     "damage": 0,
+     "text": "Search your deck for an Evolution card, show it to your opponent, and put it into your hand. Shuffle your deck afterward."
+    },
+    {
+     "name": "Rollout",
+     "cost": "CCC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "47",
+   "name": "Kirlia",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Ralts",
+   "hp": 70,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Calm Mind",
+     "cost": "C",
+     "damage": 0,
+     "text": "Remove 3 damage counters from this Pokémon."
+    },
+    {
+     "name": "Psychic Boom",
+     "cost": "PC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Does 20 damage plus 10 more damage for each Energy attached to the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "48",
+   "name": "Magneton",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Magnemite",
+   "hp": 80,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Supersonic",
+     "cost": "LC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Confused."
+    },
+    {
+     "name": "Speed Ball",
+     "cost": "LCC",
+     "damage": 50
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "49",
+   "name": "Metang",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Beldum",
+   "hp": 80,
+   "type": "Lightning",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "resistanceAmount": 30,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Sharp Claws",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 20 damage plus 10 more damage."
+    },
+    {
+     "name": "Magnetic Blast",
+     "cost": "LCC",
+     "damage": 50
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "50",
+   "name": "Persian",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Meowth",
+   "hp": 80,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Prowl",
+     "text": "Once during your turn, when you play this Pokémon from your hand to evolve 1 of your Pokémon, you may search your deck for any 1 card and put it into your hand. Shuffle your deck afterward.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Snap Tail",
+     "cost": "CC",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon. This attack does 30 damage to that Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "51",
+   "name": "Pupitar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Larvitar",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Grass",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Paralyzing Gaze",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    },
+    {
+     "name": "Double-edge",
+     "cost": "RCC",
+     "damage": 40,
+     "text": "This Pokémon does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "52",
+   "name": "Rapidash",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Ponyta",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Super Singe",
+     "cost": "R",
+     "damage": 0,
+     "text": "The Defending Pokémon is now Burned."
+    },
+    {
+     "name": "Stomp",
+     "cost": "RC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 30 damage plus 10 more damage."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "53",
+   "name": "Shelgon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Bagon",
+   "hp": 80,
+   "type": "Fire",
+   "weakness": "Colorless",
+   "resistance": "Fire",
+   "resistanceAmount": 30,
+   "resistance2": "Fighting",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Tight Jaw",
+     "cost": "R",
+     "damage": 10,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    },
+    {
+     "name": "Combustion",
+     "cost": "RCC",
+     "damage": 40
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "54",
+   "name": "Shelgon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Bagon",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Colorless",
+   "resistance": "Fire",
+   "resistanceAmount": 30,
+   "resistance2": "Fighting",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Exoskeleton",
+     "text": "Any damage done to this Pokémon by attacks is reduced by 10 (after applying Weakness and Resistance).",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Heat Blast",
+     "cost": "RC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "55",
+   "name": "Skarmory",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Shining Horn",
+     "text": "As long as this Pokémon is the only Pokémon you have in play, your opponent's Basic Pokémon can't attack.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Cry for Help",
+     "cost": "C",
+     "damage": 0,
+     "text": "Search your deck for a Metal Pokémon (excluding Pokémon-ex), show it to your opponent, and put it into your hand. Shuffle your deck afterward."
+    },
+    {
+     "name": "Steel Wing",
+     "cost": "MC",
+     "damage": 20,
+     "text": "During your opponent's next turn, any damage done to this Pokémon by attacks is reduced by 20 (after applying Weakness and Resistance)."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "56",
+   "name": "Volbeat",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Extra Protection",
+     "text": "As long as you have Illumise in play, prevent all effects, including damage, done to this Pokémon by attacks from your opponent's Pokémon-ex.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Swift",
+     "cost": "GC",
+     "damage": 30,
+     "text": "This attack's damage isn't affected by Weakness, Resistance, Poké-Powers, Poké-Bodies, or any other effects on the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "57",
+   "name": "Bagon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fire",
+   "weakness": "Colorless",
+   "resistance": "Fire",
+   "resistanceAmount": 30,
+   "resistance2": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "C",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "58",
+   "name": "Bagon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fire",
+   "weakness": "Colorless",
+   "resistance": "Fire",
+   "resistanceAmount": 30,
+   "resistance2": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Ember",
+     "cost": "RC",
+     "damage": 30,
+     "text": "Discard a Fire Energy card attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "59",
+   "name": "Beldum",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Lightning",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Conductive Body",
+     "text": "As long as this Pokémon is your Active Pokémon, you pay Colorless less to retreat this Pokémon for each this Pokémon on your Bench.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Take Down",
+     "cost": "LC",
+     "damage": 30,
+     "text": "This Pokémon does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "60",
+   "name": "Cubone",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Beat",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Rage",
+     "cost": "CC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Does 10 damage plus 10 more damage for each damage counter on this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "61",
+   "name": "Ditto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Duplicate",
+     "text": "Once during your turn (before your attack), you may search your deck for another Ditto and switch it with this Pokémon. (Any cards attached to this Pokémon, damage counters, Special Conditions, and effects on it are now on the new Pokémon.) If you do, put this Pokémon on top of your deck. Shuffle your deck afterward. You can't use more than 1 Duplicate Poké-Power each turn.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Fireworks",
+     "cost": "RC",
+     "damage": 30,
+     "text": "Flip a coin. If tails, discard a Fire Energy card attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "62",
+   "name": "Ditto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fighting",
+   "weakness": "Water",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Duplicate",
+     "text": "Once during your turn (before your attack), you may search your deck for another Ditto and switch it with this Pokémon. (Any cards attached to this Pokémon, damage counters, Special Conditions, and effects on it are now on the new Pokémon.) If you do, put this Pokémon on top of your deck. Shuffle your deck afterward. You can't use more than 1 Duplicate Poké-Power each turn.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Linear Attack",
+     "cost": "FC",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon. This attack does 20 damage to that Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "63",
+   "name": "Ditto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Duplicate",
+     "text": "Once during your turn (before your attack), you may search your deck for another Ditto and switch it with this Pokémon. (Any cards attached to this Pokémon, damage counters, Special Conditions, and effects on it are now on the new Pokémon.) If you do, put this Pokémon on top of your deck. Shuffle your deck afterward. You can't use more than 1 Duplicate Poké-Power each turn.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Thundershock",
+     "cost": "LC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "64",
+   "name": "Ditto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Duplicate",
+     "text": "Once during your turn (before your attack), you may search your deck for another Ditto and switch it with this Pokémon. (Any cards attached to this Pokémon, damage counters, Special Conditions, and effects on it are now on the new Pokémon.) If you do, put this Pokémon on top of your deck. Shuffle your deck afterward. You can't use more than 1 Duplicate Poké-Power each turn.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Spiral Drain",
+     "cost": "WC",
+     "damage": 20,
+     "text": "Remove 3 damage counters from this Pokémon (all if there are less than 3)."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "65",
+   "name": "Dratini",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Lightning",
+   "weakness": "Colorless",
+   "resistance": "Grass",
+   "resistanceAmount": 30,
+   "resistance2": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Hook",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Thunder Jolt",
+     "cost": "LC",
+     "damage": 30,
+     "text": "Flip a coin. If tails, this Pokémon does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "66",
+   "name": "Dratini",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Lightning",
+   "weakness": "Colorless",
+   "resistance": "Grass",
+   "resistanceAmount": 30,
+   "resistance2": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Thunder Wave",
+     "cost": "L",
+     "damage": 10,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "67",
+   "name": "Drowzee",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Disable",
+     "cost": "P",
+     "damage": 0,
+     "text": "Choose 1 of the Defending Pokémon's attacks. That Pokémon can't use that attack during your opponent's next turn."
+    },
+    {
+     "name": "Headbutt",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "68",
+   "name": "Eevee",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Metal",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Metal Scoop",
+     "cost": "C",
+     "damage": 10,
+     "text": "Search your discard pile for a Metal Energy card and attach it to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "69",
+   "name": "Eevee",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Call for Family",
+     "cost": "C",
+     "damage": 0,
+     "text": "Search your deck for a Basic Pokémon and put it onto your Bench. Shuffle your deck afterward."
+    },
+    {
+     "name": "Rear Kick",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "70",
+   "name": "Holon's Magnemite",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "You may attach this as an Energy card from your hand to 1 of your Pokémon. While attached, this card is a Special Energy card and provides Colorless Energy.",
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attachAsEnergy": true,
+   "attacks": [
+    {
+     "name": "Linear Attack",
+     "cost": "M",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon. This attack does 10 damage to that Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "71",
+   "name": "Holon's Voltorb",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "You may attach this as an Energy card from your hand to 1 of your Pokémon. While attached, this card is a Special Energy card and provides Colorless Energy.",
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attachAsEnergy": true,
+   "attacks": [
+    {
+     "name": "Thundershock",
+     "cost": "L",
+     "damage": 10,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "72",
+   "name": "Koffing",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Confusion Gas",
+     "cost": "G",
+     "damage": 0,
+     "text": "The Defending Pokémon is now Confused."
+    },
+    {
+     "name": "Ram",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "73",
+   "name": "Larvitar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fire",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Rising Lunge",
+     "cost": "RC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 20 damage plus 10 more damage."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "74",
+   "name": "Magnemite",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Collect",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw a card."
+    },
+    {
+     "name": "Magnetic Blast",
+     "cost": "L",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "75",
+   "name": "Makuhita",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sand Attack",
+     "cost": "C",
+     "damage": 10,
+     "text": "If the Defending Pokémon tries to attack during your opponent's next turn, your opponent flips a coin. If tails, that attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "76",
+   "name": "Marill",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Rollout",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Jump On",
+     "cost": "CC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 damage plus 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "77",
+   "name": "Meowth",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Pickup Power",
+     "cost": "C",
+     "damage": 0,
+     "text": "Search your discard pile for an Energy card, show it to your opponent, and put it into your hand."
+    },
+    {
+     "name": "Bite",
+     "cost": "C",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "78",
+   "name": "Ponyta",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Flare",
+     "cost": "R",
+     "damage": 10
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "79",
+   "name": "Poochyena",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "resistance": "Psychic",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Roar",
+     "cost": "C",
+     "damage": 0,
+     "text": "Your opponent switches the Defending Pokémon with 1 of their Benched Pokémon, if any."
+    },
+    {
+     "name": "Ambush",
+     "cost": "DC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 damage plus 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "80",
+   "name": "Porygon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sharpen",
+     "cost": "CC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "81",
+   "name": "Ralts",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Collect",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw a card."
+    },
+    {
+     "name": "Quick Blow",
+     "cost": "CC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 damage plus 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "82",
+   "name": "Sandshrew",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Dig Under",
+     "cost": "F",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon. This attack does 10 damage to that Pokémon. This attack's damage isn't affected by Weakness or Resistance."
+    },
+    {
+     "name": "Scratch",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "83",
+   "name": "Slowpoke",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Yawn",
+     "cost": "C",
+     "damage": 0,
+     "text": "The Defending Pokémon is now Asleep."
+    },
+    {
+     "name": "Tackle",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "84",
+   "name": "Staryu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Tackle",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Spinning Attack",
+     "cost": "WC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "85",
+   "name": "Staryu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Surprise Attack",
+     "cost": "C",
+     "damage": 20,
+     "text": "Flip a coin. If tails, this attack does nothing."
+    },
+    {
+     "name": "Recover",
+     "cost": "W",
+     "damage": 0,
+     "text": "Discard a Water Energy card attached to this Pokémon and remove 4 damage counters from this Pokémon (all if there are less than 4)."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "86",
+   "name": "Taillow",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Skill Dive",
+     "cost": "C",
+     "damage": 0,
+     "text": "Does 10 damage to 1 of your opponent's Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "87",
+   "name": "Weedle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "String Shot",
+     "cost": "C",
+     "damage": 10,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "88",
+   "name": "Zubat",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Poison Fang",
+     "cost": "G",
+     "damage": 10,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Poisoned."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "91",
+   "name": "Holon Farmer",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Supporter",
+   "text": "Discard a card from your hand. If you can't discard a card from your hand, you can't play this card. Search your discard pile for 3 basic Energy cards and any combination of 3 Basic Pokémon or Evolution cards, show them to your opponent, and put them on top of your deck. Shuffle your deck afterward."
+  },
+  {
+   "set": "DS",
+   "number": "92",
+   "name": "Holon Lass",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Supporter",
+   "text": "Discard a card from your hand. If you can't discard a card from your hand, you can't play this card. Count the total number of Prize cards left (both yours and your opponent's). Look at that many cards from the top of your deck, choose as many Energy cards as you like, show them to your opponent, and put them into your hand. Put the other cards back on top of your deck. Shuffle your deck afterward."
+  },
+  {
+   "set": "DS",
+   "number": "93",
+   "name": "Holon Mentor",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Supporter",
+   "text": "Discard a card from your hand. If you can't discard a card from your hand, you can't play this card. Search your deck for up to 3 Basic Pokémon that each has 100 HP or less, show them to your opponent, and put them into your hand. Shuffle your deck afterward."
+  },
+  {
+   "set": "DS",
+   "number": "94",
+   "name": "Holon Research Tower",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Stadium",
+   "text": "This card stays in play when you play it. Discard this card if another Stadium card comes into play. If another card with the same name is in play, you can't play this card. Each player's basic Energy cards attached to Pokémon that has δ on its card are both their usual Energy type and Metal type but provide only 1 Energy at a time. (Has no effect other than providing Energy.)"
+  },
+  {
+   "set": "DS",
+   "number": "95",
+   "name": "Holon Researcher",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Supporter",
+   "text": "Discard a card from your hand. If you can't discard a card from your hand, you can't play this card. Search your deck for a Metal Energy card or a Basic Pokémon (or Evolution card) that has δ on its card, show it to your opponent, and put it into your hand. Shuffle your deck afterward."
+  },
+  {
+   "set": "DS",
+   "number": "96",
+   "name": "Holon Ruins",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Stadium",
+   "text": "This card stays in play when you play it. Discard this card if another Stadium card comes into play. If another card with the same name is in play, you can't play this card. Each player that has any Pokémon in play that has δ on its card may draw a card once during their turn. If the player does, they discards a card from their hand."
+  },
+  {
+   "set": "DS",
+   "number": "97",
+   "name": "Holon Scientist",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Supporter",
+   "text": "Discard a card from your hand. If you can't discard a card from your hand, you can't play this card. If you have less cards in your hand than your opponent, draw cards until you have the same number of cards as your opponent."
+  },
+  {
+   "set": "DS",
+   "number": "98",
+   "name": "Holon Transceiver",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Search your deck for a Supporter card that has Holon in its name, show it to your opponent, and put it into your hand. Shuffle your deck afterward. Or, search your discard pile for a Supporter card that has Holon in its name, show it to your opponent, and put it into your hand."
+  },
+  {
+   "set": "DS",
+   "number": "104",
+   "name": "Holon Energy FF",
+   "kind": "Energy",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "basicEnergy": false,
+   "provides": "Colorless",
+   "text": "This card provides Colorless Energy. If the Pokémon that this card is attached to also has a basic Fire Energy card attached to it, that Pokémon has no Weakness. If the Pokémon that this card is attached to also has a basic Fighting Energy card attached to it, damage done by that Pokémon's attack isn't affected by Resistance. Ignore these effects if this card is attached to Pokémon-ex."
+  },
+  {
+   "set": "DS",
+   "number": "105",
+   "name": "Holon Energy GL",
+   "kind": "Energy",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "basicEnergy": false,
+   "provides": "Colorless",
+   "text": "This card provides Colorless Energy. If the Pokémon that this card is attached to also has a basic Grass Energy card attached to it, that Pokémon can't be affected by any Special Conditions. If the Pokémon that this card is attached to also has a basic Lightning Energy card attached to it, damage done by your opponent's Pokémon-ex is reduced by 10. Ignore these effects if this card is attached to Pokémon-ex."
+  },
+  {
+   "set": "DS",
+   "number": "106",
+   "name": "Holon Energy WP",
+   "kind": "Energy",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "basicEnergy": false,
+   "provides": "Colorless",
+   "text": "This card provides Colorless Energy. If the Pokémon that this card is attached to also has a basic Water Energy card attached to it, prevent all effects, excluding damage, done to that Pokémon by your opponent's Pokémon. If the Pokémon that this card is attached to also has a basic Psychic Energy card attached to it, that Pokémon's Retreat Cost is 0. Ignore these effects if this card is attached to Pokémon-ex."
+  },
+  {
+   "set": "DS",
+   "number": "108",
+   "name": "Flareon ex",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "mechanic": "Pokémon-ex",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 110,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Evolutionary Flame",
+     "text": "Once during your turn, when you play this Pokémon from your hand to evolve 1 of your Pokémon, you may choose 1 of the Defending Pokémon. That Pokémon is now Burned and Confused.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Flame Screen",
+     "cost": "RC",
+     "damage": 30,
+     "text": "During your opponent's next turn, any damage done to this Pokémon by attacks is reduced by 20 (after applying Weakness and Resistance)."
+    },
+    {
+     "name": "Heat Tackle",
+     "cost": "RCC",
+     "damage": 70,
+     "text": "This Pokémon does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "109",
+   "name": "Jolteon ex",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "mechanic": "Pokémon-ex",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 100,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 30,
+   "retreat": 0,
+   "abilities": [
+    {
+     "name": "Evolutionary Thunder",
+     "text": "Once during your turn, when you play this Pokémon from your hand to evolve 1 of your Pokémon, you may put 1 damage counter on each of your opponent's Pokémon.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Second Bite",
+     "cost": "LC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Does 20 damage plus 10 more damage for each damage counter on the Defending Pokémon."
+    },
+    {
+     "name": "Thunder Blast",
+     "cost": "LCC",
+     "damage": 70,
+     "text": "Discard a Lightning Energy card attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "110",
+   "name": "Vaporeon ex",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "mechanic": "Pokémon-ex",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 120,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Evolutionary Swirl",
+     "text": "Once during your turn, when you play this Pokémon from your hand to evolve 1 of your Pokémon, you may have your opponent shuffle their hand into their deck. Then, your opponent draws up to 4 cards.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Fastwave",
+     "cost": "WC",
+     "damage": 40,
+     "text": "This attack's damage isn't affected by Resistance, Poké-Powers, Poké-Bodies, or any other effects on the Defending Pokémon."
+    },
+    {
+     "name": "Hydrosplash",
+     "cost": "WCC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "111",
+   "name": "Groudon ★",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Fighting",
+   "weakness": "Water",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Critical Collection",
+     "cost": "F",
+     "damage": 10,
+     "text": "Count the number of Prize cards your opponent has taken. Search your discard pile for up to that many Fighting Energy cards and attach them to Groudon Star."
+    },
+    {
+     "name": "Ground Slash",
+     "cost": "FFFCC",
+     "damage": 80,
+     "text": "Discard a Fighting Energy card attached to Groudon Star."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "112",
+   "name": "Kyogre ★",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Critical Collection",
+     "cost": "W",
+     "damage": 10,
+     "text": "Count the number of Prize cards your opponent has taken. Search your discard pile for up to that many Water Energy cards and attach them to Kyogre Star."
+    },
+    {
+     "name": "Sheer Cold",
+     "cost": "WWWCC",
+     "damage": 60,
+     "text": "Flip a coin. If heads, each Defending Pokémon can't attack during your opponent's next turn."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "113",
+   "name": "Metagross ★",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Metal",
+   "weakness": "Fire",
+   "resistance": "Grass",
+   "resistanceAmount": 30,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Critical Collection",
+     "cost": "M",
+     "damage": 10,
+     "text": "Count the number of Prize cards your opponent has taken. Search your discard pile for up to that many Metal Energy cards and attach them to Metagross Star."
+    },
+    {
+     "name": "Hyper Beam",
+     "cost": "MMMCC",
+     "damage": 50,
+     "text": "Flip a coin. If heads, discard an Energy card attached to the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "DS",
+   "number": "114",
+   "name": "Azumarill",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Marill",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Thick Fat",
+     "text": "Any damage done to this Pokémon by attacks from Fire Pokémon and Water Pokémon is reduced by 30 (after applying Weakness and Resistance).",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Bubblebeam",
+     "cost": "WWC",
+     "damage": 40,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    }
+   ]
+  }
+ ]
+}

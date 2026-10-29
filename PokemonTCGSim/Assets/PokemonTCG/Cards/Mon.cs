@@ -132,10 +132,20 @@ namespace PokemonTCG.Cards
             return true;
         }
 
+        /// <summary>How many copied attacks are resolving inside each other on this thread (UseCopiedAttack).</summary>
+        [ThreadStatic] private static int copyDepth;
+
         /// <summary>Uses another card's attack as this attack (Gemstone Mimicry, Seek Inspiration).</summary>
         protected static void UseCopiedAttack(EffectContext ctx, CardDef source, int index)
         {
             var copied = source.Attacks[index];
+            // v169: an attack that copies an attack that copies... (Ditto's Copy against another Ditto's Copy, Metronome against
+            // Metronome) would never reach a real attack: past a few copies it does nothing instead of looping forever.
+            if (copyDepth >= 3)
+            {
+                ctx.Log(ctx.Pokemon.Name + "'s " + copied.Name + " would only copy another copying attack, so it does nothing.");
+                return;
+            }
             // Copying a GX attack is using your GX attack for the game; you can't once it's used.
             if (GameEngine.IsGxAttack(copied))
             {
@@ -158,7 +168,9 @@ namespace PokemonTCG.Cards
             }
             ctx.Log(ctx.Pokemon.Name + " uses " + source.Name + "'s " + source.Attacks[index].Name + ".");
             var copy = new EffectContext(ctx.Engine, ctx.Player, ctx.Card, ctx.Pokemon, source);
-            ctx.Engine.Scripts.For(source).ResolveAttack(copy, index);
+            copyDepth++;
+            try { ctx.Engine.Scripts.For(source).ResolveAttack(copy, index); }
+            finally { copyDepth--; }
         }
     }
 

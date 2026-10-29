@@ -17,6 +17,7 @@ namespace PokemonTCG.Cards
             r.RegisterByKey("MA-69", new Schemer(true));
             r.RegisterByKey("MA-70", new Schemer(false));
             r.RegisterByKey("MA-71", new ArchieOrMaxie(true));
+            r.RegisterByKey("MA-72", new DualBallMA());
             r.RegisterByKey("MA-73", new ArchieOrMaxie(false));
             r.RegisterByKey("MA-74", new StrengthCharmMA());
             r.RegisterByKey("MA-75", new TeamBall(true));
@@ -32,6 +33,20 @@ namespace PokemonTCG.Cards
             r.RegisterByKey("MA-86", new TeamEnergy(true));
             r.RegisterByKey("MA-87", new TeamEnergy(false));
             r.RegisterByKey("MA-88", new DoubleRainbowEnergy());
+        }
+
+        /// <summary>
+        /// Dual Ball (Team Magma vs Team Aqua, also Delta Species'): flip 2 coins, a Basic Pokémon card for each heads. Unlike
+        /// Expedition's, Baby Pokémon can be found (Compendium 2004-03-25; your ruling: its own card).
+        /// </summary>
+        private sealed class DualBallMA : CardScript
+        {
+            public override void ResolveTrainer(EffectContext ctx)
+            {
+                int heads = ctx.FlipCoins(2);
+                if (heads == 0 || ctx.Me.Deck.Count == 0) return;
+                ctx.SearchToHand(d => d.IsBasicPokemon && !d.IsLegend, heads, "Dual Ball: choose up to " + heads + " Basic Pokémon");
+            }
         }
 
         private static bool Team(bool aqua, string name) { return aqua ? CardsMA.Aqua(name) : CardsMA.Magma(name); }

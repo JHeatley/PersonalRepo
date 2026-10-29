@@ -41,11 +41,11 @@ namespace PokemonTCG.Tests
         public void Team_Magma_vs_Team_Aqua_Is_In_The_Pool_With_Its_Prints()
         {
             var set = db.Cards.Where(d => d.SetCode == "MA").ToList();
-            Assert.AreEqual(92, set.Count, "97 cards minus 5 prints");
+            Assert.AreEqual(93, set.Count, "97 cards minus 4 prints");
             Assert.AreEqual(97, db.All.Count(d => d.SetCode == "MA"));
             Assert.AreEqual("CEL-CC11", db.MainPrinting(db.Get("MA-9")).Key);
             Assert.AreEqual("NP-13", db.MainPrinting(db.Get("MA-42")).Key);
-            Assert.AreEqual("E1-139", db.MainPrinting(db.Get("MA-72")).Key);
+            Assert.AreEqual("MA-72", db.MainPrinting(db.Get("MA-72")).Key, "your ruling: Dual Ball is its own card (it can find Baby Pokémon)");
             Assert.AreEqual("G2-126", db.MainPrinting(db.Get("MA-85")).Key);
             Assert.AreEqual("MA-74", db.MainPrinting(C(StrengthCharm)).Key, "your ruling: its own card");
             Assert.AreEqual(EnergyType.Darkness, C(Kyogre).SecondType);
