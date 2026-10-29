@@ -32,8 +32,11 @@ downloaded once), reads the card pool in `Assets/PokemonTCG/Resources/CardData`,
   train (PPO, self-play, MCTS, LLM fine-tuning), Python talking to Unity (sockets, ML-Agents, ONNX), and porting
   Python and trained networks to C#. `extra/git.jsonl` has 68 on Git (commits, branches, merging and conflicts,
   undoing and recovering, rebase, stash, LFS, Unity setup and Smart Merge), GitHub (pull requests, reviews, issues,
-  Actions, releases, rules) and GitHub Desktop. Their code and commands were run and checked; `csharp_guide.md`,
-  `python_guide.md` and `git_guide.md` are the same content to read. Add your own files there in the same format: one `{"messages": [system, user, assistant]}`
+  Actions, releases, rules) and GitHub Desktop. `extra/rom_porting.jsonl` has 30 on Game Boy Advance and DS games:
+  what can and can't be converted (the model can't read a ROM itself; it reads the output of `../RomTools`), the GBA
+  and DS ROM formats, graphics, LZ77 compression, the DS file system and Nitro files, getting the graphics into Unity
+  (import settings, Tilemaps, palette swaps), and porting decompiled C to C#. Their code and commands were run and
+  checked; `csharp_guide.md`, `python_guide.md`, `git_guide.md` and `rom_porting_guide.md` are the same content to read. Add your own files there in the same format: one `{"messages": [system, user, assistant]}`
   per line.
 * Everything goes into **one model**: every example gets the same system prompt (`SYSTEM` in `build_dataset.py`,
   which `install_to_ollama.py` also gives the installed model). When you add a new subject to `extra/`, add a few
