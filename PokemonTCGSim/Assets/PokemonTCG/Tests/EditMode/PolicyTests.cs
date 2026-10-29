@@ -1172,6 +1172,116 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
+        public void The_Plan_Of_The_Turn_Learns_Which_Moves_Do_Best()
+        {
+            var r = new DecisionRequest { Kind = DecisionKind.MainAction };
+            r.Options.Add(new DecisionOption { Label = "Play A", Action = ActionType.PlayTrainer });
+            r.Options.Add(new DecisionOption { Label = "Play B", Action = ActionType.PlayTrainer });
+            var choices = PolicyEncoder.Choices(r, new List<int>());
+            int a = choices.FindIndex(c => r.Options[c.Option].Label == "Play A");
+            var probs = new double[choices.Count];
+            for (int i = 0; i < probs.Length; i++) probs[i] = i == a ? 0.7 : 0.3; // the network prefers A
+            var root = new PolicySearch.PlanNode();
+
+            // The first play-out reaches a point nobody has been to: the plan ends there and the network's top move is played.
+            var node = root;
+            var path = new List<PolicySearch.PlanNode.Step>();
+            Assert.AreEqual(a, PolicySearch.PlanNode.Select(ref node, r, choices, probs, 1.0, path));
+            Assert.IsNull(node, "past the known plan, the network plays");
+            PolicySearch.PlanNode.Backup(root, path, 0.0);
+
+            // B turns out better whenever it's tried: the plan comes to prefer it, though the network doesn't.
+            int laterB = 0;
+            for (int k = 0; k < 60; k++)
+            {
+                node = root;
+                path = new List<PolicySearch.PlanNode.Step>();
+                int pick = PolicySearch.PlanNode.Select(ref node, r, choices, probs, 1.0, path);
+                bool b = r.Options[choices[pick].Option].Label == "Play B";
+                if (k >= 30 && b) laterB++;
+                PolicySearch.PlanNode.Backup(root, path, b ? 0.8 : -0.2);
+            }
+            Assert.Greater(laterB, 25, "most of the later play-outs try B");
+            StringAssert.StartsWith("Play B", root.Describe(1));
+
+            // A play-out that failed counts for nothing (its try is taken back).
+            string before = root.Describe(1);
+            node = root;
+            path = new List<PolicySearch.PlanNode.Step>();
+            PolicySearch.PlanNode.Select(ref node, r, choices, probs, 1.0, path);
+            PolicySearch.PlanNode.Backup(root, path, double.NaN);
+            Assert.AreEqual(before, root.Describe(1));
+        }
+
+        [Test]
+        public void Deck_Guesses_Favour_The_Decks_That_Match_What_The_Opponent_Showed()
+        {
+            var grab = new PositionGrabber(new PolicyNet(), 5);
+            new GameEngine(StandardCards.CreateRegistry(), grab, new HeuristicAgent(3)).Run(Dragapult(), Zoroark(), 31);
+            int zoroark = Zoroark().Count;
+            Func<double, int> zoroarkGuesses = belief =>
+            {
+                var search = new PolicySearch(new PolicyNet(), new SearchSettings { DeckBelief = belief });
+                search.KnownDecks.Add(Dragapult());
+                search.KnownDecks.Add(Zoroark());
+                int n = 0;
+                for (int seed = 1; seed <= 40; seed++)
+                {
+                    List<CardDef> guess;
+                    search.Guess(grab.Position, 0, grab.Memory, seed, out guess);
+                    if (ReferenceEquals(guess, search.KnownDecks[1])) n++;
+                }
+                return n;
+            };
+            Assert.AreEqual(40, zoroarkGuesses(0), "0: always the closest deck");
+            Assert.GreaterOrEqual(zoroarkGuesses(1.5), 36, "a firm belief: nearly always the deck the shown cards point to");
+            int loose = zoroarkGuesses(0.001);
+            Assert.That(loose, Is.InRange(5, 35), "a very loose belief guesses both decks");
+        }
+
+        /// <summary>Plays a seat with a PolicyAgent and keeps every look-ahead report.</summary>
+        private sealed class ReportProbe : IPlayerAgent, IGameObserver
+        {
+            private readonly PolicyAgent inner;
+            public readonly List<string> Reports = new List<string>();
+
+            public ReportProbe(PolicyAgent inner)
+            {
+                this.inner = inner;
+            }
+
+            public List<int> Decide(DecisionRequest r)
+            {
+                var picks = inner.Decide(r);
+                if (r.Kind == DecisionKind.MainAction && !string.IsNullOrEmpty(inner.Search.LastReport)) Reports.Add(inner.Search.LastReport);
+                inner.Search.LastReport = "";
+                return picks;
+            }
+
+            public void OnEvent(GameEngine engine, GameEvent ev)
+            {
+                inner.OnEvent(engine, ev);
+            }
+        }
+
+        [Test]
+        public void The_Look_Ahead_Can_Plan_Whole_Turns()
+        {
+            var net = new PolicyNet();
+            var settings = new SearchSettings { Playouts = 12, MaxCandidates = 3, SkipAbove = 1.01, Threads = 2, MaxSeconds = 3, PlanTurn = true };
+            var search = new PolicySearch(net, settings);
+            search.KnownDecks.Add(Dragapult());
+            search.KnownDecks.Add(Zoroark());
+            var probe = new ReportProbe(new PolicyAgent(net, 1, 0, Dragapult()) { Greedy = true, Search = search });
+            var engine = new GameEngine(StandardCards.CreateRegistry(), probe, new HeuristicAgent(4)) { MaxTurns = 12 };
+            engine.Run(Dragapult(), Zoroark(), 41);
+            Assert.Greater(search.Searches, 3, "it looked ahead at its main actions");
+            Assert.Less(search.Failed, Math.Max(2, search.Playouts / 20), "almost every guess plays out");
+            Assert.IsTrue(probe.Reports.Any(x => x.Contains("its plan for the turn")), "some looks planned the rest of the turn: "
+                          + string.Join(" / ", probe.Reports.Take(3)));
+        }
+
+        [Test]
         public void The_Neural_AI_Plays_Whole_Games_Looking_Ahead()
         {
             var net = new PolicyNet();

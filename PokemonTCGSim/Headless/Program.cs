@@ -382,31 +382,60 @@ public static class Program
         PolicyNet other = null;
         if (o.TryGetValue("vs", out var vs) && vs != "classic")
         {
-            other = new PolicyNet();
-            if (!other.FromBytes(File.ReadAllBytes(vs))) throw new ArgumentException(vs + " isn't a network file.");
+            if (vs == "self") other = net; // the same network on both sides (to compare look-aheads)
+            else
+            {
+                other = new PolicyNet();
+                if (!other.FromBytes(File.ReadAllBytes(vs))) throw new ArgumentException(vs + " isn't a network file.");
+            }
+        }
+        // Look-ahead settings for one side: --search off|quick|deep [--search-seconds S] [--search-playouts N] [--plan on|off]
+        // [--belief B] [--explore C] [--plan-depth D]; the opponent's are the same names after "vs-" (v172, to measure one
+        // look-ahead against another).
+        SearchSettings Settings(string prefix)
+        {
+            string level = Get(o, prefix + "search", "off");
+            SearchSettings st = level == "quick" ? SearchSettings.Quick(1) : level == "deep" ? SearchSettings.Deep(1) : null;
+            if (st == null && level != "off") throw new ArgumentException("--" + prefix + "search takes off, quick or deep");
+            if (st == null) return null;
+            st.MaxSeconds = Dbl(o, prefix + "search-seconds", st.MaxSeconds);
+            st.Playouts = Int(o, prefix + "search-playouts", st.Playouts);
+            string plan = Get(o, prefix + "plan", st.PlanTurn ? "on" : "off");
+            if (plan != "on" && plan != "off") throw new ArgumentException("--" + prefix + "plan takes on or off");
+            st.PlanTurn = plan == "on";
+            st.DeckBelief = Dbl(o, prefix + "belief", st.DeckBelief);
+            st.Explore = Dbl(o, prefix + "explore", st.Explore);
+            st.PlanDepth = Int(o, prefix + "plan-depth", st.PlanDepth);
+            return st;
+        }
+        string Describe(string prefix, SearchSettings st)
+        {
+            return st == null ? "" : " (look-ahead " + Get(o, prefix + "search", "off") + (st.PlanTurn ? ", planning the turn" : "") + ")";
+        }
+        var search = Settings("");
+        var vsSearch = Settings("vs-");
+        if (vsSearch != null && other == null) throw new ArgumentException("--vs-search needs --vs self or a network file");
+        PolicySearch opponentSearch = null;
+        if (vsSearch != null)
+        {
+            opponentSearch = new PolicySearch(other, vsSearch) { PrizeReward = trainer.PrizeReward };
+            foreach (var deck in decks) opponentSearch.KnownDecks.Add(deck.Value);
         }
         IPlayerAgent Opponent(int seed)
         {
-            return other == null ? new HeuristicAgent(seed) : new PolicyAgent(other, seed) { Greedy = true };
-        }
-        SearchSettings search = null;
-        string lookAhead = Get(o, "search", "off");
-        if (lookAhead == "quick") search = SearchSettings.Quick(1);
-        else if (lookAhead == "deep") search = SearchSettings.Deep(1);
-        else if (lookAhead != "off") throw new ArgumentException("--search takes off, quick or deep");
-        if (search != null)
-        {
-            search.MaxSeconds = Dbl(o, "search-seconds", search.MaxSeconds);
-            search.Playouts = Int(o, "search-playouts", search.Playouts);
+            return other == null ? new HeuristicAgent(seed) : new PolicyAgent(other, seed) { Greedy = true, Search = opponentSearch };
         }
         var clock = System.Diagnostics.Stopwatch.StartNew();
         double wr = trainer.Evaluate(Opponent, games, Int(o, "seed", 123), search, out int w, out int d, out int l);
-        Console.WriteLine($"vs {Get(o, "vs", "classic bot")}{(search != null ? " (look-ahead " + lookAhead + ")" : "")}: {wr:P1} ({w}-{d}-{l}) over {w + d + l} games"
+        Console.WriteLine($"{Describe("", search).Trim()} vs {Get(o, "vs", "classic bot")}{Describe("vs-", vsSearch)}: {wr:P1} ({w}-{d}-{l}) over {w + d + l} games"
                           + $" in {clock.Elapsed.TotalSeconds:0}s");
         var s = trainer.LastSearch;
         if (s != null)
             Console.WriteLine($"look-ahead: {s.Searches:N0} decisions looked at, {s.Changed:N0} moves changed from the network's own, "
                               + $"{s.Playouts:N0} play-outs ({s.Failed:N0} guesses failed)");
+        if (opponentSearch != null)
+            Console.WriteLine($"opponent's look-ahead: {opponentSearch.Searches:N0} decisions looked at, {opponentSearch.Changed:N0} moves changed, "
+                              + $"{opponentSearch.Playouts:N0} play-outs ({opponentSearch.Failed:N0} guesses failed)");
         return 0;
     }
 }
