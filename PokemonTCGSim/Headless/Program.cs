@@ -390,7 +390,8 @@ public static class Program
             }
         }
         // Look-ahead settings for one side: --search off|quick|deep [--search-seconds S] [--search-playouts N] [--plan on|off]
-        // [--belief B]; the opponent's are the same names after "vs-" (v172, to measure one look-ahead against another).
+        // [--belief B] [--explore C] [--plan-depth D]; the opponent's are the same names after "vs-" (v172, to measure one
+        // look-ahead against another).
         SearchSettings Settings(string prefix)
         {
             string level = Get(o, prefix + "search", "off");
@@ -403,6 +404,8 @@ public static class Program
             if (plan != "on" && plan != "off") throw new ArgumentException("--" + prefix + "plan takes on or off");
             st.PlanTurn = plan == "on";
             st.DeckBelief = Dbl(o, prefix + "belief", st.DeckBelief);
+            st.Explore = Dbl(o, prefix + "explore", st.Explore);
+            st.PlanDepth = Int(o, prefix + "plan-depth", st.PlanDepth);
             return st;
         }
         string Describe(string prefix, SearchSettings st)
