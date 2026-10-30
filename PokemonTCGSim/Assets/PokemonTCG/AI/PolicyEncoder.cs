@@ -1040,10 +1040,18 @@ namespace PokemonTCG.AI
                 var top = mon.Top != null ? mon.Top.Def : null;
                 if (top == null) continue;
                 var cards = toCome != null ? PolicyPlan.Line(top, toCome) : new List<CardDef> { top };
-                for (int t = 0; t < targets.Count; t++)
-                    foreach (var c in cards)
-                        for (int e = 0; e < PowerUpTurns; e++)
-                            damage[t, e] = Math.Max(damage[t, e], PolicyPlan.BestDamage(c, mon.EnergyUnits, e + 1, targets[t], mon.AbilitiesActive));
+                foreach (var c in cards)
+                    foreach (var a in c.Attacks)
+                    {
+                        // The Energy it's missing doesn't depend on the target: usable from e = missing - 1 on.
+                        int missing = PolicyPlan.Missing(mon.EnergyUnits, a);
+                        if (missing > PowerUpTurns) continue;
+                        for (int t = 0; t < targets.Count; t++)
+                        {
+                            int d = PolicyPlan.DamageTo(c, mon.AbilitiesActive, a, targets[t]);
+                            for (int e = Math.Max(0, missing - 1); e < PowerUpTurns; e++) damage[t, e] = Math.Max(damage[t, e], d);
+                        }
+                    }
             }
             for (int t = 0; t < targets.Count; t++) hp[t] = targets[t].RemainingHp;
             var taken = new bool[targets.Count];
