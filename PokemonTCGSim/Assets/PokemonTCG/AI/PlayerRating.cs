@@ -336,18 +336,14 @@ namespace PokemonTCG.AI
 
         public static PlayerRating Load(string path)
         {
+            SafeFile.Recover(path);
             try { return File.Exists(path) ? Parse(File.ReadAllText(path, Encoding.UTF8)) : new PlayerRating(); }
             catch (Exception) { return new PlayerRating(); }
         }
 
         public void Save(string path)
         {
-            string dir = Path.GetDirectoryName(path);
-            if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
-            string tmp = path + ".tmp";
-            File.WriteAllText(tmp, Serialize(), new UTF8Encoding(false));
-            if (File.Exists(path)) File.Delete(path);
-            File.Move(tmp, path);
+            SafeFile.WriteText(path, Serialize());
         }
     }
 

@@ -1251,6 +1251,10 @@ namespace PokemonTCG.AI
         {
             var brain = new LearningBrain();
             brain.FilePath = path;
+            // A save a crash interrupted (SafeFile): its finished new file, if that's all that's left.
+            SafeFile.Recover(path);
+            SafeFile.Recover(NeuralPath(path));
+            SafeFile.Recover(ChampionPath(path));
             if (!string.IsNullOrEmpty(path) && File.Exists(path)) brain.LoadText(File.ReadAllText(path, Encoding.UTF8));
             string neural = NeuralPath(path);
             if (neural != null && File.Exists(neural) && !brain.Policy.FromBytes(File.ReadAllBytes(neural)))
@@ -1286,13 +1290,13 @@ namespace PokemonTCG.AI
             return brain;
         }
 
-        /// <summary>Writes the brain to FilePath (through a temporary file, so a crash can't leave half a brain).</summary>
         /// <summary>
         /// Saving is paused: another program is training this brain's file (the app's "Train in the background"), and the app
         /// reloads the file when it's done rather than writing over it.
         /// </summary>
         public bool SavesPaused;
 
+        /// <summary>Writes the brain to FilePath (SafeFile: a crash can't lose it or leave half a brain).</summary>
         public void Save()
         {
             if (string.IsNullOrEmpty(FilePath) || SavesPaused) return;
@@ -1300,19 +1304,15 @@ namespace PokemonTCG.AI
             // to set off long garbage collections, which freeze the whole app). Saves take turns.
             lock (fileLock)
             {
-                var dir = Path.GetDirectoryName(FilePath);
-                if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
-                string temp = FilePath + ".tmp";
-                using (var writer = new StreamWriter(temp, false, new UTF8Encoding(false), 1 << 16)) WriteTo(writer);
-                if (File.Exists(FilePath)) File.Delete(FilePath);
-                File.Move(temp, FilePath);
+                SafeFile.Write(FilePath, s =>
+                {
+                    using (var writer = new StreamWriter(s, new UTF8Encoding(false), 1 << 16, true)) WriteTo(writer);
+                });
                 // The Neural AI's network, in its own file next to the brain's (never a damaged one: the last good file stays).
                 string neural = NeuralPath(FilePath);
                 if (Policy.AllFinite() && PolicyLoadError == null)
                 {
-                    File.WriteAllBytes(neural + ".tmp", Policy.ToBytes());
-                    if (File.Exists(neural)) File.Delete(neural);
-                    File.Move(neural + ".tmp", neural);
+                    SafeFile.WriteBytes(neural, Policy.ToBytes());
                 }
                 // The champion (the yardstick), in its own file too; none after a reset.
                 string champion = ChampionPath(FilePath);
@@ -1323,9 +1323,7 @@ namespace PokemonTCG.AI
                 }
                 else if (champ.AllFinite())
                 {
-                    File.WriteAllBytes(champion + ".tmp", champ.ToBytes());
-                    if (File.Exists(champion)) File.Delete(champion);
-                    File.Move(champion + ".tmp", champion);
+                    SafeFile.WriteBytes(champion, champ.ToBytes());
                 }
                 SaveLeague();
             }
@@ -1351,8 +1349,7 @@ namespace PokemonTCG.AI
                 string file = Path.Combine(folder, kv.Key + ".neural");
                 keep.Add(Path.GetFileName(file));
                 if (File.Exists(file) || kv.Value == null || !kv.Value.AllFinite()) continue;
-                File.WriteAllBytes(file + ".tmp", kv.Value.ToBytes());
-                File.Move(file + ".tmp", file);
+                SafeFile.WriteBytes(file, kv.Value.ToBytes());
             }
             foreach (var file in Directory.GetFiles(folder))
                 if (!keep.Contains(Path.GetFileName(file))) File.Delete(file);

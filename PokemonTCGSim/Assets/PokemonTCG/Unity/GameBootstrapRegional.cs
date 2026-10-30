@@ -178,6 +178,7 @@ namespace PokemonTCG.Presentation
         {
             regionalLoadTried = true;
             string path = RegionalPath;
+            SafeFile.Recover(path);
             if (!File.Exists(path)) return;
             try
             {
@@ -272,13 +273,7 @@ namespace PokemonTCG.Presentation
             {
                 int ver = sim.Version;
                 string text = sim.Serialize();
-                string path = RegionalPath;
-                var dir = Path.GetDirectoryName(path);
-                if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
-                string temp = path + ".tmp";
-                File.WriteAllText(temp, text, new UTF8Encoding(false));
-                if (File.Exists(path)) File.Delete(path);
-                File.Move(temp, path);
+                SafeFile.WriteText(RegionalPath, text);
                 regionalSavedVersion = ver;
             }
             catch (Exception e)
