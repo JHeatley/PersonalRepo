@@ -5,7 +5,10 @@ using PokemonTCG.Core;
 
 namespace PokemonTCG.AI
 {
-    /// <summary>How the learning AI turns what it has learned into choices (the Opponent switch on the menu, v74).</summary>
+    /// <summary>
+    /// How the learning AI turns what it has learned into choices (v74). The app only offers the Neural AI now; Learning and
+    /// Hybrid remain for the fallback when no network loads and for the tests that compare them.
+    /// </summary>
     public enum AiStyle
     {
         /// <summary>The learning AI's feature weights only (as before v74).</summary>

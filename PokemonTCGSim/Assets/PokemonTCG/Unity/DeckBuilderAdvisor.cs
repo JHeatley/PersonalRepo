@@ -347,7 +347,7 @@ namespace PokemonTCG.Presentation
         {
             GUILayout.Label("Looks at the deck in the editor (" + Total + " cards, " + Formats.Label(format) + ") and suggests up to " + MaxImproveChanges
                             + " swaps: what's missing (evolution lines, Energy for the attacks, draw, Pokémon search, gust, switching, recovery), "
-                            + "what similar decks in your library agree on, and what the learning AI's games say about each card. "
+                            + "what similar decks in your library agree on, and what the Neural AI's games say about each card. "
                             + "A deck under 60 cards is filled; one over 60 is trimmed.", AdviceSmall(ui));
             GUI.enabled = !busyShown && Total > 0;
             if (GUILayout.Button(busyShown ? "Thinking…" : "Suggest changes", GUILayout.Height(30))) actions.Add(() => RunAdvice());

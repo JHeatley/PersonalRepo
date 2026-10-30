@@ -275,18 +275,18 @@ namespace PokemonTCG.Presentation
             IPlayerAgent you, bot;
             if (regionalWatch)
             {
-                // A Regional Sim table: both seats are the learning AI, and both learn from the game.
-                watchAgentA = new LearningAgent(brain, currentSeed + 11, mine.Name, theirs.Name) { Training = reg.Explore, Record = brain != null, Style = reg.Style };
-                watchAgentB = new LearningAgent(brain, currentSeed + 23, theirs.Name, mine.Name) { Training = reg.Explore, Record = brain != null, Style = reg.Style };
+                // A Regional Sim table: both seats are the Neural AI, and both learn from the game.
+                watchAgentA = new LearningAgent(brain, currentSeed + 11, mine.Name, theirs.Name) { Training = reg.Explore, Record = brain != null, Style = AiStyle.Neural };
+                watchAgentB = new LearningAgent(brain, currentSeed + 23, theirs.Name, mine.Name) { Training = reg.Explore, Record = brain != null, Style = AiStyle.Neural };
                 you = watchAgentA;
                 bot = watchAgentB;
             }
             else
             {
                 // Your seat records every decision (the AI studies them; Areas of Improvement replays them). Your Regional Sim
-                // opponents are always the learning AI.
+                // opponents are always the Neural AI.
                 you = watching ? MakeBot(currentSeed + 11, mine.Name, theirs.Name, false) : new InteractiveRecordingAgent(human, humanLog);
-                bot = MakeBot(currentSeed + 23, theirs.Name, mine.Name, !watching, reg != null, reg != null ? reg.Style : (AiStyle?)null);
+                bot = MakeBot(currentSeed + 23, theirs.Name, mine.Name, !watching, reg != null);
             }
             IPlayerAgent a0 = seat == 0 ? you : bot;
             IPlayerAgent a1 = seat == 0 ? bot : you;
@@ -749,7 +749,7 @@ namespace PokemonTCG.Presentation
             botVsBot = GUILayout.Toggle(botVsBot, " Watch two bots play each other");
             GUILayout.BeginHorizontal();
             GUILayout.Label("Opponent", GUILayout.Width(80));
-            int aiPick = GUILayout.Toolbar(OpponentPick, OpponentChoices, GUILayout.Width(440));
+            int aiPick = GUILayout.Toolbar(OpponentPick, OpponentChoices, GUILayout.Width(240));
             GUILayout.Label("  " + BrainLine(), Hint(ui));
             GUILayout.EndHorizontal();
             DrawLookAheadRow(ui);

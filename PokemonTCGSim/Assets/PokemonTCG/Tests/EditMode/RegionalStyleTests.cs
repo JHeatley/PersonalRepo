@@ -5,7 +5,10 @@ using PokemonTCG.AI;
 
 namespace PokemonTCG.Tests
 {
-    /// <summary>v117: the Regional Sim's AI players play as the Learning AI, the Neural AI or the Hybrid AI, saved with the event.</summary>
+    /// <summary>
+    /// The Regional Sim's AI players play as the Neural AI. Events saved when the Learning AI and Hybrid AI were still choices
+    /// (v117) load as the Neural AI too.
+    /// </summary>
     public class RegionalStyleTests
     {
         private static RegionalSim MakeEvent()
@@ -17,35 +20,32 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
-        public void A_New_Event_Plays_Hybrid_AI()
+        public void A_New_Event_Plays_The_Neural_AI()
         {
             var sim = MakeEvent();
-            Assert.AreEqual(AiStyle.Hybrid, sim.PlayStyle);
-            Assert.AreEqual(AiStyle.Hybrid, sim.View().PlayStyle);
-        }
-
-        [Test]
-        public void The_Style_Changes_And_Is_Saved_With_The_Event()
-        {
-            var sim = MakeEvent();
-            int before = sim.Version;
-            sim.PlayStyle = AiStyle.Neural;
-            Assert.Greater(sim.Version, before, "the screen sees the change");
+            Assert.AreEqual(AiStyle.Neural, sim.PlayStyle);
             Assert.AreEqual(AiStyle.Neural, sim.View().PlayStyle);
-            var back = RegionalSim.Parse(sim.Serialize());
-            Assert.AreEqual(AiStyle.Neural, back.PlayStyle);
-            back.PlayStyle = AiStyle.Learning;
-            Assert.AreEqual(AiStyle.Learning, RegionalSim.Parse(back.Serialize()).PlayStyle);
+            Assert.AreEqual(AiStyle.Neural, RegionalSim.Parse(sim.Serialize()).PlayStyle);
         }
 
         [Test]
-        public void An_Event_Saved_Before_v117_Plays_Hybrid_AI()
+        public void Events_Saved_With_The_Learning_Or_Hybrid_AI_Play_The_Neural_AI()
+        {
+            foreach (var old in new[] { AiStyle.Learning, AiStyle.Hybrid })
+            {
+                var sim = MakeEvent();
+                sim.PlayStyle = old; // as an event saved before they were removed
+                Assert.IsTrue(sim.Serialize().Split('\n').Any(l => l.StartsWith("Style\t")));
+                Assert.AreEqual(AiStyle.Neural, RegionalSim.Parse(sim.Serialize()).PlayStyle, old.ToString());
+            }
+        }
+
+        [Test]
+        public void An_Event_Saved_Before_v117_Plays_The_Neural_AI()
         {
             var sim = MakeEvent();
-            sim.PlayStyle = AiStyle.Learning;
             var lines = sim.Serialize().Split('\n').Where(l => !l.StartsWith("Style\t")).ToArray();
-            var old = RegionalSim.Parse(string.Join("\n", lines));
-            Assert.AreEqual(AiStyle.Hybrid, old.PlayStyle);
+            Assert.AreEqual(AiStyle.Neural, RegionalSim.Parse(string.Join("\n", lines)).PlayStyle);
         }
     }
 }

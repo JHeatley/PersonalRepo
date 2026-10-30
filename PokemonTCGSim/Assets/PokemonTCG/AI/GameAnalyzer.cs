@@ -197,7 +197,7 @@ namespace PokemonTCG.AI
                 var mains = decisions.Where(d => d.Request != null && d.Request.Kind == DecisionKind.MainAction && d.Snapshot != null && d.Answer != null && d.Answer.Count == 1).ToList();
 
                 neural = brain != null && brain.Policy != null && brain.Policy.Trained;
-                result.Judge = neural ? "Neural AI" : "Learning AI";
+                result.Judge = neural ? "Neural AI" : "AI";
                 if (YourDeckList == null && mains.Count > 0) YourDeckList = CardsOf(mains[0].Snapshot, seat);
                 if (TheirDeckList == null && mains.Count > 0) TheirDeckList = CardsOf(mains[0].Snapshot, 1 - seat);
                 // What you knew at each decision, for the Neural AI: the game's public events up to that turn.

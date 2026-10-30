@@ -262,8 +262,8 @@ namespace PokemonTCG.AI
             if (picks == null || picks.Count == 0 || strength <= 0) return;
             Policy.Imitate(picks, (float)(NeuralImitationRate * strength));
         }
-        /// <summary>How agents playing with this brain choose (the Opponent switch). Not saved with the brain; the menu sets it.</summary>
-        public volatile AiStyle Style = AiStyle.Hybrid;
+        /// <summary>How agents playing with this brain choose. Not saved with the brain; the app always plays the Neural AI.</summary>
+        public volatile AiStyle Style = AiStyle.Neural;
         /// <summary>The network learns from decisions where the agent simply took its best guess at this share of their credit.</summary>
         public double NeuralGreedyFactor = 0.3;
         /// <summary>Strength of the network's step toward a play it studies (yours, or one in a game log).</summary>
