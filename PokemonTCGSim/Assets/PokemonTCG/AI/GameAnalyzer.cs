@@ -638,8 +638,8 @@ namespace PokemonTCG.AI
         {
             if (neural)
             {
-                mine = new PolicyAgent(brain.Policy, seed * 2 + 1, seat, YourDeckList) { Greedy = true };
-                theirs = new PolicyAgent(brain.Policy, seed * 2 + 2, 1 - seat, TheirDeckList) { Greedy = true };
+                mine = new PolicyAgent(brain.Policy, seed * 2 + 1, seat, YourDeckList) { Greedy = true, PreviewAttacks = false };
+                theirs = new PolicyAgent(brain.Policy, seed * 2 + 2, 1 - seat, TheirDeckList) { Greedy = true, PreviewAttacks = false };
                 return;
             }
             mine = new LearningAgent(brain, seed * 2 + 1, yourDeck, theirDeck) { Record = false };

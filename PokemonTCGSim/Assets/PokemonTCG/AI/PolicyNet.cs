@@ -20,15 +20,15 @@ namespace PokemonTCG.AI
         public const int NumSlots = 2 * SideSlots;
         public const int NoTarget = NumSlots;
         /// <summary>Numbers per Pokémon in play (26 before the Energy-needed and evolution ones: PolicyNet.Widen).</summary>
-        public const int SlotFeatures = 47;
+        public const int SlotFeatures = 48;
         public const int GlobalFeatures = 20 + PolicyKinds.DecisionCount;
         /// <summary>Numbers per option (6 before the Energy attachment and evolution ones: PolicyNet.Widen).</summary>
-        public const int OptionFeatures = 21;
+        public const int OptionFeatures = 22;
         /// <summary>
         /// This turn's numbers (actions, Abilities used), then the Item numbers, the free-retreat pivots on each Bench and the
         /// Bench and play-from-hand numbers (2 + SideSlots before those: PolicyNet.Widen).
         /// </summary>
-        public const int TurnFeatures = 2 + SideSlots + 16;
+        public const int TurnFeatures = 2 + SideSlots + 35;
         /// <summary>Bags of cards: hand, your discard, their discard, your unseen cards, their known hand, cards they've shown, your plays this turn, their last turn.</summary>
         public const int BagCount = 8;
         public const int BagHand = 0, BagMyDiscard = 1, BagOppDiscard = 2, BagUnseen = 3, BagOppKnownHand = 4, BagOppSeen = 5, BagTurnPlayed = 6, BagOppLastTurn = 7;
@@ -121,6 +121,13 @@ namespace PokemonTCG.AI
         /// the new inputs, so they play exactly as before until training teaches them to use them.
         /// </summary>
         private const int OldSlotFeatures = 26, OldOptionFeatures = 6, OldStaticSize = 64, OldTurnFeatures = 2 + PolicyInput.SideSlots;
+        /// <summary>
+        /// Every earlier size of the per-Pokémon, per-option and turn numbers, oldest first: the first networks, then those
+        /// from before the Masters numbers (real attack damage, the Prize race, gust targets, known Prizes and outs).
+        /// </summary>
+        private static readonly int[] EarlierSlotFeatures = { OldSlotFeatures, 47 };
+        private static readonly int[] EarlierOptionFeatures = { OldOptionFeatures, 21 };
+        private static readonly int[] EarlierTurnFeatures = { OldTurnFeatures, 2 + PolicyInput.SideSlots + 16 };
         /// <summary>
         /// Residual blocks in the trunk: a new network has DefaultBlocks, Grow makes it deeper (BigBlocks: the Make the network bigger
         /// button), and loading takes whatever the file has, up to MaxBlocks.
@@ -350,17 +357,18 @@ namespace PokemonTCG.AI
         }
 
         /// <summary>
-        /// Saved weights from before the inputs grew (OldSlotFeatures, OldOptionFeatures, OldStaticSize, OldTurnFeatures) get
+        /// Saved weights from before the inputs grew (any of the Earlier sizes, OldStaticSize) get
         /// zero weights for the new inputs, which come last in each layer's input. Returns the printed-stat count per card the file was made with.
         /// </summary>
         private static int Widen(Dictionary<string, float[]> data)
         {
             float[] proj;
             int statics = data.TryGetValue("cards.proj.weight", out proj) && proj.Length == CardDim * OldStaticSize ? OldStaticSize : StaticSize;
-            WidenRows(data, "slot.0.weight", SlotDim, SlotIn - PolicyInput.SlotFeatures + OldSlotFeatures, SlotIn);
-            WidenRows(data, "option.0.weight", OptionDim, OptionIn - PolicyInput.OptionFeatures + OldOptionFeatures, OptionIn);
+            foreach (int n in EarlierSlotFeatures) WidenRows(data, "slot.0.weight", SlotDim, SlotIn - PolicyInput.SlotFeatures + n, SlotIn);
+            foreach (int n in EarlierOptionFeatures) WidenRows(data, "option.0.weight", OptionDim, OptionIn - PolicyInput.OptionFeatures + n, OptionIn);
             WidenRows(data, "cards.proj.weight", CardDim, OldStaticSize, StaticSize);
-            WidenRows(data, "inp.0.weight", Width, StateSize - PolicyInput.TurnFeatures + OldTurnFeatures, StateSize); // they come last
+            foreach (int n in EarlierTurnFeatures)
+                WidenRows(data, "inp.0.weight", Width, StateSize - PolicyInput.TurnFeatures + n, StateSize); // they come last
             return statics;
         }
 

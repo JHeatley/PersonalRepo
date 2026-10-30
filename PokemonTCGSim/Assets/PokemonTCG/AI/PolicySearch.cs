@@ -577,9 +577,9 @@ namespace PokemonTCG.AI
             List<CardDef> theirDeck;
             var s = Guess(setup, seed, out theirDeck);
             s.Rng = new Rng(seed ^ 0x51ED);
-            var mine = new PolicyAgent(Net, seed * 2 + 1, seat, setup.MyDeck) { Greedy = true, Moves = Moves };
+            var mine = new PolicyAgent(Net, seed * 2 + 1, seat, setup.MyDeck) { Greedy = true, Moves = Moves, PreviewAttacks = false };
             mine.Memory.CopyFrom(setup.Memory);
-            var theirs = new PolicyAgent(Net, seed * 2 + 2, 1 - seat, theirDeck) { Greedy = true, Moves = Moves };
+            var theirs = new PolicyAgent(Net, seed * 2 + 2, 1 - seat, theirDeck) { Greedy = true, Moves = Moves, PreviewAttacks = false };
             theirs.Memory.Turn = setup.Root.TurnNumber;
             me = new SearchSeat(mine, move, setup.StopTurn, this, plan);
             var engine = new GameEngine(setup.Scripts, seat == 0 ? (IPlayerAgent)me : theirs, seat == 0 ? (IPlayerAgent)theirs : me);
@@ -607,6 +607,152 @@ namespace PokemonTCG.AI
             catch (Exception)
             {
                 return double.NaN;
+            }
+        }
+
+        // ------------------------------------------------------------------ What an attack really does
+
+        /// <summary>What one attack did when played out on a copy of the position (PreviewAttacks).</summary>
+        public sealed class AttackResult
+        {
+            /// <summary>Damage done to the opponent's Active Pokémon (the HP it had left, if it was Knocked Out).</summary>
+            public int Damage;
+            public bool KnocksOut;
+            /// <summary>Prize cards the attack took (Knock Outs of the Active and Benched Pokémon alike).</summary>
+            public int Prizes;
+        }
+
+        /// <summary>
+        /// Each attack on offer in this main action, played out on a copy of the position with the hidden cards guessed (Guess:
+        /// the opponent's hand and deck made up from what they've shown, the player's own deck and Prizes shuffled), up to the
+        /// end of the attacker's turn. That gives the damage it really does to their Active Pokémon, with every "+" and "×", Tool,
+        /// Stadium and effect the engine counts, and the Prize cards it takes. By option index; an attack whose play-out
+        /// failed is left out.
+        /// </summary>
+        public Dictionary<int, AttackResult> PreviewAttacks(GameEngine engine, DecisionRequest r, PolicyMemory memory)
+        {
+            var results = new Dictionary<int, AttackResult>();
+            if (engine == null || engine.State == null || r == null || r.Kind != DecisionKind.MainAction) return results;
+            Setup setup = null;
+            int seed = 0;
+            for (int i = 0; i < r.Options.Count; i++)
+            {
+                if (r.Options[i].Action != ActionType.Attack) continue;
+                if (setup == null)
+                {
+                    var root = engine.State.Clone();
+                    int seat = r.Player;
+                    setup = new Setup
+                    {
+                        Root = root, Seat = seat, Memory = memory, MyDeck = memory.Deck() ?? ToList(engine.StartingDeck(seat)),
+                        Scripts = engine.Scripts, PrizeCount = engine.PrizeCount, Rules = engine.Rules, MaxTurns = engine.MaxTurns,
+                        StopTurn = root.TurnNumber + 1, RootLead = Lead(root, seat), Seen = SeenCards(root, seat, memory)
+                    };
+                    seed = (int)(root.Rng.Clone().NextULong() & 0x3FFFFFFF) ^ 0x2A7AC1;
+                }
+                var result = PreviewAttack(setup, r.Options[i], seed);
+                if (result != null) results[i] = result;
+            }
+            return results;
+        }
+
+        private AttackResult PreviewAttack(Setup setup, DecisionOption attack, int seed)
+        {
+            int seat = setup.Seat, opp = 1 - seat;
+            List<CardDef> theirDeck;
+            var s = Guess(setup, seed, out theirDeck);
+            s.Rng = new Rng(seed ^ 0x3C5);
+            var target = s.Players[opp].Active;
+            if (target == null) return null;
+            int uid = target.Uid, counters = target.DamageCounters, prizes = s.Players[seat].Prizes.Count;
+            var shared = new PreviewShared();
+            var mine = new PolicyAgent(Net, seed * 2 + 1, seat, setup.MyDeck) { Greedy = true, Moves = Moves, PreviewAttacks = false };
+            mine.Memory.CopyFrom(setup.Memory);
+            var theirs = new PolicyAgent(Net, seed * 2 + 2, opp, theirDeck) { Greedy = true, Moves = Moves, PreviewAttacks = false };
+            var me = new PreviewSeat(mine, attack, shared);
+            var them = new PreviewSeat(theirs, null, shared);
+            var engine = new GameEngine(setup.Scripts, seat == 0 ? (IPlayerAgent)me : them, seat == 0 ? (IPlayerAgent)them : me);
+            engine.CheckInvariants = false;
+            engine.CardsPerPlayer = 0;
+            engine.PrizeCount = setup.PrizeCount;
+            engine.Rules = setup.Rules;
+            engine.MaxTurns = setup.MaxTurns;
+            try
+            {
+                engine.LoadState(s);
+                engine.ResumeGame();
+            }
+            catch (PreviewDone)
+            {
+                // the attack was played and the attacker's turn ended
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            if (!shared.Attacked) return null;
+            int hpLeft = shared.TargetHp; // its HP left as the attacker saw it, just before attacking
+            var after = engine.State.FindPokemon(uid);
+            var result = new AttackResult { Prizes = Math.Max(0, prizes - engine.State.Players[seat].Prizes.Count) };
+            if (after == null)
+            {
+                // Knocked Out (no longer in play): the damage that took is the HP it had left.
+                result.KnocksOut = true;
+                result.Damage = Math.Max(0, hpLeft);
+            }
+            else result.Damage = Math.Max(0, (after.DamageCounters - counters) * 10);
+            return result;
+        }
+
+        private sealed class PreviewShared
+        {
+            public bool Attacked;
+            public int TargetHp;
+        }
+
+        /// <summary>The attack has been played out (the attacker's turn ended): stop the copy there.</summary>
+        private sealed class PreviewDone : Exception
+        {
+            public PreviewDone() : base("attack played out") { }
+        }
+
+        /// <summary>A seat in an attack preview: the attacker plays the attack at its main action, then the copy stops when that turn ends.</summary>
+        private sealed class PreviewSeat : IPlayerAgent, IGameObserver
+        {
+            private readonly PolicyAgent inner;
+            private readonly DecisionOption attack;
+            private readonly PreviewShared shared;
+
+            public PreviewSeat(PolicyAgent inner, DecisionOption attack, PreviewShared shared)
+            {
+                this.inner = inner;
+                this.attack = attack;
+                this.shared = shared;
+            }
+
+            public void OnEvent(GameEngine engine, GameEvent ev)
+            {
+                // The attacker's turn is over: stop before Pokémon Checkup, so damage between turns (Poison) isn't counted.
+                if (attack != null && shared.Attacked && ev != null && ev.Type == GameEventType.TurnEnd) throw new PreviewDone();
+                inner.OnEvent(engine, ev);
+            }
+
+            public List<int> Decide(DecisionRequest r)
+            {
+                if (r.Kind == DecisionKind.MainAction)
+                {
+                    if (shared.Attacked || attack == null) throw new PreviewDone();
+                    int i = ForcedPlayAgent.Match(r.Options, attack);
+                    if (i < 0) throw new InvalidOperationException("the attack isn't on offer in this guess");
+                    if (r.View != null && r.View.Opponent != null && r.View.Opponent.Active != null) shared.TargetHp = r.View.Opponent.Active.RemainingHp;
+                    shared.Attacked = true;
+                    return new List<int> { i };
+                }
+                return inner.Decide(r);
             }
         }
 
@@ -663,9 +809,12 @@ namespace PokemonTCG.AI
             var me = s.Players[seat];
             var opp = s.Players[1 - seat];
 
-            // Mine: the deck and face-down Prize cards are the right cards (my own list) in an unknown order.
+            // Mine: the deck and face-down Prize cards are the right cards (my own list) in an unknown order, except the Prize
+            // cards I know from searching my deck (PolicyMemory.KnownPrizes), which stay where they are.
             var pool = new List<CardInstance>(me.Deck);
             var mySlots = HiddenPrizeSlots(me);
+            if (setup.Memory != null && setup.Memory.KnownPrizes.Count > 0)
+                mySlots.RemoveAll(i => setup.Memory.KnownPrizes.ContainsKey(me.Prizes[i].Id));
             foreach (int i in mySlots) pool.Add(me.Prizes[i]);
             rng.Shuffle(pool);
             int k = 0;
