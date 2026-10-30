@@ -204,10 +204,14 @@ namespace PokemonTCG.Tests
         [Test]
         public void A_Network_From_Before_The_New_Inputs_Loads_And_Plays_Exactly_As_Before()
         {
+            // Read the starting network without leaving it set for other tests (a brain made with it set starts from it).
+            var saved = LearningBrain.PolicyStart;
             UnityCardData.LoadPolicyStart();
-            Assert.NotNull(LearningBrain.PolicyStart, "Resources/AI/policy_start.bytes");
+            var start = LearningBrain.PolicyStart;
+            LearningBrain.PolicyStart = saved;
+            Assert.NotNull(start, "Resources/AI/policy_start.bytes");
             var net = new PolicyNet();
-            Assert.IsTrue(net.FromBytes(LearningBrain.PolicyStart), "the Python bot's network (made before the new inputs) loads");
+            Assert.IsTrue(net.FromBytes(start), "the Python bot's network (made before the new inputs) loads");
 
             PolicyInput found = null;
             var agent = new PolicyAgent(net, 1) { Record = true };
