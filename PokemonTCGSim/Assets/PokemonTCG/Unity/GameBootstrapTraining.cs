@@ -908,8 +908,8 @@ namespace PokemonTCG.Presentation
                                 + "Needs the updated learner.py.", Hint(ui));
             }
             if (trainGpu)
-                GUILayout.Label("Neural AI training plays its games here and learns on the graphics card: start PokemonTCGSim/GpuLearner/learner.py first "
-                                + "(see its README). Learning is most of the training time, so this is about 2 to 3 times as fast and keeps that work off the CPU. "
+                GUILayout.Label("Neural AI training plays its games here and learns on the graphics card: start the GPU learner first "
+                                + "(GpuLearner/start_gpu_learner.bat beside the game, or in PokemonTCGSim/GpuLearner; see its README). Learning is most of the training time, so this is about 2 to 3 times as fast and keeps that work off the CPU. "
                                 + "If the learner isn't running, it learns on the CPU and says so.", Hint(ui));
             GUI.enabled = true;
             if (CpuThreads.Supported)
