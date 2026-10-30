@@ -151,9 +151,7 @@ public static class Program
     static void Save(PolicyNet net, string path)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
-        File.WriteAllBytes(path + ".tmp", net.ToBytes());
-        if (File.Exists(path)) File.Delete(path);
-        File.Move(path + ".tmp", path);
+        SafeFile.WriteBytes(path, net.ToBytes());
     }
 
     // ------------------------------------------------------------------ Commands
