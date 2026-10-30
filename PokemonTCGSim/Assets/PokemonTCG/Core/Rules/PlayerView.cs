@@ -116,6 +116,10 @@ namespace PokemonTCG.Core
         /// <summary>This player has used their VSTAR Power / GX attack this game (the markers are turned over).</summary>
         public bool VstarUsed;
         public bool GxUsed;
+        /// <summary>The turn this player can't play Items in (an Item lock such as Budew's Itchy Pollen), or -1.</summary>
+        public int ItemLockTurn = -1;
+        /// <summary>How many Benched Pokémon this player may have now (5, more or fewer with Stadiums such as Area Zero Underdepths).</summary>
+        public int BenchLimit = PlayerState.DefaultMaxBench;
         public PokemonView Active;
         public List<PokemonView> Bench = new List<PokemonView>();
         /// <summary>Hands this player mulliganed (public: both players see them).</summary>
@@ -206,6 +210,8 @@ namespace PokemonTCG.Core
                 foreach (var c in p.LostZone) side.LostZone.Add(new CardRef(c));
                 side.VstarUsed = p.VstarUsed;
                 side.GxUsed = p.GxUsed;
+                side.ItemLockTurn = p.ItemLockTurn;
+                if (engine != null) side.BenchLimit = engine.MaxBench(i);
                 foreach (var hand in p.MulliganHands) side.MulliganHands.Add(hand.Select(c => new CardRef(c)).ToList());
                 // During setup both players place Pokémon face down, so the opponent's board is hidden.
                 bool boardVisible = mine || !s.InSetup;

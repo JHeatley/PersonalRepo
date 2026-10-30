@@ -19,10 +19,16 @@ namespace PokemonTCG.AI
         public const int SideSlots = 1 + MaxBench;
         public const int NumSlots = 2 * SideSlots;
         public const int NoTarget = NumSlots;
-        public const int SlotFeatures = 26;
+        /// <summary>Numbers per Pokémon in play (26 before the Energy-needed and evolution ones: PolicyNet.Widen).</summary>
+        public const int SlotFeatures = 47;
         public const int GlobalFeatures = 20 + PolicyKinds.DecisionCount;
-        public const int OptionFeatures = 6;
-        public const int TurnFeatures = 2 + SideSlots;
+        /// <summary>Numbers per option (6 before the Energy attachment and evolution ones: PolicyNet.Widen).</summary>
+        public const int OptionFeatures = 21;
+        /// <summary>
+        /// This turn's numbers (actions, Abilities used), then the Item numbers, the free-retreat pivots on each Bench and the
+        /// Bench and play-from-hand numbers (2 + SideSlots before those: PolicyNet.Widen).
+        /// </summary>
+        public const int TurnFeatures = 2 + SideSlots + 16;
         /// <summary>Bags of cards: hand, your discard, their discard, your unseen cards, their known hand, cards they've shown, your plays this turn, their last turn.</summary>
         public const int BagCount = 8;
         public const int BagHand = 0, BagMyDiscard = 1, BagOppDiscard = 2, BagUnseen = 3, BagOppKnownHand = 4, BagOppSeen = 5, BagTurnPlayed = 6, BagOppLastTurn = 7;
@@ -108,7 +114,13 @@ namespace PokemonTCG.AI
     /// </summary>
     public sealed class PolicyNet
     {
-        public const int CardDim = 48, SlotDim = 96, Width = 384, OptionDim = 128, StaticSize = 64;
+        public const int CardDim = 48, SlotDim = 96, Width = 384, OptionDim = 128, StaticSize = 176;
+        /// <summary>
+        /// Input sizes of networks saved before the per-attack costs (PolicyCards), the Energy-needed and evolution numbers
+        /// per Pokémon and the attachment numbers per option. They still load: Widen gives their first layers zero weights for
+        /// the new inputs, so they play exactly as before until training teaches them to use them.
+        /// </summary>
+        private const int OldSlotFeatures = 26, OldOptionFeatures = 6, OldStaticSize = 64, OldTurnFeatures = 2 + PolicyInput.SideSlots;
         /// <summary>
         /// Residual blocks in the trunk: a new network has DefaultBlocks, Grow makes it deeper (BigBlocks: the Make the network bigger
         /// button), and loading takes whatever the file has, up to MaxBlocks.
@@ -158,6 +170,9 @@ namespace PokemonTCG.AI
         private readonly object cardLock = new object();
         private readonly List<float[]> cardRows = new List<float[]>();
         private readonly List<float[]> cardStatic = new List<float[]>();
+        /// <summary>Rows whose printed stats from OldStaticSize on aren't filled in yet (loaded from an older network), and how many.</summary>
+        private readonly List<bool> cardStale = new List<bool>();
+        private volatile int staleRows;
         private readonly List<string> cardKeys = new List<string>();
         private readonly List<float[]> cardM = new List<float[]>(), cardV = new List<float[]>();
         private readonly Dictionary<string, int> rowOfKey = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -334,6 +349,30 @@ namespace PokemonTCG.AI
             }
         }
 
+        /// <summary>
+        /// Saved weights from before the inputs grew (OldSlotFeatures, OldOptionFeatures, OldStaticSize, OldTurnFeatures) get
+        /// zero weights for the new inputs, which come last in each layer's input. Returns the printed-stat count per card the file was made with.
+        /// </summary>
+        private static int Widen(Dictionary<string, float[]> data)
+        {
+            float[] proj;
+            int statics = data.TryGetValue("cards.proj.weight", out proj) && proj.Length == CardDim * OldStaticSize ? OldStaticSize : StaticSize;
+            WidenRows(data, "slot.0.weight", SlotDim, SlotIn - PolicyInput.SlotFeatures + OldSlotFeatures, SlotIn);
+            WidenRows(data, "option.0.weight", OptionDim, OptionIn - PolicyInput.OptionFeatures + OldOptionFeatures, OptionIn);
+            WidenRows(data, "cards.proj.weight", CardDim, OldStaticSize, StaticSize);
+            WidenRows(data, "inp.0.weight", Width, StateSize - PolicyInput.TurnFeatures + OldTurnFeatures, StateSize); // they come last
+            return statics;
+        }
+
+        private static void WidenRows(Dictionary<string, float[]> data, string name, int rows, int oldColumns, int columns)
+        {
+            float[] a;
+            if (oldColumns == columns || !data.TryGetValue(name, out a) || a.Length != rows * oldColumns) return;
+            var b = new float[rows * columns];
+            for (int r = 0; r < rows; r++) Array.Copy(a, r * oldColumns, b, r * columns, oldColumns);
+            data[name] = b;
+        }
+
         /// <summary>The block count of saved weights (body.0, body.1, ... each with its .net.1.weight), or 0 if there are none.</summary>
         private static int BlocksIn(Dictionary<string, float[]> data)
         {
@@ -400,6 +439,8 @@ namespace PokemonTCG.AI
             {
                 cardRows.Clear();
                 cardStatic.Clear();
+                cardStale.Clear();
+                staleRows = 0;
                 cardKeys.Clear();
                 cardM.Clear();
                 cardV.Clear();
@@ -407,6 +448,7 @@ namespace PokemonTCG.AI
                 rowIndex = new Dictionary<string, int>(StringComparer.Ordinal);
                 cardRows.Add(new float[CardDim]);
                 cardStatic.Add(new float[StaticSize]);
+                cardStale.Add(false);
                 cardKeys.Add("");
                 cardM.Add(null);
                 cardV.Add(null);
@@ -453,21 +495,31 @@ namespace PokemonTCG.AI
             if (def == null) return 0;
             string key = def.BaseKey ?? def.Name;
             int known;
-            if (rowIndex.TryGetValue(key, out known)) return known;
+            if (rowIndex.TryGetValue(key, out known))
+            {
+                if (staleRows > 0) Refresh(known, def);
+                return known;
+            }
             lock (cardLock)
             {
                 int row;
-                if (rowOfKey.TryGetValue(key, out row)) return row;
-                if (def.Key != null && def.Key != key && rowOfKey.TryGetValue(def.Key, out row)) return row;
+                if (rowOfKey.TryGetValue(key, out row)
+                    || (def.Key != null && def.Key != key && rowOfKey.TryGetValue(def.Key, out row)))
+                {
+                    if (staleRows > 0) Refresh(row, def);
+                    return row;
+                }
                 if (rowOfKey.TryGetValue("name:" + NameKey(def), out row))
                 {
                     rowOfKey[key] = row;
                     rowIndex = new Dictionary<string, int>(rowOfKey, StringComparer.Ordinal);
+                    if (staleRows > 0) Refresh(row, def);
                     return row;
                 }
                 row = cardRows.Count;
                 cardRows.Add(new float[CardDim]);
                 cardStatic.Add(PolicyCards.Static(def));
+                cardStale.Add(false);
                 cardKeys.Add(key);
                 cardM.Add(null);
                 cardV.Add(null);
@@ -475,6 +527,34 @@ namespace PokemonTCG.AI
                 rowIndex = new Dictionary<string, int>(rowOfKey, StringComparer.Ordinal);
                 return row;
             }
+        }
+
+        /// <summary>
+        /// Fills in the printed stats a row loaded from an older network lacks (from OldStaticSize on: the per-attack costs),
+        /// from the card itself. The learned row and the older stats stay as they were.
+        /// </summary>
+        private void Refresh(int row, CardDef def)
+        {
+            lock (cardLock)
+            {
+                if (row <= 0 || row >= cardStale.Count || !cardStale[row]) return;
+                var fresh = PolicyCards.Static(def);
+                var s = (float[])cardStatic[row].Clone();
+                Array.Copy(fresh, OldStaticSize, s, OldStaticSize, StaticSize - OldStaticSize);
+                cardStatic[row] = s;
+                cardStale[row] = false;
+                staleRows--;
+                var cache = cardCache;
+                if (row < cache.Length) cache[row] = null;
+            }
+            Interlocked.Increment(ref weightsRevision); // the GPU learner's copy of the stats is out of date now (GpuMoves)
+        }
+
+        /// <summary>True when a card's printed stats are all zero from index from on.</summary>
+        private static bool Blank(float[] s, int from)
+        {
+            for (int i = from; i < s.Length; i++) if (s[i] != 0) return false;
+            return true;
         }
 
         /// <summary>Name used to match a card printed in a set the Python bot didn't know.</summary>
@@ -1856,6 +1936,7 @@ namespace PokemonTCG.AI
                     for (int i = 0; i < n; i++) a[i] = Clean(r.ReadSingle());
                     data[name] = a;
                 }
+                int fileStatics = Widen(data);
                 int nb = BlocksIn(data);
                 if (!Fits(data, nb)) return false;
                 int rows = r.ReadInt32();
@@ -1868,7 +1949,7 @@ namespace PokemonTCG.AI
                     var e = new float[CardDim];
                     for (int j = 0; j < CardDim; j++) e[j] = Clean(r.ReadSingle());
                     var s = new float[StaticSize];
-                    for (int j = 0; j < StaticSize; j++) s[j] = Clean(r.ReadSingle());
+                    for (int j = 0; j < fileStatics; j++) s[j] = Clean(r.ReadSingle());
                     learned.Add(e);
                     statics.Add(s);
                 }
@@ -1915,6 +1996,7 @@ namespace PokemonTCG.AI
                     for (int i = 0; i < n; i++) a[i] = Clean(r.ReadSingle());
                     data[name] = a;
                 }
+                int fileStatics = Widen(data);
                 int nb = BlocksIn(data);
                 if (!Fits(data, nb)) return false;
                 float[] ids;
@@ -1930,7 +2012,7 @@ namespace PokemonTCG.AI
                     string name = ReadPyString(r);
                     string prints = ReadPyString(r);
                     var s = new float[StaticSize];
-                    for (int j = 0; j < StaticSize; j++) s[j] = Clean(r.ReadSingle());
+                    for (int j = 0; j < fileStatics; j++) s[j] = Clean(r.ReadSingle());
                     var e = new float[CardDim];
                     Array.Copy(ids, c * CardDim, e, 0, CardDim);
                     var printList = prints.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
@@ -1977,6 +2059,8 @@ namespace PokemonTCG.AI
                 cardKeys.Clear();
                 cardRows.Clear();
                 cardStatic.Clear();
+                cardStale.Clear();
+                staleRows = 0;
                 cardM.Clear();
                 cardV.Clear();
                 rowOfKey.Clear();
@@ -1985,6 +2069,10 @@ namespace PokemonTCG.AI
                     cardKeys.Add(keys[i]);
                     cardRows.Add(learned[i]);
                     cardStatic.Add(statics[i]);
+                    // Saved before the per-attack stats (or never refreshed since): filled in from the card when it's next met.
+                    bool stale = i > 0 && Blank(statics[i], OldStaticSize);
+                    cardStale.Add(stale);
+                    if (stale) staleRows++;
                     cardM.Add(null);
                     cardV.Add(null);
                     if (i > 0 && !rowOfKey.ContainsKey(keys[i])) rowOfKey[keys[i]] = i;
