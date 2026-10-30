@@ -1,7 +1,7 @@
 """Measure a vision model on the pictures held back for checking (val.jsonl), before and after training.
 
     python evaluate.py scenes_dataset --model qwen3-vl:4b-instruct --limit 50   # the untrained model: the starting point
-    python evaluate.py scenes_dataset --model scenes --limit 50                 # after training
+    python evaluate.py scenes_dataset --model pokemon-tcg --limit 50            # after training
 
 Prints the average scores (see score.py for what they mean) and saves, in scenes_dataset/eval_<model>/,
 each answer (answers.jsonl) and, for the first --previews pictures, the picture next to the scene drawn from the answer.
@@ -21,7 +21,7 @@ import score
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("dataset")
-    ap.add_argument("--model", default="scenes")
+    ap.add_argument("--model", default="pokemon-tcg")
     ap.add_argument("--sprites", help="the sprite folder (default: the dataset's demo_sprites, if any)")
     ap.add_argument("--api", choices=("ollama", "openai"), default="ollama")
     ap.add_argument("--url")

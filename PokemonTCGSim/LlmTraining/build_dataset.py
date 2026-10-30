@@ -7,7 +7,7 @@
 Each line of train.jsonl is one conversation: {"messages": [system, user, assistant]}, the format the training notebook
 (train_colab.ipynb) reads. Only Python's standard library is needed:
 
-    python build_dataset.py                     # writes train.jsonl next to this file
+    python build_dataset.py                     # writes train.jsonl and qwen_training.zip next to this file
     python build_dataset.py --cards 6000        # more card questions (default 4000 cards; 0 for none)
     python build_dataset.py --no-download       # card questions only (or reuse the pages saved in ./compendium)
 
@@ -17,6 +17,11 @@ and Unity files there. Every example gets the same system prompt (SYSTEM below),
 it. --extra-limit N keeps at most N examples from each extra file (picked at random), for a quicker training run.
 
 The downloaded pages are saved in ./compendium, so running it again doesn't download them again (--refresh does).
+
+Pictures: if ../VisionTools/scenes_dataset exists (made by VisionTools/make_dataset.py), or --scenes names another such
+folder, its pictures go in too: each becomes an example with "image" (its path in the pack) and the scene JSON as the
+answer, so the same model learns to rebuild pictures as Unity scenes. Everything ends up in one file to upload to Colab,
+qwen_training.zip: train.jsonl, the pictures, the held-back pictures for checking, and the code that scores them.
 """
 import argparse
 import glob
@@ -27,6 +32,7 @@ import random
 import re
 import sys
 import urllib.request
+import zipfile
 from html.parser import HTMLParser
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -38,7 +44,8 @@ SYSTEM = ("You are a helpful assistant and an expert on the Pokémon Trading Car
           "cards), the Pokémon video games, Thomas & Friends and The Railway Series, the Unity game engine, C# and .NET, "
           "Python, neural networks and machine learning (including connecting Python to Unity games), Git, GitHub and "
           "GitHub Desktop, and Game Boy Advance and Nintendo DS games (their ROM and file formats, extracting their data, "
-          "and rebuilding games like them in Unity, honestly saying what can't be converted). Answer "
+          "and rebuilding games like them in Unity, honestly saying what can't be converted). When you're given a picture "
+          "and asked to rebuild it as a Unity scene, answer with the scene JSON only. Answer "
           "clearly and accurately. When a Pokémon ruling comes from the Rulings Compendium, give its source and date. "
           "For code, give correct, working examples, check them before you answer, and explain why.")
 
@@ -303,6 +310,46 @@ def card_examples(limit, rng):
     return out
 
 
+# ---------------------------------------------------------------------------------------------- pictures and the pack
+
+DEFAULT_SCENES = os.path.join(HERE, "..", "VisionTools", "scenes_dataset")
+
+
+def picture_examples(folder):
+    """(training examples, examples held back for checking) from a VisionTools/make_dataset.py folder. A picture example
+    is a normal conversation plus "image": the picture's path inside the pack, which the notebook puts before the
+    question, as ask_model.py sends it."""
+    def read(name):
+        path = os.path.join(folder, name)
+        return [json.loads(line) for line in open(path, encoding="utf-8") if line.strip()] if os.path.exists(path) else []
+
+    def convert(row):
+        return {"messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": row["prompt"]},
+                             {"role": "assistant", "content": row["answer"]}],
+                "image": "pictures/" + row["image"].replace("\\", "/")}
+
+    train, val = read("train.jsonl"), read("val.jsonl")
+    print(f"{folder}: {len(train):,} pictures to train on, {len(val):,} held back for checking")
+    return [convert(r) for r in train], [convert(r) for r in val]
+
+
+def write_pack(pack, train_path, scenes, checks):
+    """The one file to upload: train.jsonl, and with pictures: pictures/images/..., pictures/check.jsonl (the held-back
+    pictures), pictures/sprite_names.json and tools/ (the scene format and scoring code, to score the checks)."""
+    with zipfile.ZipFile(pack, "w", zipfile.ZIP_DEFLATED) as z:
+        z.write(train_path, "train.jsonl")
+        if scenes:
+            z.writestr("pictures/check.jsonl", "".join(json.dumps(c, ensure_ascii=False) + "\n" for c in checks))
+            z.write(os.path.join(scenes, "sprite_names.json"), "pictures/sprite_names.json")
+            for name in ("scenespec.py", "score.py"):
+                z.write(os.path.join(HERE, "..", "VisionTools", name), "tools/" + name)
+            images = sorted(os.listdir(os.path.join(scenes, "images")))
+            for name in images:
+                # PNGs are already compressed: stored as they are, which is quicker.
+                z.write(os.path.join(scenes, "images", name), "pictures/images/" + name, compress_type=zipfile.ZIP_STORED)
+    print(f"wrote {pack} ({os.path.getsize(pack) / 1e6:.0f} MB): upload this one file to Colab")
+
+
 # ---------------------------------------------------------------------------------------------- main
 
 def main():
@@ -313,6 +360,10 @@ def main():
     ap.add_argument("--refresh", action="store_true", help="download the Compendium pages again")
     ap.add_argument("--extra-limit", type=int, default=0,
                     help="at most this many examples from each file in ./extra (0: all of them)")
+    ap.add_argument("--scenes", default=DEFAULT_SCENES,
+                    help="a VisionTools/make_dataset.py folder whose pictures to add (default: ../VisionTools/scenes_dataset if it's there)")
+    ap.add_argument("--no-scenes", action="store_true", help="text only, even if there are pictures")
+    ap.add_argument("--pack", default=os.path.join(HERE, "qwen_training.zip"), help="the one file to upload to Colab")
     ap.add_argument("--seed", type=int, default=7)
     args = ap.parse_args()
     rng = random.Random(args.seed)
@@ -351,12 +402,19 @@ def main():
                 msgs.insert(0, {"role": "system", "content": SYSTEM})
         print(f"{os.path.basename(path)}: {len(added):,} examples")
         examples += added
+    n_text = len(examples)
+    scenes = None if args.no_scenes else args.scenes
+    pictures, checks = picture_examples(scenes) if scenes and os.path.exists(os.path.join(scenes, "train.jsonl")) else ([], [])
+    if scenes and scenes != DEFAULT_SCENES and not pictures:
+        sys.exit(f"no pictures in {scenes} (make them with VisionTools/make_dataset.py)")
+    examples += pictures
     rng.shuffle(examples)
     with open(args.out, "w", encoding="utf-8") as f:
         for ex in examples:
             f.write(json.dumps(ex, ensure_ascii=False) + "\n")
     print(f"wrote {len(examples):,} examples ({n_rulings:,} rulings, {n_cards:,} card questions, "
-          f"{len(examples) - n_rulings - n_cards:,} from extra/) to {args.out}")
+          f"{n_text - n_rulings - n_cards:,} from extra/, {len(pictures):,} pictures) to {args.out}")
+    write_pack(args.pack, args.out, scenes if pictures else None, checks)
 
 
 if __name__ == "__main__":
