@@ -44,11 +44,11 @@ namespace PokemonTCG.EditorTools
         }
 
         /// <summary>
-        /// Trains the learning AI (the same brain file the game uses) on the built-in Dragapult and N's Zoroark decks,
+        /// Trains the Neural AI (the same brain file the game uses) on the built-in Dragapult and N's Zoroark decks,
         /// measuring it against the classic bot before and after. The Train screen in the game does the same for any decks.
         /// </summary>
-        [MenuItem("Pokemon TCG/Train Learning AI - 1,000 Games (Dragapult vs N's Zoroark)")]
-        public static void TrainLearningAi()
+        [MenuItem("Pokemon TCG/Train Neural AI - 1,000 Games (Dragapult vs N's Zoroark)")]
+        public static void TrainNeuralAi()
         {
             var decks = LoadBuiltInDecks();
             if (decks.Count < 2) return;
@@ -77,7 +77,7 @@ namespace PokemonTCG.EditorTools
                 EditorUtility.ClearProgressBar();
             }
             var end = session.Status();
-            Debug.Log("[PokemonTCG] Learning AI trained: " + a.Key + " vs " + b.Key + ", " + end.Done + " games (A " + end.WinsA + ", B " + end.WinsB + ", " + end.Errors + " errors) in "
+            Debug.Log("[PokemonTCG] Neural AI trained: " + a.Key + " vs " + b.Key + ", " + end.Done + " games (A " + end.WinsA + ", B " + end.WinsB + ", " + end.Errors + " errors) in "
                       + end.Seconds.ToString("0") + "s. Against the classic bot: " + (end.ScoreBefore * 100).ToString("0") + "% before, " + (end.ScoreAfter * 100).ToString("0")
                       + "% after. Brain: " + brain.FeatureCount + " weights, " + brain.GamesTrained + " games trained.");
         }

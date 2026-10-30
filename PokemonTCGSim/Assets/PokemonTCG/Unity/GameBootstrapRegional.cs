@@ -41,15 +41,12 @@ namespace PokemonTCG.Presentation
         private const string PrefRegTopCut = "PokemonTCG.RegionalTopCut";
         private const string PrefRegCutBestOf3 = "PokemonTCG.RegionalCutBestOf3";
         private const string PrefRegTables = "PokemonTCG.RegionalTablesAtOnce";
-        private const string PrefRegStyle = "PokemonTCG.RegionalAiStyle";
         private const string PrefRegDay2 = "PokemonTCG.RegionalDay2";
         private const string PrefRegDay2Min = "PokemonTCG.RegionalDay2MinPlayers";
         private const string PrefRegDay2Rounds = "PokemonTCG.RegionalDay2Rounds";
         private const string PrefRegDay2Points = "PokemonTCG.RegionalDay2Points";
         private const int MaxDay2Rounds = 9;
         private const string PrefRegAsymCut = "PokemonTCG.RegionalAsymmetricCut";
-        /// <summary>The AI players' style choices (v117), in AiStyle order.</summary>
-        private static readonly string[] RegionalStyleNames = { "Learning AI", "Neural AI", "Hybrid AI" };
         private static readonly string[] RegionalTabs = { "Standings", "Pairings & results", "Decks" };
         private static readonly string[] RegionalTabsWithCut = { "Standings", "Pairings & results", "Decks", "Top cut" };
         /// <summary>Top cut sizes on the setup screen (v70): none, top 2, top 4, top 8.</summary>
@@ -74,8 +71,6 @@ namespace PokemonTCG.Presentation
             public bool Explore;
             /// <summary>A Tie-Breaker game after a drawn top cut game (v76): it ends as soon as one player leads on Prize cards.</summary>
             public bool TieBreaker;
-            /// <summary>How the event's AI players play (v117): your opponent and both seats of a watched table.</summary>
-            public AiStyle Style = AiStyle.Hybrid;
         }
 
         private RegionalSim regional;
@@ -106,8 +101,6 @@ namespace PokemonTCG.Presentation
         private bool regExpanded;
         private bool regAiOnly;
         private bool regExplore = true;
-        /// <summary>How the AI players play (v117): Learning AI 0, Neural AI 1, Hybrid AI 2 (AiStyle).</summary>
-        private int regStyle = (int)AiStyle.Hybrid;
         private bool regWatch = true;
         private int regDeck = -1;
         private Vector2 regDeckScroll;
@@ -336,14 +329,6 @@ namespace PokemonTCG.Presentation
             }
         }
 
-        /// <summary>One line about the AI style on the setup screen.</summary>
-        private static string RegionalStyleHint(int style)
-        {
-            if (style == (int)AiStyle.Learning) return "The AI players use the learning AI's feature weights.";
-            if (style == (int)AiStyle.Neural) return "The AI players use the neural network only (untrained, it plays like the classic bot).";
-            return "The AI players use the weights and the network added together. Every style teaches both from every game.";
-        }
-
         /// <summary>On quitting: the event is saved and its AI tables stop (unfinished tables are played next time).</summary>
         private void ShutDownRegional()
         {
@@ -520,7 +505,6 @@ namespace PokemonTCG.Presentation
                 sim.SetAsymmetricCut(regTopCut > 0 && regAsymCut);
                 // v127: a big event is split into 2 days.
                 if (Day2Applies(total)) sim.SetDayTwo(Mathf.Clamp(regRounds, 1, MaxRegionalRounds), Mathf.Clamp(regDay2Rounds, 1, MaxDay2Rounds), Mathf.Max(0, regDay2Points));
-                sim.PlayStyle = (AiStyle)Mathf.Clamp(regStyle, 0, 2);
                 sim.Begin();
                 AttachRegional(sim);
                 SaveRegional();
@@ -572,8 +556,7 @@ namespace PokemonTCG.Presentation
                         + (RegionalSim.TieBreakerNext(m) ? " (Tie-Breaker game: the first to lead on Prize cards wins)" : ""),
                 ChooserSeat = chooser < 0 ? -1 : chooser == 0 ? seat : 1 - seat,
                 HigherSeedChooses = RegionalSim.HigherSeedChoosesFor(m) && chooser >= 0,
-                TieBreaker = RegionalSim.TieBreakerNext(m),
-                Style = sim.PlayStyle
+                TieBreaker = RegionalSim.TieBreakerNext(m)
             };
             StartGame(new DeckRecord { Name = you.Deck, Text = sim.DeckText(you.Deck) ?? "" },
                       new DeckRecord { Name = opp.Deck, Text = sim.DeckText(opp.Deck) ?? "" }, start);
@@ -601,7 +584,6 @@ namespace PokemonTCG.Presentation
                 NameA = a.Name,
                 NameB = b.Name,
                 Explore = sim.AiExplore,
-                Style = sim.PlayStyle,
                 ChooserSeat = watchChooser,
                 HigherSeedChooses = RegionalSim.HigherSeedChoosesFor(m) && watchChooser >= 0,
                 TieBreaker = RegionalSim.TieBreakerNext(m),
@@ -777,18 +759,6 @@ namespace PokemonTCG.Presentation
             GUILayout.Label(stage, ui.Title);
 
             DrawRegionalStatus(ui, v, actions, r.width - 28);
-            // v117: the AI players' style, which can change during the event (the next games play the new way).
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("AI players play as", GUILayout.Width(150));
-            int eventStyle = (int)v.PlayStyle;
-            int newEventStyle = GUILayout.Toolbar(eventStyle, RegionalStyleNames, GUILayout.Width(360));
-            if (newEventStyle != eventStyle)
-            {
-                var styleSim = regional;
-                actions.Add(() => { if (styleSim != null) styleSim.PlayStyle = (AiStyle)newEventStyle; });
-            }
-            GUILayout.Label("Games already being played finish the way they started.", Hint(ui));
-            GUILayout.EndHorizontal();
             if (regionalError != null) GUILayout.Label(regionalError, ui.Error);
             if (!string.IsNullOrEmpty(v.LastError)) GUILayout.Label("AI tables: " + v.AiErrors + " game(s) hit an engine error and counted as draws. Last: " + v.LastError, ui.Error);
             if (!string.IsNullOrEmpty(learnStatus)) GUILayout.Label(learnStatus, Hint(ui));
@@ -930,7 +900,7 @@ namespace PokemonTCG.Presentation
             }
             else
             {
-                GUILayout.Label("AI only: every seat is the learning AI, and it learns from every game of the event.", ui.Label);
+                GUILayout.Label("AI only: every seat is the Neural AI, and it learns from every game of the event.", ui.Label);
                 GUILayout.BeginHorizontal();
                 bool watch = GUILayout.Toggle(v.Watching, " Watch one match each round (picked at random)");
                 if (watch != v.Watching)
@@ -1217,7 +1187,7 @@ namespace PokemonTCG.Presentation
             // The whole screen scrolls (v69: the AI players' decks made it longer).
             regSetupScroll = GUILayout.BeginScrollView(regSetupScroll);
             GUILayout.Label("Regional Sim", ui.Header);
-            GUILayout.Label("A Swiss event where every other seat is the learning AI. It learns from every game as the event goes on. The AI "
+            GUILayout.Label("A Swiss event where every other seat is the Neural AI. It learns from every game as the event goes on. The AI "
                             + "players play the decks you choose for them, and the rest pick theirs at random from the legal decks of the format. Your "
                             + "games are played on the board; the other tables play in the background, and a round is paired only when every match "
                             + "of the previous one is over.", ui.Label);
@@ -1382,12 +1352,6 @@ namespace PokemonTCG.Presentation
             if (fmt != (regExpanded ? 1 : 0)) actions.Add(() => { regExpanded = fmt == 1; regDeck = -1; });
             GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("AI players play as", GUILayout.Width(150));
-            int pickedStyle = GUILayout.Toolbar(Mathf.Clamp(regStyle, 0, 2), RegionalStyleNames, GUILayout.Width(360));
-            if (pickedStyle != regStyle) actions.Add(() => regStyle = pickedStyle);
-            GUILayout.EndHorizontal();
-            GUILayout.Label(RegionalStyleHint(regStyle), Hint(ui));
 
             bool explore = GUILayout.Toggle(regExplore, " The AI games try other plays now and then while learning (it learns faster, like on the Train screen; your own opponents always play their best)");
             if (explore != regExplore) actions.Add(() => regExplore = explore);
@@ -1740,7 +1704,6 @@ namespace PokemonTCG.Presentation
             regExpanded = PlayerPrefs.GetInt(PrefRegExpanded, 0) == 1;
             regAiOnly = PlayerPrefs.GetInt(PrefRegAiOnly, 0) == 1;
             regExplore = PlayerPrefs.GetInt(PrefRegExplore, 1) == 1;
-            regStyle = Mathf.Clamp(PlayerPrefs.GetInt(PrefRegStyle, (int)AiStyle.Hybrid), 0, 2);
             regWatch = PlayerPrefs.GetInt(PrefRegWatch, 1) == 1;
             regFillRandom = PlayerPrefs.GetInt(PrefRegFillRandom, 1) == 1;
             regFieldByPercent = PlayerPrefs.GetInt(PrefRegFieldByPct, 0) == 1;
@@ -1780,7 +1743,6 @@ namespace PokemonTCG.Presentation
             PlayerPrefs.SetInt(PrefRegExpanded, regExpanded ? 1 : 0);
             PlayerPrefs.SetInt(PrefRegAiOnly, regAiOnly ? 1 : 0);
             PlayerPrefs.SetInt(PrefRegExplore, regExplore ? 1 : 0);
-            PlayerPrefs.SetInt(PrefRegStyle, Mathf.Clamp(regStyle, 0, 2));
             PlayerPrefs.SetInt(PrefRegWatch, regWatch ? 1 : 0);
             PlayerPrefs.SetInt(PrefRegFillRandom, regFillRandom ? 1 : 0);
             PlayerPrefs.SetInt(PrefRegFieldByPct, regFieldByPercent ? 1 : 0);

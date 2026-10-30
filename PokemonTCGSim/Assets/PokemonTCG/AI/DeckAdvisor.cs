@@ -1351,7 +1351,7 @@ namespace PokemonTCG.AI
             {
                 var record = brain.RecordOf(deckName);
                 if (record.Games > 0)
-                    notes.Add("The learning AI has played this deck " + record.Games.ToString("N0", CultureInfo.InvariantCulture) + " times: "
+                    notes.Add("The Neural AI has played this deck " + record.Games.ToString("N0", CultureInfo.InvariantCulture) + " times: "
                               + record.Wins.ToString("N0", CultureInfo.InvariantCulture) + " wins, " + record.Losses.ToString("N0", CultureInfo.InvariantCulture) + " losses.");
                 var skill = brain.SkillOf(deckName);
                 if (skill.Decisions > 0)

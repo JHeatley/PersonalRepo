@@ -128,12 +128,12 @@ namespace PokemonTCG.Presentation
             GUI.Box(r, GUIContent.none);
             GUILayout.BeginArea(new Rect(r.x + 16, r.y + 16, r.width - 32, r.height - 32));
             GUILayout.Label("Save folders", ui.Header);
-            GUILayout.Label("Where the learning AI's brain and your saved decks are kept on this computer. When you choose a new folder, "
+            GUILayout.Label("Where the Neural AI's brain and your saved decks are kept on this computer. When you choose a new folder, "
                             + "the files in the current one are copied there (files already in the new folder are kept), and the old files "
                             + "stay where they were as a backup.", ui.Label);
             GUILayout.Space(10);
 
-            DrawFolderRow(ui, FolderBrain, "Learning AI (brain.txt and feedback.txt)", ref brainFolderText,
+            DrawFolderRow(ui, FolderBrain, "Neural AI (brain.txt and feedback.txt)", ref brainFolderText,
                 SavePaths.BrainFolder, SavePaths.DefaultBrainFolder, SavePaths.BrainFolderIsDefault, BrainFolderBlocked());
             GUILayout.Space(14);
             DrawFolderRow(ui, FolderDecks, "Saved decks", ref deckFolderText,

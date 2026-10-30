@@ -318,11 +318,10 @@ public static class Program
             var brain = LearningBrain.Load(J("brain"));
             // v171: never train (and save) over a network file this trainer can't read: it would replace it with the starting network.
             if (brain.PolicyLoadError != null) throw new InvalidDataException(brain.PolicyLoadError);
-            var style = J("style", "neural").ToLowerInvariant();
             var session = new TrainingSession(StandardCards.CreateRegistry(), brain, deckA.Key, deckA.Value, deckB.Key, deckB.Value,
                 JI("games", 1000), JI("measure", 0), JI("seed", Environment.TickCount & 0x0FFFFFFF) | 1)
             {
-                Style = style == "learning" ? AiStyle.Learning : style == "hybrid" ? AiStyle.Hybrid : AiStyle.Neural,
+                Style = AiStyle.Neural, // a job's style= line (learning or hybrid from older builds) is ignored: only the Neural AI trains
                 DeckPool = randomA || randomB ? decks : null,
                 RandomA = randomA,
                 RandomB = randomB,

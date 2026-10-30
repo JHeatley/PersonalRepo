@@ -24,7 +24,14 @@ namespace PokemonTCG.AI
         public const int PlacementGames = 10;
         public const double PlacementK = 40, NormalK = 20, OpponentK = 16;
         public const double QualityPar = 60, QualitySpread = 40, QualityNudge = 8, PlacementQualityNudge = 12;
-        public const string ClassicBot = "Classic bot", LearningAi = "Learning AI";
+        public const string ClassicBot = "Classic bot", LearningAi = "Neural AI";
+        /// <summary>The learning opponent's name in rating files from before the Learning and Hybrid AI were removed (read as LearningAi).</summary>
+        private const string OldLearningAi = "Learning AI";
+
+        private static string Renamed(string opponent)
+        {
+            return opponent == OldLearningAi ? LearningAi : opponent;
+        }
         public const string FileName = "rating.txt";
 
         public double Rating = StartRating;
@@ -291,7 +298,7 @@ namespace PokemonTCG.AI
                 else if (line.StartsWith("opponent="))
                 {
                     var p = line.Substring(9).Split('\t');
-                    if (p.Length >= 2) r.Opponents[p[0]] = D(p[1], StartRating);
+                    if (p.Length >= 2) r.Opponents[Renamed(p[0])] = D(p[1], StartRating);
                 }
                 else if (line.StartsWith("G\t"))
                 {
@@ -307,7 +314,7 @@ namespace PokemonTCG.AI
                         When = when,
                         YourDeck = p[2],
                         TheirDeck = p[3],
-                        Opponent = p[4],
+                        Opponent = Renamed(p[4]),
                         OpponentRating = D(p[5], StartRating),
                         Result = D(p[6], 0),
                         Turns = turns,

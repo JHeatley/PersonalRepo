@@ -82,6 +82,19 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
+        public void A_Rating_Saved_Against_The_Learning_AI_Carries_Over_To_The_Neural_AI()
+        {
+            var r = new PlayerRating();
+            r.Record(1, PlayerRating.LearningAi, "Dragapult ex", "Gardevoir ex", 11, null, When);
+            double theirs = r.OpponentRating(PlayerRating.LearningAi);
+            // A file from before the Learning AI was removed names the same opponent "Learning AI".
+            var old = PlayerRating.Parse(r.Serialize().Replace(PlayerRating.LearningAi, "Learning AI"));
+            Assert.AreEqual("Neural AI", PlayerRating.LearningAi);
+            Assert.AreEqual(theirs, old.OpponentRating(PlayerRating.LearningAi), 1e-6);
+            Assert.AreEqual(PlayerRating.LearningAi, old.History[0].Opponent);
+        }
+
+        [Test]
         public void What_To_Work_On_Comes_From_The_Habits_Flagged_Most_Often()
         {
             var r = new PlayerRating();

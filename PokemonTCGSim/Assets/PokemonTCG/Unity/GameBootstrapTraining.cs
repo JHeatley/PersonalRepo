@@ -22,12 +22,11 @@ namespace PokemonTCG.Presentation
     public sealed partial class GameBootstrap
     {
         private const string PrefOpponentAi = "PokemonTCG.OpponentAI";
-        /// <summary>Learning AI 0, Neural AI 1, Hybrid AI 2 (v74; AiStyle).</summary>
-        private const string PrefOpponentStyle = "PokemonTCG.OpponentStyle";
-        /// <summary>The Opponent switch (v74): the three ways the learning AI can play, then the classic bot.</summary>
-        private static readonly string[] OpponentChoices = { "Learning AI", "Neural AI", "Hybrid AI", "Classic bot" };
-        /// <summary>How the AI plays in training (v78): Learning AI 0, Neural AI 1, Hybrid AI 2 (AiStyle), apart from the Opponent switch.</summary>
-        private const string PrefTrainStyle = "PokemonTCG.TrainStyle";
+        /// <summary>
+        /// The Opponent switch: the Neural AI, which learns, or the classic bot, which doesn't. (The Learning AI and Hybrid AI
+        /// choices were removed: the Neural AI plays everything, in training and the Regional Sim too.)
+        /// </summary>
+        private static readonly string[] OpponentChoices = { "Neural AI", "Classic bot" };
         private const string PrefTrainA = "PokemonTCG.TrainDeckA";
         private const string PrefTrainB = "PokemonTCG.TrainDeckB";
         private const string PrefTrainGames = "PokemonTCG.TrainGames";
@@ -71,7 +70,6 @@ namespace PokemonTCG.Presentation
         private LearningBrain brain;
         private string brainError;
         private bool opponentLearning = true;
-        private AiStyle opponentStyle = AiStyle.Hybrid;
 
         // Train screen
         private TrainingSession training;
@@ -95,7 +93,6 @@ namespace PokemonTCG.Presentation
         /// <summary>The deck that plays every game in focus mode (index into decks), or -1.</summary>
         private int TrainFocusDeck { get { return !TrainFocus ? -1 : trainRandomA ? trainB : trainA; } }
         private bool trainMeasure = true;
-        private AiStyle trainStyle = AiStyle.Hybrid;
         private bool confirmReset;
         private bool sessionUndone;
         private Vector2 trainScrollA, trainScrollB, trainScrollInfo, trainScrollMatchups, trainScrollLessons, trainScrollDecks, trainScrollSettings;
@@ -131,7 +128,6 @@ namespace PokemonTCG.Presentation
             public double NetLoss;
             public string NetOrigin;
             public int NetBlocks;
-            public AiStyle Style;
             public List<MatchupStats> Matchups = new List<MatchupStats>();
             public List<DeckSkill> Decks = new List<DeckSkill>();
             public List<KeyValuePair<string, double>> Lessons = new List<KeyValuePair<string, double>>();
@@ -196,7 +192,6 @@ namespace PokemonTCG.Presentation
         private void LoadBrain()
         {
             opponentLearning = PlayerPrefs.GetInt(PrefOpponentAi, 1) == 1;
-            opponentStyle = (AiStyle)Mathf.Clamp(PlayerPrefs.GetInt(PrefOpponentStyle, (int)AiStyle.Hybrid), 0, 2);
             brainError = null;
             try
             {
@@ -209,7 +204,7 @@ namespace PokemonTCG.Presentation
                 brainError = "Couldn't read the AI's file (" + e.Message + "); starting fresh.";
                 brain = new LearningBrain { FilePath = BrainPath };
             }
-            brain.Style = opponentStyle;
+            brain.Style = AiStyle.Neural;
             brainView = null;
             nextBrainRefresh = 0f;
             // A Regional Sim event in progress plays with (and teaches) the brain from the new folder from now on.
@@ -272,52 +267,22 @@ namespace PokemonTCG.Presentation
             PlayerPrefs.SetInt(PrefOpponentAi, on ? 1 : 0);
         }
 
-        /// <summary>Position of the Opponent switch: the learning AI's style (0-2), or 3 for the classic bot.</summary>
-        private int OpponentPick { get { return opponentLearning ? (int)opponentStyle : 3; } }
+        /// <summary>Position of the Opponent switch: 0 the Neural AI, 1 the classic bot.</summary>
+        private int OpponentPick { get { return opponentLearning ? 0 : 1; } }
 
-        /// <summary>
-        /// The Opponent switch (v74). The style is the brain's: training, the Regional Sim and the measuring games play the same
-        /// way as your opponent. Every style learns from every game (the feature weights and the network both).
-        /// </summary>
         private void SetOpponentPick(int pick)
         {
-            if (pick >= 3)
-            {
-                SetOpponentLearning(false);
-                return;
-            }
-            SetOpponentLearning(true);
-            opponentStyle = (AiStyle)Mathf.Clamp(pick, 0, 2);
-            PlayerPrefs.SetInt(PrefOpponentStyle, (int)opponentStyle);
-            if (brain != null) brain.Style = opponentStyle;
-        }
-
-        private static string StyleName(AiStyle style)
-        {
-            return OpponentChoices[(int)style];
-        }
-
-        /// <summary>What each training style means (v78).</summary>
-        private static string TrainStyleHint(AiStyle style)
-        {
-            string how = style == AiStyle.Learning
-                ? "The training games are played with the feature weights only."
-                : style == AiStyle.Neural
-                    ? "The training games are played with the neural network only, and the network learns from them by PPO self-play (it starts from the Python bot's training)."
-                    : "The training games are played with the weights and the network added together.";
-            return how + (style == AiStyle.Neural ? "" : " The feature weights learn from every game.") + " The measuring games play the same way. "
-                   + "Your opponent's style is the Opponent switch on the menu.";
+            SetOpponentLearning(pick == 0);
         }
 
         /// <summary>
-        /// The bot for a game: the learning AI (no exploring) or the classic bot. forceLearning: always the learning AI
-        /// (your Regional Sim opponents, v57), whatever the menu says.
+        /// The bot for a game: the Neural AI (no exploring) or the classic bot. forceLearning: always the Neural AI (your Regional
+        /// Sim opponents, v57), whatever the menu says.
         /// </summary>
-        private IPlayerAgent MakeBot(int seed, string myDeckName, string oppDeckName, bool learnFromGame, bool forceLearning = false, AiStyle? style = null)
+        private IPlayerAgent MakeBot(int seed, string myDeckName, string oppDeckName, bool learnFromGame, bool forceLearning = false)
         {
             if ((!opponentLearning && !forceLearning) || brain == null) return new HeuristicAgent(seed);
-            // style: the Regional Sim's own choice (v117); null plays the Opponent switch's style.
-            var agent = new LearningAgent(brain, seed, myDeckName, oppDeckName) { Training = false, Record = learnFromGame, Style = style };
+            var agent = new LearningAgent(brain, seed, myDeckName, oppDeckName) { Training = false, Record = learnFromGame, Style = AiStyle.Neural };
             if (learnFromGame) learningBot = agent;
             if (lookAhead > 0 && agent.Neural != null) agent.Neural.Search = MakeSearch();
             return agent;
@@ -360,13 +325,10 @@ namespace PokemonTCG.Presentation
         {
             if (!opponentLearning) return "The classic bot plays the same way every game.";
             if (brain == null) return "";
-            string line = StyleName(opponentStyle) + ": trained on " + brain.GamesTrained.ToString("N0") + " games, learned from " + brain.GamesVsYou + " of yours";
-            if (opponentStyle != AiStyle.Learning)
-            {
-                long steps = brain.Policy.Steps;
-                string origin = brain.Policy.Origin;
-                line += ", network " + (string.IsNullOrEmpty(origin) ? "" : "from the " + origin + ", ") + steps.ToString("N0") + " learning steps here";
-            }
+            string line = "Neural AI: trained on " + brain.GamesTrained.ToString("N0") + " games, learned from " + brain.GamesVsYou + " of yours";
+            long steps = brain.Policy.Steps;
+            string origin = brain.Policy.Origin;
+            line += ", network " + (string.IsNullOrEmpty(origin) ? "" : "from the " + origin + ", ") + steps.ToString("N0") + " learning steps here";
             line += ".";
             var st = trainView;
             if (st != null && st.Running) line += "  Training now: " + st.Done + " / " + st.Games + ".";
@@ -431,8 +393,6 @@ namespace PokemonTCG.Presentation
             RefreshDecks();
             trainA = IndexOfDeck(PlayerPrefs.GetString(PrefTrainA, ""), myDeck);
             trainB = IndexOfDeck(PlayerPrefs.GetString(PrefTrainB, ""), oppDeck);
-            // The style training plays (v78): its own choice, starting from the Opponent switch's until you pick one.
-            trainStyle = (AiStyle)Mathf.Clamp(PlayerPrefs.GetInt(PrefTrainStyle, (int)opponentStyle), 0, 2);
             trainGames = Mathf.Clamp(PlayerPrefs.GetInt(PrefTrainGames, 1000), 1, MaxTrainGames);
             trainGamesText = trainGames.ToString("N0");
             bool all = PlayerPrefs.GetInt(PrefTrainAll, 0) == 1; // the earlier All decks switch
@@ -471,7 +431,6 @@ namespace PokemonTCG.Presentation
                     NetLoss = brain.Policy.AverageLoss,
                     NetOrigin = brain.Policy.Origin,
                     NetBlocks = brain.Policy.Blocks,
-                    Style = brain.Style,
                     Matchups = brain.Matchups(),
                     Decks = brain.DeckSkills(),
                     Lessons = brain.StrongestLessons(0, 5), // all of them; the Train screen shows them in a scrolling list
@@ -637,7 +596,7 @@ namespace PokemonTCG.Presentation
                     RandomA = trainRandomA,
                     RandomB = trainRandomB
                 };
-                training.Style = trainStyle;
+                training.Style = AiStyle.Neural;
                 var poolFormat = (focus >= 0 ? decks[focus].ResolvedFormat : null) ?? GameFormat.Standard;
                 training.Rules = poolFormat.Rules;
                 training.PrizeCount = poolFormat.PrizeCount;
@@ -662,7 +621,7 @@ namespace PokemonTCG.Presentation
             PlayerPrefs.SetString(PrefTrainB, decks[trainB].Name);
             training = new TrainingSession(StandardCards.CreateRegistry(), brain, decks[trainA].Name, cardsA, decks[trainB].Name, cardsB,
                 games, trainMeasure ? MeasureGames : 0, seed);
-            training.Style = trainStyle;
+            training.Style = AiStyle.Neural;
             // A custom format's deck trains by that format's rules and Prize cards (v123).
             var trainFormat = decks[trainA].ResolvedFormat ?? GameFormat.Standard;
             training.Rules = trainFormat.Rules;
@@ -817,16 +776,7 @@ namespace PokemonTCG.Presentation
                 GUILayout.Label("A test it takes twice: before training it plays " + MeasureGames + " games against the classic bot (the sim's original AI, which never "
                                 + "learns); after training it replays the same " + MeasureGames + " games (same decks, seats and shuffles), so the difference "
                                 + "comes from what it learned, not luck. It doesn't learn from these games. 50% = as good as the classic bot"
-                                + (trainStyle == AiStyle.Neural ? "; the Neural AI is also checked (100 games) every fifth of the session." : "."), Hint(ui));
-            GUILayout.Label("Train as", ui.Label);
-            int newStyle = GUILayout.Toolbar((int)trainStyle, new[] { OpponentChoices[0], OpponentChoices[1], OpponentChoices[2] });
-            if (newStyle != (int)trainStyle)
-                actions.Add(() =>
-                {
-                    trainStyle = (AiStyle)Mathf.Clamp(newStyle, 0, 2);
-                    PlayerPrefs.SetInt(PrefTrainStyle, (int)trainStyle);
-                });
-            GUILayout.Label(TrainStyleHint(trainStyle), Hint(ui));
+                                + "; the Neural AI is also checked (100 games) every fifth of the session.", Hint(ui));
             GUILayout.BeginHorizontal();
             GUILayout.Label("Speed", GUILayout.Width(60));
             int speed = GUILayout.Toolbar(trainFast ? 1 : 0, new[] { "Gentle", "Fast" });
@@ -1096,9 +1046,8 @@ namespace PokemonTCG.Presentation
                                 ? b.NetSteps.ToString("N0") + " learning steps here · loss " + b.NetLoss.ToString("0.00")
                                   + " (how far off its guesses of who wins were, lately: not a score, since its opponent is itself and gets better too; "
                                   + "a sudden jump to several times its usual size means something went wrong)"
-                                : "no learning steps here yet (Train as Neural AI to train it)")
-                            + " · your opponent plays as " + StyleName(b.Style) + " (the Opponent switch on the menu); training plays as " + StyleName(trainStyle)
-                            + " (Train as, above).", ui.Label);
+                                : "no learning steps here yet (train it on this screen)")
+                            + ".", ui.Label);
             GUILayout.BeginHorizontal();
             if (b.NetBlocks < PolicyNet.BigBlocks)
             {

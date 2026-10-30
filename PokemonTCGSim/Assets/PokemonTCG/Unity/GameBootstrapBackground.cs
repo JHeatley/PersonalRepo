@@ -277,7 +277,7 @@ namespace PokemonTCG.Presentation
                 sb.Append("brain=").Append(BrainPath).Append('\n');
                 sb.Append("games=").Append(Mathf.Clamp(trainGames, 1, MaxTrainGames)).Append('\n');
                 sb.Append("measure=").Append(trainMeasure ? MeasureGames : 0).Append('\n');
-                sb.Append("style=").Append(trainStyle == AiStyle.Learning ? "learning" : trainStyle == AiStyle.Hybrid ? "hybrid" : "neural").Append('\n');
+                sb.Append("style=neural").Append('\n');
                 sb.Append("pool=").Append(string.Join(",", pool.Select(i => i.ToString(CultureInfo.InvariantCulture)).ToArray())).Append('\n');
                 sb.Append("champion=").Append(string.Join(",", champion.Select(i => i.ToString(CultureInfo.InvariantCulture)).ToArray())).Append('\n');
                 sb.Append("a=").Append(trainRandomA ? -1 : trainA).Append('\n');

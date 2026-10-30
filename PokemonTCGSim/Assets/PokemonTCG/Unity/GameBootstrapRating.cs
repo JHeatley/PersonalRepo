@@ -185,7 +185,7 @@ namespace PokemonTCG.Presentation
 
             GUILayout.Space(8);
             GUILayout.Label("How it's worked out", ui.Title);
-            GUILayout.Label("Each game moves your rating two ways. The result: standard Elo against your opponent's rating (the classic bot and the learning AI each have "
+            GUILayout.Label("Each game moves your rating two ways. The result: standard Elo against your opponent's rating (the classic bot and the Neural AI each have "
                             + "their own, and it moves too, so beating a stronger AI is worth more). The play: a 0-100 score from the Areas of Improvement review "
                             + "(how often you made the AI's choice, the win chance its simulations say your key mistakes cost, and the habits it flagged). Above 60 "
                             + "adds a little, below takes a little, up to " + PlayerRating.QualityNudge + " a game (" + PlayerRating.PlacementQualityNudge + " while placing), "

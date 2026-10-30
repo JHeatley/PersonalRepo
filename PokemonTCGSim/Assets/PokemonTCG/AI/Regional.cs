@@ -174,8 +174,8 @@ namespace PokemonTCG.AI
         public int CutStart { get { return Rounds + PlayInRounds; } }
         public bool YouPlaying;
         public bool AiExplore;
-        /// <summary>How the AI players play (v117): Learning AI, Neural AI or Hybrid AI.</summary>
-        public AiStyle PlayStyle = AiStyle.Hybrid;
+        /// <summary>How the AI players play: the Neural AI.</summary>
+        public AiStyle PlayStyle = AiStyle.Neural;
         public string Format = "";
         public bool Finished;
         public List<RegionalStanding> Standings = new List<RegionalStanding>();
@@ -257,8 +257,8 @@ namespace PokemonTCG.AI
         public const int MaxCutGames = 9;
         private string format = "Standard";
         private bool aiExplore = true;
-        /// <summary>How every AI player of this event plays (v117; saved with the event). Older events play Hybrid AI.</summary>
-        private AiStyle aiStyle = AiStyle.Hybrid;
+        /// <summary>How every AI player of this event plays (v117; saved with the event): the Neural AI, for events saved with another style too.</summary>
+        private AiStyle aiStyle = AiStyle.Neural;
         private bool finished;
         /// <summary>AI only: each round one table is played on the board for you to watch instead of in the background.</summary>
         private bool watchOne;
@@ -1856,7 +1856,7 @@ namespace PokemonTCG.AI
                     }
                     case "Format": sim.format = f.Length > 1 ? Unescape(f[1]) : "Standard"; break;
                     case "Explore": sim.aiExplore = ParseInt(f, 1) != 0; break;
-                    case "Style": sim.aiStyle = (AiStyle)Math.Max(0, Math.Min(2, ParseInt(f, 1))); break;
+                    case "Style": sim.aiStyle = AiStyle.Neural; break; // the Learning and Hybrid AI were removed
                     case "Finished": sim.finished = ParseInt(f, 1) != 0; break;
                     case "Watch": sim.watchOne = ParseInt(f, 1) != 0; break;
                     case "Featured": sim.featuredTable = ParseInt(f, 1); break;
