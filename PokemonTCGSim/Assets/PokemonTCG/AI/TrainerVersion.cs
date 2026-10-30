@@ -8,6 +8,6 @@ namespace PokemonTCG.AI
     /// </summary>
     public static class TrainerVersion
     {
-        public const int Number = 172; // 172: the background job's lookaheaddecisions (how much training looks ahead)
+        public const int Number = 173; // 173: the network sees attack costs, Energy needed, evolutions, Knock Outs, Items, the Bench and protection (bigger inputs)
     }
 }

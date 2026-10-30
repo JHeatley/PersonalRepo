@@ -398,7 +398,8 @@ namespace PokemonTCG.Presentation
                                 + "Games you play against the AI until then don't teach it.", Hint(ui));
             }
             else if (!BackgroundTrainerAvailable)
-                GUILayout.Label("Background training needs Windows and Tools/sim-train/sim-train.exe next to the Assets folder.", Hint(ui));
+                GUILayout.Label("Background training needs Windows and Tools/sim-train/sim-train.exe beside the game (a Windows build "
+                                + "includes it) or, in the editor, beside the Assets folder.", Hint(ui));
             else
                 GUILayout.Label("Runs this session (the decks, games, style and settings above) in a separate trainer program: several times faster "
                                 + "than training in the app, and the app stays light. When it's done, the app loads what it learned.", Hint(ui));

@@ -16,18 +16,28 @@ using PokemonTCG.Core;
 /// </summary>
 public static class Program
 {
-    /// <summary>The PokemonTCGSim folder (its Assets hold the card data): --root, or found upward from this program's folder.</summary>
+    /// <summary>
+    /// The PokemonTCGSim folder (its Assets hold the card data), or a game build's folder (its TrainerData holds them): --root,
+    /// or found upward from this program's folder.
+    /// </summary>
     static string Root = FindRoot();
 
     static string FindRoot()
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
         for (var d = dir; d != null; d = d.Parent)
-            if (Directory.Exists(Path.Combine(d.FullName, "Assets", "PokemonTCG", "Resources", "CardData"))) return d.FullName;
+            if (Directory.Exists(Path.Combine(d.FullName, "Assets", "PokemonTCG", "Resources", "CardData"))
+                || Directory.Exists(Path.Combine(d.FullName, "TrainerData", "CardData"))) return d.FullName;
         return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
     }
 
-    static string Resources => Path.Combine(Root, "Assets", "PokemonTCG", "Resources");
+    /// <summary>
+    /// The card data, decklists and starting network: the project's Resources, or in a game build (which packs Resources
+    /// into Unity's own files) the TrainerData folder the build copies beside the game (Editor/TrainerBuildFiles.cs).
+    /// </summary>
+    static string Resources => Directory.Exists(Path.Combine(Root, "TrainerData", "CardData"))
+        ? Path.Combine(Root, "TrainerData")
+        : Path.Combine(Root, "Assets", "PokemonTCG", "Resources");
     static string DefaultOut => Path.Combine(Root, "Headless", "out", "policy.neural");
 
     public static int Main(string[] args)

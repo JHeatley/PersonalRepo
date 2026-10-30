@@ -57,7 +57,9 @@ import torch.nn.functional as F
 VERSION = 1
 VERSIONS = (1, 2)
 VERSION_SLOT = 3
-CARD_DIM, STATIC_SIZE = 48, 64
+CARD_DIM = 48
+# Printed stats per card: taken from the sim's weights (cards.proj.weight), since the sim has grown them over time (64, then 144).
+STATIC_SIZE = 64
 NEG_INF = -1e9
 
 
@@ -108,12 +110,15 @@ def w_floats(f, a):
 
 
 def read_weights(r, with_static=True):
+    global STATIC_SIZE
     tensors = {}
     for _ in range(r.i32()):
         name = r.str()
         shape = [r.i32() for _ in range(r.i32())]
         n = int(np.prod(shape)) if shape else 1
         tensors[name] = r.floats(n).reshape(shape)
+    if "cards.proj.weight" in tensors:
+        STATIC_SIZE = tensors["cards.proj.weight"].shape[1]
     rows = r.i32()
     learned = r.floats(rows * CARD_DIM).reshape(rows, CARD_DIM)
     static = r.floats(rows * STATIC_SIZE).reshape(rows, STATIC_SIZE) if with_static else None

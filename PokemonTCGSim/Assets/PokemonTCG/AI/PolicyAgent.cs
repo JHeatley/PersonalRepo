@@ -74,7 +74,7 @@ namespace PokemonTCG.AI
         private GameEngine engine;
 
         /// <summary>Counts for the sequencing report.</summary>
-        public int Attacks, AttacksWithResourcesLeft, Shuffles, ShufflesWithPlaysLeft, DrewThenShuffled;
+        public int Attacks, AttacksWithResourcesLeft, Shuffles, ShufflesWithPlaysLeft, DrewThenShuffled, Attachments, WastedAttachments;
         private readonly Rng rng;
         private int drewTurn = -1;
 
@@ -220,6 +220,9 @@ namespace PokemonTCG.AI
         /// The Python bot's common sequencing mistakes: shuffling your hand away (Lillie's Determination, Judge...) while
         /// Items, Basics to bench or an Energy attachment were still available; attacking (which ends the turn) with an Energy
         /// attachment, an Ability or a Basic to bench left; using a draw Ability and then shuffling the hand away that turn.
+        /// And a wasted Energy attachment: a basic Energy that helps none of the Pokémon's attacks, nor its evolutions' to come,
+        /// nor the Active Pokémon's retreat (PolicyPlan.Wasted: Budew's free attack, a fourth Energy on a Pokémon whose attacks
+        /// need three).
         /// </summary>
         private int SequencingMistakes(DecisionRequest r, List<PolicyEncoder.Choice> choices, int a)
         {
@@ -263,6 +266,15 @@ namespace PokemonTCG.AI
                         mistakes++;
                         break;
                     }
+                }
+            }
+            else if (o.Action == ActionType.AttachEnergy && o.Card != null && o.PokemonUid >= 0)
+            {
+                Attachments++;
+                if (PolicyEncoder.WastedAttachment(r, Memory, o))
+                {
+                    WastedAttachments++;
+                    mistakes++;
                 }
             }
             else if (o.Action == ActionType.UseAbility && o.Card != null && o.Index >= 0 && o.Index < o.Card.Abilities.Count

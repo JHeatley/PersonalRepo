@@ -4,7 +4,17 @@ Makes the Neural AI's training learn on your NVIDIA graphics card. The sim still
 CPU, but learning from them (most of the training time) moves to the GPU, which is about 2 to 3 times as fast
 overall and keeps the heaviest maths off the CPU.
 
-## Set up (once)
+## The easy way (Windows)
+
+Install Python 3.10 or newer from python.org (tick "Add python.exe to PATH"), then double-click
+`start_gpu_learner.bat`. The first time, it sets up its own copy of PyTorch for NVIDIA cards (about 3 GB, in a `.venv`
+folder here, so nothing else on the PC changes) and checks it can see the card; every time, it starts the learner.
+Keep its window open while training.
+
+A Windows build of the game carries this folder beside the game (`GpuLearner/`), so someone you give the game to does
+the same there. Without it, training still works: it learns on the CPU.
+
+## Set up by hand (once)
 
 1. Install Python 3.10 or newer from python.org (tick "Add python.exe to PATH").
 2. Install PyTorch **with CUDA**. A plain `pip install torch` on Windows gets the CPU-only build, which can't use the

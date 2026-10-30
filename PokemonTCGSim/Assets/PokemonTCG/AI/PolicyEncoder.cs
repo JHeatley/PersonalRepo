@@ -57,6 +57,28 @@ namespace PokemonTCG.AI
             return DeckList;
         }
 
+        private List<CardDef> factsFor;
+        private bool deckTeamEnergy;
+        private float deckItemShare;
+
+        /// <summary>
+        /// Facts about the whole deck, worked out once per decklist (not on every decision): does a card in it use Energy on your
+        /// other Pokémon (PolicyPlan.TeamUsesEnergy), and what share of it is Items.
+        /// </summary>
+        public bool DeckUsesTeamEnergy { get { DeckFacts(); return deckTeamEnergy; } }
+        public float DeckItemShare { get { DeckFacts(); return deckItemShare; } }
+
+        private void DeckFacts()
+        {
+            var deck = Deck();
+            if (deck == null || ReferenceEquals(deck, factsFor)) return;
+            deckTeamEnergy = PolicyPlan.TeamUsesEnergy(deck);
+            int items = 0;
+            foreach (var d in deck) if (d != null && d.IsItem) items++;
+            deckItemShare = deck.Count > 0 ? items / (float)deck.Count : 0;
+            factsFor = deck;
+        }
+
         public void OnEvent(GameEngine engine, GameEvent ev)
         {
             if (engine != null) this.engine = engine;
@@ -431,12 +453,25 @@ namespace PokemonTCG.AI
             int turn = v != null ? v.TurnNumber : 0;
             var slotOf = new Dictionary<int, int>();
 
+            // What's still to come for you (your hand and the cards left in your deck and Prizes): evolutions and their attacks.
+            List<CardDef> toCome = null, unseen = null;
+            bool teamEnergy = false;
+            if (me != null)
+            {
+                toCome = new List<CardDef>();
+                foreach (var c in me.Hand) if (c != null && c.Def != null) toCome.Add(c.Def);
+                unseen = UnseenDefs(v, me, mem);
+                toCome.AddRange(unseen);
+                teamEnergy = mem != null && mem.DeckUsesTeamEnergy;
+            }
+
             // Board slots: yours, then the opponent's (hidden while setting up).
             if (me != null)
             {
                 for (int side = 0; side < 2; side++)
                 {
                     var s = side == 0 ? me : opp;
+                    var other = side == 0 ? opp : me;
                     if (side == 1 && v.InSetup) break;
                     int k = 0;
                     foreach (var mon in PolicyMemory.InPlay(s))
@@ -447,6 +482,10 @@ namespace PokemonTCG.AI
                         x.SlotCard[slot] = net.RowOf(mon.Top != null ? mon.Top.Def : null);
                         x.SlotTool[slot] = mon.Tool != null ? net.RowOf(mon.Tool.Def) : 0;
                         SlotFeatures(mon, k == 0, turn, mem, x.SlotFeat, slot * PolicyInput.SlotFeatures);
+                        RetreatFeatures(mon, x.SlotFeat, slot * PolicyInput.SlotFeatures);
+                        GuardFeatures(mon, v.InSetup ? null : other, x.SlotFeat, slot * PolicyInput.SlotFeatures);
+                        PlanFeatures(mon, side == 0 ? toCome : null, side == 0 ? me : null, v.InSetup ? null : other,
+                                     x.SlotFeat, slot * PolicyInput.SlotFeatures);
                         k++;
                     }
                 }
@@ -457,7 +496,7 @@ namespace PokemonTCG.AI
                 x.Bags[PolicyInput.BagHand] = Rows(net, me.Hand, PolicyInput.BagLimit[PolicyInput.BagHand], false);
                 x.Bags[PolicyInput.BagMyDiscard] = Rows(net, me.Discard, PolicyInput.BagLimit[PolicyInput.BagMyDiscard], true);
                 x.Bags[PolicyInput.BagOppDiscard] = Rows(net, opp.Discard, PolicyInput.BagLimit[PolicyInput.BagOppDiscard], true);
-                x.Bags[PolicyInput.BagUnseen] = Sorted(Unseen(v, me, mem, net), PolicyInput.BagLimit[PolicyInput.BagUnseen]);
+                x.Bags[PolicyInput.BagUnseen] = Sorted(Unseen(unseen, net), PolicyInput.BagLimit[PolicyInput.BagUnseen]);
                 if (mem != null)
                 {
                     x.Bags[PolicyInput.BagOppKnownHand] = Sorted(DefRows(net, mem.OppKnownHand.Values), PolicyInput.BagLimit[PolicyInput.BagOppKnownHand]);
@@ -496,6 +535,11 @@ namespace PokemonTCG.AI
                 }
                 gl[19] = me.Bench.Count / 8f;
 
+                ItemFeatures(r, v, me, opp, mem, unseen, x.TurnFeats);
+                x.TurnFeats[2 + PolicyInput.SideSlots + 7] = Math.Min(FreePivots(me), 3) / 3f;
+                if (!v.InSetup) x.TurnFeats[2 + PolicyInput.SideSlots + 8] = Math.Min(FreePivots(opp), 3) / 3f;
+                BenchFeatures(v, me, opp, toCome, x.TurnFeats);
+                if (!v.InSetup) x.TurnFeats[2 + PolicyInput.SideSlots + 15] = OpponentSpreads(opp, mem) ? 1 : 0;
                 if (mem != null && v.CurrentPlayer == viewer && !v.InSetup)
                 {
                     var tf = x.TurnFeats;
@@ -536,7 +580,19 @@ namespace PokemonTCG.AI
                 {
                     int ai = Math.Max(0, o.Index);
                     x.OptFeat[f + Math.Min(ai, 1)] = 1;
-                    if (o.Card != null && ai < o.Card.Attacks.Count) x.OptFeat[f + 2] = o.Card.Attacks[ai].Damage / 300f;
+                    if (o.Card != null && ai < o.Card.Attacks.Count)
+                    {
+                        var attack = o.Card.Attacks[ai];
+                        x.OptFeat[f + 2] = attack.Damage / 300f;
+                        // What this attack does to their Active: lock their Items, Knock it Out, how much of its HP it takes.
+                        x.OptFeat[f + 13] = PolicyCards.AttackLocksItems(attack) ? 1 : 0;
+                        if (me != null && opp != null && me.Active != null && opp.Active != null && !v.InSetup)
+                        {
+                            int damage = PolicyPlan.DamageTo(o.Card, me.Active.AbilitiesActive, attack, opp.Active);
+                            x.OptFeat[f + 14] = damage > 0 && damage >= opp.Active.RemainingHp ? 1 : 0;
+                            x.OptFeat[f + 15] = Ratio(damage, opp.Active.RemainingHp);
+                        }
+                    }
                 }
                 else if (kind == "choice")
                 {
@@ -549,8 +605,78 @@ namespace PokemonTCG.AI
                     foreach (var h in me.Hand) if (h.Def != null && h.Def.BaseKey == o.Card.BaseKey) copies++;
                     x.OptFeat[f + 4] = copies / 4f;
                 }
+                if (me != null && o.Card != null && o.PokemonUid >= 0 && r.Kind == DecisionKind.MainAction
+                    && (o.Action == ActionType.AttachEnergy || o.Action == ActionType.Evolve))
+                    OptionPlan(o, me, v.InSetup ? null : opp, toCome, teamEnergy, x.OptFeat, f);
+                if (me != null && o.Card != null && o.Card.IsPokemon && o.Action == ActionType.BenchBasic)
+                    BenchOption(o.Card, me, toCome, x.OptFeat, f);
             }
             return x;
+        }
+
+        /// <summary>True when this Energy attachment (a main action) would be wasted (PolicyPlan.Wasted).</summary>
+        public static bool WastedAttachment(DecisionRequest r, PolicyMemory mem, DecisionOption o)
+        {
+            var v = r.View;
+            if (v == null || o.Card == null || !o.Card.IsEnergy) return false;
+            int viewer = v.Viewer < 0 ? r.Player : v.Viewer;
+            var me = v.Sides[viewer];
+            bool active;
+            var target = Mine(me, o.PokemonUid, out active);
+            if (target == null || target.Top == null || target.Top.Def == null) return false;
+            var toCome = new List<CardDef>();
+            foreach (var c in me.Hand) if (c != null && c.Def != null) toCome.Add(c.Def);
+            toCome.AddRange(UnseenDefs(v, me, mem));
+            var line = PolicyPlan.Line(target.Top.Def, toCome);
+            bool team = mem != null && mem.DeckUsesTeamEnergy;
+            return PolicyPlan.Wasted(target.EnergyUnits, o.Card, line, target.RetreatCost, active, team);
+        }
+
+        /// <summary>Your Pokémon with this Uid in play, or null.</summary>
+        private static PokemonView Mine(SideView me, int uid, out bool active)
+        {
+            active = me.Active != null && me.Active.Uid == uid;
+            foreach (var mon in PolicyMemory.InPlay(me)) if (mon.Uid == uid) return mon;
+            return null;
+        }
+
+        /// <summary>
+        /// An Energy attachment's or an evolution's numbers (option features 6 to 12): does the Energy help an attack (now or
+        /// after evolving) or the Active Pokémon's retreat, does it make an attack usable, is it wasted (PolicyPlan.Wasted),
+        /// does its bonus need this Pokémon's type and get it (Growing Grass Energy on a Grass Pokémon), is it the Pokémon's
+        /// own type, does it make an attack usable that Knocks Out their Active; for an evolution, the Energy its strongest
+        /// attack would still need.
+        /// </summary>
+        private static void OptionPlan(DecisionOption o, SideView me, SideView opp, List<CardDef> toCome, bool teamEnergy, float[] feat, int f)
+        {
+            bool active;
+            var target = Mine(me, o.PokemonUid, out active);
+            if (target == null || target.Top == null || target.Top.Def == null) return;
+            var top = target.Top.Def;
+            if (o.Action == ActionType.AttachEnergy && o.Card.IsEnergy)
+            {
+                int unit = PolicyPlan.UnitOf(o.Card);
+                var line = PolicyPlan.Line(top, toCome);
+                feat[f + 6] = PolicyPlan.Helps(target.EnergyUnits, unit, line, target.RetreatCost, active) ? 1 : 0;
+                feat[f + 7] = PolicyPlan.Completes(target.EnergyUnits, unit, top) ? 1 : 0;
+                feat[f + 8] = PolicyPlan.Wasted(target.EnergyUnits, o.Card, line, target.RetreatCost, active, teamEnergy) ? 1 : 0;
+                int bonus = PolicyCards.BonusType(o.Card);
+                bool ownType = PolicyCards.TypeIndex(top.PokemonType) == bonus
+                               || (top.SecondType.HasValue && PolicyCards.TypeIndex(top.SecondType.Value) == bonus);
+                feat[f + 9] = bonus >= 0 && ownType ? 1 : 0;
+                feat[f + 10] = o.Card.EnergyProvides == top.PokemonType
+                               || (top.SecondType.HasValue && o.Card.EnergyProvides == top.SecondType.Value) ? 1 : 0;
+                if (opp != null && opp.Active != null && PolicyPlan.Completes(target.EnergyUnits, unit, top))
+                {
+                    feat[f + 11] = PolicyPlan.CanKnockOut(top, new List<int>(target.EnergyUnits) { unit }, 0, opp.Active, target.AbilitiesActive) ? 1 : 0;
+                }
+                feat[f + 20] = PolicyPlan.Blocks(o.Card, top) && !PolicyPlan.EffectsBlocked(target) ? 1 : 0;
+            }
+            else if (o.Action == ActionType.Evolve && o.Card.IsPokemon)
+            {
+                int missing = PolicyPlan.StrongestMissing(target.EnergyUnits, new[] { o.Card });
+                feat[f + 12] = missing < 0 ? 0 : Math.Min(missing, 4) / 4f;
+            }
         }
 
         private static void SlotFeatures(PokemonView mon, bool active, int turn, PolicyMemory mem, float[] f, int o)
@@ -582,6 +708,186 @@ namespace PokemonTCG.AI
                 if (Has(note, "prevent") || Has(note, "less damage") || Has(note, "damage taken")) f[o + 24] = 1;
             }
             f[o + 25] = (mon.Stack.Count - 1) / 2f;
+        }
+
+        /// <summary>
+        /// A Pokémon's plan numbers (slot features 26 to 39). What it needs: can it attack now, the Energy missing for its
+        /// cheapest and its strongest attack, Energy beyond what any attack or its retreat needs, for yours (toCome: your hand and
+        /// deck) an evolution in hand, how many are left in the deck and the Energy its line's strongest attack needs, and
+        /// whether its cards do more with Energy than pay for attacks. What it faces (other: the other side): can their Active
+        /// Knock it Out next turn (with at most one more Energy) and how much of its HP that takes, can any of theirs, and can it
+        /// Knock Out their Active now or with one more Energy, and how much of that Pokémon's HP its best attack takes.
+        /// </summary>
+        private static void PlanFeatures(PokemonView mon, List<CardDef> toCome, SideView mine, SideView other, float[] f, int o)
+        {
+            var top = mon.Top != null ? mon.Top.Def : null;
+            if (top == null) return;
+            var units = mon.EnergyUnits;
+            int cheapest = PolicyPlan.Cheapest(units, top);
+            int strongest = PolicyPlan.StrongestMissing(units, new[] { top });
+            f[o + 26] = cheapest == 0 ? 1 : 0;
+            f[o + 27] = Math.Max(0, Math.Min(cheapest, 4)) / 4f;
+            f[o + 28] = Math.Max(0, Math.Min(strongest, 4)) / 4f;
+            f[o + 29] = Math.Min(Math.Max(0, units.Count - Math.Max(PolicyPlan.MostCost(top), mon.RetreatCost)), 4) / 4f;
+            var line = PolicyPlan.Line(top, toCome);
+            if (mine != null)
+            {
+                int inHand = 0;
+                foreach (var c in mine.Hand) if (c != null && c.Def != null && c.Def.IsPokemon && c.Def.EvolvesFrom == top.Name) inHand++;
+                f[o + 30] = inHand > 0 ? 1 : 0;
+                f[o + 31] = Math.Min(PolicyPlan.EvolutionsOf(top.Name, toCome) - inHand, 4) / 4f;
+                int lineMissing = PolicyPlan.StrongestMissing(units, line);
+                f[o + 32] = Math.Max(0, Math.Min(lineMissing, 4)) / 4f;
+            }
+            else f[o + 32] = f[o + 28];
+            foreach (var c in line)
+                if (PolicyCards.MentionsEnergy(c)) f[o + 33] = 1;
+            if (other == null) return;
+            if (other.Active != null)
+            {
+                int theirs = PolicyPlan.BestDamage(other.Active, 1, mon);
+                f[o + 34] = theirs > 0 && theirs >= mon.RemainingHp ? 1 : 0;
+                f[o + 35] = Ratio(theirs, mon.RemainingHp);
+                f[o + 37] = PolicyPlan.CanKnockOut(mon, 0, other.Active) ? 1 : 0;
+                f[o + 38] = PolicyPlan.CanKnockOut(mon, 1, other.Active) ? 1 : 0;
+                f[o + 39] = Ratio(PolicyPlan.BestDamage(mon, 1, other.Active), other.Active.RemainingHp);
+            }
+            foreach (var them in PolicyMemory.InPlay(other))
+                if (PolicyPlan.CanKnockOut(them, 1, mon)) f[o + 36] = 1;
+        }
+
+        /// <summary>
+        /// A Pokémon's protection numbers (slot features 43 to 46): its Abilities have an effect now (not turned off, as by
+        /// Legendary Pyroduct), the other side's Active can't damage it (its protection stops every damaging attack of theirs),
+        /// it can't damage their Active, and an attached card stops the effects of attacks on it (Mist Energy).
+        /// </summary>
+        private static void GuardFeatures(PokemonView mon, SideView other, float[] f, int o)
+        {
+            var top = mon.Top != null ? mon.Top.Def : null;
+            if (top == null) return;
+            f[o + 43] = mon.AbilitiesActive && PolicyPlan.HasAbility(top) ? 1 : 0;
+            if (other != null && other.Active != null && other.Active.Top != null)
+            {
+                f[o + 44] = PolicyPlan.AllShielded(other.Active.Top.Def, other.Active.AbilitiesActive, mon) ? 1 : 0;
+                f[o + 45] = PolicyPlan.AllShielded(top, mon.AbilitiesActive, other.Active) ? 1 : 0;
+            }
+            f[o + 46] = PolicyPlan.EffectsBlocked(mon) ? 1 : 0;
+        }
+
+        /// <summary>A Pokémon's retreat numbers (slot features 40 to 42): its Retreat Cost now, free retreat, Energy enough to pay it.</summary>
+        private static void RetreatFeatures(PokemonView mon, float[] f, int o)
+        {
+            f[o + 40] = Math.Min(mon.RetreatCost, 4) / 4f;
+            f[o + 41] = mon.RetreatCost == 0 ? 1 : 0;
+            f[o + 42] = mon.EnergyUnits.Count >= mon.RetreatCost ? 1 : 0;
+        }
+
+        /// <summary>
+        /// The Bench and play-from-hand numbers (turn features from 2 + SideSlots + 9 on): your Bench limit and free spaces, your
+        /// Pokémon with an Ability that works when played from your hand (Meowth ex) in your hand and still in your deck (they
+        /// need a free space to be any use), your Supporters in hand, and the opponent's free Bench spaces. A full Bench can't
+        /// take the Pokémon you'll want later.
+        /// </summary>
+        private static void BenchFeatures(PlayerView v, SideView me, SideView opp, List<CardDef> toCome, float[] tf)
+        {
+            int o = 2 + PolicyInput.SideSlots + 9;
+            tf[o] = Math.Min(me.BenchLimit, 8) / 8f;
+            tf[o + 1] = Math.Max(0, Math.Min(me.BenchLimit - me.Bench.Count, 8)) / 8f;
+            int inHand = 0, supporters = 0;
+            foreach (var c in me.Hand)
+            {
+                if (c == null || c.Def == null) continue;
+                if (PolicyCards.PlaysFromHand(c.Def)) inHand++;
+                if (c.Def.IsTrainer && c.Def.TrainerKind == TrainerKind.Supporter) supporters++;
+            }
+            int all = 0;
+            if (toCome != null) foreach (var d in toCome) if (PolicyCards.PlaysFromHand(d)) all++;
+            tf[o + 2] = Math.Min(inHand, 2) / 2f;
+            tf[o + 3] = Math.Min(Math.Max(0, all - inHand), 4) / 4f;
+            tf[o + 4] = Math.Min(supporters, 4) / 4f;
+            if (!v.InSetup) tf[o + 5] = Math.Max(0, Math.Min(opp.BenchLimit - opp.Bench.Count, 8)) / 8f;
+        }
+
+        /// <summary>True when the opponent has shown a Pokémon with an attack that puts damage counters on Pokémon (spread).</summary>
+        private static bool OpponentSpreads(SideView opp, PolicyMemory mem)
+        {
+            Func<CardDef, bool> spreads = PolicyCards.Spreads;
+            foreach (var mon in PolicyMemory.InPlay(opp)) if (mon.Top != null && spreads(mon.Top.Def)) return true;
+            foreach (var c in opp.Discard) if (c != null && spreads(c.Def)) return true;
+            if (mem != null) foreach (var d in mem.OppSeen.Values) if (spreads(d)) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Benching a Basic (option features 16 to 19): does its Ability work as it's played (Meowth ex), the Bench spaces left
+        /// after it, do evolutions for it remain (in hand or deck), and how many of it are in play already.
+        /// </summary>
+        private static void BenchOption(CardDef card, SideView me, List<CardDef> toCome, float[] feat, int f)
+        {
+            feat[f + 16] = PolicyCards.PlaysFromHand(card) ? 1 : 0;
+            feat[f + 17] = Math.Max(0, Math.Min(me.BenchLimit - me.Bench.Count - 1, 8)) / 8f;
+            feat[f + 18] = PolicyPlan.EvolutionsOf(card.Name, toCome) > 0 ? 1 : 0;
+            int copies = 0;
+            foreach (var mon in PolicyMemory.InPlay(me)) if (mon.Top != null && mon.Top.Def != null && mon.Top.Def.Name == card.Name) copies++;
+            feat[f + 19] = Math.Min(copies, 3) / 3f;
+        }
+
+        /// <summary>Free-retreat Pokémon on a Bench (pivots: one can come in and go out again for nothing).</summary>
+        private static int FreePivots(SideView s)
+        {
+            int n = 0;
+            foreach (var b in s.Bench) if (b != null && b.RetreatCost == 0) n++;
+            return n;
+        }
+
+        /// <summary>
+        /// Items (turn features from 2 + SideSlots on): are you locked out of Items now (an Item lock this turn, or Items in hand
+        /// that none of the options can play), is the opponent locked on their next turn, how many Items you hold, what share of
+        /// the opponent's cards seen so far are Items and how many, and how many Items are left in your deck and what share of
+        /// your deck they make. With these and the attacks' Item-lock flag the network can weigh locking their Items against
+        /// the other things an attack could do.
+        /// </summary>
+        private static void ItemFeatures(DecisionRequest r, PlayerView v, SideView me, SideView opp, PolicyMemory mem, List<CardDef> unseen, float[] tf)
+        {
+            int o = 2 + PolicyInput.SideSlots;
+            int turn = v.TurnNumber;
+            int itemsInHand = 0;
+            foreach (var c in me.Hand) if (c != null && c.Def != null && c.Def.IsItem) itemsInHand++;
+            bool locked = me.ItemLockTurn == turn && v.CurrentPlayer == me.Player;
+            if (!locked && itemsInHand > 0 && r.Kind == DecisionKind.MainAction && v.CurrentPlayer == me.Player)
+            {
+                bool playable = false;
+                foreach (var op in r.Options)
+                    if (op.Action == ActionType.PlayTrainer && op.Card != null && op.Card.IsItem) playable = true;
+                locked = !playable;
+            }
+            tf[o] = locked ? 1 : 0;
+            int theirTurn = v.CurrentPlayer == me.Player ? turn + 1 : turn;
+            tf[o + 1] = opp.ItemLockTurn == theirTurn ? 1 : 0;
+            tf[o + 2] = Math.Min(itemsInHand, 5) / 5f;
+            int seen = 0, seenItems = 0;
+            var counted = new HashSet<int>();
+            Action<int, CardDef> count = (id, d) =>
+            {
+                if (d == null || !counted.Add(id)) return;
+                seen++;
+                if (d.IsItem) seenItems++;
+            };
+            foreach (var c in opp.Discard) if (c != null) count(c.Id, c.Def);
+            if (mem != null) foreach (var kv in mem.OppSeen) count(kv.Key, kv.Value);
+            tf[o + 3] = seen > 0 ? seenItems / (float)seen : 0;
+            tf[o + 4] = Math.Min(seenItems, 10) / 10f;
+            int leftItems = 0;
+            foreach (var d in unseen) if (d.IsItem) leftItems++;
+            tf[o + 5] = Math.Min(leftItems, 10) / 10f;
+            if (mem != null) tf[o + 6] = mem.DeckItemShare;
+        }
+
+        /// <summary>Damage as a share of the HP left, 0 to 1 (1 = twice what's needed or more).</summary>
+        private static float Ratio(int damage, int hp)
+        {
+            if (damage <= 0 || hp <= 0) return 0;
+            return Math.Min(2f, damage / (float)hp) / 2f;
         }
 
         /// <summary>The Python type index of a unit that provides exactly one type, else -1 (any-type and multi-type units).</summary>
@@ -617,24 +923,35 @@ namespace PokemonTCG.AI
         }
 
         /// <summary>Your decklist minus every card of yours you can see: what's still in your deck and Prize cards.</summary>
-        private static List<int> Unseen(PlayerView v, SideView me, PolicyMemory mem, PolicyNet net)
+        private static List<int> Unseen(List<CardDef> unseen, PolicyNet net)
         {
-            var left = new Dictionary<int, int>();
+            var rows = new List<int>();
+            foreach (var d in unseen) rows.Add(net.RowOf(d));
+            return rows;
+        }
+
+        /// <summary>Your cards you haven't seen yet: your deck list less the cards in your hand, discard pile, Lost Zone, Prizes you've seen and in play.</summary>
+        private static List<CardDef> UnseenDefs(PlayerView v, SideView me, PolicyMemory mem)
+        {
+            var left = new Dictionary<string, int>(StringComparer.Ordinal);
+            var defs = new Dictionary<string, CardDef>(StringComparer.Ordinal);
             var deck = mem == null ? null : mem.Deck();
-            if (deck == null) return new List<int>();
+            if (deck == null) return new List<CardDef>();
             foreach (var d in deck)
             {
-                int row = net.RowOf(d);
+                if (d == null) continue;
+                string key = d.BaseKey ?? d.Name;
                 int n;
-                left.TryGetValue(row, out n);
-                left[row] = n + 1;
+                left.TryGetValue(key, out n);
+                left[key] = n + 1;
+                defs[key] = d;
             }
             Action<CardRef> take = c =>
             {
                 if (c == null || c.Def == null) return;
-                int row = net.RowOf(c.Def);
+                string key = c.Def.BaseKey ?? c.Def.Name;
                 int n;
-                if (left.TryGetValue(row, out n) && n > 0) left[row] = n - 1;
+                if (left.TryGetValue(key, out n) && n > 0) left[key] = n - 1;
             };
             foreach (var c in me.Hand) take(c);
             foreach (var c in me.Discard) take(c);
@@ -648,9 +965,9 @@ namespace PokemonTCG.AI
                 foreach (var c in mon.Attached) take(c);
             }
             if (v.Stadium != null && v.StadiumOwner == me.Player) take(v.Stadium);
-            var rows = new List<int>();
-            foreach (var kv in left) for (int i = 0; i < kv.Value; i++) rows.Add(kv.Key);
-            return rows;
+            var cards = new List<CardDef>();
+            foreach (var kv in left) for (int i = 0; i < kv.Value; i++) cards.Add(defs[kv.Key]);
+            return cards;
         }
     }
 }
