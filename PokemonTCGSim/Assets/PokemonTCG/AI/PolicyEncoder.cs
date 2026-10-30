@@ -57,6 +57,28 @@ namespace PokemonTCG.AI
             return DeckList;
         }
 
+        private List<CardDef> factsFor;
+        private bool deckTeamEnergy;
+        private float deckItemShare;
+
+        /// <summary>
+        /// Facts about the whole deck, worked out once per decklist (not on every decision): does a card in it use Energy on your
+        /// other Pokémon (PolicyPlan.TeamUsesEnergy), and what share of it is Items.
+        /// </summary>
+        public bool DeckUsesTeamEnergy { get { DeckFacts(); return deckTeamEnergy; } }
+        public float DeckItemShare { get { DeckFacts(); return deckItemShare; } }
+
+        private void DeckFacts()
+        {
+            var deck = Deck();
+            if (deck == null || ReferenceEquals(deck, factsFor)) return;
+            deckTeamEnergy = PolicyPlan.TeamUsesEnergy(deck);
+            int items = 0;
+            foreach (var d in deck) if (d != null && d.IsItem) items++;
+            deckItemShare = deck.Count > 0 ? items / (float)deck.Count : 0;
+            factsFor = deck;
+        }
+
         public void OnEvent(GameEngine engine, GameEvent ev)
         {
             if (engine != null) this.engine = engine;
@@ -432,14 +454,15 @@ namespace PokemonTCG.AI
             var slotOf = new Dictionary<int, int>();
 
             // What's still to come for you (your hand and the cards left in your deck and Prizes): evolutions and their attacks.
-            List<CardDef> toCome = null;
+            List<CardDef> toCome = null, unseen = null;
             bool teamEnergy = false;
             if (me != null)
             {
                 toCome = new List<CardDef>();
                 foreach (var c in me.Hand) if (c != null && c.Def != null) toCome.Add(c.Def);
-                toCome.AddRange(UnseenDefs(v, me, mem));
-                teamEnergy = mem != null && PolicyPlan.TeamUsesEnergy(mem.Deck());
+                unseen = UnseenDefs(v, me, mem);
+                toCome.AddRange(unseen);
+                teamEnergy = mem != null && mem.DeckUsesTeamEnergy;
             }
 
             // Board slots: yours, then the opponent's (hidden while setting up).
@@ -473,7 +496,7 @@ namespace PokemonTCG.AI
                 x.Bags[PolicyInput.BagHand] = Rows(net, me.Hand, PolicyInput.BagLimit[PolicyInput.BagHand], false);
                 x.Bags[PolicyInput.BagMyDiscard] = Rows(net, me.Discard, PolicyInput.BagLimit[PolicyInput.BagMyDiscard], true);
                 x.Bags[PolicyInput.BagOppDiscard] = Rows(net, opp.Discard, PolicyInput.BagLimit[PolicyInput.BagOppDiscard], true);
-                x.Bags[PolicyInput.BagUnseen] = Sorted(Unseen(v, me, mem, net), PolicyInput.BagLimit[PolicyInput.BagUnseen]);
+                x.Bags[PolicyInput.BagUnseen] = Sorted(Unseen(unseen, net), PolicyInput.BagLimit[PolicyInput.BagUnseen]);
                 if (mem != null)
                 {
                     x.Bags[PolicyInput.BagOppKnownHand] = Sorted(DefRows(net, mem.OppKnownHand.Values), PolicyInput.BagLimit[PolicyInput.BagOppKnownHand]);
@@ -512,7 +535,7 @@ namespace PokemonTCG.AI
                 }
                 gl[19] = me.Bench.Count / 8f;
 
-                ItemFeatures(r, v, me, opp, mem, x.TurnFeats);
+                ItemFeatures(r, v, me, opp, mem, unseen, x.TurnFeats);
                 x.TurnFeats[2 + PolicyInput.SideSlots + 7] = Math.Min(FreePivots(me), 3) / 3f;
                 if (!v.InSetup) x.TurnFeats[2 + PolicyInput.SideSlots + 8] = Math.Min(FreePivots(opp), 3) / 3f;
                 BenchFeatures(v, me, opp, toCome, x.TurnFeats);
@@ -562,7 +585,7 @@ namespace PokemonTCG.AI
                         var attack = o.Card.Attacks[ai];
                         x.OptFeat[f + 2] = attack.Damage / 300f;
                         // What this attack does to their Active: lock their Items, Knock it Out, how much of its HP it takes.
-                        x.OptFeat[f + 13] = PolicyCards.LocksItems(attack.Text) ? 1 : 0;
+                        x.OptFeat[f + 13] = PolicyCards.AttackLocksItems(attack) ? 1 : 0;
                         if (me != null && opp != null && me.Active != null && opp.Active != null && !v.InSetup)
                         {
                             int damage = PolicyPlan.DamageTo(o.Card, me.Active.AbilitiesActive, attack, opp.Active);
@@ -605,7 +628,7 @@ namespace PokemonTCG.AI
             foreach (var c in me.Hand) if (c != null && c.Def != null) toCome.Add(c.Def);
             toCome.AddRange(UnseenDefs(v, me, mem));
             var line = PolicyPlan.Line(target.Top.Def, toCome);
-            bool team = mem != null && PolicyPlan.TeamUsesEnergy(mem.Deck());
+            bool team = mem != null && mem.DeckUsesTeamEnergy;
             return PolicyPlan.Wasted(target.EnergyUnits, o.Card, line, target.RetreatCost, active, team);
         }
 
@@ -788,12 +811,7 @@ namespace PokemonTCG.AI
         /// <summary>True when the opponent has shown a Pokémon with an attack that puts damage counters on Pokémon (spread).</summary>
         private static bool OpponentSpreads(SideView opp, PolicyMemory mem)
         {
-            Func<CardDef, bool> spreads = d =>
-            {
-                if (d == null || !d.IsPokemon) return false;
-                foreach (var a in d.Attacks) if (PolicyCards.PlacesCounters(a.Text)) return true;
-                return false;
-            };
+            Func<CardDef, bool> spreads = PolicyCards.Spreads;
             foreach (var mon in PolicyMemory.InPlay(opp)) if (mon.Top != null && spreads(mon.Top.Def)) return true;
             foreach (var c in opp.Discard) if (c != null && spreads(c.Def)) return true;
             if (mem != null) foreach (var d in mem.OppSeen.Values) if (spreads(d)) return true;
@@ -829,7 +847,7 @@ namespace PokemonTCG.AI
         /// your deck they make. With these and the attacks' Item-lock flag the network can weigh locking their Items against
         /// the other things an attack could do.
         /// </summary>
-        private static void ItemFeatures(DecisionRequest r, PlayerView v, SideView me, SideView opp, PolicyMemory mem, float[] tf)
+        private static void ItemFeatures(DecisionRequest r, PlayerView v, SideView me, SideView opp, PolicyMemory mem, List<CardDef> unseen, float[] tf)
         {
             int o = 2 + PolicyInput.SideSlots;
             int turn = v.TurnNumber;
@@ -860,15 +878,9 @@ namespace PokemonTCG.AI
             tf[o + 3] = seen > 0 ? seenItems / (float)seen : 0;
             tf[o + 4] = Math.Min(seenItems, 10) / 10f;
             int leftItems = 0;
-            foreach (var d in UnseenDefs(v, me, mem)) if (d.IsItem) leftItems++;
+            foreach (var d in unseen) if (d.IsItem) leftItems++;
             tf[o + 5] = Math.Min(leftItems, 10) / 10f;
-            var deck = mem != null ? mem.Deck() : null;
-            if (deck != null && deck.Count > 0)
-            {
-                int items = 0;
-                foreach (var d in deck) if (d != null && d.IsItem) items++;
-                tf[o + 6] = items / (float)deck.Count;
-            }
+            if (mem != null) tf[o + 6] = mem.DeckItemShare;
         }
 
         /// <summary>Damage as a share of the HP left, 0 to 1 (1 = twice what's needed or more).</summary>
@@ -911,10 +923,10 @@ namespace PokemonTCG.AI
         }
 
         /// <summary>Your decklist minus every card of yours you can see: what's still in your deck and Prize cards.</summary>
-        private static List<int> Unseen(PlayerView v, SideView me, PolicyMemory mem, PolicyNet net)
+        private static List<int> Unseen(List<CardDef> unseen, PolicyNet net)
         {
             var rows = new List<int>();
-            foreach (var d in UnseenDefs(v, me, mem)) rows.Add(net.RowOf(d));
+            foreach (var d in unseen) rows.Add(net.RowOf(d));
             return rows;
         }
 

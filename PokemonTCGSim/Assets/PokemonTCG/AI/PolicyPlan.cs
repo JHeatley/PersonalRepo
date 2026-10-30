@@ -175,19 +175,15 @@ namespace PokemonTCG.AI
         /// </summary>
         public static bool Shielded(CardDef attacker, bool abilitiesOn, AttackDef a, PokemonView defender)
         {
-            if (attacker == null || a == null || defender == null || PolicyCards.IgnoresEffects(a.Text)) return false;
+            if (attacker == null || a == null || defender == null) return false;
             var d = defender.Top != null ? defender.Top.Def : null;
             if (d == null || !defender.AbilitiesActive) return false;
-            foreach (var ab in d.Abilities)
-            {
-                string t = ab.Text ?? "";
-                if (!PolicyCards.PreventsDamage(t)) continue;
-                if (Has(t, "Pokémon ex")) { if (attacker.IsEx || attacker.IsMegaEx) return true; }
-                else if (Has(t, "have an Ability")) { if (abilitiesOn && HasAbility(attacker)) return true; }
-                else if (Has(t, "Basic Pokémon")) { if (attacker.Stage == Stage.Basic) return true; }
-                else if (Has(t, "Pokémon V")) { if (attacker.IsPokemonV) return true; }
-            }
-            return false;
+            int shield = PolicyCards.Shield(d);
+            if (shield == 0 || PolicyCards.AttackIgnoresEffects(a)) return false;
+            return ((shield & 1) != 0 && (attacker.IsEx || attacker.IsMegaEx))
+                   || ((shield & 2) != 0 && abilitiesOn && HasAbility(attacker))
+                   || ((shield & 4) != 0 && attacker.Stage == Stage.Basic)
+                   || ((shield & 8) != 0 && attacker.IsPokemonV);
         }
 
         /// <summary>True when every damaging attack of the attacker is stopped by the defender's protection (and it has some).</summary>
@@ -206,13 +202,7 @@ namespace PokemonTCG.AI
 
         public static bool HasAbility(CardDef c)
         {
-            foreach (var a in c.Abilities) if (a.IsAbility) return true;
-            return false;
-        }
-
-        private static bool Has(string text, string word)
-        {
-            return text.IndexOf(word, StringComparison.OrdinalIgnoreCase) >= 0;
+            return PolicyCards.HasAbility(c);
         }
 
         /// <summary>
@@ -230,7 +220,7 @@ namespace PokemonTCG.AI
         /// <summary>True when this card, attached to a Pokémon of this card, stops the effects of attacks on it (its type condition met).</summary>
         public static bool Blocks(CardDef card, CardDef pokemon)
         {
-            if (card == null || !PolicyCards.PreventsEffects(card.Text)) return false;
+            if (card == null || !PolicyCards.CardPreventsEffects(card)) return false;
             int type = PolicyCards.BonusType(card);
             return type < 0 || (pokemon != null && (PolicyCards.TypeIndex(pokemon.PokemonType) == type
                                                     || (pokemon.SecondType.HasValue && PolicyCards.TypeIndex(pokemon.SecondType.Value) == type)));
@@ -243,9 +233,7 @@ namespace PokemonTCG.AI
         public static int DamageTo(CardDef attacker, bool abilitiesOn, AttackDef a, PokemonView defender)
         {
             if (Shielded(attacker, abilitiesOn, a, defender)) return 0;
-            string text = a.Text ?? "";
-            if (Has(text, "Weakness") && Has(text, "Resistance") && (Has(text, "don't") || Has(text, "isn't") || Has(text, "not ")))
-                return a.Damage;
+            if (PolicyCards.AttackIgnoresWeakness(a)) return a.Damage;
             return DamageTo(attacker, a.Damage, defender);
         }
 

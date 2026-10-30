@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using PokemonTCG.Core;
 
 namespace PokemonTCG.AI
@@ -118,18 +119,93 @@ namespace PokemonTCG.AI
             return Has(text, "when you play") && Has(text, "from your hand");
         }
 
+        /// <summary>What a card's text says, worked out once per card (reading text on every decision would slow training down).</summary>
+        private sealed class Facts
+        {
+            public bool PlaysFromHand, TeamEnergy, MentionsEnergy, LocksItems, PreventsEffects, Spreads, HasAbility;
+            public int BonusType;
+            /// <summary>Its Abilities prevent all damage from attacks by: 1 Pokémon ex, 2 Pokémon with an Ability, 4 Basic Pokémon, 8 Pokémon V.</summary>
+            public int Shield;
+        }
+
+        /// <summary>The same for an attack's text.</summary>
+        private sealed class AttackFacts
+        {
+            public bool LocksItems, IgnoresEffects, IgnoresWeakness, PlacesCounters;
+        }
+
+        private static readonly ConditionalWeakTable<CardDef, Facts> facts = new ConditionalWeakTable<CardDef, Facts>();
+        private static readonly ConditionalWeakTable<AttackDef, AttackFacts> attackFacts = new ConditionalWeakTable<AttackDef, AttackFacts>();
+
+        private static Facts Of(CardDef c)
+        {
+            return facts.GetValue(c, card =>
+            {
+                var f = new Facts { BonusType = NamedType(card.Text ?? "", "Pok"), PreventsEffects = PreventsEffects(card.Text) };
+                foreach (var a in card.Attacks)
+                {
+                    string t = a.Text ?? "";
+                    if (TeamEnergy(t)) f.TeamEnergy = true;
+                    if (Has(t, "energy")) f.MentionsEnergy = true;
+                    if (LocksItems(t)) f.LocksItems = true;
+                    if (PlacesCounters(t)) f.Spreads = true;
+                }
+                foreach (var a in card.Abilities)
+                {
+                    string t = a.Text ?? "";
+                    if (a.IsAbility) f.HasAbility = true;
+                    if (card.IsPokemon && OnPlay(t)) f.PlaysFromHand = true;
+                    if (TeamEnergy(t)) f.TeamEnergy = true;
+                    if (Has(t, "energy")) f.MentionsEnergy = true;
+                    if (LocksItems(t)) f.LocksItems = true;
+                    if (PreventsDamage(t))
+                    {
+                        if (Has(t, "Pokémon ex")) f.Shield |= 1;
+                        else if (Has(t, "have an Ability")) f.Shield |= 2;
+                        else if (Has(t, "Basic Pokémon")) f.Shield |= 4;
+                        else if (Has(t, "Pokémon V")) f.Shield |= 8;
+                    }
+                }
+                return f;
+            });
+        }
+
+        private static AttackFacts Of(AttackDef a)
+        {
+            return attackFacts.GetValue(a, attack =>
+            {
+                string t = attack.Text ?? "";
+                return new AttackFacts
+                {
+                    LocksItems = LocksItems(t),
+                    IgnoresEffects = IgnoresEffects(t),
+                    IgnoresWeakness = Has(t, "Weakness") && Has(t, "Resistance") && (Has(t, "don't") || Has(t, "isn't") || Has(t, "not ")),
+                    PlacesCounters = PlacesCounters(t)
+                };
+            });
+        }
+
+        public static bool AttackLocksItems(AttackDef a) { return a != null && Of(a).LocksItems; }
+        public static bool AttackIgnoresEffects(AttackDef a) { return a != null && Of(a).IgnoresEffects; }
+        public static bool AttackIgnoresWeakness(AttackDef a) { return a != null && Of(a).IgnoresWeakness; }
+        /// <summary>True when the card has an attack that puts damage counters on Pokémon (spread).</summary>
+        public static bool Spreads(CardDef c) { return c != null && c.IsPokemon && Of(c).Spreads; }
+        /// <summary>The kinds of attacker its Abilities prevent all damage from (Facts.Shield bits).</summary>
+        public static int Shield(CardDef c) { return c == null ? 0 : Of(c).Shield; }
+        public static bool HasAbility(CardDef c) { return c != null && Of(c).HasAbility; }
+        /// <summary>True when the card's own text stops the effects of attacks on its Pokémon (Mist Energy).</summary>
+        public static bool CardPreventsEffects(CardDef c) { return c != null && Of(c).PreventsEffects; }
+
         /// <summary>True when the card has an Ability that works as it's played from your hand.</summary>
         public static bool PlaysFromHand(CardDef c)
         {
-            if (c == null || !c.IsPokemon) return false;
-            foreach (var a in c.Abilities) if (OnPlay(a.Text)) return true;
-            return false;
+            return c != null && c.IsPokemon && Of(c).PlaysFromHand;
         }
 
         /// <summary>The type an Energy card's bonus needs its Pokémon to be ("attached to a Grass Pokémon"), or -1 for none.</summary>
         public static int BonusType(CardDef energy)
         {
-            return energy == null ? -1 : NamedType(energy.Text ?? "", "Pok");
+            return energy == null ? -1 : Of(energy).BonusType;
         }
 
         /// <summary>
@@ -138,10 +214,7 @@ namespace PokemonTCG.AI
         /// </summary>
         public static bool UsesTeamEnergy(CardDef c)
         {
-            if (c == null) return false;
-            foreach (var a in c.Attacks) if (TeamEnergy(a.Text)) return true;
-            foreach (var a in c.Abilities) if (TeamEnergy(a.Text)) return true;
-            return false;
+            return c != null && Of(c).TeamEnergy;
         }
 
         /// <summary>
@@ -258,10 +331,7 @@ namespace PokemonTCG.AI
         /// <summary>True when one of the card's attacks or Abilities locks the opponent's Items.</summary>
         public static bool LocksItems(CardDef c)
         {
-            if (c == null) return false;
-            foreach (var a in c.Attacks) if (LocksItems(a.Text)) return true;
-            foreach (var a in c.Abilities) if (LocksItems(a.Text)) return true;
-            return false;
+            return c != null && Of(c).LocksItems;
         }
 
         private static bool Has(string text, string word)
@@ -280,10 +350,7 @@ namespace PokemonTCG.AI
         /// </summary>
         public static bool MentionsEnergy(CardDef c)
         {
-            if (c == null) return false;
-            foreach (var a in c.Attacks) if (Has(a.Text ?? "", "energy")) return true;
-            foreach (var a in c.Abilities) if (Has(a.Text ?? "", "energy")) return true;
-            return false;
+            return c != null && Of(c).MentionsEnergy;
         }
 
         public static float[] Static(CardDef c)
