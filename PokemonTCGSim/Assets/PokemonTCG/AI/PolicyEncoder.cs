@@ -38,6 +38,29 @@ namespace PokemonTCG.AI
         private readonly Dictionary<int, int> movedTurn = new Dictionary<int, int>();
         private readonly int[] activeUid = { -1, -1 };
         public readonly int[] KoTurn = { -10, -10 };
+        /// <summary>Your Prize cards as you last saw them when you searched your deck (by card id).</summary>
+        public readonly Dictionary<int, CardDef> KnownPrizes = new Dictionary<int, CardDef>();
+
+        /// <summary>Your cards you know are still in your Prizes: the known ones not seen anywhere else since (a taken Prize card is in your hand).</summary>
+        public List<CardDef> StillPrized(SideView me)
+        {
+            var list = new List<CardDef>();
+            if (KnownPrizes.Count == 0 || me == null) return list;
+            var visible = new HashSet<int>();
+            foreach (var c in me.Hand) if (c != null) visible.Add(c.Id);
+            foreach (var c in me.Discard) if (c != null) visible.Add(c.Id);
+            foreach (var c in me.LostZone) if (c != null) visible.Add(c.Id);
+            foreach (var mon in InPlay(me))
+            {
+                foreach (var c in mon.Stack) if (c != null) visible.Add(c.Id);
+                foreach (var c in mon.Energy) if (c != null) visible.Add(c.Id);
+                foreach (var c in mon.Tools) if (c != null) visible.Add(c.Id);
+                foreach (var c in mon.Attached) if (c != null) visible.Add(c.Id);
+            }
+            foreach (var kv in KnownPrizes) if (!visible.Contains(kv.Key)) list.Add(kv.Value);
+            if (list.Count > me.PrizeCount) list.RemoveRange(me.PrizeCount, list.Count - me.PrizeCount);
+            return list;
+        }
 
         public PolicyMemory(int seat)
         {
@@ -117,6 +140,15 @@ namespace PokemonTCG.AI
                     break;
                 case GameEventType.KnockOut:
                     if (ev.Player == 0 || ev.Player == 1) KoTurn[ev.Player] = turn;
+                    break;
+                case GameEventType.Search:
+                    // Searching your deck shows all of it, so you know which of your cards are in the Prizes (a real player
+                    // works it out the same way).
+                    if (ev.Player == Seat && engine != null && engine.State != null)
+                    {
+                        KnownPrizes.Clear();
+                        foreach (var c in engine.State.Players[Seat].Prizes) if (c != null && c.Def != null) KnownPrizes[c.Id] = c.Def;
+                    }
                     break;
             }
             if (ev.Player == opp && ev.Card != null && ev.CardId >= 0)
@@ -256,6 +288,7 @@ namespace PokemonTCG.AI
         public void CopyFrom(PolicyMemory o)
         {
             Seat = o.Seat;
+            Copy(o.KnownPrizes, KnownPrizes);
             DeckList = o.DeckList;
             Turn = o.Turn;
             ActionsThisTurn = o.ActionsThisTurn;
@@ -442,8 +475,12 @@ namespace PokemonTCG.AI
             return -1;
         }
 
-        /// <summary>Encodes the request with these choices as the options.</summary>
-        public static PolicyInput Encode(DecisionRequest r, PolicyMemory mem, PolicyNet net, List<Choice> choices)
+        /// <summary>
+        /// Encodes the request with these choices as the options. attacks: what each attack on offer really does, by option
+        /// index (PolicySearch.PreviewAttacks), or null to use the printed damage.
+        /// </summary>
+        public static PolicyInput Encode(DecisionRequest r, PolicyMemory mem, PolicyNet net, List<Choice> choices,
+                                         Dictionary<int, PolicySearch.AttackResult> attacks = null)
         {
             var x = new PolicyInput();
             var v = r.View;
@@ -453,21 +490,23 @@ namespace PokemonTCG.AI
             int turn = v != null ? v.TurnNumber : 0;
             var slotOf = new Dictionary<int, int>();
 
-            // What's still to come for you (your hand and the cards left in your deck and Prizes): evolutions and their attacks.
-            List<CardDef> toCome = null, unseen = null;
+            // What's still to come for you (your hand and the cards left in your deck and Prizes, less the Prize cards you know
+            // are there): evolutions and their attacks.
+            List<CardDef> toCome = null, unseen = null, deckLeft = null, prized = null;
             bool teamEnergy = false;
             if (me != null)
             {
-                toCome = new List<CardDef>();
-                foreach (var c in me.Hand) if (c != null && c.Def != null) toCome.Add(c.Def);
                 unseen = UnseenDefs(v, me, mem);
-                toCome.AddRange(unseen);
+                prized = mem != null ? mem.StillPrized(me) : new List<CardDef>();
+                deckLeft = Less(unseen, prized);
+                toCome = ToCome(me, deckLeft);
                 teamEnergy = mem != null && mem.DeckUsesTeamEnergy;
             }
 
             // Board slots: yours, then the opponent's (hidden while setting up).
             if (me != null)
             {
+                var gustTarget = v.InSetup ? null : BestGustTarget(me, opp);
                 for (int side = 0; side < 2; side++)
                 {
                     var s = side == 0 ? me : opp;
@@ -486,6 +525,8 @@ namespace PokemonTCG.AI
                         GuardFeatures(mon, v.InSetup ? null : other, x.SlotFeat, slot * PolicyInput.SlotFeatures);
                         PlanFeatures(mon, side == 0 ? toCome : null, side == 0 ? me : null, v.InSetup ? null : other,
                                      x.SlotFeat, slot * PolicyInput.SlotFeatures);
+                        if (side == 1 && ReferenceEquals(mon, gustTarget))
+                            x.SlotFeat[slot * PolicyInput.SlotFeatures + 47] = 1;
                         k++;
                     }
                 }
@@ -540,6 +581,8 @@ namespace PokemonTCG.AI
                 if (!v.InSetup) x.TurnFeats[2 + PolicyInput.SideSlots + 8] = Math.Min(FreePivots(opp), 3) / 3f;
                 BenchFeatures(v, me, opp, toCome, x.TurnFeats);
                 if (!v.InSetup) x.TurnFeats[2 + PolicyInput.SideSlots + 15] = OpponentSpreads(opp, mem) ? 1 : 0;
+                if (!v.InSetup) RaceFeatures(me, opp, toCome, x.TurnFeats);
+                OutsFeatures(me, opp, mem, deckLeft, prized, x.TurnFeats);
                 if (mem != null && v.CurrentPlayer == viewer && !v.InSetup)
                 {
                     var tf = x.TurnFeats;
@@ -586,11 +629,22 @@ namespace PokemonTCG.AI
                         x.OptFeat[f + 2] = attack.Damage / 300f;
                         // What this attack does to their Active: lock their Items, Knock it Out, how much of its HP it takes.
                         x.OptFeat[f + 13] = PolicyCards.AttackLocksItems(attack) ? 1 : 0;
-                        if (me != null && opp != null && me.Active != null && opp.Active != null && !v.InSetup)
+                        // With a preview, what it really did when played out (every "+", Tool and Stadium counted) and the
+                        // Prize cards it took; without, the printed damage and the Active's Prize cards if that Knocks it Out.
+                        PolicySearch.AttackResult real;
+                        if (attacks != null && attacks.TryGetValue(c.Option, out real) && opp != null && opp.Active != null)
+                        {
+                            x.OptFeat[f + 14] = real.KnocksOut ? 1 : 0;
+                            x.OptFeat[f + 15] = Ratio(real.Damage, opp.Active.RemainingHp);
+                            x.OptFeat[f + 21] = Math.Min(real.Prizes, 3) / 3f;
+                        }
+                        else if (me != null && opp != null && me.Active != null && opp.Active != null && !v.InSetup)
                         {
                             int damage = PolicyPlan.DamageTo(o.Card, me.Active.AbilitiesActive, attack, opp.Active);
-                            x.OptFeat[f + 14] = damage > 0 && damage >= opp.Active.RemainingHp ? 1 : 0;
+                            bool ko = damage > 0 && damage >= opp.Active.RemainingHp;
+                            x.OptFeat[f + 14] = ko ? 1 : 0;
                             x.OptFeat[f + 15] = Ratio(damage, opp.Active.RemainingHp);
+                            x.OptFeat[f + 21] = ko ? Math.Min(PrizesFor(opp.Active), 3) / 3f : 0;
                         }
                     }
                 }
@@ -624,9 +678,8 @@ namespace PokemonTCG.AI
             bool active;
             var target = Mine(me, o.PokemonUid, out active);
             if (target == null || target.Top == null || target.Top.Def == null) return false;
-            var toCome = new List<CardDef>();
-            foreach (var c in me.Hand) if (c != null && c.Def != null) toCome.Add(c.Def);
-            toCome.AddRange(UnseenDefs(v, me, mem));
+            var prized = mem != null ? mem.StillPrized(me) : new List<CardDef>();
+            var toCome = ToCome(me, Less(UnseenDefs(v, me, mem), prized));
             var line = PolicyPlan.Line(target.Top.Def, toCome);
             bool team = mem != null && mem.DeckUsesTeamEnergy;
             return PolicyPlan.Wasted(target.EnergyUnits, o.Card, line, target.RetreatCost, active, team);
@@ -881,6 +934,216 @@ namespace PokemonTCG.AI
             foreach (var d in unseen) if (d.IsItem) leftItems++;
             tf[o + 5] = Math.Min(leftItems, 10) / 10f;
             if (mem != null) tf[o + 6] = mem.DeckItemShare;
+        }
+
+        /// <summary>Your hand and these cards still to come from your deck.</summary>
+        private static List<CardDef> ToCome(SideView me, List<CardDef> deckLeft)
+        {
+            var list = new List<CardDef>();
+            foreach (var c in me.Hand) if (c != null && c.Def != null) list.Add(c.Def);
+            list.AddRange(deckLeft);
+            return list;
+        }
+
+        /// <summary>These cards less those (one for one, matched by card).</summary>
+        private static List<CardDef> Less(List<CardDef> cards, List<CardDef> less)
+        {
+            if (less == null || less.Count == 0) return cards;
+            var take = new Dictionary<string, int>(StringComparer.Ordinal);
+            foreach (var d in less)
+            {
+                int n;
+                string key = d.BaseKey ?? d.Name;
+                take.TryGetValue(key, out n);
+                take[key] = n + 1;
+            }
+            var list = new List<CardDef>();
+            foreach (var d in cards)
+            {
+                int n;
+                string key = d.BaseKey ?? d.Name;
+                if (take.TryGetValue(key, out n) && n > 0) take[key] = n - 1;
+                else list.Add(d);
+            }
+            return list;
+        }
+
+        /// <summary>Prize cards the other player takes for Knocking Out this Pokémon.</summary>
+        private static int PrizesFor(PokemonView mon)
+        {
+            return mon.Top != null && mon.Top.Def != null ? mon.Top.Def.PrizeValue : 1;
+        }
+
+        /// <summary>
+        /// The opponent's Benched Pokémon most worth bringing up to Knock Out (slot feature 47): of those your Active could
+        /// Knock Out with at most one more Energy, the one giving the most Prize cards (the first on a tie). Null if none.
+        /// </summary>
+        private static PokemonView BestGustTarget(SideView me, SideView opp)
+        {
+            if (me.Active == null || opp == null) return null;
+            PokemonView best = null;
+            foreach (var b in opp.Bench)
+                if (b != null && PolicyPlan.CanKnockOut(me.Active, 1, b) && (best == null || PrizesFor(b) > PrizesFor(best))) best = b;
+            return best;
+        }
+
+        /// <summary>
+        /// The Prize race (turn features from 2 + SideSlots + 16 on, and 33 and 34): the Knock Outs each side needs to take its
+        /// last Prize card, the Pokémon worth 2 or more Prize cards each side has in play, the turns each side would need to
+        /// win and who is ahead in that race, and the Prize cards each side could take in its next 2 turns (TurnsToWin). A
+        /// board set up to win in 1 or 2 turns looks different here from one that needs 3 or 4.
+        /// </summary>
+        private static void RaceFeatures(SideView me, SideView opp, List<CardDef> toCome, float[] tf)
+        {
+            int o = 2 + PolicyInput.SideSlots + 16;
+            int myKos, theirKos, mySoon, theirSoon;
+            int mine = TurnsToWin(me, opp, toCome, out myKos, out mySoon), theirs = TurnsToWin(opp, me, null, out theirKos, out theirSoon);
+            tf[o] = Math.Min(myKos, 6) / 6f;
+            tf[o + 1] = Math.Min(theirKos, 6) / 6f;
+            tf[o + 2] = Math.Min(MultiPrize(me), 3) / 3f;
+            tf[o + 3] = Math.Min(MultiPrize(opp), 3) / 3f;
+            tf[o + 4] = Math.Min(mine, 8) / 8f;
+            tf[o + 5] = Math.Min(theirs, 8) / 8f;
+            tf[o + 6] = (Math.Max(-4, Math.Min(4, theirs - mine)) + 4) / 8f;
+            tf[o + 17] = Math.Min(mySoon, 6) / 6f;
+            tf[o + 18] = Math.Min(theirSoon, 6) / 6f;
+        }
+
+        private static int MultiPrize(SideView s)
+        {
+            int n = 0;
+            foreach (var mon in PolicyMemory.InPlay(s)) if (PrizesFor(mon) >= 2) n++;
+            return n;
+        }
+
+        /// <summary>Most turns counted for one Knock Out, and the turns ahead in which the board keeps powering up.</summary>
+        private const int MaxTurnsPerKo = 3, PowerUpTurns = 3;
+
+        /// <summary>
+        /// Turns the attacker's side needs to take its remaining Prize cards from the defender's Pokémon in play, played out a
+        /// turn at a time: each turn its best attacker hits one target, with one more Energy attached each turn (one
+        /// attachment a turn, up to PowerUpTurns more) and, for yours (toCome), as the evolutions still to come in its line;
+        /// damage stays on the target from turn to turn, so a Pokémon needing two hits takes two turns. The next target is
+        /// the one giving the most Prize cards per turn spent on it (a 2-Prize Pokémon ex in one hit before a 1-Prize one;
+        /// no more Prize cards counted than are left). A target nothing can damage counts MaxTurnsPerKo turns; Prize cards
+        /// left after the Pokémon in play count a turn and a Knock Out each. kos: the Knock Outs that takes; soon: the Prize
+        /// cards taken within its next 2 turns.
+        /// </summary>
+        private static int TurnsToWin(SideView attacker, SideView defender, List<CardDef> toCome, out int kos, out int soon)
+        {
+            var targets = new List<PokemonView>(PolicyMemory.InPlay(defender));
+            // damage[t, e]: the most any attacker does to target t with e + 1 more Energy.
+            var damage = new int[targets.Count, PowerUpTurns];
+            var hp = new int[targets.Count];
+            foreach (var mon in PolicyMemory.InPlay(attacker))
+            {
+                var top = mon.Top != null ? mon.Top.Def : null;
+                if (top == null) continue;
+                var cards = toCome != null ? PolicyPlan.Line(top, toCome) : new List<CardDef> { top };
+                foreach (var c in cards)
+                    foreach (var a in c.Attacks)
+                    {
+                        // The Energy it's missing doesn't depend on the target: usable from e = missing - 1 on.
+                        int missing = PolicyPlan.Missing(mon.EnergyUnits, a);
+                        if (missing > PowerUpTurns) continue;
+                        for (int t = 0; t < targets.Count; t++)
+                        {
+                            int d = PolicyPlan.DamageTo(c, mon.AbilitiesActive, a, targets[t]);
+                            for (int e = Math.Max(0, missing - 1); e < PowerUpTurns; e++) damage[t, e] = Math.Max(damage[t, e], d);
+                        }
+                    }
+            }
+            for (int t = 0; t < targets.Count; t++) hp[t] = targets[t].RemainingHp;
+            var taken = new bool[targets.Count];
+            int left = attacker.PrizeCount, turns = 0;
+            kos = soon = 0;
+            while (left > 0)
+            {
+                int pick = -1, pickNeed = 0, pickPrizes = 0;
+                for (int t = 0; t < targets.Count; t++)
+                {
+                    if (taken[t]) continue;
+                    int need = TurnsFor(damage, t, hp[t], turns);
+                    int prizes = Math.Min(PrizesFor(targets[t]), left);
+                    // More Prize cards per turn first (prizes / need, compared without dividing), then the quicker one.
+                    if (pick < 0 || prizes * pickNeed > pickPrizes * need || (prizes * pickNeed == pickPrizes * need && need < pickNeed))
+                    {
+                        pick = t;
+                        pickNeed = need;
+                        pickPrizes = prizes;
+                    }
+                }
+                if (pick < 0) break;
+                taken[pick] = true;
+                turns += pickNeed;
+                left -= pickPrizes;
+                kos++;
+                if (turns <= 2) soon += pickPrizes;
+            }
+            if (left > 0)
+            {
+                if (turns < 2) soon += Math.Min(left, 2 - turns);
+                turns += left;
+                kos += left;
+            }
+            return turns;
+        }
+
+        /// <summary>Turns to Knock Out target t (hp left) starting turns from now, its damage adding up (at most MaxTurnsPerKo).</summary>
+        private static int TurnsFor(int[,] damage, int t, int hp, int from)
+        {
+            for (int n = 1; n <= MaxTurnsPerKo; n++)
+            {
+                hp -= Math.Max(0, damage[t, Math.Min(from + n - 1, PowerUpTurns - 1)]);
+                if (hp <= 0) return n;
+            }
+            return MaxTurnsPerKo;
+        }
+
+        /// <summary>
+        /// Outs and resources (turn features from 2 + SideSlots + 23 on): your Prize cards you know of, the Supporters and
+        /// Energy left in your deck (less those known to be Prizes) and the chance your next draw is a Supporter, the cards
+        /// that bring up an opponent's Benched Pokémon (Boss's Orders) in your hand and left in your deck, the cards that
+        /// switch your Active in your hand, and of the opponent's: such gust and switch cards seen so far, and whether their
+        /// hand is known to hold a gust card.
+        /// </summary>
+        private static void OutsFeatures(SideView me, SideView opp, PolicyMemory mem, List<CardDef> deckLeft, List<CardDef> prized, float[] tf)
+        {
+            int o = 2 + PolicyInput.SideSlots + 23;
+            tf[o] = Math.Min(prized.Count, 6) / 6f;
+            int supporters = 0, energy = 0, gusts = 0;
+            foreach (var d in deckLeft)
+            {
+                if (d.IsTrainer && d.TrainerKind == TrainerKind.Supporter) supporters++;
+                if (d.IsEnergy) energy++;
+                if (PolicyCards.Gusts(d)) gusts++;
+            }
+            tf[o + 1] = Math.Min(supporters, 10) / 10f;
+            tf[o + 2] = Math.Min(1f, supporters / (float)Math.Max(1, me.DeckCount));
+            tf[o + 3] = Math.Min(energy, 15) / 15f;
+            int gustsInHand = 0, switchesInHand = 0;
+            foreach (var c in me.Hand)
+            {
+                if (c == null || c.Def == null) continue;
+                if (PolicyCards.Gusts(c.Def)) gustsInHand++;
+                if (PolicyCards.SwitchesOwn(c.Def)) switchesInHand++;
+            }
+            tf[o + 4] = Math.Min(gustsInHand, 2) / 2f;
+            tf[o + 5] = Math.Min(gusts, 4) / 4f;
+            tf[o + 6] = Math.Min(switchesInHand, 2) / 2f;
+            int theirGusts = 0, theirSwitches = 0;
+            var counted = new HashSet<int>();
+            Action<int, CardDef> count = (id, d) =>
+            {
+                if (d == null || !counted.Add(id)) return;
+                if (PolicyCards.Gusts(d)) theirGusts++;
+                if (PolicyCards.SwitchesOwn(d)) theirSwitches++;
+            };
+            foreach (var c in opp.Discard) if (c != null) count(c.Id, c.Def);
+            if (mem != null) foreach (var kv in mem.OppSeen) count(kv.Key, kv.Value);
+            tf[o + 7] = Math.Min(theirGusts, 4) / 4f;
+            tf[o + 8] = Math.Min(theirSwitches, 4) / 4f;
+            if (mem != null) foreach (var d in mem.OppKnownHand.Values) if (PolicyCards.Gusts(d)) tf[o + 9] = 1;
         }
 
         /// <summary>Damage as a share of the HP left, 0 to 1 (1 = twice what's needed or more).</summary>

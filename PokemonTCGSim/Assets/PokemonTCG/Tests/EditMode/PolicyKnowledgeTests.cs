@@ -236,6 +236,248 @@ namespace PokemonTCG.Tests
             Assert.AreEqual(before.Value, copy.Forward(found).Value, 1e-5);
         }
 
+        // ------------------------------------------------------------------ What a Masters player keeps track of
+
+        [Test]
+        public void Gust_And_Switch_Cards_Are_Recognised()
+        {
+            Assert.IsTrue(PolicyCards.Gusts(C("MEG-114")), "Boss's Orders");
+            Assert.IsTrue(PolicyCards.Gusts(C("PAR-160")), "Counter Catcher");
+            Assert.IsFalse(PolicyCards.Gusts(C("MEG-130")), "Switch moves your own Pokémon");
+            Assert.IsTrue(PolicyCards.SwitchesOwn(C("MEG-130")), "Switch");
+            Assert.IsTrue(PolicyCards.SwitchesOwn(C("BST-125")), "Escape Rope");
+            Assert.IsFalse(PolicyCards.SwitchesOwn(C("MEG-114")), "Boss's Orders moves theirs");
+            Assert.IsFalse(PolicyCards.Gusts(C("SVP-44")) || PolicyCards.SwitchesOwn(C("SVP-44")), "a Pokémon is neither");
+        }
+
+        [Test]
+        public void Attack_Previews_Give_The_Real_Damage_Knock_Out_And_Prizes()
+        {
+            // Heat Tackle prints 30; Vitality Band adds 10, which only playing it out shows.
+            var probe = new PreviewProbe();
+            var e = ProbeScenario(probe);
+            var charmander = e.ScenarioActive(0, C("SVP-44"));
+            e.ScenarioAttach(charmander, C("MEE-10"));
+            e.ScenarioAttachTool(charmander, C("SVI-197"));
+            e.ScenarioActive(1, C("POR-62"));
+            e.ScenarioBench(1, C("ASC-16"));
+            var x = probe.Run(e);
+            var attack = probe.Results.Single();
+            Assert.AreEqual(40, attack.Value.Damage, "30 + 10 from Vitality Band");
+            Assert.IsFalse(attack.Value.KnocksOut);
+            Assert.AreEqual(0, attack.Value.Prizes);
+            int f = PolicyInput.OptionFeatures;
+            int i = Option(probe.Request, probe.Choices, o => o.Action == ActionType.Attack);
+            Assert.AreEqual(40 / 170f / 2, x.OptFeat[i * f + 15], 1e-6, "the network sees 40 of Meowth ex's 170 HP");
+            Assert.AreEqual(0, x.OptFeat[i * f + 14]);
+
+            // Into Budew (30 HP, weak to Fire): a Knock Out and 1 Prize card.
+            probe = new PreviewProbe();
+            e = ProbeScenario(probe);
+            charmander = e.ScenarioActive(0, C("SVP-44"));
+            e.ScenarioAttach(charmander, C("MEE-10"));
+            e.ScenarioActive(1, C("ASC-16"));
+            e.ScenarioBench(1, C("POR-62"));
+            x = probe.Run(e);
+            attack = probe.Results.Single();
+            Assert.IsTrue(attack.Value.KnocksOut);
+            Assert.AreEqual(30, attack.Value.Damage, "the HP it had left");
+            Assert.AreEqual(1, attack.Value.Prizes);
+            i = Option(probe.Request, probe.Choices, o => o.Action == ActionType.Attack);
+            Assert.AreEqual(1, x.OptFeat[i * f + 14]);
+            Assert.AreEqual(1 / 3f, x.OptFeat[i * f + 21], 1e-6, "takes 1 Prize card");
+        }
+
+        [Test]
+        public void The_Network_Sees_The_Prize_Race_And_The_Best_Gust_Target()
+        {
+            // Charmander (30 for R, 60 into Budew's Fire Weakness) against Meowth ex (170 HP, 2 Prizes) with Budew on the Bench.
+            var probe = new PreviewProbe();
+            var e = ProbeScenario(probe);
+            var charmander = e.ScenarioActive(0, C("SVP-44"));
+            e.ScenarioAttach(charmander, C("MEE-10"));
+            e.ScenarioActive(1, C("POR-62"));
+            e.ScenarioBench(1, C("ASC-16"));
+            var x = probe.Run(e);
+
+            int n = PolicyInput.SlotFeatures, theirs = PolicyInput.SideSlots;
+            Assert.AreEqual(1, x.SlotFeat[(theirs + 1) * n + 47], "Budew is the Benched Pokémon to bring up and Knock Out");
+            Assert.AreEqual(0, x.SlotFeat[theirs * n + 47], "not their Active");
+
+            // Yours: Budew first (1 Prize in 1 turn), then Meowth ex (2 Prizes, 3 turns at 30), then 3 more Pokémon: 5 Knock
+            // Outs in 7 turns, 1 Prize card in the next 2. Theirs: Charmander takes 3 turns (Itchy Pollen's 10, then Tuck Tail's
+            // 60 once Meowth ex has the Energy), then 5 more Pokémon: 6 Knock Outs in 8 turns.
+            int o = 2 + PolicyInput.SideSlots + 16;
+            var tf = x.TurnFeats;
+            Assert.AreEqual(5 / 6f, tf[o], 1e-6, "your Knock Outs needed");
+            Assert.AreEqual(1, tf[o + 1], 1e-6, "theirs");
+            Assert.AreEqual(0, tf[o + 2], "no multi-Prize Pokémon of yours in play");
+            Assert.AreEqual(1 / 3f, tf[o + 3], 1e-6, "Meowth ex");
+            Assert.AreEqual(7 / 8f, tf[o + 4], 1e-6, "your turns to win");
+            Assert.AreEqual(1, tf[o + 5], 1e-6, "theirs");
+            Assert.AreEqual(5 / 8f, tf[o + 6], 1e-6, "you're a turn ahead");
+            Assert.AreEqual(1 / 6f, tf[o + 17], 1e-6, "1 Prize card in your next 2 turns");
+            Assert.AreEqual(0, tf[o + 18], "none in theirs");
+        }
+
+        [Test]
+        public void Known_Prizes_Outs_And_The_Opponents_Gust_And_Switch_Cards()
+        {
+            var probe = new PreviewProbe { Preview = false };
+            var e = ProbeScenario(probe);
+            var charmander = e.ScenarioActive(0, C("SVP-44"));
+            e.ScenarioAttach(charmander, C("MEE-10"));
+            e.ScenarioActive(1, C("POR-62"));
+            e.ScenarioAddToHand(0, C("MEG-114"));
+            e.ScenarioAddToHand(0, C("MEG-130"));
+            e.ScenarioAddToDiscard(1, C("MEG-114"), 1);
+            e.ScenarioAddToDiscard(1, C("BST-125"), 1);
+            // The deck list: what's in play and in hand, 2 Counter Catcher, 2 Professor's Research and 9 Fire Energy: 1 attached,
+            // 6 in the Prizes (all Fire Energy, as Scenario's are) and 2 left in the deck.
+            probe.Memory.DeckList = new List<CardDef> { C("SVP-44"), C("MEE-10"), C("MEG-114"), C("MEG-130"), C("PAR-160"), C("PAR-160") };
+            var research = db.All.First(d => d.Name == "Professor's Research");
+            probe.Memory.DeckList.Add(research);
+            probe.Memory.DeckList.Add(research);
+            for (int k = 0; k < 8; k++) probe.Memory.DeckList.Add(C("MEE-10"));
+            var catcher = e.ScenarioAddToHand(1, C("PAR-160"));
+            probe.Memory.OppKnownHand[catcher.Id] = catcher.Def;
+            // Searching the deck shows which cards are in the Prizes.
+            probe.Memory.OnEvent(e, new GameEvent { Type = GameEventType.Search, Player = 0 });
+            Assert.AreEqual(6, probe.Memory.KnownPrizes.Count);
+            var x = probe.Run(e);
+
+            int o = 2 + PolicyInput.SideSlots + 23;
+            var tf = x.TurnFeats;
+            Assert.AreEqual(1, tf[o], 1e-6, "all 6 Prize cards known");
+            Assert.AreEqual(2 / 10f, tf[o + 1], 1e-6, "2 Supporters left in the deck");
+            Assert.AreEqual(2 / 20f, tf[o + 2], 1e-6, "2 in 20 to draw one next");
+            Assert.AreEqual(2 / 15f, tf[o + 3], 1e-6, "2 Fire Energy left in the deck (the other 6 are Prizes)");
+            Assert.AreEqual(1 / 2f, tf[o + 4], 1e-6, "Boss's Orders in hand");
+            Assert.AreEqual(2 / 4f, tf[o + 5], 1e-6, "2 Counter Catcher in the deck");
+            Assert.AreEqual(1 / 2f, tf[o + 6], 1e-6, "Switch in hand");
+            Assert.AreEqual(1 / 4f, tf[o + 7], 1e-6, "they've used a Boss's Orders");
+            Assert.AreEqual(1 / 4f, tf[o + 8], 1e-6, "and an Escape Rope");
+            Assert.AreEqual(1, tf[o + 9], "a Counter Catcher is known to be in their hand");
+        }
+
+        [Test]
+        public void A_Network_From_Before_The_Masters_Inputs_Loads_And_Plays_Exactly_As_Before()
+        {
+            var net = new PolicyNet();
+            var probe = new PreviewProbe { Net = net };
+            var e = ProbeScenario(probe);
+            var charmander = e.ScenarioActive(0, C("SVP-44"));
+            e.ScenarioAttach(charmander, C("MEE-10"));
+            e.ScenarioActive(1, C("POR-62"));
+            e.ScenarioBench(1, C("ASC-16"));
+            var x = probe.Run(e);
+
+            // A network saved with the earlier sizes (47 per Pokémon, 21 per option, 2 + SideSlots + 16 turn numbers).
+            int newTurn = PolicyInput.TurnFeatures - (2 + PolicyInput.SideSlots + 16);
+            var old = Narrow(net.ToBytes(), new Dictionary<string, int> { { "slot.0.weight", 1 }, { "option.0.weight", 1 }, { "inp.0.weight", newTurn } });
+            var loaded = new PolicyNet();
+            Assert.IsTrue(loaded.FromBytes(old), "it loads");
+
+            // It plays as the network it came from does with the new numbers blank.
+            for (int s = 0; s < PolicyInput.NumSlots; s++) x.SlotFeat[s * PolicyInput.SlotFeatures + 47] = 0;
+            for (int k = 0; k < x.Count; k++) x.OptFeat[k * PolicyInput.OptionFeatures + 21] = 0;
+            for (int i = 2 + PolicyInput.SideSlots + 16; i < PolicyInput.TurnFeatures; i++) x.TurnFeats[i] = 0;
+            var want = net.Forward(x);
+            var got = loaded.Forward(x);
+            Assert.AreEqual(want.Value, got.Value, 1e-5);
+            for (int i = 0; i < want.Logits.Length; i++) Assert.AreEqual(want.Logits[i], got.Logits[i], 1e-5);
+        }
+
+        /// <summary>The bytes of a saved network with the last columns of these weights removed (as an older network saved them).</summary>
+        private static byte[] Narrow(byte[] bytes, Dictionary<string, int> cut)
+        {
+            var rows = new Dictionary<string, int> { { "slot.0.weight", PolicyNet.SlotDim }, { "option.0.weight", PolicyNet.OptionDim }, { "inp.0.weight", PolicyNet.Width } };
+            using (var input = new System.IO.MemoryStream(bytes))
+            using (var r = new System.IO.BinaryReader(input))
+            using (var output = new System.IO.MemoryStream())
+            using (var w = new System.IO.BinaryWriter(output))
+            {
+                w.Write(r.ReadBytes(8));
+                w.Write(r.ReadInt32());
+                w.Write(r.ReadInt64());
+                w.Write(r.ReadInt64());
+                w.Write(r.ReadDouble());
+                w.Write(r.ReadString());
+                int count = r.ReadInt32();
+                w.Write(count);
+                for (int k = 0; k < count; k++)
+                {
+                    string name = r.ReadString();
+                    int len = r.ReadInt32();
+                    var a = new float[len];
+                    for (int i = 0; i < len; i++) a[i] = r.ReadSingle();
+                    int less;
+                    if (cut.TryGetValue(name, out less))
+                    {
+                        int n = rows[name], cols = len / n, keep = cols - less;
+                        var b = new float[n * keep];
+                        for (int row = 0; row < n; row++) System.Array.Copy(a, row * cols, b, row * keep, keep);
+                        a = b;
+                    }
+                    w.Write(name);
+                    w.Write(a.Length);
+                    foreach (float v in a) w.Write(v);
+                }
+                w.Write(r.ReadBytes((int)(input.Length - input.Position)));
+                w.Flush();
+                return output.ToArray();
+            }
+        }
+
+        /// <summary>Scenario's empty board (6 Fire Energy Prizes and 20 Psychic Energy in each deck), with the probe as seat 0, on turn 3.</summary>
+        private GameEngine ProbeScenario(PreviewProbe probe)
+        {
+            var e = new GameEngine(StandardCards.CreateRegistry(), probe, new ScriptedAgent());
+            e.BeginScenario(42);
+            e.ScenarioAddPrizes(0, C("MEE-10"), 6);
+            e.ScenarioAddPrizes(1, C("MEE-10"), 6);
+            e.ScenarioAddToDeck(0, C("MEE-13"), 20);
+            e.ScenarioAddToDeck(1, C("MEE-13"), 20);
+            probe.Engine = e;
+            return e;
+        }
+
+        /// <summary>At its first main action, previews the attacks on offer (PolicySearch.PreviewAttacks) and encodes the decision with them; then ends the turn.</summary>
+        private sealed class PreviewProbe : IPlayerAgent
+        {
+            public GameEngine Engine;
+            public bool Preview = true;
+            public readonly PolicyMemory Memory = new PolicyMemory(0) { DeckList = new List<CardDef>() };
+            public DecisionRequest Request;
+            public List<PolicyEncoder.Choice> Choices;
+            public Dictionary<int, PolicySearch.AttackResult> Results;
+            public PolicyInput Input;
+            public PolicyNet Net = new PolicyNet();
+
+            public PolicyInput Run(GameEngine e)
+            {
+                e.ScenarioSetTurn(0, 3);
+                Step(e);
+                Assert.NotNull(Input, "no main action came");
+                return Input;
+            }
+
+            public List<int> Decide(DecisionRequest r)
+            {
+                if (r.Kind == DecisionKind.MainAction && Request == null)
+                {
+                    Request = r;
+                    Memory.See(r.View);
+                    Results = Preview ? new PolicySearch(Net, new SearchSettings()).PreviewAttacks(Engine, r, Memory) : null;
+                    Choices = PolicyEncoder.Choices(r, new List<int>());
+                    Input = PolicyEncoder.Encode(r, Memory, Net, Choices, Results);
+                }
+                for (int i = 0; i < r.Options.Count; i++)
+                    if (r.Options[i].Action == ActionType.EndTurn) return new List<int> { i };
+                return r.MinChoices > 0 ? new List<int> { 0 } : new List<int>();
+            }
+        }
+
         private sealed class Recorder : IPlayerAgent, IGameObserver
         {
             private readonly PolicyAgent inner;

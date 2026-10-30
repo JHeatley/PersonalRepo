@@ -72,6 +72,22 @@ namespace PokemonTCG.AI
             return moves != null && moves.Net == Net ? moves.Evaluate(x, out value) : Net.Evaluate(x, out value);
         }
         private GameEngine engine;
+        /// <summary>
+        /// Before choosing a main action with attacks on offer, play each attack out on a copy of the position (with the hidden
+        /// cards guessed) to see the damage it really does and the Prizes it takes (PolicySearch.PreviewAttacks). Off in the
+        /// look-ahead's own play-outs, which are many and short.
+        /// </summary>
+        public bool PreviewAttacks = true;
+        private PolicySearch previewer;
+        /// <summary>The last decision previewed and what its attacks did (the same decision isn't played out twice).</summary>
+        private DecisionRequest previewedFor;
+        private Dictionary<int, PolicySearch.AttackResult> previewed;
+
+        /// <summary>This decision's attack previews if it has been previewed already, else null (printed damage).</summary>
+        private Dictionary<int, PolicySearch.AttackResult> Previewed(DecisionRequest r)
+        {
+            return ReferenceEquals(r, previewedFor) ? previewed : null;
+        }
 
         /// <summary>Counts for the sequencing report.</summary>
         public int Attacks, AttacksWithResourcesLeft, Shuffles, ShufflesWithPlaysLeft, DrewThenShuffled, Attachments, WastedAttachments;
@@ -99,7 +115,7 @@ namespace PokemonTCG.AI
             var choices = PolicyEncoder.Choices(r, new List<int>());
             if (choices.Count == 0) return 0;
             float value;
-            Evaluate(PolicyEncoder.Encode(r, Memory, Net, choices), out value);
+            Evaluate(PolicyEncoder.Encode(r, Memory, Net, choices, Previewed(r)), out value);
             return value;
         }
 
@@ -111,7 +127,7 @@ namespace PokemonTCG.AI
         {
             if (Memory.Seat < 0) Memory.Seat = r.Player;
             float value;
-            return PolicyNet.Softmax(Evaluate(PolicyEncoder.Encode(r, Memory, Net, choices), out value));
+            return PolicyNet.Softmax(Evaluate(PolicyEncoder.Encode(r, Memory, Net, choices, Previewed(r)), out value));
         }
 
         public List<int> Decide(DecisionRequest r)
@@ -148,7 +164,7 @@ namespace PokemonTCG.AI
 
         private int Choose(DecisionRequest r, List<PolicyEncoder.Choice> choices)
         {
-            var x = PolicyEncoder.Encode(r, Memory, Net, choices);
+            var x = PolicyEncoder.Encode(r, Memory, Net, choices, Preview(r));
             float value;
             var logits = Evaluate(x, out value);
             var p = PolicyNet.Softmax(logits);
@@ -201,6 +217,31 @@ namespace PokemonTCG.AI
                 });
             }
             return a;
+        }
+
+        /// <summary>What each attack on offer really does (PreviewAttacks), or null.</summary>
+        private Dictionary<int, PolicySearch.AttackResult> Preview(DecisionRequest r)
+        {
+            if (!PreviewAttacks || engine == null || r.Kind != DecisionKind.MainAction) return null;
+            if (ReferenceEquals(r, previewedFor)) return previewed;
+            bool any = false;
+            foreach (var o in r.Options) if (o.Action == ActionType.Attack) any = true;
+            if (!any) return null;
+            if (previewer == null) previewer = new PolicySearch(Net, new SearchSettings()) { Moves = Moves };
+            try
+            {
+                previewed = previewer.PreviewAttacks(engine, r, Memory);
+                previewedFor = r;
+                return previewed;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                return null; // the network falls back on printed damage
+            }
         }
 
         /// <summary>The look-ahead's move and improved choice for a training decision; -1 when it didn't look ahead (sure enough).</summary>

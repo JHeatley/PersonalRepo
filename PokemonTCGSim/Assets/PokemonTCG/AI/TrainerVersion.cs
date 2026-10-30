@@ -8,6 +8,6 @@ namespace PokemonTCG.AI
     /// </summary>
     public static class TrainerVersion
     {
-        public const int Number = 173; // 173: the network sees attack costs, Energy needed, evolutions, Knock Outs, Items, the Bench and protection (bigger inputs)
+        public const int Number = 174; // 174: the network sees what attacks really do, the Prize race, gust targets, known Prizes, outs and the opponent's gust and switch cards (bigger inputs)
     }
 }

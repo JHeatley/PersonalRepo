@@ -122,7 +122,7 @@ namespace PokemonTCG.AI
         /// <summary>What a card's text says, worked out once per card (reading text on every decision would slow training down).</summary>
         private sealed class Facts
         {
-            public bool PlaysFromHand, TeamEnergy, MentionsEnergy, LocksItems, PreventsEffects, Spreads, HasAbility;
+            public bool PlaysFromHand, TeamEnergy, MentionsEnergy, LocksItems, PreventsEffects, Spreads, HasAbility, Gusts, SwitchesOwn;
             public int BonusType;
             /// <summary>Its Abilities prevent all damage from attacks by: 1 Pokémon ex, 2 Pokémon with an Ability, 4 Basic Pokémon, 8 Pokémon V.</summary>
             public int Shield;
@@ -141,7 +141,15 @@ namespace PokemonTCG.AI
         {
             return facts.GetValue(c, card =>
             {
-                var f = new Facts { BonusType = NamedType(card.Text ?? "", "Pok"), PreventsEffects = PreventsEffects(card.Text) };
+                string text = card.Text ?? "";
+                var f = new Facts { BonusType = NamedType(text, "Pok"), PreventsEffects = PreventsEffects(text) };
+                if (card.IsTrainer)
+                {
+                    // Boss's Orders, Counter Catcher, Prime Catcher: "switch ... your opponent's Benched Pokémon ... Active".
+                    f.Gusts = Has(text, "opponent's Benched Pok") && Has(text, "Active") && Has(text, "switch");
+                    // Switch, Switch Cart, Escape Rope, Prime Catcher: your own Active Pokémon out.
+                    f.SwitchesOwn = Has(text, "switch your Active") || Has(text, "switches their Active");
+                }
                 foreach (var a in card.Attacks)
                 {
                     string t = a.Text ?? "";
@@ -186,6 +194,10 @@ namespace PokemonTCG.AI
         }
 
         public static bool AttackLocksItems(AttackDef a) { return a != null && Of(a).LocksItems; }
+        /// <summary>True for a Trainer that brings one of the opponent's Benched Pokémon up to the Active Spot (Boss's Orders).</summary>
+        public static bool Gusts(CardDef c) { return c != null && Of(c).Gusts; }
+        /// <summary>True for a Trainer that switches your own Active Pokémon out (Switch, Escape Rope).</summary>
+        public static bool SwitchesOwn(CardDef c) { return c != null && Of(c).SwitchesOwn; }
         public static bool AttackIgnoresEffects(AttackDef a) { return a != null && Of(a).IgnoresEffects; }
         public static bool AttackIgnoresWeakness(AttackDef a) { return a != null && Of(a).IgnoresWeakness; }
         /// <summary>True when the card has an attack that puts damage counters on Pokémon (spread).</summary>
