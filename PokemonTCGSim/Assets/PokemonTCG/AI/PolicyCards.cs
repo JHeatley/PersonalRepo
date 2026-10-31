@@ -126,6 +126,18 @@ namespace PokemonTCG.AI
             public bool PlaysFromHand, TeamEnergy, MentionsEnergy, LocksItems, PreventsEffects, Spreads, HasAbility, Gusts, SwitchesOwn;
             /// <summary>What playing the card (a Trainer) or using its Abilities draws for you.</summary>
             public DrawFacts Draw;
+            /// <summary>Damage its Abilities (or, for a Trainer, the card) move from your Pokémon to the opponent's or put on them.</summary>
+            public DamageFacts Damage;
+            /// <summary>A Stadium that puts damage counters on Basic Pokémon as they're benched (Risky Ruins), and the type it spares (-1: none).</summary>
+            public int BenchCounters, BenchSpares = -1;
+            /// <summary>Its attacks or Abilities work (or get stronger) with damage counters on it; work only without any.</summary>
+            public bool LikesDamage, NeedsNoDamage;
+            /// <summary>
+            /// A Prize-card condition for it to work (PrizeCondition): you have more Prize cards remaining than your opponent
+            /// (Counter Catcher, Defiance Vest), or fewer, or a player has N or fewer / N or more / exactly N left (Special Red
+            /// Card: your opponent 3 or fewer).
+            /// </summary>
+            public PrizeCondition Prizes;
             public int BonusType;
             /// <summary>Its Abilities prevent all damage from attacks by: 1 Pokémon ex, 2 Pokémon with an Ability, 4 Basic Pokémon, 8 Pokémon V.</summary>
             public int Shield;
@@ -151,6 +163,85 @@ namespace PokemonTCG.AI
             public int Count, Until;
             public bool PerPrize, Refills;
             public bool Any { get { return Count > 0 || Until > 0 || PerPrize; } }
+        }
+
+        /// <summary>
+        /// Damage an Ability (or a Trainer) deals without attacking: damage counters it moves from your Pokémon to the opponent's
+        /// (Munkidori's Adrena-Brain, Hatterene VMAX, Agatha), only to their Active Pokémon or to any, with the Energy type the
+        /// Pokémon needs attached for it (-1: none); and damage counters it puts on one of theirs (Dusclops' Cursed Blast), and
+        /// whether that Knocks Out the Pokémon using it.
+        /// </summary>
+        public struct DamageFacts
+        {
+            public int Move, Place, NeedsType;
+            public bool ActiveOnly, KnocksOutSelf;
+        }
+
+        private static readonly Regex MoveCounters = new Regex(@"move (up to )?(\d+|a|one|two|three|four|five) damage counters? from (1 of )?your (Active )?Pokémon to (1 of )?your opponent's (Active )?Pokémon", RegexOptions.IgnoreCase);
+        private static readonly Regex PutCounters = new Regex(@"put (\d+|a|one|two|three|four|five) damage counters? on (1 of )?your opponent's (Active )?Pokémon", RegexOptions.IgnoreCase);
+        private static readonly Regex BenchedCounters = new Regex(@"onto their Bench[^.]*place (\d+|a|one|two|three) damage counters? on it", RegexOptions.IgnoreCase);
+        private static readonly Regex LikesDamageText = new Regex(@"(if|while|as long as) this Pokémon has (any|\d+ or more) damage counters|for each damage counter on this Pokémon|if this Pokémon has no damage counters on it, (this attack does nothing|you can't)", RegexOptions.IgnoreCase);
+        private static readonly Regex NeedsNoDamageText = new Regex(@"(if|while|as long as) this Pokémon has no damage counters on it(?!, (this attack does nothing|you can't))", RegexOptions.IgnoreCase);
+
+        private static DamageFacts DamageOf(string t, DamageFacts d)
+        {
+            if (string.IsNullOrEmpty(t) || !Has(t, "damage counter")) return d;
+            var m = MoveCounters.Match(t);
+            if (m.Success && Number(m.Groups[2].Value) > d.Move)
+            {
+                d.Move = Number(m.Groups[2].Value);
+                d.ActiveOnly = m.Groups[6].Success && m.Groups[6].Value.Length > 0;
+                d.NeedsType = Has(t, "if it has") || Has(t, "if this Pokémon has") ? NamedType(t, "Energy attached") : -1;
+            }
+            var p = PutCounters.Match(t);
+            if (p.Success && Number(p.Groups[1].Value) > d.Place)
+            {
+                d.Place = Number(p.Groups[1].Value);
+                d.KnocksOutSelf = Has(t, "this Pokémon is Knocked Out");
+            }
+            return d;
+        }
+
+        /// <summary>A Prize-card condition: Kind 0 none, 1 you have more remaining than the opponent, 2 fewer, 3 a count (Theirs: the
+        /// opponent's; AtMost / AtLeast / exactly N).</summary>
+        public struct PrizeCondition
+        {
+            public int Kind, N, Direction; // Direction: -1 N or fewer, 1 N or more, 0 exactly N
+            public bool Theirs;
+
+            /// <summary>True when the condition holds with these Prize cards left (always, without a condition).</summary>
+            public bool Met(int mine, int theirs)
+            {
+                switch (Kind)
+                {
+                    case 1: return mine > theirs;
+                    case 2: return mine < theirs;
+                    case 3:
+                        int n = Theirs ? theirs : mine;
+                        return Direction < 0 ? n <= N : Direction > 0 ? n >= N : n == N;
+                    default: return true;
+                }
+            }
+        }
+
+        private static readonly Regex PrizeCount = new Regex(@"(only if|if) (your opponent has|you have) (exactly )?(\d+) (or (fewer|more) )?Prize cards? (remaining|left)", RegexOptions.IgnoreCase);
+
+        private static PrizeCondition PrizeConditionOf(string t)
+        {
+            var c = new PrizeCondition();
+            if (string.IsNullOrEmpty(t) || !Has(t, "Prize card")) return c;
+            if (Has(t, "more Prize cards remaining than your opponent") || Has(t, "more Prize cards left than your opponent")) c.Kind = 1;
+            else if (Has(t, "fewer Prize cards remaining than your opponent") || Has(t, "fewer Prize cards left than your opponent")) c.Kind = 2;
+            else
+            {
+                var m = PrizeCount.Match(t);
+                if (!m.Success) return c;
+                c.Kind = 3;
+                c.Theirs = m.Groups[2].Value.StartsWith("your opponent", StringComparison.OrdinalIgnoreCase);
+                c.N = Number(m.Groups[4].Value);
+                c.Direction = m.Groups[6].Value == "fewer" ? -1 : m.Groups[6].Value == "more" ? 1 : 0;
+            }
+            return c;
         }
 
         private static readonly Regex DrawNumber = new Regex(@"\bdraws? (\d+|a|an|one|two|three|four|five|six|seven|eight) (more )?cards?\b", RegexOptions.IgnoreCase);
@@ -212,7 +303,16 @@ namespace PokemonTCG.AI
                     // Switch, Switch Cart, Escape Rope, Prime Catcher: your own Active Pokémon out.
                     f.SwitchesOwn = Has(text, "switch your Active") || Has(text, "switches their Active");
                     f.Draw = Draws(text);
+                    f.Damage = DamageOf(text, new DamageFacts { NeedsType = -1 });
+                    f.Prizes = PrizeConditionOf(text);
+                    var bench = BenchedCounters.Match(text);
+                    if (bench.Success)
+                    {
+                        f.BenchCounters = Number(bench.Groups[1].Value);
+                        for (int i = 0; i < TypeWords.Length; i++) if (Has(text, "non-" + TypeWords[i])) f.BenchSpares = i;
+                    }
                 }
+                else f.Damage.NeedsType = -1;
                 foreach (var a in card.Attacks)
                 {
                     string t = a.Text ?? "";
@@ -220,12 +320,17 @@ namespace PokemonTCG.AI
                     if (Has(t, "energy")) f.MentionsEnergy = true;
                     if (LocksItems(t)) f.LocksItems = true;
                     if (PlacesCounters(t)) f.Spreads = true;
+                    if (LikesDamageText.IsMatch(t)) f.LikesDamage = true;
+                    if (NeedsNoDamageText.IsMatch(t)) f.NeedsNoDamage = true;
                 }
                 foreach (var a in card.Abilities)
                 {
                     string t = a.Text ?? "";
                     if (a.IsAbility) f.HasAbility = true;
                     f.Draw = Most(f.Draw, Draws(t));
+                    if (card.IsPokemon) f.Damage = DamageOf(t, f.Damage);
+                    if (LikesDamageText.IsMatch(t)) f.LikesDamage = true;
+                    if (NeedsNoDamageText.IsMatch(t)) f.NeedsNoDamage = true;
                     if (card.IsPokemon && OnPlay(t)) f.PlaysFromHand = true;
                     if (TeamEnergy(t)) f.TeamEnergy = true;
                     if (Has(t, "energy")) f.MentionsEnergy = true;
@@ -262,6 +367,17 @@ namespace PokemonTCG.AI
         public static bool AttackLocksItems(AttackDef a) { return a != null && Of(a).LocksItems; }
         /// <summary>What playing this card (a Trainer) or using its Abilities draws for you (DrawFacts).</summary>
         public static DrawFacts CardDraws(CardDef c) { return c != null ? Of(c).Draw : new DrawFacts(); }
+        public static DamageFacts Damage(CardDef c) { return c != null ? Of(c).Damage : new DamageFacts { NeedsType = -1 }; }
+        /// <summary>Damage counters this Stadium puts on Basic Pokémon as they're benched (Risky Ruins), and the type it spares (-1: none).</summary>
+        public static int BenchCounters(CardDef c, out int spares)
+        {
+            spares = c != null ? Of(c).BenchSpares : -1;
+            return c != null ? Of(c).BenchCounters : 0;
+        }
+        public static bool LikesDamage(CardDef c) { return c != null && Of(c).LikesDamage; }
+        public static bool NeedsNoDamage(CardDef c) { return c != null && Of(c).NeedsNoDamage; }
+        /// <summary>The card's Prize-card condition for working (Kind 0: none).</summary>
+        public static PrizeCondition Prizes(CardDef c) { return c != null ? Of(c).Prizes : new PrizeCondition(); }
         public static DrawFacts AttackDraws(AttackDef a) { return a != null ? Of(a).Draw : new DrawFacts(); }
         /// <summary>The top cards of the opponent's deck this attack discards (mill), or 0.</summary>
         public static int AttackMills(AttackDef a) { return a != null ? Of(a).Mills : 0; }

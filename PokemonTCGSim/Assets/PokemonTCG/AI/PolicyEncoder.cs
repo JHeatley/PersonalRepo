@@ -594,10 +594,12 @@ namespace PokemonTCG.AI
             }
 
             // Board slots: yours, then the opponent's (hidden while setting up).
+            AbilityDamage hurt = null;
             if (me != null)
             {
                 var gustTarget = v.InSetup ? null : BestGustTarget(me, opp);
                 var stallTarget = v.InSetup ? null : BestStallTarget(opp);
+                hurt = v.InSetup ? null : AbilityDamage.For(v, me, mem, viewer);
                 for (int side = 0; side < 2; side++)
                 {
                     var s = side == 0 ? me : opp;
@@ -621,6 +623,7 @@ namespace PokemonTCG.AI
                         x.SlotFeat[slot * PolicyInput.SlotFeatures + 48] = k > 0 ? StallScore(mon) : 0;
                         if (side == 1 && ReferenceEquals(mon, stallTarget))
                             x.SlotFeat[slot * PolicyInput.SlotFeatures + 49] = 1;
+                        DamageSlotFeatures(mon, k == 0, side == 1 ? hurt : null, me, x.SlotFeat, slot * PolicyInput.SlotFeatures);
                         k++;
                     }
                 }
@@ -680,6 +683,7 @@ namespace PokemonTCG.AI
                 var bottom = mem != null ? mem.KnownDeckCards(viewer, false) : null;
                 OutsFeatures(me, opp, mem, Less(deckLeft, bottom), prized, x.TurnFeats);
                 if (mem != null) DeckKnowledgeFeatures(mem, viewer, x.TurnFeats);
+                if (hurt != null) hurt.TurnFeatures(me, opp, x.TurnFeats);
                 if (mem != null && v.CurrentPlayer == viewer && !v.InSetup)
                 {
                     var tf = x.TurnFeats;
@@ -767,6 +771,7 @@ namespace PokemonTCG.AI
                 if (me != null && o.Card != null && r.Kind == DecisionKind.MainAction
                     && (o.Action == ActionType.PlayTrainer || o.Action == ActionType.UseAbility || o.Action == ActionType.UseHandAbility))
                     DrawOption(PolicyCards.CardDraws(o.Card), me, o.Action == ActionType.PlayTrainer, x.OptFeat, f);
+                if (hurt != null && o.Card != null && r.Kind == DecisionKind.MainAction) hurt.Option(o, me, opp, x.OptFeat, f);
             }
             return x;
         }
@@ -1104,6 +1109,190 @@ namespace PokemonTCG.AI
             foreach (var b in opp.Bench)
                 if (b != null && PolicyPlan.CanKnockOut(me.Active, 1, b) && (best == null || PrizesFor(b) > PrizesFor(best))) best = b;
             return best;
+        }
+
+        /// <summary>
+        /// A Pokémon's Ability-damage numbers (slot features 50 to 53): for the opponent's (hurt: your Ability damage this turn),
+        /// can your damage-moving and damage-placing Abilities, with the damage you could still create (Risky Ruins), put it in
+        /// range of your Active Pokémon's attack, or Knock it Out by themselves; for any Pokémon, do its attacks or Abilities
+        /// work (or get stronger) with damage counters on it, or only without any.
+        /// </summary>
+        private static void DamageSlotFeatures(PokemonView mon, bool active, AbilityDamage hurt, SideView me, float[] f, int o)
+        {
+            var top = mon.Top != null ? mon.Top.Def : null;
+            if (top == null) return;
+            f[o + 52] = PolicyCards.LikesDamage(top) ? 1 : 0;
+            f[o + 53] = PolicyCards.NeedsNoDamage(top) ? 1 : 0;
+            if (hurt == null) return;
+            int damage = hurt.OnTarget(active) * 10;
+            if (damage <= 0) return;
+            if (damage >= mon.RemainingHp) f[o + 51] = 1;
+            int attack = me.Active != null ? PolicyPlan.BestDamage(me.Active, 1, mon) : -1;
+            if (attack > 0 && mon.RemainingHp > attack && mon.RemainingHp - damage <= attack) f[o + 50] = 1; // only with the help
+        }
+
+        /// <summary>
+        /// Damage your Abilities (and a Supporter in hand) can deal this turn without attacking: damage counters your movers can
+        /// move from your Pokémon to the opponent's (Munkidori's Adrena-Brain: not used yet this turn, its Energy attached, its
+        /// Abilities working; Hatterene VMAX and Agatha only to their Active Pokémon), limited by the counters on your Pokémon
+        /// and those a Stadium would put on the Basics you bench (Risky Ruins: Fuel), and damage counters your Abilities can put
+        /// on them (Dusclops' Cursed Blast), which Knock Out your own Pokémon and give the opponent its Prize cards.
+        /// </summary>
+        private sealed class AbilityDamage
+        {
+            public int MoveAny, MoveActive, Available, Fuel, Place, SelfKoPrizes, BenchCounters, BenchSpares = -1;
+            public bool BenchStadiumInPlay;
+
+            public static AbilityDamage For(PlayerView v, SideView me, PolicyMemory mem, int viewer)
+            {
+                var a = new AbilityDamage();
+                bool myTurn = v.CurrentPlayer == viewer;
+                foreach (var mon in PolicyMemory.InPlay(me))
+                {
+                    a.Available += mon.DamageCounters;
+                    var top = mon.Top != null ? mon.Top.Def : null;
+                    if (top == null || !mon.AbilitiesActive) continue;
+                    if (myTurn && mem != null && mem.AbilityUidsThisTurn.Contains(mon.Uid)) continue;
+                    var d = PolicyCards.Damage(top);
+                    if (d.Move > 0 && (d.NeedsType < 0 || HasEnergyType(mon, d.NeedsType)))
+                    {
+                        if (d.ActiveOnly) a.MoveActive += d.Move;
+                        else a.MoveAny += d.Move;
+                    }
+                    if (d.Place > 0)
+                    {
+                        a.Place += d.Place;
+                        if (d.KnocksOutSelf) a.SelfKoPrizes = Math.Max(a.SelfKoPrizes, PrizesFor(mon));
+                    }
+                }
+                // A Supporter that moves damage counters (Agatha), if a Supporter can still be played.
+                bool supporter = !(myTurn && mem != null && mem.SupporterPlayed);
+                int fromHand = 0;
+                foreach (var c in me.Hand)
+                {
+                    if (c == null || c.Def == null || !c.Def.IsTrainer) continue;
+                    var d = PolicyCards.Damage(c.Def);
+                    if (d.Move > 0 && (supporter || c.Def.TrainerKind != TrainerKind.Supporter)) fromHand = Math.Max(fromHand, d.Move);
+                }
+                a.MoveActive += fromHand;
+                // Fuel: the Stadium in play, or one in hand while a Stadium can still be played this turn.
+                int spares;
+                int bench = PolicyCards.BenchCounters(v.Stadium != null ? v.Stadium.Def : null, out spares);
+                a.BenchStadiumInPlay = bench > 0;
+                if (bench == 0 && !(myTurn && mem != null && mem.StadiumPlayed))
+                    foreach (var c in me.Hand)
+                    {
+                        if (c == null || c.Def == null || !c.Def.IsStadium) continue;
+                        int s;
+                        int n = PolicyCards.BenchCounters(c.Def, out s);
+                        if (n > bench)
+                        {
+                            bench = n;
+                            spares = s;
+                        }
+                    }
+                a.BenchCounters = bench;
+                a.BenchSpares = spares;
+                if (bench > 0)
+                {
+                    int basics = 0;
+                    foreach (var c in me.Hand) if (c != null && c.Def != null && Hurts(c.Def, a)) basics++;
+                    a.Fuel = bench * Math.Min(basics, Math.Max(0, me.BenchLimit - me.Bench.Count));
+                }
+                return a;
+            }
+
+            /// <summary>True when benching this card now would put the Stadium's damage counters on it (a Basic it doesn't spare).</summary>
+            public static bool Hurts(CardDef c, AbilityDamage a)
+            {
+                return a.BenchCounters > 0 && c.IsBasicPokemon && PolicyCards.TypeIndex(c.PokemonType) != a.BenchSpares;
+            }
+
+            public bool Ready { get { return MoveAny + MoveActive > 0; } }
+
+            /// <summary>Damage counters your Abilities could deal to one of their Pokémon this turn (its Active: active), with the fuel.</summary>
+            public int OnTarget(bool active)
+            {
+                return Math.Min(MoveAny + (active ? MoveActive : 0), Available + Fuel) + Place;
+            }
+
+            /// <summary>
+            /// Turn features from 2 + SideSlots + 49 on: the damage counters you could move now, and with the fuel, a mover ready,
+            /// a Stadium in play that damages benched Basics, the damage counters you could put on their Pokémon, whether a
+            /// self-Knock Out (Cursed Blast: the opponent takes its Prize cards) would switch on a card in your hand that its
+            /// Prize-card condition holds back (Counter Catcher: more left than them; Special Red Card: them 3 or fewer), and how
+            /// many cards in your hand a Prize-card condition holds back now.
+            /// </summary>
+            public void TurnFeatures(SideView me, SideView opp, float[] tf)
+            {
+                int o = 2 + PolicyInput.SideSlots + 49;
+                int cap = MoveAny + MoveActive;
+                tf[o] = Math.Min(Math.Min(cap, Available), 6) / 6f;
+                tf[o + 1] = Math.Min(Math.Min(cap, Available + Fuel), 6) / 6f;
+                tf[o + 2] = Ready ? 1 : 0;
+                tf[o + 3] = BenchStadiumInPlay ? 1 : 0;
+                tf[o + 4] = Math.Min(Place, 13) / 13f;
+                int heldBack = 0;
+                foreach (var c in me.Hand)
+                {
+                    if (c == null || c.Def == null) continue;
+                    var condition = PolicyCards.Prizes(c.Def);
+                    if (condition.Kind == 0 || condition.Met(me.PrizeCount, opp.PrizeCount)) continue;
+                    heldBack++;
+                    if (SelfKoPrizes > 0 && condition.Met(me.PrizeCount, Math.Max(0, opp.PrizeCount - SelfKoPrizes))) tf[o + 5] = 1;
+                }
+                tf[o + 6] = Math.Min(heldBack, 3) / 3f;
+            }
+
+            /// <summary>
+            /// Option features 25 to 28: benching this Basic would give your movers damage counters to move (the Stadium's), this
+            /// mover or placer (an Ability, or a Trainer like Agatha) sets up a Knock Out now, playing this Stadium would fuel a
+            /// ready mover with the Basics in your hand, and this Ability Knocks Out your own Pokémon (the Prize cards it gives).
+            /// </summary>
+            public void Option(DecisionOption o, SideView me, SideView opp, float[] feat, int f)
+            {
+                if (o.Action == ActionType.BenchBasic && o.Card.IsPokemon && BenchStadiumInPlay && Ready && Hurts(o.Card, this))
+                    feat[f + 25] = Math.Min(BenchCounters, 6) / 6f;
+                if (o.Action == ActionType.UseAbility || o.Action == ActionType.UseHandAbility || o.Action == ActionType.PlayTrainer)
+                {
+                    var d = PolicyCards.Damage(o.Card);
+                    if ((d.Move > 0 || d.Place > 0) && opp != null)
+                    {
+                        int counters = Math.Min(d.Move, Available) + d.Place;
+                        int attack;
+                        foreach (var them in PolicyMemory.InPlay(opp))
+                        {
+                            bool active = ReferenceEquals(them, opp.Active);
+                            int dealt = (d.ActiveOnly && !active ? d.Place : counters) * 10;
+                            if (dealt <= 0) continue;
+                            attack = me.Active != null ? PolicyPlan.BestDamage(me.Active, 1, them) : -1;
+                            if (dealt >= them.RemainingHp || (attack > 0 && them.RemainingHp > attack && them.RemainingHp - dealt <= attack)) feat[f + 26] = 1;
+                        }
+                    }
+                    if (d.KnocksOutSelf && o.Action != ActionType.PlayTrainer)
+                        foreach (var mon in PolicyMemory.InPlay(me))
+                            if (mon.Uid == o.PokemonUid) feat[f + 28] = Math.Min(PrizesFor(mon), 3) / 3f;
+                }
+                if (o.Action == ActionType.PlayTrainer && o.Card.IsStadium && Ready)
+                {
+                    int s;
+                    int n = PolicyCards.BenchCounters(o.Card, out s);
+                    if (n > 0)
+                        foreach (var c in me.Hand)
+                            if (c != null && c.Def != null && c.Def.IsBasicPokemon && PolicyCards.TypeIndex(c.Def.PokemonType) != s) feat[f + 27] = 1;
+                }
+            }
+
+            private static bool HasEnergyType(PokemonView mon, int type)
+            {
+                foreach (EnergyType t in Enum.GetValues(typeof(EnergyType)))
+                {
+                    if (PolicyCards.TypeIndex(t) != type) continue;
+                    int mask = EnergyMask.Of(t);
+                    foreach (int unit in mon.EnergyUnits) if ((unit & mask) != 0) return true;
+                }
+                return false;
+            }
         }
 
         /// <summary>
