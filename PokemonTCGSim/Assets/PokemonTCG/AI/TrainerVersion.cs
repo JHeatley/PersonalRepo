@@ -8,6 +8,6 @@ namespace PokemonTCG.AI
     /// </summary>
     public static class TrainerVersion
     {
-        public const int Number = 175; // 175: the network sees Boss-stall targets, switch cards in hand and deck, how deep each play draws or mills, who is running out of cards, and the cards known on top of or under each deck (bigger inputs)
+        public const int Number = 176; // 176: Ability damage (moving counters with Munkidori, Cursed Blast), Risky Ruins as fuel, Pokémon switched on by damage, self-Knock Outs that switch on cards held back by Prize conditions (Counter Catcher, Special Red Card). 175: the network sees Boss-stall targets, switch cards in hand and deck, how deep each play draws or mills, who is running out of cards, and the cards known on top of or under each deck (bigger inputs)
     }
 }

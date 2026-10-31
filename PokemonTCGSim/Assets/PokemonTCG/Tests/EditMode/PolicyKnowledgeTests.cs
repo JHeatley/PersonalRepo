@@ -510,9 +510,97 @@ namespace PokemonTCG.Tests
             }
         }
 
+        [Test]
+        public void Damage_Moving_And_Placing_Cards_Risky_Ruins_And_Prize_Conditions_Are_Recognised()
+        {
+            var munkidori = PolicyCards.Damage(C("TWM-95"));
+            Assert.AreEqual(3, munkidori.Move, "Adrena-Brain moves up to 3");
+            Assert.IsFalse(munkidori.ActiveOnly);
+            Assert.AreEqual(PolicyCards.TypeIndex(EnergyType.Darkness), munkidori.NeedsType, "with Darkness Energy attached");
+            Assert.IsTrue(PolicyCards.Damage(C("CRZ-66")).ActiveOnly, "Hatterene VMAX: only to their Active Pokémon");
+            Assert.AreEqual(3, PolicyCards.Damage(C("CRE-129")).Move, "Agatha");
+            var dusclops = PolicyCards.Damage(C("PRE-36"));
+            Assert.AreEqual(5, dusclops.Place);
+            Assert.IsTrue(dusclops.KnocksOutSelf, "Cursed Blast Knocks Out Dusclops");
+            Assert.AreEqual(13, PolicyCards.Damage(C("PRE-37")).Place, "Dusknoir");
+            int spares;
+            Assert.AreEqual(2, PolicyCards.BenchCounters(C("MEG-127"), out spares), "Risky Ruins");
+            Assert.AreEqual(PolicyCards.TypeIndex(EnergyType.Darkness), spares, "spares Darkness Pokémon");
+            Assert.IsTrue(PolicyCards.LikesDamage(C("SVP-161")), "Charizard ex: 100 more with damage counters on it");
+            Assert.IsTrue(PolicyCards.LikesDamage(C("CRZ-106")), "Tauros: does nothing without");
+            Assert.IsFalse(PolicyCards.NeedsNoDamage(C("CRZ-106")));
+            var red = PolicyCards.Prizes(C("CRI-82"));
+            Assert.IsTrue(red.Met(6, 3) && !red.Met(6, 4), "Special Red Card: the opponent 3 or fewer");
+            var catcher = PolicyCards.Prizes(C("PAR-160"));
+            Assert.IsTrue(catcher.Met(5, 4) && !catcher.Met(4, 4), "Counter Catcher: more left than them");
+            Assert.AreEqual(0, PolicyCards.Prizes(C("MEG-114")).Kind, "Boss's Orders has no condition");
+        }
+
+        [Test]
+        public void The_Network_Sees_Risky_Ruins_Fuel_For_Munkidori_And_The_Knock_Outs_It_Sets_Up()
+        {
+            // Charmander (30) attacks; Munkidori (Darkness Energy) can move 3 counters, but only 1 is on my Pokémon. Risky Ruins
+            // is in play and Budew in hand: benching it adds 2 more.
+            var probe = new PreviewProbe { Preview = false };
+            var e = ProbeScenario(probe);
+            var charmander = e.ScenarioActive(0, C("SVP-44"));
+            e.ScenarioAttach(charmander, C("MEE-10"));
+            var munkidori = e.ScenarioBench(0, C("TWM-95"));
+            e.ScenarioAttach(munkidori, C("MEE-15"));
+            var hurt = e.ScenarioBench(0, C("SVP-44"));
+            hurt.DamageCounters = 1;
+            e.ScenarioSetStadium(0, C("MEG-127"));
+            e.ScenarioAddToHand(0, C("ASC-16"));
+            e.ScenarioActive(1, C("SVP-44")); // 60 HP
+            e.ScenarioBench(1, C("ASC-16")); // 30 HP
+            var x = probe.Run(e);
+
+            int t = 2 + PolicyInput.SideSlots + 49;
+            Assert.AreEqual(1 / 6f, x.TurnFeats[t], 1e-6, "1 counter to move now");
+            Assert.AreEqual(3 / 6f, x.TurnFeats[t + 1], 1e-6, "3 once Budew is benched under Risky Ruins");
+            Assert.AreEqual(1, x.TurnFeats[t + 2], "Munkidori is ready");
+            Assert.AreEqual(1, x.TurnFeats[t + 3], "Risky Ruins is in play");
+
+            int n = PolicyInput.SlotFeatures, theirs = PolicyInput.SideSlots;
+            Assert.AreEqual(1, x.SlotFeat[theirs * n + 50], "their Charmander: 30 moved, then Charmander's 30 Knocks it Out");
+            Assert.AreEqual(0, x.SlotFeat[theirs * n + 51]);
+            Assert.AreEqual(1, x.SlotFeat[(theirs + 1) * n + 51], "their Budew: the 3 moved counters Knock it Out alone");
+
+            int f = PolicyInput.OptionFeatures;
+            int bench = Option(probe.Request, probe.Choices, o => o.Action == ActionType.BenchBasic && o.Card != null && o.Card.Name == "Budew");
+            Assert.AreEqual(2 / 6f, x.OptFeat[bench * f + 25], 1e-6, "benching Budew gives Munkidori 2 counters to move");
+            int move = Option(probe.Request, probe.Choices, o => o.Action == ActionType.UseAbility && o.Card != null && o.Card.Name == "Munkidori");
+            Assert.AreEqual(0, x.OptFeat[move * f + 26], "moving the 1 counter now sets up nothing: bench Budew first");
+        }
+
+        [Test]
+        public void The_Network_Sees_Cursed_Blast_Knock_Outs_And_The_Cards_A_Self_Knock_Out_Switches_On()
+        {
+            // 6 Prize cards each: Counter Catcher is held back; Cursed Blast gives them a Prize card, which switches it on.
+            var probe = new PreviewProbe { Preview = false };
+            var e = ProbeScenario(probe);
+            e.ScenarioActive(0, C("SVP-44"));
+            e.ScenarioBench(0, C("PRE-36"));
+            e.ScenarioAddToHand(0, C("PAR-160"));
+            e.ScenarioAddToHand(0, C("CRI-82"));
+            e.ScenarioActive(1, C("POR-62")); // 170 HP
+            e.ScenarioBench(1, C("ASC-16")); // 30 HP
+            var x = probe.Run(e);
+
+            int t = 2 + PolicyInput.SideSlots + 49;
+            Assert.AreEqual(5 / 13f, x.TurnFeats[t + 4], 1e-6, "5 counters Dusclops can put down");
+            Assert.AreEqual(1, x.TurnFeats[t + 5], "Cursed Blast would switch on Counter Catcher");
+            Assert.AreEqual(2 / 3f, x.TurnFeats[t + 6], 1e-6, "Counter Catcher and Special Red Card are held back now");
+            int f = PolicyInput.OptionFeatures;
+            int blast = Option(probe.Request, probe.Choices, o => o.Action == ActionType.UseAbility && o.Card != null && o.Card.Name == "Dusclops");
+            Assert.AreEqual(1, x.OptFeat[blast * f + 26], "Cursed Blast Knocks Out their Budew");
+            Assert.AreEqual(1 / 3f, x.OptFeat[blast * f + 28], 1e-6, "and gives them 1 Prize card");
+        }
+
         /// <summary>Earlier networks' sizes: per Pokémon, per option, turn numbers.</summary>
         [TestCase(47, 21, 16, TestName = "A network from before the Masters inputs loads and plays exactly as before")]
         [TestCase(48, 22, 35, TestName = "A network from before the Boss-stall and deck-out inputs loads and plays exactly as before")]
+        [TestCase(50, 25, 49, TestName = "A network from before the Ability-damage inputs loads and plays exactly as before")]
         public void An_Earlier_Network_Loads_And_Plays_Exactly_As_Before(int slots, int options, int turnExtra)
         {
             var net = new PolicyNet();
