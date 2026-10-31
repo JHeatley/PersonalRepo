@@ -41,6 +41,89 @@ namespace PokemonTCG.AI
         /// <summary>Your Prize cards as you last saw them when you searched your deck (by card id).</summary>
         public readonly Dictionary<int, CardDef> KnownPrizes = new Dictionary<int, CardDef>();
 
+        /// <summary>A card known to be near the top or at the bottom of a deck.</summary>
+        public struct DeckSpot
+        {
+            public CardDef Def;
+            public bool Top;
+        }
+
+        /// <summary>
+        /// Cards known to be in each player's deck (by player, then card id), near the top or at the bottom, the way a real
+        /// player keeps track: cards seen going into the deck (your hand put on the bottom by Iono, a Pokémon put on the bottom
+        /// by Lillie's Poké Doll, a card put back on top) and cards you looked at and left there. Their order within the top or
+        /// the bottom isn't kept. A shuffle of that deck forgets them all; a card that leaves the deck is forgotten. Of the
+        /// opponent's deck only the bottom and a single card put on top are kept (their draws would otherwise show which of
+        /// several known cards they drew).
+        /// </summary>
+        public readonly Dictionary<int, DeckSpot>[] KnownInDeck = { new Dictionary<int, DeckSpot>(), new Dictionary<int, DeckSpot>() };
+        private readonly HashSet<int>[] deckIds = { new HashSet<int>(), new HashSet<int>() };
+        private readonly HashSet<int>[] visibleIds = { new HashSet<int>(), new HashSet<int>() };
+
+        /// <summary>Your known cards in a player's deck near the top (top) or at the bottom.</summary>
+        public List<CardDef> KnownDeckCards(int player, bool top)
+        {
+            var list = new List<CardDef>();
+            if (player < 0 || player > 1) return list;
+            foreach (var kv in KnownInDeck[player]) if (kv.Value.Top == top && kv.Value.Def != null) list.Add(kv.Value.Def);
+            return list;
+        }
+
+        private void TrackDecks(GameEngine engine, GameEvent ev)
+        {
+            var st = engine.State;
+            if (st == null || st.Players == null || st.Players.Length < 2) return;
+            for (int side = 0; side < 2; side++)
+            {
+                var p = st.Players[side];
+                var deck = p.Deck;
+                var known = KnownInDeck[side];
+                var before = deckIds[side];
+                var seen = visibleIds[side];
+                int entered = 0, knownTop = 0;
+                foreach (var c in deck) if (!before.Contains(c.Id)) entered++;
+                foreach (var kv in known) if (kv.Value.Top) knownTop++;
+                for (int i = 0; i < deck.Count; i++)
+                {
+                    var c = deck[i];
+                    if (before.Contains(c.Id) || !seen.Contains(c.Id) || known.ContainsKey(c.Id)) continue;
+                    bool top = i < deck.Count / 2;
+                    if (side != Seat && top && (entered != 1 || knownTop > 0)) continue;
+                    known[c.Id] = new DeckSpot { Def = c.Def, Top = top };
+                }
+                if (side == Seat)
+                    foreach (var c in engine.LookedAtBy(side))
+                    {
+                        int i = deck.IndexOf(c);
+                        if (i >= 0 && !known.ContainsKey(c.Id)) known[c.Id] = new DeckSpot { Def = c.Def, Top = i < deck.Count / 2 };
+                    }
+                before.Clear();
+                foreach (var c in deck) before.Add(c.Id);
+                if (known.Count > 0)
+                {
+                    var gone = new List<int>();
+                    foreach (var id in known.Keys) if (!before.Contains(id)) gone.Add(id);
+                    foreach (var id in gone) known.Remove(id);
+                }
+                if (ev.Type == GameEventType.Shuffle && ev.Player == side) known.Clear();
+                // What this player (the memory's) can see of that side now: all of its own cards out of the deck; of the
+                // opponent's, the public ones and those known in their hand.
+                seen.Clear();
+                if (side == Seat) foreach (var c in p.Hand) seen.Add(c.Id);
+                else foreach (var id in OppKnownHand.Keys) seen.Add(id);
+                foreach (var c in p.Discard) seen.Add(c.Id);
+                foreach (var c in p.LostZone) seen.Add(c.Id);
+                foreach (var mon in p.InPlay())
+                {
+                    foreach (var c in mon.Stack) seen.Add(c.Id);
+                    foreach (var c in mon.Energy) seen.Add(c.Id);
+                    foreach (var c in mon.Tools) seen.Add(c.Id);
+                    foreach (var c in mon.Attached) seen.Add(c.Id);
+                }
+                foreach (var c in p.Prizes) if (p.FaceUpPrizeIds.Contains(c.Id)) seen.Add(c.Id);
+            }
+        }
+
         /// <summary>Your cards you know are still in your Prizes: the known ones not seen anywhere else since (a taken Prize card is in your hand).</summary>
         public List<CardDef> StillPrized(SideView me)
         {
@@ -151,6 +234,7 @@ namespace PokemonTCG.AI
                     }
                     break;
             }
+            if (engine != null) TrackDecks(engine, ev);
             if (ev.Player == opp && ev.Card != null && ev.CardId >= 0)
             {
                 OppSeen[ev.CardId] = ev.Card;
@@ -289,6 +373,12 @@ namespace PokemonTCG.AI
         {
             Seat = o.Seat;
             Copy(o.KnownPrizes, KnownPrizes);
+            for (int side = 0; side < 2; side++)
+            {
+                Copy(o.KnownInDeck[side], KnownInDeck[side]);
+                Copy(o.deckIds[side], deckIds[side]);
+                Copy(o.visibleIds[side], visibleIds[side]);
+            }
             DeckList = o.DeckList;
             Turn = o.Turn;
             ActionsThisTurn = o.ActionsThisTurn;
@@ -507,6 +597,7 @@ namespace PokemonTCG.AI
             if (me != null)
             {
                 var gustTarget = v.InSetup ? null : BestGustTarget(me, opp);
+                var stallTarget = v.InSetup ? null : BestStallTarget(opp);
                 for (int side = 0; side < 2; side++)
                 {
                     var s = side == 0 ? me : opp;
@@ -527,6 +618,9 @@ namespace PokemonTCG.AI
                                      x.SlotFeat, slot * PolicyInput.SlotFeatures);
                         if (side == 1 && ReferenceEquals(mon, gustTarget))
                             x.SlotFeat[slot * PolicyInput.SlotFeatures + 47] = 1;
+                        x.SlotFeat[slot * PolicyInput.SlotFeatures + 48] = k > 0 ? StallScore(mon) : 0;
+                        if (side == 1 && ReferenceEquals(mon, stallTarget))
+                            x.SlotFeat[slot * PolicyInput.SlotFeatures + 49] = 1;
                         k++;
                     }
                 }
@@ -582,7 +676,10 @@ namespace PokemonTCG.AI
                 BenchFeatures(v, me, opp, toCome, x.TurnFeats);
                 if (!v.InSetup) x.TurnFeats[2 + PolicyInput.SideSlots + 15] = OpponentSpreads(opp, mem) ? 1 : 0;
                 if (!v.InSetup) RaceFeatures(me, opp, toCome, x.TurnFeats);
-                OutsFeatures(me, opp, mem, deckLeft, prized, x.TurnFeats);
+                // Outs: the cards you could draw, less those known to be at the bottom of your deck.
+                var bottom = mem != null ? mem.KnownDeckCards(viewer, false) : null;
+                OutsFeatures(me, opp, mem, Less(deckLeft, bottom), prized, x.TurnFeats);
+                if (mem != null) DeckKnowledgeFeatures(mem, viewer, x.TurnFeats);
                 if (mem != null && v.CurrentPlayer == viewer && !v.InSetup)
                 {
                     var tf = x.TurnFeats;
@@ -629,6 +726,9 @@ namespace PokemonTCG.AI
                         x.OptFeat[f + 2] = attack.Damage / 300f;
                         // What this attack does to their Active: lock their Items, Knock it Out, how much of its HP it takes.
                         x.OptFeat[f + 13] = PolicyCards.AttackLocksItems(attack) ? 1 : 0;
+                        if (me != null) DrawOption(PolicyCards.AttackDraws(attack), me, false, x.OptFeat, f);
+                        int mill = PolicyCards.AttackMills(attack);
+                        if (mill > 0 && opp != null) x.OptFeat[f + 24] = Math.Min(1f, mill / (float)Math.Max(1, opp.DeckCount));
                         // With a preview, what it really did when played out (every "+", Tool and Stadium counted) and the
                         // Prize cards it took; without, the printed damage and the Active's Prize cards if that Knocks it Out.
                         PolicySearch.AttackResult real;
@@ -664,6 +764,9 @@ namespace PokemonTCG.AI
                     OptionPlan(o, me, v.InSetup ? null : opp, toCome, teamEnergy, x.OptFeat, f);
                 if (me != null && o.Card != null && o.Card.IsPokemon && o.Action == ActionType.BenchBasic)
                     BenchOption(o.Card, me, toCome, x.OptFeat, f);
+                if (me != null && o.Card != null && r.Kind == DecisionKind.MainAction
+                    && (o.Action == ActionType.PlayTrainer || o.Action == ActionType.UseAbility || o.Action == ActionType.UseHandAbility))
+                    DrawOption(PolicyCards.CardDraws(o.Card), me, o.Action == ActionType.PlayTrainer, x.OptFeat, f);
             }
             return x;
         }
@@ -885,6 +988,22 @@ namespace PokemonTCG.AI
             feat[f + 19] = Math.Min(copies, 3) / 3f;
         }
 
+        /// <summary>
+        /// What a play draws (option features 22 and 23): the cards it draws as a share of the cards left in your deck (1 = all of
+        /// them or more: the deck would run out), counting a hand shuffled back in first (Judge, Iono) as refilling the deck, and
+        /// whether it does refill it. Drawing deep is often how a deck finds its win; this only says how deep.
+        /// </summary>
+        private static void DrawOption(PolicyCards.DrawFacts d, SideView me, bool fromHand, float[] feat, int f)
+        {
+            if (!d.Any) return;
+            int hand = Math.Max(0, me.HandCount - (fromHand ? 1 : 0)); // the card played leaves the hand
+            int deck = me.DeckCount + (d.Refills ? hand : 0);
+            int draws = Math.Max(d.Count, d.Until > 0 ? d.Until - (d.Refills ? 0 : hand) : 0);
+            if (d.PerPrize) draws = Math.Max(draws, me.PrizeCount);
+            feat[f + 22] = Math.Min(1f, Math.Max(0, draws) / (float)Math.Max(1, deck));
+            feat[f + 23] = d.Refills ? 1 : 0;
+        }
+
         /// <summary>Free-retreat Pokémon on a Bench (pivots: one can come in and go out again for nothing).</summary>
         private static int FreePivots(SideView s)
         {
@@ -988,7 +1107,41 @@ namespace PokemonTCG.AI
         }
 
         /// <summary>
-        /// The Prize race (turn features from 2 + SideSlots + 16 on, and 33 and 34): the Knock Outs each side needs to take its
+        /// How badly a Benched Pokémon would be stuck if it were brought up to the Active Spot (slot feature 48; Boss stalling):
+        /// it couldn't attack next turn even with an Energy attached (or has no attacks), graded by its Retreat Cost (0 for free
+        /// retreat, 1 for 4 or more). Brought up with Boss's Orders, it costs its owner the turn: retreat (discarding Energy), a
+        /// switch card, or Energy attached to it instead of their attacker.
+        /// </summary>
+        private static float StallScore(PokemonView mon)
+        {
+            var top = mon.Top != null ? mon.Top.Def : null;
+            if (top == null || mon.RetreatCost <= 0) return 0;
+            int cheapest = PolicyPlan.Cheapest(mon.EnergyUnits, top);
+            if (cheapest >= 0 && cheapest <= 1) return 0;
+            return Math.Min(mon.RetreatCost, 4) / 4f;
+        }
+
+        /// <summary>The opponent's Benched Pokémon most stuck if brought up (slot feature 49): the highest StallScore (the first on a tie), or null.</summary>
+        private static PokemonView BestStallTarget(SideView opp)
+        {
+            if (opp == null) return null;
+            PokemonView best = null;
+            float bestScore = 0;
+            foreach (var b in opp.Bench)
+            {
+                if (b == null) continue;
+                float score = StallScore(b);
+                if (score > bestScore)
+                {
+                    best = b;
+                    bestScore = score;
+                }
+            }
+            return best;
+        }
+
+        /// <summary>
+        /// The Prize race (turn features from 2 + SideSlots + 16 on, 33 and 34, and the deck-out numbers 37 to 40): the Knock Outs each side needs to take its
         /// last Prize card, the Pokémon worth 2 or more Prize cards each side has in play, the turns each side would need to
         /// win and who is ahead in that race, and the Prize cards each side could take in its next 2 turns (TurnsToWin). A
         /// board set up to win in 1 or 2 turns looks different here from one that needs 3 or 4.
@@ -1007,6 +1160,19 @@ namespace PokemonTCG.AI
             tf[o + 6] = (Math.Max(-4, Math.Min(4, theirs - mine)) + 4) / 8f;
             tf[o + 17] = Math.Min(mySoon, 6) / 6f;
             tf[o + 18] = Math.Min(theirSoon, 6) / 6f;
+            // Decking out (2 + SideSlots + 37 to 40): a player who can't draw at the start of their turn loses. The draws each
+            // side has left, and its spare cards: the cards left beyond the turns it needs to win (negative: it would run out
+            // first). Plenty spare means drawing deep is safe; few or none means it's running out (or the opponent is).
+            tf[o + 21] = Math.Min(me.DeckCount, 10) / 10f;
+            tf[o + 22] = Math.Min(opp.DeckCount, 10) / 10f;
+            tf[o + 23] = Spare(me.DeckCount, mine);
+            tf[o + 24] = Spare(opp.DeckCount, theirs);
+        }
+
+        /// <summary>Cards left beyond the turns needed to win (one draw a turn), -5 to 15, as 0 to 1 (0.25 = none spare).</summary>
+        private static float Spare(int deck, int turnsToWin)
+        {
+            return (Math.Max(-5, Math.Min(15, deck - turnsToWin)) + 5) / 20f;
         }
 
         private static int MultiPrize(SideView s)
@@ -1105,7 +1271,8 @@ namespace PokemonTCG.AI
         /// Energy left in your deck (less those known to be Prizes) and the chance your next draw is a Supporter, the cards
         /// that bring up an opponent's Benched Pokémon (Boss's Orders) in your hand and left in your deck, the cards that
         /// switch your Active in your hand, and of the opponent's: such gust and switch cards seen so far, and whether their
-        /// hand is known to hold a gust card.
+        /// hand is known to hold a gust card; then (2 + SideSlots + 35 and 36, for Boss stalling) whether their hand is known to
+        /// hold a switch card, and the switch cards left in your deck.
         /// </summary>
         private static void OutsFeatures(SideView me, SideView opp, PolicyMemory mem, List<CardDef> deckLeft, List<CardDef> prized, float[] tf)
         {
@@ -1143,7 +1310,47 @@ namespace PokemonTCG.AI
             if (mem != null) foreach (var kv in mem.OppSeen) count(kv.Key, kv.Value);
             tf[o + 7] = Math.Min(theirGusts, 4) / 4f;
             tf[o + 8] = Math.Min(theirSwitches, 4) / 4f;
-            if (mem != null) foreach (var d in mem.OppKnownHand.Values) if (PolicyCards.Gusts(d)) tf[o + 9] = 1;
+            if (mem != null)
+                foreach (var d in mem.OppKnownHand.Values)
+                {
+                    if (PolicyCards.Gusts(d)) tf[o + 9] = 1;
+                    if (PolicyCards.SwitchesOwn(d)) tf[o + 12] = 1;
+                }
+            int switchesLeft = 0;
+            foreach (var d in deckLeft) if (PolicyCards.SwitchesOwn(d)) switchesLeft++;
+            tf[o + 13] = Math.Min(switchesLeft, 4) / 4f;
+        }
+
+        /// <summary>
+        /// What each side knows is coming from its deck (turn features from 2 + SideSlots + 41 on, PolicyMemory.KnownInDeck):
+        /// your cards known near the top (you'll draw them soon) and how many are Supporters, Energy and Pokémon, your cards
+        /// known at the bottom (you won't draw them soon), and of the opponent's: a card known on top (and whether it's a
+        /// Supporter or a gust card) and their cards known at the bottom.
+        /// </summary>
+        private static void DeckKnowledgeFeatures(PolicyMemory mem, int viewer, float[] tf)
+        {
+            int o = 2 + PolicyInput.SideSlots + 41;
+            var top = mem.KnownDeckCards(viewer, true);
+            tf[o] = Math.Min(top.Count, 3) / 3f;
+            tf[o + 1] = Math.Min(mem.KnownDeckCards(viewer, false).Count, 10) / 10f;
+            if (top.Count > 0)
+            {
+                int supporters = 0, energy = 0, pokemon = 0;
+                foreach (var d in top)
+                {
+                    if (d.IsTrainer && d.TrainerKind == TrainerKind.Supporter) supporters++;
+                    if (d.IsEnergy) energy++;
+                    if (d.IsPokemon) pokemon++;
+                }
+                tf[o + 2] = supporters / (float)top.Count;
+                tf[o + 3] = energy / (float)top.Count;
+                tf[o + 4] = pokemon / (float)top.Count;
+            }
+            var theirTop = mem.KnownDeckCards(1 - viewer, true);
+            tf[o + 5] = Math.Min(theirTop.Count, 1);
+            tf[o + 6] = Math.Min(mem.KnownDeckCards(1 - viewer, false).Count, 10) / 10f;
+            foreach (var d in theirTop)
+                if ((d.IsTrainer && d.TrainerKind == TrainerKind.Supporter) || PolicyCards.Gusts(d)) tf[o + 7] = 1;
         }
 
         /// <summary>Damage as a share of the HP left, 0 to 1 (1 = twice what's needed or more).</summary>

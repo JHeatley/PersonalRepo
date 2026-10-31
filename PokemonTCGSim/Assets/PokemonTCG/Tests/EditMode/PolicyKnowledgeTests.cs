@@ -361,7 +361,159 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
-        public void A_Network_From_Before_The_Masters_Inputs_Loads_And_Plays_Exactly_As_Before()
+        public void The_Network_Sees_Boss_Stall_Targets_And_Switch_Cards()
+        {
+            // Their Bench: Charmeleon (Retreat 2, R R attack, no Energy) would be stuck if brought up; Budew retreats for free.
+            var probe = new PreviewProbe { Preview = false };
+            var e = ProbeScenario(probe);
+            var charmander = e.ScenarioActive(0, C("SVP-44"));
+            e.ScenarioAttach(charmander, C("MEE-10"));
+            e.ScenarioActive(1, C("POR-62"));
+            e.ScenarioBench(1, C("ASC-16"));
+            e.ScenarioBench(1, C("OBF-27"));
+            var known = e.ScenarioAddToHand(1, C("MEG-130"));
+            probe.Memory.OppKnownHand[known.Id] = known.Def;
+            probe.Memory.DeckList = new List<CardDef> { C("SVP-44"), C("MEE-10"), C("MEG-130"), C("BST-125") };
+            var x = probe.Run(e);
+
+            int n = PolicyInput.SlotFeatures, theirs = PolicyInput.SideSlots;
+            Assert.AreEqual(0, x.SlotFeat[(theirs + 1) * n + 48], "Budew isn't stuck (free retreat, free attack)");
+            Assert.AreEqual(0.5f, x.SlotFeat[(theirs + 2) * n + 48], 1e-6, "Charmeleon is: it can't attack next turn and retreats for 2");
+            Assert.AreEqual(1, x.SlotFeat[(theirs + 2) * n + 49], "the Boss-stall target");
+            Assert.AreEqual(0, x.SlotFeat[(theirs + 1) * n + 49]);
+            Assert.AreEqual(0, x.SlotFeat[theirs * n + 48], "their Active can't be brought up");
+
+            int o = 2 + PolicyInput.SideSlots;
+            Assert.AreEqual(1, x.TurnFeats[o + 35], "a Switch is known to be in their hand");
+            Assert.AreEqual(2 / 4f, x.TurnFeats[o + 36], 1e-6, "Switch and Escape Rope left in your deck");
+        }
+
+        [Test]
+        public void Draw_And_Mill_Cards_Are_Recognised()
+        {
+            var research = PolicyCards.CardDraws(db.All.First(d => d.Name == "Professor's Research"));
+            Assert.AreEqual(7, research.Count, "Professor's Research draws 7");
+            Assert.IsFalse(research.Refills);
+            var iono = PolicyCards.CardDraws(db.All.First(d => d.Name == "Iono"));
+            Assert.IsTrue(iono.PerPrize && iono.Refills, "Iono: shuffle the hand in, draw for each remaining Prize card");
+            var until = PolicyCards.CardDraws(db.All.First(d => d.IsTrainer && (d.Text ?? "").StartsWith("Draw cards until you have 6 cards", System.StringComparison.Ordinal)));
+            Assert.AreEqual(6, until.Until);
+            Assert.AreEqual(2, PolicyCards.AttackMills(C("BKT-21").Attacks[0]), "Houndoom-EX discards the top 2 cards of their deck");
+            Assert.IsFalse(PolicyCards.CardDraws(C("MEG-114")).Any, "Boss's Orders draws nothing");
+        }
+
+        [Test]
+        public void The_Network_Sees_How_Deep_A_Play_Draws_And_Who_Is_Running_Out_Of_Cards()
+        {
+            // 20 cards in each deck: Professor's Research draws 7 of yours, Houndoom-EX's attack mills 2 of theirs.
+            var probe = new PreviewProbe { Preview = false };
+            var e = ProbeScenario(probe);
+            var houndoom = e.ScenarioActive(0, C("BKT-21"));
+            e.ScenarioAttach(houndoom, C("MEE-10"));
+            e.ScenarioActive(1, C("POR-62"));
+            e.ScenarioBench(1, C("ASC-16"));
+            e.ScenarioAddToHand(0, db.All.First(d => d.Name == "Professor's Research"));
+            var x = probe.Run(e);
+            int f = PolicyInput.OptionFeatures;
+            int play = Option(probe.Request, probe.Choices, o => o.Action == ActionType.PlayTrainer && o.Card != null && o.Card.Name == "Professor's Research");
+            Assert.AreEqual(7 / 20f, x.OptFeat[play * f + 22], 1e-6, "draws 7 of the 20 cards left");
+            int attack = Option(probe.Request, probe.Choices, o => o.Action == ActionType.Attack);
+            Assert.AreEqual(2 / 20f, x.OptFeat[attack * f + 24], 1e-6, "mills 2 of their 20");
+            int o0 = 2 + PolicyInput.SideSlots;
+            Assert.AreEqual(1, x.TurnFeats[o0 + 37], 1e-6, "10 or more draws left");
+            Assert.Greater(x.TurnFeats[o0 + 39], 0.25f, "cards to spare: drawing deep is safe");
+
+            // With 3 cards left and 6 Prize cards to take, it would run out first.
+            probe = new PreviewProbe { Preview = false };
+            e = ProbeScenario(probe, 3);
+            houndoom = e.ScenarioActive(0, C("BKT-21"));
+            e.ScenarioAttach(houndoom, C("MEE-10"));
+            e.ScenarioActive(1, C("POR-62"));
+            e.ScenarioBench(1, C("ASC-16"));
+            x = probe.Run(e);
+            Assert.AreEqual(0.3f, x.TurnFeats[o0 + 37], 1e-6, "3 draws left");
+            Assert.Less(x.TurnFeats[o0 + 39], 0.25f, "fewer cards than the turns it needs to win");
+            Assert.Greater(x.TurnFeats[o0 + 40], 0.25f, "the opponent has cards to spare");
+        }
+
+        [Test]
+        public void The_AI_Remembers_Cards_Put_On_The_Top_Or_Bottom_Of_A_Deck_Until_It_Is_Shuffled()
+        {
+            var e = Scenario(new ScriptedAgent(), new ScriptedAgent());
+            e.ScenarioActive(0, C("SVP-44"));
+            e.ScenarioActive(1, C("POR-62"));
+            var boss = e.ScenarioAddToHand(0, C("MEG-114"));
+            var research = e.ScenarioAddToHand(0, db.All.First(d => d.Name == "Professor's Research"));
+            e.ScenarioAddToDiscard(1, C("ASC-16"), 1);
+            var theirBudew = e.State.Players[1].Discard.Last();
+            var theirSecret = e.ScenarioAddToHand(1, C("PAR-160")); // not known to player 0
+            var mem = new PolicyMemory(0);
+            var info = new GameEvent { Type = GameEventType.Info, Player = 0 };
+            mem.OnEvent(e, info);
+
+            // Boss's Orders goes on the bottom of my deck and Professor's Research on top (as effects put them).
+            var me = e.State.Players[0];
+            me.Hand.Remove(boss);
+            me.Deck.Add(boss);
+            me.Hand.Remove(research);
+            me.Deck.Insert(0, research);
+            // Their Budew (from the discard pile, public) and their unknown hand card go on the bottom of their deck.
+            var them = e.State.Players[1];
+            them.Discard.Remove(theirBudew);
+            them.Deck.Add(theirBudew);
+            them.Hand.Remove(theirSecret);
+            them.Deck.Add(theirSecret);
+            mem.OnEvent(e, info);
+
+            CollectionAssert.AreEqual(new[] { "Boss's Orders" }, mem.KnownDeckCards(0, false).Select(d => d.Name).ToArray());
+            CollectionAssert.AreEqual(new[] { "Professor's Research" }, mem.KnownDeckCards(0, true).Select(d => d.Name).ToArray());
+            CollectionAssert.AreEqual(new[] { "Budew" }, mem.KnownDeckCards(1, false).Select(d => d.Name).ToArray(),
+                "their public card is known; the one from their hidden hand isn't");
+
+            // Drawing Professor's Research forgets it; shuffling my deck forgets the rest of mine, not theirs.
+            me.Deck.Remove(research);
+            me.Hand.Add(research);
+            mem.OnEvent(e, info);
+            Assert.AreEqual(0, mem.KnownDeckCards(0, true).Count);
+            mem.OnEvent(e, new GameEvent { Type = GameEventType.Shuffle, Player = 0, Text = "Player 1 shuffled their deck." });
+            Assert.AreEqual(0, mem.KnownDeckCards(0, false).Count);
+            Assert.AreEqual(1, mem.KnownDeckCards(1, false).Count);
+
+            // A card an effect let me look at and left on top is known too.
+            var top = me.Deck[0];
+            e.NoteLookedAt(new List<CardInstance> { top }, "The top card of your deck", 0);
+            mem.OnEvent(e, info);
+            CollectionAssert.AreEqual(new[] { top.Def.Name }, mem.KnownDeckCards(0, true).Select(d => d.Name).ToArray());
+
+            // The look-ahead's guesses keep known cards where they are: Boss's Orders back on my bottom, the Budew on theirs.
+            me.Deck.Remove(boss);
+            me.Hand.Add(boss); // drawn
+            mem.OnEvent(e, info);
+            foreach (var c in new[] { boss, research })
+            {
+                me.Hand.Remove(c);
+                me.Deck.Add(c);
+            }
+            mem.OnEvent(e, info);
+            Assert.AreEqual(2, mem.KnownDeckCards(0, false).Count);
+            var search = new PolicySearch(new PolicyNet(), new SearchSettings());
+            for (int seed = 1; seed <= 5; seed++)
+            {
+                List<CardDef> theirDeck;
+                var g = search.Guess(e.State, 0, mem, seed, out theirDeck);
+                var mine = g.Players[0].Deck;
+                CollectionAssert.AreEquivalent(new[] { boss.Id, research.Id }, new[] { mine[mine.Count - 1].Id, mine[mine.Count - 2].Id }, "seed " + seed);
+                Assert.AreEqual(top.Id, mine[0].Id, "the looked-at top card stays on top");
+                var theirs = g.Players[1].Deck;
+                Assert.AreEqual(theirBudew.Id, theirs[theirs.Count - 2].Id, "their known card is real and stays where it was put");
+                Assert.AreNotEqual(theirSecret.Id, theirs[theirs.Count - 1].Id, "their unknown card under it is guessed, not read");
+            }
+        }
+
+        /// <summary>Earlier networks' sizes: per Pokémon, per option, turn numbers.</summary>
+        [TestCase(47, 21, 16, TestName = "A network from before the Masters inputs loads and plays exactly as before")]
+        [TestCase(48, 22, 35, TestName = "A network from before the Boss-stall and deck-out inputs loads and plays exactly as before")]
+        public void An_Earlier_Network_Loads_And_Plays_Exactly_As_Before(int slots, int options, int turnExtra)
         {
             var net = new PolicyNet();
             var probe = new PreviewProbe { Net = net };
@@ -370,18 +522,24 @@ namespace PokemonTCG.Tests
             e.ScenarioAttach(charmander, C("MEE-10"));
             e.ScenarioActive(1, C("POR-62"));
             e.ScenarioBench(1, C("ASC-16"));
+            e.ScenarioBench(1, C("OBF-27"));
             var x = probe.Run(e);
 
-            // A network saved with the earlier sizes (47 per Pokémon, 21 per option, 2 + SideSlots + 16 turn numbers).
-            int newTurn = PolicyInput.TurnFeatures - (2 + PolicyInput.SideSlots + 16);
-            var old = Narrow(net.ToBytes(), new Dictionary<string, int> { { "slot.0.weight", 1 }, { "option.0.weight", 1 }, { "inp.0.weight", newTurn } });
+            int turns = 2 + PolicyInput.SideSlots + turnExtra;
+            var old = Narrow(net.ToBytes(), new Dictionary<string, int>
+            {
+                { "slot.0.weight", PolicyInput.SlotFeatures - slots }, { "option.0.weight", PolicyInput.OptionFeatures - options },
+                { "inp.0.weight", PolicyInput.TurnFeatures - turns }
+            });
             var loaded = new PolicyNet();
             Assert.IsTrue(loaded.FromBytes(old), "it loads");
 
-            // It plays as the network it came from does with the new numbers blank.
-            for (int s = 0; s < PolicyInput.NumSlots; s++) x.SlotFeat[s * PolicyInput.SlotFeatures + 47] = 0;
-            for (int k = 0; k < x.Count; k++) x.OptFeat[k * PolicyInput.OptionFeatures + 21] = 0;
-            for (int i = 2 + PolicyInput.SideSlots + 16; i < PolicyInput.TurnFeatures; i++) x.TurnFeats[i] = 0;
+            // It plays as the network it came from does with the newer numbers blank.
+            for (int s = 0; s < PolicyInput.NumSlots; s++)
+                for (int i = slots; i < PolicyInput.SlotFeatures; i++) x.SlotFeat[s * PolicyInput.SlotFeatures + i] = 0;
+            for (int k = 0; k < x.Count; k++)
+                for (int i = options; i < PolicyInput.OptionFeatures; i++) x.OptFeat[k * PolicyInput.OptionFeatures + i] = 0;
+            for (int i = turns; i < PolicyInput.TurnFeatures; i++) x.TurnFeats[i] = 0;
             var want = net.Forward(x);
             var got = loaded.Forward(x);
             Assert.AreEqual(want.Value, got.Value, 1e-5);
@@ -429,14 +587,14 @@ namespace PokemonTCG.Tests
             }
         }
 
-        /// <summary>Scenario's empty board (6 Fire Energy Prizes and 20 Psychic Energy in each deck), with the probe as seat 0, on turn 3.</summary>
-        private GameEngine ProbeScenario(PreviewProbe probe)
+        /// <summary>Scenario's empty board (6 Fire Energy Prizes and 20 Psychic Energy in each deck, or myDeck in yours), with the probe as seat 0, on turn 3.</summary>
+        private GameEngine ProbeScenario(PreviewProbe probe, int myDeck = 20)
         {
             var e = new GameEngine(StandardCards.CreateRegistry(), probe, new ScriptedAgent());
             e.BeginScenario(42);
             e.ScenarioAddPrizes(0, C("MEE-10"), 6);
             e.ScenarioAddPrizes(1, C("MEE-10"), 6);
-            e.ScenarioAddToDeck(0, C("MEE-13"), 20);
+            e.ScenarioAddToDeck(0, C("MEE-13"), myDeck);
             e.ScenarioAddToDeck(1, C("MEE-13"), 20);
             probe.Engine = e;
             return e;
