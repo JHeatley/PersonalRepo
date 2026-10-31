@@ -507,6 +507,7 @@ namespace PokemonTCG.AI
             if (me != null)
             {
                 var gustTarget = v.InSetup ? null : BestGustTarget(me, opp);
+                var stallTarget = v.InSetup ? null : BestStallTarget(opp);
                 for (int side = 0; side < 2; side++)
                 {
                     var s = side == 0 ? me : opp;
@@ -527,6 +528,9 @@ namespace PokemonTCG.AI
                                      x.SlotFeat, slot * PolicyInput.SlotFeatures);
                         if (side == 1 && ReferenceEquals(mon, gustTarget))
                             x.SlotFeat[slot * PolicyInput.SlotFeatures + 47] = 1;
+                        x.SlotFeat[slot * PolicyInput.SlotFeatures + 48] = k > 0 ? StallScore(mon) : 0;
+                        if (side == 1 && ReferenceEquals(mon, stallTarget))
+                            x.SlotFeat[slot * PolicyInput.SlotFeatures + 49] = 1;
                         k++;
                     }
                 }
@@ -629,6 +633,9 @@ namespace PokemonTCG.AI
                         x.OptFeat[f + 2] = attack.Damage / 300f;
                         // What this attack does to their Active: lock their Items, Knock it Out, how much of its HP it takes.
                         x.OptFeat[f + 13] = PolicyCards.AttackLocksItems(attack) ? 1 : 0;
+                        if (me != null) DrawOption(PolicyCards.AttackDraws(attack), me, false, x.OptFeat, f);
+                        int mill = PolicyCards.AttackMills(attack);
+                        if (mill > 0 && opp != null) x.OptFeat[f + 24] = Math.Min(1f, mill / (float)Math.Max(1, opp.DeckCount));
                         // With a preview, what it really did when played out (every "+", Tool and Stadium counted) and the
                         // Prize cards it took; without, the printed damage and the Active's Prize cards if that Knocks it Out.
                         PolicySearch.AttackResult real;
@@ -664,6 +671,9 @@ namespace PokemonTCG.AI
                     OptionPlan(o, me, v.InSetup ? null : opp, toCome, teamEnergy, x.OptFeat, f);
                 if (me != null && o.Card != null && o.Card.IsPokemon && o.Action == ActionType.BenchBasic)
                     BenchOption(o.Card, me, toCome, x.OptFeat, f);
+                if (me != null && o.Card != null && r.Kind == DecisionKind.MainAction
+                    && (o.Action == ActionType.PlayTrainer || o.Action == ActionType.UseAbility || o.Action == ActionType.UseHandAbility))
+                    DrawOption(PolicyCards.CardDraws(o.Card), me, o.Action == ActionType.PlayTrainer, x.OptFeat, f);
             }
             return x;
         }
@@ -885,6 +895,22 @@ namespace PokemonTCG.AI
             feat[f + 19] = Math.Min(copies, 3) / 3f;
         }
 
+        /// <summary>
+        /// What a play draws (option features 22 and 23): the cards it draws as a share of the cards left in your deck (1 = all of
+        /// them or more: the deck would run out), counting a hand shuffled back in first (Judge, Iono) as refilling the deck, and
+        /// whether it does refill it. Drawing deep is often how a deck finds its win; this only says how deep.
+        /// </summary>
+        private static void DrawOption(PolicyCards.DrawFacts d, SideView me, bool fromHand, float[] feat, int f)
+        {
+            if (!d.Any) return;
+            int hand = Math.Max(0, me.HandCount - (fromHand ? 1 : 0)); // the card played leaves the hand
+            int deck = me.DeckCount + (d.Refills ? hand : 0);
+            int draws = Math.Max(d.Count, d.Until > 0 ? d.Until - (d.Refills ? 0 : hand) : 0);
+            if (d.PerPrize) draws = Math.Max(draws, me.PrizeCount);
+            feat[f + 22] = Math.Min(1f, Math.Max(0, draws) / (float)Math.Max(1, deck));
+            feat[f + 23] = d.Refills ? 1 : 0;
+        }
+
         /// <summary>Free-retreat Pokémon on a Bench (pivots: one can come in and go out again for nothing).</summary>
         private static int FreePivots(SideView s)
         {
@@ -988,7 +1014,41 @@ namespace PokemonTCG.AI
         }
 
         /// <summary>
-        /// The Prize race (turn features from 2 + SideSlots + 16 on, and 33 and 34): the Knock Outs each side needs to take its
+        /// How badly a Benched Pokémon would be stuck if it were brought up to the Active Spot (slot feature 48; Boss stalling):
+        /// it couldn't attack next turn even with an Energy attached (or has no attacks), graded by its Retreat Cost (0 for free
+        /// retreat, 1 for 4 or more). Brought up with Boss's Orders, it costs its owner the turn: retreat (discarding Energy), a
+        /// switch card, or Energy attached to it instead of their attacker.
+        /// </summary>
+        private static float StallScore(PokemonView mon)
+        {
+            var top = mon.Top != null ? mon.Top.Def : null;
+            if (top == null || mon.RetreatCost <= 0) return 0;
+            int cheapest = PolicyPlan.Cheapest(mon.EnergyUnits, top);
+            if (cheapest >= 0 && cheapest <= 1) return 0;
+            return Math.Min(mon.RetreatCost, 4) / 4f;
+        }
+
+        /// <summary>The opponent's Benched Pokémon most stuck if brought up (slot feature 49): the highest StallScore (the first on a tie), or null.</summary>
+        private static PokemonView BestStallTarget(SideView opp)
+        {
+            if (opp == null) return null;
+            PokemonView best = null;
+            float bestScore = 0;
+            foreach (var b in opp.Bench)
+            {
+                if (b == null) continue;
+                float score = StallScore(b);
+                if (score > bestScore)
+                {
+                    best = b;
+                    bestScore = score;
+                }
+            }
+            return best;
+        }
+
+        /// <summary>
+        /// The Prize race (turn features from 2 + SideSlots + 16 on, 33 and 34, and the deck-out numbers 37 to 40): the Knock Outs each side needs to take its
         /// last Prize card, the Pokémon worth 2 or more Prize cards each side has in play, the turns each side would need to
         /// win and who is ahead in that race, and the Prize cards each side could take in its next 2 turns (TurnsToWin). A
         /// board set up to win in 1 or 2 turns looks different here from one that needs 3 or 4.
@@ -1007,6 +1067,19 @@ namespace PokemonTCG.AI
             tf[o + 6] = (Math.Max(-4, Math.Min(4, theirs - mine)) + 4) / 8f;
             tf[o + 17] = Math.Min(mySoon, 6) / 6f;
             tf[o + 18] = Math.Min(theirSoon, 6) / 6f;
+            // Decking out (2 + SideSlots + 37 to 40): a player who can't draw at the start of their turn loses. The draws each
+            // side has left, and its spare cards: the cards left beyond the turns it needs to win (negative: it would run out
+            // first). Plenty spare means drawing deep is safe; few or none means it's running out (or the opponent is).
+            tf[o + 21] = Math.Min(me.DeckCount, 10) / 10f;
+            tf[o + 22] = Math.Min(opp.DeckCount, 10) / 10f;
+            tf[o + 23] = Spare(me.DeckCount, mine);
+            tf[o + 24] = Spare(opp.DeckCount, theirs);
+        }
+
+        /// <summary>Cards left beyond the turns needed to win (one draw a turn), -5 to 15, as 0 to 1 (0.25 = none spare).</summary>
+        private static float Spare(int deck, int turnsToWin)
+        {
+            return (Math.Max(-5, Math.Min(15, deck - turnsToWin)) + 5) / 20f;
         }
 
         private static int MultiPrize(SideView s)
@@ -1105,7 +1178,8 @@ namespace PokemonTCG.AI
         /// Energy left in your deck (less those known to be Prizes) and the chance your next draw is a Supporter, the cards
         /// that bring up an opponent's Benched Pokémon (Boss's Orders) in your hand and left in your deck, the cards that
         /// switch your Active in your hand, and of the opponent's: such gust and switch cards seen so far, and whether their
-        /// hand is known to hold a gust card.
+        /// hand is known to hold a gust card; then (2 + SideSlots + 35 and 36, for Boss stalling) whether their hand is known to
+        /// hold a switch card, and the switch cards left in your deck.
         /// </summary>
         private static void OutsFeatures(SideView me, SideView opp, PolicyMemory mem, List<CardDef> deckLeft, List<CardDef> prized, float[] tf)
         {
@@ -1143,7 +1217,15 @@ namespace PokemonTCG.AI
             if (mem != null) foreach (var kv in mem.OppSeen) count(kv.Key, kv.Value);
             tf[o + 7] = Math.Min(theirGusts, 4) / 4f;
             tf[o + 8] = Math.Min(theirSwitches, 4) / 4f;
-            if (mem != null) foreach (var d in mem.OppKnownHand.Values) if (PolicyCards.Gusts(d)) tf[o + 9] = 1;
+            if (mem != null)
+                foreach (var d in mem.OppKnownHand.Values)
+                {
+                    if (PolicyCards.Gusts(d)) tf[o + 9] = 1;
+                    if (PolicyCards.SwitchesOwn(d)) tf[o + 12] = 1;
+                }
+            int switchesLeft = 0;
+            foreach (var d in deckLeft) if (PolicyCards.SwitchesOwn(d)) switchesLeft++;
+            tf[o + 13] = Math.Min(switchesLeft, 4) / 4f;
         }
 
         /// <summary>Damage as a share of the HP left, 0 to 1 (1 = twice what's needed or more).</summary>

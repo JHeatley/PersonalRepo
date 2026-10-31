@@ -20,15 +20,15 @@ namespace PokemonTCG.AI
         public const int NumSlots = 2 * SideSlots;
         public const int NoTarget = NumSlots;
         /// <summary>Numbers per Pokémon in play (26 before the Energy-needed and evolution ones: PolicyNet.Widen).</summary>
-        public const int SlotFeatures = 48;
+        public const int SlotFeatures = 50;
         public const int GlobalFeatures = 20 + PolicyKinds.DecisionCount;
         /// <summary>Numbers per option (6 before the Energy attachment and evolution ones: PolicyNet.Widen).</summary>
-        public const int OptionFeatures = 22;
+        public const int OptionFeatures = 25;
         /// <summary>
         /// This turn's numbers (actions, Abilities used), then the Item numbers, the free-retreat pivots on each Bench and the
         /// Bench and play-from-hand numbers (2 + SideSlots before those: PolicyNet.Widen).
         /// </summary>
-        public const int TurnFeatures = 2 + SideSlots + 35;
+        public const int TurnFeatures = 2 + SideSlots + 41;
         /// <summary>Bags of cards: hand, your discard, their discard, your unseen cards, their known hand, cards they've shown, your plays this turn, their last turn.</summary>
         public const int BagCount = 8;
         public const int BagHand = 0, BagMyDiscard = 1, BagOppDiscard = 2, BagUnseen = 3, BagOppKnownHand = 4, BagOppSeen = 5, BagTurnPlayed = 6, BagOppLastTurn = 7;
@@ -123,11 +123,12 @@ namespace PokemonTCG.AI
         private const int OldSlotFeatures = 26, OldOptionFeatures = 6, OldStaticSize = 64, OldTurnFeatures = 2 + PolicyInput.SideSlots;
         /// <summary>
         /// Every earlier size of the per-Pokémon, per-option and turn numbers, oldest first: the first networks, then those
-        /// from before the Masters numbers (real attack damage, the Prize race, gust targets, known Prizes and outs).
+        /// from before the Masters numbers (real attack damage, the Prize race, gust targets, known Prizes and outs), then those
+        /// from before the Boss-stall and deck-out numbers.
         /// </summary>
-        private static readonly int[] EarlierSlotFeatures = { OldSlotFeatures, 47 };
-        private static readonly int[] EarlierOptionFeatures = { OldOptionFeatures, 21 };
-        private static readonly int[] EarlierTurnFeatures = { OldTurnFeatures, 2 + PolicyInput.SideSlots + 16 };
+        private static readonly int[] EarlierSlotFeatures = { OldSlotFeatures, 47, 48 };
+        private static readonly int[] EarlierOptionFeatures = { OldOptionFeatures, 21, 22 };
+        private static readonly int[] EarlierTurnFeatures = { OldTurnFeatures, 2 + PolicyInput.SideSlots + 16, 2 + PolicyInput.SideSlots + 35 };
         /// <summary>
         /// Residual blocks in the trunk: a new network has DefaultBlocks, Grow makes it deeper (BigBlocks: the Make the network bigger
         /// button), and loading takes whatever the file has, up to MaxBlocks.

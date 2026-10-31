@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using PokemonTCG.Core;
 
 namespace PokemonTCG.AI
@@ -123,6 +124,8 @@ namespace PokemonTCG.AI
         private sealed class Facts
         {
             public bool PlaysFromHand, TeamEnergy, MentionsEnergy, LocksItems, PreventsEffects, Spreads, HasAbility, Gusts, SwitchesOwn;
+            /// <summary>What playing the card (a Trainer) or using its Abilities draws for you.</summary>
+            public DrawFacts Draw;
             public int BonusType;
             /// <summary>Its Abilities prevent all damage from attacks by: 1 Pokémon ex, 2 Pokémon with an Ability, 4 Basic Pokémon, 8 Pokémon V.</summary>
             public int Shield;
@@ -132,6 +135,65 @@ namespace PokemonTCG.AI
         private sealed class AttackFacts
         {
             public bool LocksItems, IgnoresEffects, IgnoresWeakness, PlacesCounters;
+            /// <summary>Cards it draws for you (Draws), and the top cards of the opponent's deck it discards (mill).</summary>
+            public DrawFacts Draw;
+            public int Mills;
+        }
+
+        /// <summary>
+        /// The cards a text draws for you: a number ("draw 3 cards", "draw a card": the most it names), up to a hand size ("draw
+        /// cards until you have 6 cards in your hand"), or one for each of your remaining Prize cards (Iono); and whether it
+        /// shuffles your hand back into your deck first (Judge, Iono), which refills the deck. Read from the card's words, so
+        /// a guide (coin flips and "for each" counts are left out).
+        /// </summary>
+        public struct DrawFacts
+        {
+            public int Count, Until;
+            public bool PerPrize, Refills;
+            public bool Any { get { return Count > 0 || Until > 0 || PerPrize; } }
+        }
+
+        private static readonly Regex DrawNumber = new Regex(@"\bdraws? (\d+|a|an|one|two|three|four|five|six|seven|eight) (more )?cards?\b", RegexOptions.IgnoreCase);
+        private static readonly Regex DrawUntil = new Regex(@"\bdraws? (cards )?(from your deck )?until (you have|they have) (exactly )?(\d+)", RegexOptions.IgnoreCase);
+        /// <summary>The hand goes back into the deck: "shuffle your hand into your deck" (Judge), "shuffles their hand and puts it on the bottom of their deck" (Iono).</summary>
+        private static readonly Regex HandBack = new Regex(@"shuffles? (your|their) hand (into|and puts? it on the bottom of) (your|their) deck", RegexOptions.IgnoreCase);
+        private static readonly Regex MillNumber = new Regex(@"discard the top (\d+|a|an|one|two|three|four|five|six|seven|eight) cards? of your opponent's deck", RegexOptions.IgnoreCase);
+        private static readonly string[] NumberWords = { "a", "one", "two", "three", "four", "five", "six", "seven", "eight" };
+
+        private static int Number(string word)
+        {
+            int n;
+            if (int.TryParse(word, out n)) return n;
+            if (string.Equals(word, "an", StringComparison.OrdinalIgnoreCase)) return 1;
+            int i = Array.FindIndex(NumberWords, w => string.Equals(w, word, StringComparison.OrdinalIgnoreCase));
+            return i == 0 ? 1 : Math.Max(0, i);
+        }
+
+        private static DrawFacts Draws(string t)
+        {
+            var d = new DrawFacts();
+            if (string.IsNullOrEmpty(t) || !Has(t, "draw")) return d;
+            foreach (Match m in DrawNumber.Matches(t)) d.Count = Math.Max(d.Count, Number(m.Groups[1].Value));
+            foreach (Match m in DrawUntil.Matches(t)) d.Until = Math.Max(d.Until, Number(m.Groups[5].Value));
+            d.PerPrize = Has(t, "for each of") && Has(t, "remaining Prize");
+            d.Refills = HandBack.IsMatch(t);
+            return d;
+        }
+
+        private static int Mills(string t)
+        {
+            int most = 0;
+            if (string.IsNullOrEmpty(t)) return 0;
+            foreach (Match m in MillNumber.Matches(t)) most = Math.Max(most, Number(m.Groups[1].Value));
+            return most;
+        }
+
+        private static DrawFacts Most(DrawFacts a, DrawFacts b)
+        {
+            return new DrawFacts
+            {
+                Count = Math.Max(a.Count, b.Count), Until = Math.Max(a.Until, b.Until), PerPrize = a.PerPrize || b.PerPrize, Refills = a.Refills || b.Refills
+            };
         }
 
         private static readonly ConditionalWeakTable<CardDef, Facts> facts = new ConditionalWeakTable<CardDef, Facts>();
@@ -149,6 +211,7 @@ namespace PokemonTCG.AI
                     f.Gusts = Has(text, "opponent's Benched Pok") && Has(text, "Active") && Has(text, "switch");
                     // Switch, Switch Cart, Escape Rope, Prime Catcher: your own Active Pokémon out.
                     f.SwitchesOwn = Has(text, "switch your Active") || Has(text, "switches their Active");
+                    f.Draw = Draws(text);
                 }
                 foreach (var a in card.Attacks)
                 {
@@ -162,6 +225,7 @@ namespace PokemonTCG.AI
                 {
                     string t = a.Text ?? "";
                     if (a.IsAbility) f.HasAbility = true;
+                    f.Draw = Most(f.Draw, Draws(t));
                     if (card.IsPokemon && OnPlay(t)) f.PlaysFromHand = true;
                     if (TeamEnergy(t)) f.TeamEnergy = true;
                     if (Has(t, "energy")) f.MentionsEnergy = true;
@@ -188,12 +252,19 @@ namespace PokemonTCG.AI
                     LocksItems = LocksItems(t),
                     IgnoresEffects = IgnoresEffects(t),
                     IgnoresWeakness = Has(t, "Weakness") && Has(t, "Resistance") && (Has(t, "don't") || Has(t, "isn't") || Has(t, "not ")),
-                    PlacesCounters = PlacesCounters(t)
+                    PlacesCounters = PlacesCounters(t),
+                    Draw = Draws(t),
+                    Mills = Mills(t)
                 };
             });
         }
 
         public static bool AttackLocksItems(AttackDef a) { return a != null && Of(a).LocksItems; }
+        /// <summary>What playing this card (a Trainer) or using its Abilities draws for you (DrawFacts).</summary>
+        public static DrawFacts CardDraws(CardDef c) { return c != null ? Of(c).Draw : new DrawFacts(); }
+        public static DrawFacts AttackDraws(AttackDef a) { return a != null ? Of(a).Draw : new DrawFacts(); }
+        /// <summary>The top cards of the opponent's deck this attack discards (mill), or 0.</summary>
+        public static int AttackMills(AttackDef a) { return a != null ? Of(a).Mills : 0; }
         /// <summary>True for a Trainer that brings one of the opponent's Benched Pokémon up to the Active Spot (Boss's Orders).</summary>
         public static bool Gusts(CardDef c) { return c != null && Of(c).Gusts; }
         /// <summary>True for a Trainer that switches your own Active Pokémon out (Switch, Escape Rope).</summary>

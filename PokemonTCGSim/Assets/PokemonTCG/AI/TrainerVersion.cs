@@ -8,6 +8,6 @@ namespace PokemonTCG.AI
     /// </summary>
     public static class TrainerVersion
     {
-        public const int Number = 174; // 174: the network sees what attacks really do, the Prize race, gust targets, known Prizes, outs and the opponent's gust and switch cards (bigger inputs)
+        public const int Number = 175; // 175: the network sees Boss-stall targets, switch cards in hand and deck, how deep each play draws or mills, and who is running out of cards (bigger inputs)
     }
 }
