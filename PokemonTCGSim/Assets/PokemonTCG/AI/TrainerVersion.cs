@@ -8,6 +8,6 @@ namespace PokemonTCG.AI
     /// </summary>
     public static class TrainerVersion
     {
-        public const int Number = 175; // 175: the network sees Boss-stall targets, switch cards in hand and deck, how deep each play draws or mills, and who is running out of cards (bigger inputs)
+        public const int Number = 175; // 175: the network sees Boss-stall targets, switch cards in hand and deck, how deep each play draws or mills, who is running out of cards, and the cards known on top of or under each deck (bigger inputs)
     }
 }

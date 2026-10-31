@@ -28,7 +28,7 @@ namespace PokemonTCG.AI
         /// This turn's numbers (actions, Abilities used), then the Item numbers, the free-retreat pivots on each Bench and the
         /// Bench and play-from-hand numbers (2 + SideSlots before those: PolicyNet.Widen).
         /// </summary>
-        public const int TurnFeatures = 2 + SideSlots + 41;
+        public const int TurnFeatures = 2 + SideSlots + 49;
         /// <summary>Bags of cards: hand, your discard, their discard, your unseen cards, their known hand, cards they've shown, your plays this turn, their last turn.</summary>
         public const int BagCount = 8;
         public const int BagHand = 0, BagMyDiscard = 1, BagOppDiscard = 2, BagUnseen = 3, BagOppKnownHand = 4, BagOppSeen = 5, BagTurnPlayed = 6, BagOppLastTurn = 7;
@@ -124,7 +124,7 @@ namespace PokemonTCG.AI
         /// <summary>
         /// Every earlier size of the per-Pokémon, per-option and turn numbers, oldest first: the first networks, then those
         /// from before the Masters numbers (real attack damage, the Prize race, gust targets, known Prizes and outs), then those
-        /// from before the Boss-stall and deck-out numbers.
+        /// from before the Boss-stall, deck-out and known-deck-cards numbers.
         /// </summary>
         private static readonly int[] EarlierSlotFeatures = { OldSlotFeatures, 47, 48 };
         private static readonly int[] EarlierOptionFeatures = { OldOptionFeatures, 21, 22 };

@@ -1146,6 +1146,15 @@ namespace PokemonTCG.Core
             finally { seenForNextAsk = null; seenTitleForNextAsk = null; }
         }
 
+        /// <summary>
+        /// The cards an effect let this player look at (LookAtTop) and hasn't finished with, or an empty list: what that player
+        /// knows about the top of their deck (PolicyMemory remembers the ones left there).
+        /// </summary>
+        public IList<CardInstance> LookedAtBy(int player)
+        {
+            return lookedAt != null && lookedAtPlayer == player ? (IList<CardInstance>)lookedAt : new CardInstance[0];
+        }
+
         public void ForgetLookedAt()
         {
             lookedAt = null;

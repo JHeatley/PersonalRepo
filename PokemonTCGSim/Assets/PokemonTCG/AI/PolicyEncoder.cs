@@ -41,6 +41,89 @@ namespace PokemonTCG.AI
         /// <summary>Your Prize cards as you last saw them when you searched your deck (by card id).</summary>
         public readonly Dictionary<int, CardDef> KnownPrizes = new Dictionary<int, CardDef>();
 
+        /// <summary>A card known to be near the top or at the bottom of a deck.</summary>
+        public struct DeckSpot
+        {
+            public CardDef Def;
+            public bool Top;
+        }
+
+        /// <summary>
+        /// Cards known to be in each player's deck (by player, then card id), near the top or at the bottom, the way a real
+        /// player keeps track: cards seen going into the deck (your hand put on the bottom by Iono, a Pokémon put on the bottom
+        /// by Lillie's Poké Doll, a card put back on top) and cards you looked at and left there. Their order within the top or
+        /// the bottom isn't kept. A shuffle of that deck forgets them all; a card that leaves the deck is forgotten. Of the
+        /// opponent's deck only the bottom and a single card put on top are kept (their draws would otherwise show which of
+        /// several known cards they drew).
+        /// </summary>
+        public readonly Dictionary<int, DeckSpot>[] KnownInDeck = { new Dictionary<int, DeckSpot>(), new Dictionary<int, DeckSpot>() };
+        private readonly HashSet<int>[] deckIds = { new HashSet<int>(), new HashSet<int>() };
+        private readonly HashSet<int>[] visibleIds = { new HashSet<int>(), new HashSet<int>() };
+
+        /// <summary>Your known cards in a player's deck near the top (top) or at the bottom.</summary>
+        public List<CardDef> KnownDeckCards(int player, bool top)
+        {
+            var list = new List<CardDef>();
+            if (player < 0 || player > 1) return list;
+            foreach (var kv in KnownInDeck[player]) if (kv.Value.Top == top && kv.Value.Def != null) list.Add(kv.Value.Def);
+            return list;
+        }
+
+        private void TrackDecks(GameEngine engine, GameEvent ev)
+        {
+            var st = engine.State;
+            if (st == null || st.Players == null || st.Players.Length < 2) return;
+            for (int side = 0; side < 2; side++)
+            {
+                var p = st.Players[side];
+                var deck = p.Deck;
+                var known = KnownInDeck[side];
+                var before = deckIds[side];
+                var seen = visibleIds[side];
+                int entered = 0, knownTop = 0;
+                foreach (var c in deck) if (!before.Contains(c.Id)) entered++;
+                foreach (var kv in known) if (kv.Value.Top) knownTop++;
+                for (int i = 0; i < deck.Count; i++)
+                {
+                    var c = deck[i];
+                    if (before.Contains(c.Id) || !seen.Contains(c.Id) || known.ContainsKey(c.Id)) continue;
+                    bool top = i < deck.Count / 2;
+                    if (side != Seat && top && (entered != 1 || knownTop > 0)) continue;
+                    known[c.Id] = new DeckSpot { Def = c.Def, Top = top };
+                }
+                if (side == Seat)
+                    foreach (var c in engine.LookedAtBy(side))
+                    {
+                        int i = deck.IndexOf(c);
+                        if (i >= 0 && !known.ContainsKey(c.Id)) known[c.Id] = new DeckSpot { Def = c.Def, Top = i < deck.Count / 2 };
+                    }
+                before.Clear();
+                foreach (var c in deck) before.Add(c.Id);
+                if (known.Count > 0)
+                {
+                    var gone = new List<int>();
+                    foreach (var id in known.Keys) if (!before.Contains(id)) gone.Add(id);
+                    foreach (var id in gone) known.Remove(id);
+                }
+                if (ev.Type == GameEventType.Shuffle && ev.Player == side) known.Clear();
+                // What this player (the memory's) can see of that side now: all of its own cards out of the deck; of the
+                // opponent's, the public ones and those known in their hand.
+                seen.Clear();
+                if (side == Seat) foreach (var c in p.Hand) seen.Add(c.Id);
+                else foreach (var id in OppKnownHand.Keys) seen.Add(id);
+                foreach (var c in p.Discard) seen.Add(c.Id);
+                foreach (var c in p.LostZone) seen.Add(c.Id);
+                foreach (var mon in p.InPlay())
+                {
+                    foreach (var c in mon.Stack) seen.Add(c.Id);
+                    foreach (var c in mon.Energy) seen.Add(c.Id);
+                    foreach (var c in mon.Tools) seen.Add(c.Id);
+                    foreach (var c in mon.Attached) seen.Add(c.Id);
+                }
+                foreach (var c in p.Prizes) if (p.FaceUpPrizeIds.Contains(c.Id)) seen.Add(c.Id);
+            }
+        }
+
         /// <summary>Your cards you know are still in your Prizes: the known ones not seen anywhere else since (a taken Prize card is in your hand).</summary>
         public List<CardDef> StillPrized(SideView me)
         {
@@ -151,6 +234,7 @@ namespace PokemonTCG.AI
                     }
                     break;
             }
+            if (engine != null) TrackDecks(engine, ev);
             if (ev.Player == opp && ev.Card != null && ev.CardId >= 0)
             {
                 OppSeen[ev.CardId] = ev.Card;
@@ -289,6 +373,12 @@ namespace PokemonTCG.AI
         {
             Seat = o.Seat;
             Copy(o.KnownPrizes, KnownPrizes);
+            for (int side = 0; side < 2; side++)
+            {
+                Copy(o.KnownInDeck[side], KnownInDeck[side]);
+                Copy(o.deckIds[side], deckIds[side]);
+                Copy(o.visibleIds[side], visibleIds[side]);
+            }
             DeckList = o.DeckList;
             Turn = o.Turn;
             ActionsThisTurn = o.ActionsThisTurn;
@@ -586,7 +676,10 @@ namespace PokemonTCG.AI
                 BenchFeatures(v, me, opp, toCome, x.TurnFeats);
                 if (!v.InSetup) x.TurnFeats[2 + PolicyInput.SideSlots + 15] = OpponentSpreads(opp, mem) ? 1 : 0;
                 if (!v.InSetup) RaceFeatures(me, opp, toCome, x.TurnFeats);
-                OutsFeatures(me, opp, mem, deckLeft, prized, x.TurnFeats);
+                // Outs: the cards you could draw, less those known to be at the bottom of your deck.
+                var bottom = mem != null ? mem.KnownDeckCards(viewer, false) : null;
+                OutsFeatures(me, opp, mem, Less(deckLeft, bottom), prized, x.TurnFeats);
+                if (mem != null) DeckKnowledgeFeatures(mem, viewer, x.TurnFeats);
                 if (mem != null && v.CurrentPlayer == viewer && !v.InSetup)
                 {
                     var tf = x.TurnFeats;
@@ -1226,6 +1319,38 @@ namespace PokemonTCG.AI
             int switchesLeft = 0;
             foreach (var d in deckLeft) if (PolicyCards.SwitchesOwn(d)) switchesLeft++;
             tf[o + 13] = Math.Min(switchesLeft, 4) / 4f;
+        }
+
+        /// <summary>
+        /// What each side knows is coming from its deck (turn features from 2 + SideSlots + 41 on, PolicyMemory.KnownInDeck):
+        /// your cards known near the top (you'll draw them soon) and how many are Supporters, Energy and Pokémon, your cards
+        /// known at the bottom (you won't draw them soon), and of the opponent's: a card known on top (and whether it's a
+        /// Supporter or a gust card) and their cards known at the bottom.
+        /// </summary>
+        private static void DeckKnowledgeFeatures(PolicyMemory mem, int viewer, float[] tf)
+        {
+            int o = 2 + PolicyInput.SideSlots + 41;
+            var top = mem.KnownDeckCards(viewer, true);
+            tf[o] = Math.Min(top.Count, 3) / 3f;
+            tf[o + 1] = Math.Min(mem.KnownDeckCards(viewer, false).Count, 10) / 10f;
+            if (top.Count > 0)
+            {
+                int supporters = 0, energy = 0, pokemon = 0;
+                foreach (var d in top)
+                {
+                    if (d.IsTrainer && d.TrainerKind == TrainerKind.Supporter) supporters++;
+                    if (d.IsEnergy) energy++;
+                    if (d.IsPokemon) pokemon++;
+                }
+                tf[o + 2] = supporters / (float)top.Count;
+                tf[o + 3] = energy / (float)top.Count;
+                tf[o + 4] = pokemon / (float)top.Count;
+            }
+            var theirTop = mem.KnownDeckCards(1 - viewer, true);
+            tf[o + 5] = Math.Min(theirTop.Count, 1);
+            tf[o + 6] = Math.Min(mem.KnownDeckCards(1 - viewer, false).Count, 10) / 10f;
+            foreach (var d in theirTop)
+                if ((d.IsTrainer && d.TrainerKind == TrainerKind.Supporter) || PolicyCards.Gusts(d)) tf[o + 7] = 1;
         }
 
         /// <summary>Damage as a share of the HP left, 0 to 1 (1 = twice what's needed or more).</summary>

@@ -436,6 +436,80 @@ namespace PokemonTCG.Tests
             Assert.Greater(x.TurnFeats[o0 + 40], 0.25f, "the opponent has cards to spare");
         }
 
+        [Test]
+        public void The_AI_Remembers_Cards_Put_On_The_Top_Or_Bottom_Of_A_Deck_Until_It_Is_Shuffled()
+        {
+            var e = Scenario(new ScriptedAgent(), new ScriptedAgent());
+            e.ScenarioActive(0, C("SVP-44"));
+            e.ScenarioActive(1, C("POR-62"));
+            var boss = e.ScenarioAddToHand(0, C("MEG-114"));
+            var research = e.ScenarioAddToHand(0, db.All.First(d => d.Name == "Professor's Research"));
+            e.ScenarioAddToDiscard(1, C("ASC-16"), 1);
+            var theirBudew = e.State.Players[1].Discard.Last();
+            var theirSecret = e.ScenarioAddToHand(1, C("PAR-160")); // not known to player 0
+            var mem = new PolicyMemory(0);
+            var info = new GameEvent { Type = GameEventType.Info, Player = 0 };
+            mem.OnEvent(e, info);
+
+            // Boss's Orders goes on the bottom of my deck and Professor's Research on top (as effects put them).
+            var me = e.State.Players[0];
+            me.Hand.Remove(boss);
+            me.Deck.Add(boss);
+            me.Hand.Remove(research);
+            me.Deck.Insert(0, research);
+            // Their Budew (from the discard pile, public) and their unknown hand card go on the bottom of their deck.
+            var them = e.State.Players[1];
+            them.Discard.Remove(theirBudew);
+            them.Deck.Add(theirBudew);
+            them.Hand.Remove(theirSecret);
+            them.Deck.Add(theirSecret);
+            mem.OnEvent(e, info);
+
+            CollectionAssert.AreEqual(new[] { "Boss's Orders" }, mem.KnownDeckCards(0, false).Select(d => d.Name).ToArray());
+            CollectionAssert.AreEqual(new[] { "Professor's Research" }, mem.KnownDeckCards(0, true).Select(d => d.Name).ToArray());
+            CollectionAssert.AreEqual(new[] { "Budew" }, mem.KnownDeckCards(1, false).Select(d => d.Name).ToArray(),
+                "their public card is known; the one from their hidden hand isn't");
+
+            // Drawing Professor's Research forgets it; shuffling my deck forgets the rest of mine, not theirs.
+            me.Deck.Remove(research);
+            me.Hand.Add(research);
+            mem.OnEvent(e, info);
+            Assert.AreEqual(0, mem.KnownDeckCards(0, true).Count);
+            mem.OnEvent(e, new GameEvent { Type = GameEventType.Shuffle, Player = 0, Text = "Player 1 shuffled their deck." });
+            Assert.AreEqual(0, mem.KnownDeckCards(0, false).Count);
+            Assert.AreEqual(1, mem.KnownDeckCards(1, false).Count);
+
+            // A card an effect let me look at and left on top is known too.
+            var top = me.Deck[0];
+            e.NoteLookedAt(new List<CardInstance> { top }, "The top card of your deck", 0);
+            mem.OnEvent(e, info);
+            CollectionAssert.AreEqual(new[] { top.Def.Name }, mem.KnownDeckCards(0, true).Select(d => d.Name).ToArray());
+
+            // The look-ahead's guesses keep known cards where they are: Boss's Orders back on my bottom, the Budew on theirs.
+            me.Deck.Remove(boss);
+            me.Hand.Add(boss); // drawn
+            mem.OnEvent(e, info);
+            foreach (var c in new[] { boss, research })
+            {
+                me.Hand.Remove(c);
+                me.Deck.Add(c);
+            }
+            mem.OnEvent(e, info);
+            Assert.AreEqual(2, mem.KnownDeckCards(0, false).Count);
+            var search = new PolicySearch(new PolicyNet(), new SearchSettings());
+            for (int seed = 1; seed <= 5; seed++)
+            {
+                List<CardDef> theirDeck;
+                var g = search.Guess(e.State, 0, mem, seed, out theirDeck);
+                var mine = g.Players[0].Deck;
+                CollectionAssert.AreEquivalent(new[] { boss.Id, research.Id }, new[] { mine[mine.Count - 1].Id, mine[mine.Count - 2].Id }, "seed " + seed);
+                Assert.AreEqual(top.Id, mine[0].Id, "the looked-at top card stays on top");
+                var theirs = g.Players[1].Deck;
+                Assert.AreEqual(theirBudew.Id, theirs[theirs.Count - 2].Id, "their known card is real and stays where it was put");
+                Assert.AreNotEqual(theirSecret.Id, theirs[theirs.Count - 1].Id, "their unknown card under it is guessed, not read");
+            }
+        }
+
         /// <summary>Earlier networks' sizes: per Pokémon, per option, turn numbers.</summary>
         [TestCase(47, 21, 16, TestName = "A network from before the Masters inputs loads and plays exactly as before")]
         [TestCase(48, 22, 35, TestName = "A network from before the Boss-stall and deck-out inputs loads and plays exactly as before")]

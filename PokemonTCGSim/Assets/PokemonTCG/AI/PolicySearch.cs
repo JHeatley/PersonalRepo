@@ -810,8 +810,11 @@ namespace PokemonTCG.AI
             var opp = s.Players[1 - seat];
 
             // Mine: the deck and face-down Prize cards are the right cards (my own list) in an unknown order, except the Prize
-            // cards I know from searching my deck (PolicyMemory.KnownPrizes), which stay where they are.
-            var pool = new List<CardInstance>(me.Deck);
+            // cards I know from searching my deck (PolicyMemory.KnownPrizes) and the cards I know near the top or at the
+            // bottom of my deck (PolicyMemory.KnownInDeck), which stay where they are (in an unknown order among themselves).
+            var knownMine = setup.Memory != null ? setup.Memory.KnownInDeck[seat] : null;
+            var pool = new List<CardInstance>();
+            foreach (var c in me.Deck) if (knownMine == null || !knownMine.ContainsKey(c.Id)) pool.Add(c);
             var mySlots = HiddenPrizeSlots(me);
             if (setup.Memory != null && setup.Memory.KnownPrizes.Count > 0)
                 mySlots.RemoveAll(i => setup.Memory.KnownPrizes.ContainsKey(me.Prizes[i].Id));
@@ -819,7 +822,10 @@ namespace PokemonTCG.AI
             rng.Shuffle(pool);
             int k = 0;
             foreach (int i in mySlots) me.Prizes[i] = pool[k++];
-            me.Deck = pool.GetRange(k, pool.Count - k);
+            var myDeck = new List<CardInstance>(me.Deck.Count);
+            foreach (var c in me.Deck) myDeck.Add(knownMine != null && knownMine.ContainsKey(c.Id) ? c : pool[k++]);
+            MixKnown(myDeck, knownMine, rng);
+            me.Deck = myDeck;
 
             // Theirs: a deck like the cards they've shown, less what's face up now and what I know is in their hand.
             theirDeck = GuessDeck(setup.Seen, rng);
@@ -830,6 +836,16 @@ namespace PokemonTCG.AI
             var counts = new Dictionary<string, int>(StringComparer.Ordinal);
             foreach (var c in PublicCards(s, 1 - seat)) Add(counts, c.Def.Name, 1);
             foreach (var def in known) Add(counts, def.Name, 1);
+            // Their cards I know near the top or at the bottom of their deck stay real, where they are.
+            var knownTheirs = setup.Memory != null ? setup.Memory.KnownInDeck[1 - seat] : null;
+            int keptInDeck = 0;
+            if (knownTheirs != null)
+                foreach (var c in opp.Deck)
+                    if (knownTheirs.ContainsKey(c.Id))
+                    {
+                        Add(counts, c.Def.Name, 1);
+                        keptInDeck++;
+                    }
             var rest = new List<CardDef>();
             var source = theirDeck ?? new List<CardDef>(setup.Seen.Values);
             foreach (var def in source)
@@ -839,7 +855,7 @@ namespace PokemonTCG.AI
                 else rest.Add(def);
             }
             var oppSlots = HiddenPrizeSlots(opp);
-            int needed = (opp.Hand.Count - known.Count) + opp.Deck.Count + oppSlots.Count;
+            int needed = (opp.Hand.Count - known.Count) + opp.Deck.Count - keptInDeck + oppSlots.Count;
             rng.Shuffle(rest);
             if (rest.Count > needed) rest.RemoveRange(needed, rest.Count - needed);
             var filler = source.Count > 0 ? source : setup.MyDeck ?? new List<CardDef>();
@@ -868,7 +884,13 @@ namespace PokemonTCG.AI
                 opp.Prizes[i] = made;
             }
             var deck = new List<CardInstance>();
+            foreach (var c in opp.Deck)
+            {
+                if (knownTheirs != null && knownTheirs.ContainsKey(c.Id)) deck.Add(c);
+                else if (at < rest.Count) deck.Add(new CardInstance(nextId++, rest[at++], owner));
+            }
             while (at < rest.Count) deck.Add(new CardInstance(nextId++, rest[at++], owner));
+            MixKnown(deck, knownTheirs, rng);
             opp.Deck = deck;
 
             // Their face-down Benched Pokémon (Lt. Surge's Secret Plan): a Basic Pokémon from the guess.
@@ -935,6 +957,29 @@ namespace PokemonTCG.AI
             int had;
             counts.TryGetValue(key, out had);
             counts[key] = had + n;
+        }
+
+        /// <summary>
+        /// Known cards near the top of the deck swap places among themselves, and so do those at the bottom: the player knows
+        /// where they are, not their order.
+        /// </summary>
+        private static void MixKnown(List<CardInstance> deck, Dictionary<int, PolicyMemory.DeckSpot> known, Rng rng)
+        {
+            if (known == null || known.Count < 2) return;
+            foreach (bool top in new[] { true, false })
+            {
+                var at = new List<int>();
+                for (int i = 0; i < deck.Count; i++)
+                {
+                    PolicyMemory.DeckSpot spot;
+                    if (known.TryGetValue(deck[i].Id, out spot) && spot.Top == top) at.Add(i);
+                }
+                if (at.Count < 2) continue;
+                var cards = new List<CardInstance>();
+                foreach (int i in at) cards.Add(deck[i]);
+                rng.Shuffle(cards);
+                for (int j = 0; j < at.Count; j++) deck[at[j]] = cards[j];
+            }
         }
 
         private static List<int> HiddenPrizeSlots(PlayerState p)
