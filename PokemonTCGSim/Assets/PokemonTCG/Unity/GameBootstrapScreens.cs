@@ -493,7 +493,7 @@ namespace PokemonTCG.Presentation
             float h = UiScale.Height - 80f;
             var r = new Rect((UiScale.Width - w) / 2f, 40f, w, h);
             CardDraw.Fill(r, new Color(0.11f, 0.12f, 0.15f, 0.98f));
-            string owner = host != null ? host.Engine.Possessive(pileSeat) : SeatName(pileSeat) + "'s";
+            string owner = host != null ? host.Possessive(pileSeat) : SeatName(pileSeat) + "'s";
             GUI.Label(new Rect(r.x + 20f, r.y + 10f, r.width - 180f, 34f),
                 "<size=22><b>" + owner + (pileIsLostZone ? " Lost Zone" : " discard pile") + "</b></size>   " + pile.Count + (pile.Count == 1 ? " card" : " cards") + "  (newest first)", CardDraw.PanelText());
             var close = new Rect(r.xMax - 140f, r.y + 10f, 120f, 34f);
@@ -639,7 +639,7 @@ namespace PokemonTCG.Presentation
             GUILayout.BeginArea(new Rect(panel.x + 12f, panel.y + 10f, panel.width - 24f, panel.height - 20f));
             GUILayout.Label("<size=22><b>" + def.Name + "</b></size>     <size=18>HP " + Mathf.Max(0, pv.RemainingHp) + " / " + pv.MaxHp + "</size>", text);
             bool active = current.Sides[pv.Owner].Active == pv;
-            string whose = host != null ? host.Engine.Possessive(pv.Owner) : "";
+            string whose = host != null ? host.Possessive(pv.Owner) : "";
             GUILayout.Label(def.Stage + " " + def.PokemonType + (def.IsEx ? " ex" : "") + "   ·   " + whose + (active ? " Active Pokémon" : " Benched Pokémon"), text);
             if (pv.Tools.Count > 0 || pv.Energy.Count > 0 || pv.Attached.Count > 0)
             {

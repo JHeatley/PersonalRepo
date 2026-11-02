@@ -95,6 +95,56 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
+        public void The_Friends_Game_Screen_Gets_The_Game_Through_RemoteGameHost()
+        {
+            var deck0 = UnityCardData.LoadDeck(db, UnityCardData.DefaultDeck);
+            var deck1 = UnityCardData.LoadDeck(db, UnityCardData.ZoroarkDeck);
+            using (var host = new OnlineHost(0, "Alex"))
+            {
+                string hostName;
+                var guest = OnlineHost.Join("127.0.0.1:" + host.Port, "Sam", "", "", out hostName);
+                for (int i = 0; i < 100 && host.Guest == null; i++) Thread.Sleep(20);
+
+                // The friend's copy: RemoteGameHost, answered like the screen does (Human.Pending, then Submit).
+                var human = new HumanAgent();
+                var screen = new RemoteGameHost(guest, new NetCodec(db.Get), human, new[] { "Alex", "Sam" });
+                screen.Start();
+                var bot = new HeuristicAgent(5);
+                int answered = 0, shown = 0;
+                var player = new Thread(() =>
+                {
+                    while (!screen.Finished)
+                    {
+                        HostMessage m;
+                        while (screen.TryDequeue(out m)) if (m.View != null) shown++;
+                        var req = human.Pending;
+                        if (req != null)
+                        {
+                            human.Submit(bot.Decide(req));
+                            answered++;
+                        }
+                        Thread.Sleep(1);
+                    }
+                }) { IsBackground = true };
+                player.Start();
+
+                var remote = new RemoteSeat(host.Guest, new NetCodec(db.Get), 1, new HeuristicAgent(9));
+                var engine = new GameEngine(StandardCards.CreateRegistry(), new HeuristicAgent(3), remote);
+                engine.PlayerNames = new[] { "Alex", "Sam" };
+                engine.AddObserver(remote);
+                engine.Run(deck0, deck1, 99);
+                host.Guest.Send(NetMessageType.End, (byte[])null);
+                Assert.IsTrue(player.Join(20000));
+                Assert.IsTrue(screen.Ended, "the host said the game is over");
+                Assert.IsNull(remote.Lost);
+                Assert.Greater(answered, 10);
+                Assert.Greater(shown, 20);
+                Assert.AreEqual("Alex's", screen.Possessive(0));
+                guest.Close("done");
+            }
+        }
+
+        [Test]
         public void If_The_Friend_Leaves_The_Fallback_Finishes_Their_Game()
         {
             var deck0 = UnityCardData.LoadDeck(db, UnityCardData.DefaultDeck);

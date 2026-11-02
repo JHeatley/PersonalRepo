@@ -21,7 +21,7 @@ namespace PokemonTCG.Presentation
     /// </summary>
     public sealed partial class GameBootstrap : MonoBehaviour
     {
-        private enum Mode { Menu, Builder, Game, Train, Folders, Regional, Video, Formats, Rating }
+        private enum Mode { Menu, Builder, Game, Train, Folders, Regional, Video, Formats, Rating, Online }
 
         [Header("Players")]
         [Tooltip("0 = you are Player 1, 1 = you are Player 2.")]
@@ -72,7 +72,7 @@ namespace PokemonTCG.Presentation
         private Vector2 myScroll, oppScroll, menuScroll;
 
         // Game
-        private EngineHost host;
+        private IGameHost host;
         /// <summary>
         /// v134.4: the card scripts for the games on the board, built once instead of at the start of every game (about 9,500
         /// cards, a noticeable pause on the main thread). Like the AI tables, which keep one for all their games, the games
@@ -225,10 +225,12 @@ namespace PokemonTCG.Presentation
         /// Starts a game. reg: a Regional Sim game (v57) - your game against an AI seat, or an AI table you watch - or null for
         /// an ordinary game from the menu.
         /// </summary>
-        private void StartGame(DeckRecord mine, DeckRecord theirs, RegionalGameStart reg = null)
+        /// <param name="online">An online game you host (GameBootstrapOnline): the opponent's seat is your friend over the network.</param>
+        private void StartGame(DeckRecord mine, DeckRecord theirs, RegionalGameStart reg = null, OnlineMatch online = null)
         {
             StopGame();
             menuError = null;
+            onlineGameOnBoard = online != null;
             var p1 = new List<string>();
             var p2 = new List<string>();
             var deck1 = DeckLibrary.Build(db, mine, p1);
@@ -254,7 +256,7 @@ namespace PokemonTCG.Presentation
             regionalGame = reg != null;
             regionalWatch = reg != null && reg.Watch;
             // Two bots: "Watch two bots play each other" from the menu, or a Regional Sim table you watch.
-            bool watching = reg != null ? reg.Watch : botVsBot;
+            bool watching = reg != null ? reg.Watch : online == null && botVsBot;
 
             errorText = null;
             log.Clear();
@@ -286,7 +288,7 @@ namespace PokemonTCG.Presentation
                 // Your seat records every decision (the AI studies them; Areas of Improvement replays them). Your Regional Sim
                 // opponents are always the Neural AI.
                 you = watching ? MakeBot(currentSeed + 11, mine.Name, theirs.Name, false) : new InteractiveRecordingAgent(human, humanLog);
-                bot = MakeBot(currentSeed + 23, theirs.Name, mine.Name, !watching, reg != null);
+                bot = online != null ? OnlineSeatFor(online, 1 - seat, currentSeed + 23) : MakeBot(currentSeed + 23, theirs.Name, mine.Name, !watching, reg != null);
             }
             IPlayerAgent a0 = seat == 0 ? you : bot;
             IPlayerAgent a1 = seat == 0 ? bot : you;
@@ -315,6 +317,13 @@ namespace PokemonTCG.Presentation
             // Short names keep the battle log readable ("Opponent's Dreepy", "Your Dragapult ex").
             string youName = regionalWatch ? reg.NameA : watching ? (seat == 0 ? "Bot 1" : "Bot 2") : "You";
             string themName = regionalWatch ? reg.NameB : watching ? (seat == 0 ? "Bot 2" : "Bot 1") : "Opponent";
+            // Online, both players have their own names: the battle log reads the same on both screens.
+            if (online != null)
+            {
+                youName = online.HostName;
+                themName = online.GuestName == youName ? online.GuestName + " (2)" : online.GuestName;
+                engine.AddObserver(onlineSeat);
+            }
             engine.PlayerNames = seat == 0 ? new[] { youName, themName } : new[] { themName, youName };
             // Your birthday from the menu (_____'s Pikachu); a bot never has a birthday.
             engine.Birthdays = new int[2];
@@ -332,9 +341,11 @@ namespace PokemonTCG.Presentation
             viewerSeat = watching ? -1 : seat;
             board.BottomSeat = viewerSeat < 0 ? seat : viewerSeat;
             board.Clear();
-            host = new EngineHost(engine, human, viewerSeat);
-            boardScriptsUser = host;
-            host.Start(d0, d1, currentSeed);
+            var local = new EngineHost(engine, human, viewerSeat);
+            host = local;
+            boardScriptsUser = local;
+            if (online != null) SendOnlineStart(online, 1 - seat, engine.PlayerNames, new[] { deckNames[0], deckNames[1] });
+            local.Start(d0, d1, currentSeed);
             // v134.7: in your own Regional Sim match you find out your opponent's deck by playing it.
             string theirLabel = reg != null && !reg.Watch ? "your opponent's deck" : theirs.Name;
             log.Add((reg != null ? "Regional Sim, " + reg.Label + ": " : "New game: ") + mine.Name + " vs " + theirLabel + " (seed " + currentSeed + ").");
@@ -356,6 +367,7 @@ namespace PokemonTCG.Presentation
             gameRecord = null;
             CancelReview();
             finalView = null;
+            if (onlineCancel != null) onlineCancel.Cancel(); // a friend's seat stops waiting for them
             if (host != null) host.Stop();
             host = null;
             human = null;
@@ -367,6 +379,7 @@ namespace PokemonTCG.Presentation
         private void OnDestroy()
         {
             StopGame();
+            StopOnline();
             ShutDownRegional();
         }
 
@@ -405,7 +418,23 @@ namespace PokemonTCG.Presentation
             if (pendingMenu)
             {
                 pendingMenu = false;
-                if (regionalGame)
+                if (OnlineGame || (mode == Mode.Game && (onlineHost != null || onlineGuest != null)))
+                {
+                    // An online game you leave: back to the online screen (the friend's game ends there too).
+                    if (onlineMatch != null && !onlineEndSent)
+                    {
+                        onlineEndSent = true;
+                        try
+                        {
+                            onlineMatch.Connection.Send(NetMessageType.End, (byte[])null);
+                        }
+                        catch (System.IO.IOException)
+                        {
+                        }
+                    }
+                    pendingOnlineLobby = true;
+                }
+                else if (regionalGame)
                 {
                     // A Regional Sim game you leave isn't counted: it's played again from the event screen.
                     BackToRegionalHub();
@@ -461,6 +490,7 @@ namespace PokemonTCG.Presentation
             UpdateFolders();
             UpdateRating();
             UpdateRegional();
+            UpdateOnline();
             UpdateVideo();
             if (mode == Mode.Builder && builder != null && builder.WantsClose)
             {
@@ -644,7 +674,7 @@ namespace PokemonTCG.Presentation
             int mineSeat = viewerSeat >= 0 ? viewerSeat : (board != null ? board.BottomSeat : 0);
             for (int seat = 0; seat < 2; seat++)
             {
-                string name = host.Engine.PlayerName(seat);
+                string name = host.PlayerName(seat);
                 bool mine = seat == mineSeat;
                 string col = mine ? MineColor : TheirColor;
                 text = Regex.Replace(text, @"\b" + Regex.Escape(name) + @"('s)?\b", m => "<color=" + col + ">" + m.Value + "</color>");
@@ -691,6 +721,9 @@ namespace PokemonTCG.Presentation
                     break;
                 case Mode.Video:
                     DrawVideo(ui);
+                    break;
+                case Mode.Online:
+                    DrawOnline(ui);
                     break;
                 default:
                     DrawGame(ui);
@@ -792,6 +825,7 @@ namespace PokemonTCG.Presentation
             if (GUILayout.Button("Deck builder", GUILayout.Height(34))) pendingBuilder = true;
             if (GUILayout.Button("Train the AI", GUILayout.Height(34))) pendingTrain = true;
             if (GUILayout.Button("Regional Sim", GUILayout.Height(34))) pendingRegional = true;
+            if (GUILayout.Button("Play online", GUILayout.Height(34))) pendingOnline = true;
             if (GUILayout.Button("Save folders", GUILayout.Height(34))) pendingFolders = true;
             GUILayout.EndHorizontal();
 
@@ -929,7 +963,7 @@ namespace PokemonTCG.Presentation
             {
                 var sb = new StringBuilder();
                 if (current.InSetup) sb.Append("Setup");
-                else sb.Append("Turn " + current.TurnNumber + " - " + (host != null ? host.Engine.Possessive(current.CurrentPlayer) : SeatName(current.CurrentPlayer)) + " turn");
+                else sb.Append("Turn " + current.TurnNumber + " - " + (host != null ? host.Possessive(current.CurrentPlayer) : SeatName(current.CurrentPlayer)) + " turn");
                 sb.Append("\n");
                 for (int i = 0; i < 2; i++)
                 {
@@ -960,7 +994,7 @@ namespace PokemonTCG.Presentation
         private string SeatName(int seat)
         {
             if (host == null || seat < 0) return "Nobody";
-            return host.Engine.PlayerName(seat);
+            return host.PlayerName(seat);
         }
 
         /// <summary>
@@ -1332,10 +1366,14 @@ namespace PokemonTCG.Presentation
                 endRect = r;
                 GUI.Box(r, GUIContent.none);
                 GUILayout.BeginArea(new Rect(r.x + 10, r.y + 10, r.width - 20, r.height - 20));
-                GUILayout.Label("Something went wrong in the engine", ui.Title);
+                GUILayout.Label(host is RemoteGameHost ? "The online game stopped" : "Something went wrong in the engine", ui.Title);
                 GUILayout.Label(errorText.Length > 900 ? errorText.Substring(0, 900) + "..." : errorText, ui.Label);
                 GUILayout.BeginHorizontal();
-                if (regionalGame)
+                if (onlineHost != null || onlineGuest != null || host is RemoteGameHost)
+                {
+                    if (GUILayout.Button("Back to the online screen")) pendingOnlineLobby = true;
+                }
+                else if (regionalGame)
                 {
                     // Not counted for the event: play it again or go back.
                     if (GUILayout.Button("Play this game again")) pendingRegionalGame = true;
@@ -1364,7 +1402,18 @@ namespace PokemonTCG.Presentation
                 GUILayout.Label(RatingEndLine(), ui.Small); // v157
                 if (analyzer != null && GUILayout.Button("Areas of Improvement")) guiActions.Add(() => reviewOpen = true);
                 GUILayout.BeginHorizontal();
-                if (regionalGame)
+                if (onlineHost != null && onlineHost.Guest != null && !onlineHost.Guest.Closed && host is EngineHost)
+                {
+                    // Online, hosting: another game with the same decks (the friend may pick another deck meanwhile), or back.
+                    if (GUILayout.Button("Play again")) pendingOnlineStart = true;
+                    if (GUILayout.Button("Back to the online screen")) pendingOnlineLobby = true;
+                }
+                else if (host is RemoteGameHost || onlineGuest != null || onlineHost != null)
+                {
+                    GUILayout.Label(host is RemoteGameHost ? "The host starts the next game." : "Your friend has left.", ui.Small);
+                    if (GUILayout.Button("Back to the online screen")) pendingOnlineLobby = true;
+                }
+                else if (regionalGame)
                 {
                     // Regional Sim: the next game of the match, or back to the event (a game can't be replayed once it counted).
                     if (regionalNextGame > 0 && GUILayout.Button((regionalWatch ? "Watch game " : "Play game ") + regionalNextGame)) pendingRegionalGame = true;
