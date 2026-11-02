@@ -86,6 +86,7 @@ namespace PokemonTCG.Presentation
             try
             {
                 onlineHost = new OnlineHost(OnlinePort, OnlineDisplayName);
+                KeepRunningInBackground();
                 onlineStatus = "Waiting for a friend to join on port " + onlineHost.Port + ".";
                 onlineError = null;
             }
@@ -117,6 +118,7 @@ namespace PokemonTCG.Presentation
                     var c = OnlineHost.Join(address, name, deck.Name, deck.Text ?? "", out hostName);
                     onlineHostName = hostName;
                     onlineGuest = c;
+                    keepRunningRequested = true;
                     onlineStatus = "Joined " + hostName + "'s game. Waiting for them to start it.";
                 }
                 catch (Exception e)
@@ -129,6 +131,17 @@ namespace PokemonTCG.Presentation
                     onlineJoining = false;
                 }
             });
+        }
+
+        private volatile bool keepRunningRequested;
+
+        /// <summary>
+        /// Online, the game keeps running while its window isn't focused (Unity pauses an unfocused window otherwise): the
+        /// host's copy keeps sending the game, and side-by-side testing (the editor and a build on one computer) works.
+        /// </summary>
+        private void KeepRunningInBackground()
+        {
+            Application.runInBackground = true;
         }
 
         private string OnlineDisplayName
@@ -235,6 +248,11 @@ namespace PokemonTCG.Presentation
             {
                 pendingOnline = false;
                 OpenOnline();
+            }
+            if (keepRunningRequested)
+            {
+                keepRunningRequested = false; // set by the join thread; Unity's settings are changed on the main thread
+                KeepRunningInBackground();
             }
             if (pendingOnlineStart)
             {
