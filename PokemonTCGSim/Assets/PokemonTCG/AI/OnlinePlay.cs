@@ -98,7 +98,9 @@ namespace PokemonTCG.AI
         /// <summary>Host to guest: a line of text for the lobby or the event screen (standings, pairings...).</summary>
         Note = 10,
         /// <summary>Guest to host: a different deck for the next game.</summary>
-        Deck = 11
+        Deck = 11,
+        /// <summary>Guest to host: ready for their next Regional Sim game.</summary>
+        Ready = 12
     }
 
     /// <summary>One message as read from the connection.</summary>

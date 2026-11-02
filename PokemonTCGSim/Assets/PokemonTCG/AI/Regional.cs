@@ -14,11 +14,13 @@ namespace PokemonTCG.AI
         public int Id;
         public string Name = "";
         public bool Human;
+        /// <summary>A person playing from another computer (a friend who joined the host's online game: AddGuest).</summary>
+        public bool Remote;
         public string Deck = "";
 
         public RegionalEntrant Copy()
         {
-            return new RegionalEntrant { Id = Id, Name = Name, Human = Human, Deck = Deck };
+            return new RegionalEntrant { Id = Id, Name = Name, Human = Human, Remote = Remote, Deck = Deck };
         }
     }
 
@@ -427,7 +429,7 @@ namespace PokemonTCG.AI
         /// <summary>You have a seat at this event (false: AI only).</summary>
         public bool YouPlaying
         {
-            get { lock (gate) return entrants.Any(e => e.Human); }
+            get { lock (gate) return entrants.Any(e => e.Human && !e.Remote); }
         }
 
         /// <summary>AI games explore (try other plays now and then, like training) so the brain learns faster.</summary>
@@ -598,8 +600,135 @@ namespace PokemonTCG.AI
 
         private RegionalEntrant YouLocked()
         {
-            foreach (var e in entrants) if (e.Human) return e;
+            foreach (var e in entrants) if (e.Human && !e.Remote) return e;
             return null;
+        }
+
+        /// <summary>
+        /// The match's player who sits as A: a person rather than an AI player (their games are played on their screen), and
+        /// the host rather than an online friend (the host's copy plays their match against each other). True: b should be A.
+        /// </summary>
+        private bool PutFirst(int a, int b)
+        {
+            var ea = entrants[a];
+            var eb = entrants[b];
+            return eb.Human && (!ea.Human || (ea.Remote && !eb.Remote));
+        }
+
+        // ------------------------------------------------------------------ An online friend in the event
+
+        /// <summary>
+        /// Adds a friend who joined the host's online game as a player (call after Create, before Begin): their decklist is
+        /// kept under deckName. Their games against AI players are played on their screen through the host's copy; their
+        /// match against the host is the host's own match.
+        /// </summary>
+        public void AddGuest(string name, string deckName, string deckText)
+        {
+            lock (gate)
+            {
+                if (round > 0) throw new InvalidOperationException("The event has already begun.");
+                if (entrants.Count >= MaxPlayers) throw new ArgumentException("An event can have at most " + MaxPlayers + " players.");
+                deckTexts[deckName] = deckText ?? "";
+                entrants.Add(new RegionalEntrant { Id = entrants.Count, Name = string.IsNullOrEmpty(name) ? "Friend" : name, Human = true, Remote = true, Deck = deckName });
+                version++;
+            }
+        }
+
+        private RegionalEntrant GuestLocked()
+        {
+            foreach (var e in entrants) if (e.Human && e.Remote) return e;
+            return null;
+        }
+
+        private RegionalMatch MatchOfLocked(RegionalEntrant e)
+        {
+            if (e == null) return null;
+            for (int k = roundStart; k < matches.Count; k++)
+            {
+                var m = matches[k];
+                if (m.Round == round && (m.A == e.Id || m.B == e.Id)) return m;
+            }
+            return null;
+        }
+
+        /// <summary>The online friend in this event, or null.</summary>
+        public RegionalEntrant Guest()
+        {
+            lock (gate)
+            {
+                var g = GuestLocked();
+                return g == null ? null : g.Copy();
+            }
+        }
+
+        /// <summary>The online friend's match this round (a copy), or null.</summary>
+        public RegionalMatch GuestMatch()
+        {
+            lock (gate)
+            {
+                var m = MatchOfLocked(GuestLocked());
+                return m == null ? null : m.Copy();
+            }
+        }
+
+        /// <summary>The online friend has a game to play now against an AI player (their match against the host is the host's to start).</summary>
+        public bool GuestGamePending
+        {
+            get
+            {
+                lock (gate)
+                {
+                    var g = GuestLocked();
+                    var m = MatchOfLocked(g);
+                    if (m == null || m.Finished || m.IsBye || finished || dropped.ContainsKey(g.Id)) return false;
+                    return !entrants[m.A == g.Id ? m.B : m.A].Human;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Records one of the online friend's games against an AI player: result 1 = the friend won, -1 = lost, 0 = a draw (for
+        /// the round and game it was started for, so never twice). Returns true when it was recorded.
+        /// </summary>
+        public bool RecordGuestGame(int roundNumber, int gameIndex, int result)
+        {
+            lock (gate)
+            {
+                var g = GuestLocked();
+                var m = MatchOfLocked(g);
+                if (m == null || m.Finished || m.IsBye || m.Round != roundNumber || m.Games.Count != gameIndex) return false;
+                RecordGameLocked(m, Winner(m, g, result));
+                Monitor.PulseAll(gate);
+                return true;
+            }
+        }
+
+        /// <summary>Who wins the game for RecordGameLocked (0 = A, 1 = B, -1 = a draw) when player e's result is result.</summary>
+        private static int Winner(RegionalMatch m, RegionalEntrant e, int result)
+        {
+            if (result == 0) return -1;
+            bool eIsA = m.A == e.Id;
+            return result > 0 ? (eIsA ? 0 : 1) : (eIsA ? 1 : 0);
+        }
+
+        /// <summary>The online friend leaves the event (their connection was lost): their match is conceded and they play no more.</summary>
+        public bool DropGuest()
+        {
+            lock (gate)
+            {
+                var g = GuestLocked();
+                if (g == null || finished || dropped.ContainsKey(g.Id)) return false;
+                dropped[g.Id] = round;
+                version++;
+                var m = MatchOfLocked(g);
+                if (m != null && !m.Finished && !m.IsBye)
+                {
+                    m.ConcededBy = g.Id;
+                    CompleteMatchLocked(m);
+                }
+                Monitor.PulseAll(gate);
+                return true;
+            }
         }
 
         private RegionalMatch YourMatchLocked()
@@ -694,7 +823,7 @@ namespace PokemonTCG.AI
             {
                 var m = YourMatchLocked();
                 if (m == null || m.Finished || m.IsBye || m.Round != roundNumber || m.Games.Count != gameIndex) return false;
-                RecordGameLocked(m, result > 0 ? 0 : result < 0 ? 1 : -1);
+                RecordGameLocked(m, Winner(m, YouLocked(), result));
                 Monitor.PulseAll(gate);
                 return true;
             }
@@ -995,7 +1124,7 @@ namespace PokemonTCG.AI
             {
                 int high = bottom[k], low = bottom[2 * count - 1 - k];
                 int seedHigh = PlayInSeedLocked(high), seedLow = PlayInSeedLocked(low);
-                if (entrants[low].Human)
+                if (PutFirst(high, low))
                     matches.Add(new RegionalMatch { Round = round, Table = k + 1, A = low, B = high, SeedA = seedLow, SeedB = seedHigh, PlayIn = true });
                 else
                     matches.Add(new RegionalMatch { Round = round, Table = k + 1, A = high, B = low, SeedA = seedHigh, SeedB = seedLow, PlayIn = true });
@@ -1057,7 +1186,7 @@ namespace PokemonTCG.AI
         private void AddCutMatchLocked(int table, int higherSeed, int lowerSeed)
         {
             int high = cutSeeds[higherSeed - 1], low = cutSeeds[lowerSeed - 1];
-            if (entrants[low].Human)
+            if (PutFirst(high, low))
                 matches.Add(new RegionalMatch { Round = round, Table = table, A = low, B = high, SeedA = lowerSeed, SeedB = higherSeed });
             else
                 matches.Add(new RegionalMatch { Round = round, Table = table, A = high, B = low, SeedA = higherSeed, SeedB = lowerSeed });
@@ -1265,7 +1394,7 @@ namespace PokemonTCG.AI
                 v.Watching = watchOne;
                 v.YouPlaying = YouLocked() != null;
                 foreach (var s in v.Standings)
-                    if (s.Human) v.You = s;
+                    if (s.Human && !entrants[s.Id].Remote) v.You = s;
                 foreach (var m in matches)
                 {
                     if (m.Round != round) continue;
@@ -1334,7 +1463,7 @@ namespace PokemonTCG.AI
             foreach (var pair in pairs)
             {
                 int a = pair.Key, b = pair.Value;
-                if (entrants[b].Human)
+                if (PutFirst(a, b))
                 {
                     int t = a;
                     a = b;
@@ -1791,7 +1920,8 @@ namespace PokemonTCG.AI
                 sb.Append("Featured\t").Append(I(featuredTable)).Append('\n');
                 foreach (var kv in deckTexts) sb.Append("Deck\t").Append(Escape(kv.Key)).Append('\t').Append(Escape(kv.Value)).Append('\n');
                 foreach (var e in entrants)
-                    sb.Append("Player\t").Append(I(e.Id)).Append('\t').Append(e.Human ? "1" : "0").Append('\t').Append(Escape(e.Name)).Append('\t').Append(Escape(e.Deck)).Append('\n');
+                    sb.Append("Player\t").Append(I(e.Id)).Append('\t').Append(e.Human ? "1" : "0").Append('\t').Append(Escape(e.Name)).Append('\t').Append(Escape(e.Deck))
+                      .Append('\t').Append(e.Remote ? "1" : "0").Append('\n');
                 foreach (var m in matches)
                 {
                     sb.Append("Match\t").Append(I(m.Round)).Append('\t').Append(I(m.Table)).Append('\t').Append(I(m.A)).Append('\t').Append(I(m.B)).Append('\t')
@@ -1865,7 +1995,7 @@ namespace PokemonTCG.AI
                         break;
                     case "Player":
                         if (f.Length < 5) throw new FormatException("Bad player line " + (i + 1) + ".");
-                        sim.entrants.Add(new RegionalEntrant { Id = ParseInt(f, 1), Human = f[2] == "1", Name = Unescape(f[3]), Deck = Unescape(f[4]) });
+                        sim.entrants.Add(new RegionalEntrant { Id = ParseInt(f, 1), Human = f[2] == "1", Name = Unescape(f[3]), Deck = Unescape(f[4]), Remote = f.Length > 5 && f[5] == "1" });
                         break;
                     case "Match":
                     {

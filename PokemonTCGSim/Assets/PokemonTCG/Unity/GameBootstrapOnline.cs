@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using PokemonTCG.AI;
+using PokemonTCG.Cards;
 using PokemonTCG.Core;
 using UnityEngine;
 
@@ -144,6 +145,7 @@ namespace PokemonTCG.Presentation
         private void StopOnline()
         {
             if (onlineCancel != null) onlineCancel.Cancel();
+            if (friendCancel != null) friendCancel.Cancel();
             if (onlineHost != null) onlineHost.Dispose();
             onlineHost = null;
             if (onlineGuest != null) onlineGuest.Leave("They left the game.");
@@ -248,10 +250,10 @@ namespace PokemonTCG.Presentation
                 onlineSeat = null;
                 mode = Mode.Online;
             }
-            bool betweenGames = mode == Mode.Online || (mode == Mode.Game && host != null && host.Finished);
+            bool betweenGames = mode != Mode.Game || (host != null && host.Finished);
             // Host: the friend left, or changed their deck.
             var h = onlineHost;
-            if (h != null && h.Guest != null && betweenGames && onlineMatch == null)
+            if (h != null && h.Guest != null && onlineMatch == null && !friendGameRunning) // no game is using their connection
             {
                 if (h.Guest.Closed)
                 {
@@ -269,6 +271,7 @@ namespace PokemonTCG.Presentation
                             h.GuestDeckName = r.ReadString();
                             h.GuestDeckText = r.ReadString();
                         }
+                        else if (m.Type == NetMessageType.Ready) friendReady = true;
                         else if (m.Type == NetMessageType.Bye) h.Guest.Close(r.ReadString());
                     }
                 }
@@ -301,6 +304,7 @@ namespace PokemonTCG.Presentation
                     onlineStatus = null;
                 }
             }
+            UpdateRegionalFriend();
             // Host: tell the friend once this game is over.
             if (onlineMatch != null && !onlineEndSent && host != null && host.Finished && host.QueuedCount == 0)
             {
@@ -346,6 +350,17 @@ namespace PokemonTCG.Presentation
             {
                 // the friend's seat notices and the fallback plays it
             }
+        }
+
+        /// <summary>One line for the menu while you're hosting or connected (null otherwise).</summary>
+        private string OnlineMenuLine()
+        {
+            if (onlineHost != null)
+                return onlineHost.Guest != null && !onlineHost.Guest.Closed
+                    ? "Online: " + onlineHost.GuestName + " is connected to you (Play online to start a game, or start a Regional Sim event they play in)."
+                    : "Online: hosting on port " + onlineHost.Port + ", waiting for a friend to join.";
+            if (onlineGuest != null && !onlineGuest.Closed) return "Online: connected to " + onlineHostName + "'s game. Your games start when they start them.";
+            return null;
         }
 
         private void DrawOnline(UiStyles ui)
@@ -445,17 +460,21 @@ namespace PokemonTCG.Presentation
             else
             {
                 GUILayout.Label("Connected to " + onlineHostName + ". They start each game; you'll go to the board when they do.", ui.Good);
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button("Ready for my next Regional game", GUILayout.Width(280))) actions.Add(SendOnlineReady);
                 if (GUILayout.Button("Leave", GUILayout.Width(160))) actions.Add(StopOnline);
+                GUILayout.EndHorizontal();
             }
 
             GUILayout.Space(10);
             if (!string.IsNullOrEmpty(onlineStatus)) GUILayout.Label(onlineStatus, ui.Label);
             if (!string.IsNullOrEmpty(onlineError)) GUILayout.Label(onlineError, ui.Error);
             GUILayout.Space(10);
+            GUILayout.Label("You stay connected on the other screens (hosting, you can start a Regional Sim event your friend plays in). "
+                            + "Stop hosting or Leave ends it.", Hint(ui));
             if (GUILayout.Button("Back to menu", GUILayout.Width(160)))
                 actions.Add(() =>
                 {
-                    StopOnline();
                     RefreshDecks();
                     mode = Mode.Menu;
                 });

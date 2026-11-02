@@ -418,22 +418,19 @@ namespace PokemonTCG.Presentation
             if (pendingMenu)
             {
                 pendingMenu = false;
-                if (OnlineGame || (mode == Mode.Game && (onlineHost != null || onlineGuest != null)))
+                // An online game you leave ends for your friend too.
+                if (onlineMatch != null && !onlineEndSent)
                 {
-                    // An online game you leave: back to the online screen (the friend's game ends there too).
-                    if (onlineMatch != null && !onlineEndSent)
+                    onlineEndSent = true;
+                    try
                     {
-                        onlineEndSent = true;
-                        try
-                        {
-                            onlineMatch.Connection.Send(NetMessageType.End, (byte[])null);
-                        }
-                        catch (System.IO.IOException)
-                        {
-                        }
+                        onlineMatch.Connection.Send(NetMessageType.End, (byte[])null);
                     }
-                    pendingOnlineLobby = true;
+                    catch (System.IO.IOException)
+                    {
+                    }
                 }
+                if (OnlineGame && !regionalGame) pendingOnlineLobby = true; // back to the online screen
                 else if (regionalGame)
                 {
                     // A Regional Sim game you leave isn't counted: it's played again from the event screen.
@@ -835,6 +832,8 @@ namespace PokemonTCG.Presentation
                     foreach (var p in deckProblems[i]) GUILayout.Label(decks[i].Name + ": " + p, ui.Error);
             }
             if (menuError != null) GUILayout.Label(menuError, ui.Error);
+            string onlineLine = OnlineMenuLine();
+            if (onlineLine != null) GUILayout.Label(onlineLine, ui.Good);
             GUILayout.Label("Your saved decks live in " + SavePaths.DeckFolder + "; the AI's brain in " + SavePaths.BrainFolder + ". Change them with Save folders.", Hint(ui));
             GUILayout.EndScrollView();
             GUILayout.EndArea();
@@ -1369,7 +1368,7 @@ namespace PokemonTCG.Presentation
                 GUILayout.Label(host is RemoteGameHost ? "The online game stopped" : "Something went wrong in the engine", ui.Title);
                 GUILayout.Label(errorText.Length > 900 ? errorText.Substring(0, 900) + "..." : errorText, ui.Label);
                 GUILayout.BeginHorizontal();
-                if (onlineHost != null || onlineGuest != null || host is RemoteGameHost)
+                if (OnlineGame && !regionalGame)
                 {
                     if (GUILayout.Button("Back to the online screen")) pendingOnlineLobby = true;
                 }
@@ -1402,15 +1401,16 @@ namespace PokemonTCG.Presentation
                 GUILayout.Label(RatingEndLine(), ui.Small); // v157
                 if (analyzer != null && GUILayout.Button("Areas of Improvement")) guiActions.Add(() => reviewOpen = true);
                 GUILayout.BeginHorizontal();
-                if (onlineHost != null && onlineHost.Guest != null && !onlineHost.Guest.Closed && host is EngineHost)
+                if (OnlineGame && !regionalGame && host is EngineHost && onlineHost != null && onlineHost.Guest != null && !onlineHost.Guest.Closed)
                 {
                     // Online, hosting: another game with the same decks (the friend may pick another deck meanwhile), or back.
                     if (GUILayout.Button("Play again")) pendingOnlineStart = true;
                     if (GUILayout.Button("Back to the online screen")) pendingOnlineLobby = true;
                 }
-                else if (host is RemoteGameHost || onlineGuest != null || onlineHost != null)
+                else if (host is RemoteGameHost || (OnlineGame && !regionalGame))
                 {
                     GUILayout.Label(host is RemoteGameHost ? "The host starts the next game." : "Your friend has left.", ui.Small);
+                    if (host is RemoteGameHost && GUILayout.Button("Ready (Regional)")) guiActions.Add(SendOnlineReady);
                     if (GUILayout.Button("Back to the online screen")) pendingOnlineLobby = true;
                 }
                 else if (regionalGame)
