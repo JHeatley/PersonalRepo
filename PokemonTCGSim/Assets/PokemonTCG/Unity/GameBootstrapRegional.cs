@@ -500,6 +500,7 @@ namespace PokemonTCG.Presentation
                 sim.SetAsymmetricCut(regTopCut > 0 && regAsymCut);
                 // v127: a big event is split into 2 days.
                 if (Day2Applies(total)) sim.SetDayTwo(Mathf.Clamp(regRounds, 1, MaxRegionalRounds), Mathf.Clamp(regDay2Rounds, 1, MaxDay2Rounds), Mathf.Max(0, regDay2Points));
+                if (!regAiOnly && regWithFriend && !AddOnlineFriend(sim)) return;
                 sim.Begin();
                 AttachRegional(sim);
                 SaveRegional();
@@ -553,8 +554,15 @@ namespace PokemonTCG.Presentation
                 HigherSeedChooses = RegionalSim.HigherSeedChoosesFor(m) && chooser >= 0,
                 TieBreaker = RegionalSim.TieBreakerNext(m)
             };
+            // Your online friend: your match against them is played over the network (OnlineMatch).
+            var friend = opp.Remote ? RegionalFriendMatch(opp) : null;
+            if (opp.Remote && friend == null)
+            {
+                regionalError = opp.Name + " isn't connected: they're dropped from the event when their connection is lost.";
+                return;
+            }
             StartGame(new DeckRecord { Name = you.Deck, Text = sim.DeckText(you.Deck) ?? "" },
-                      new DeckRecord { Name = opp.Deck, Text = sim.DeckText(opp.Deck) ?? "" }, start);
+                      new DeckRecord { Name = opp.Deck, Text = sim.DeckText(opp.Deck) ?? "" }, start, friend);
         }
 
         private void StartRegionalWatch()
@@ -1348,6 +1356,7 @@ namespace PokemonTCG.Presentation
             GUILayout.EndHorizontal();
 
 
+            DrawRegionalFriendRow(actions);
             bool explore = GUILayout.Toggle(regExplore, " The AI games try other plays now and then while learning (it learns faster, like on the Train screen; your own opponents always play their best)");
             if (explore != regExplore) actions.Add(() => regExplore = explore);
             if (regAiOnly)

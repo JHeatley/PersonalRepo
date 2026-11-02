@@ -51,6 +51,7 @@ namespace PokemonTCG.Presentation
         private void BeginRatedGame(GameState state, int seat, string yourDeck, string theirDeck)
         {
             if (state == null || !state.IsOver || seat < 0) return;
+            if (OnlineGame) return; // a game against a friend isn't rated against the AI
             bool learning = (regionalGame || opponentLearning) && brain != null;
             pendingRated = new PendingRated
             {
