@@ -115,6 +115,17 @@ namespace PokemonTCG.Core
     }
 
     /// <summary>Anything that can play a seat: the human UI, a heuristic bot, a search AI.</summary>
+    /// <summary>
+    /// Thrown from a player's Decide when they concede while being asked (the screen's Concede button, or an online friend's):
+    /// the engine ends the game there, the other player winning (GameEngine.Concede must have been called first).
+    /// </summary>
+    public sealed class ConcedeException : System.Exception
+    {
+        public ConcedeException() : base("Conceded")
+        {
+        }
+    }
+
     public interface IPlayerAgent
     {
         /// <summary>Return the chosen option indices (between MinChoices and MaxChoices of them, no duplicates).</summary>
