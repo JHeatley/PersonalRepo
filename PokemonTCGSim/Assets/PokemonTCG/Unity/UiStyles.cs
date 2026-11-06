@@ -10,7 +10,7 @@ namespace PokemonTCG.Presentation
         private static UiStyles instance;
 
         public readonly GUIStyle Label, Small, Badge, Tooltip, Title, Header, Button, Error, Good;
-        public readonly Texture2D Highlight, Selected, BadgeBackground;
+        public readonly Texture2D Highlight, Selected, BadgeBackground, TooltipBackground, TooltipEdge;
 
         public static UiStyles Get()
         {
@@ -25,7 +25,15 @@ namespace PokemonTCG.Presentation
             Small.normal.textColor = Color.black;
             Badge = new GUIStyle(GUI.skin.label) { fontSize = 12, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
             Badge.normal.textColor = Color.white;
-            Tooltip = new GUIStyle(GUI.skin.box) { fontSize = 13, wordWrap = true, alignment = TextAnchor.UpperLeft, richText = true };
+            // The card popup is solid (the default box is see-through): nothing on the board shows through the text.
+            TooltipBackground = CardVisuals.Solid(new Color(0.07f, 0.08f, 0.11f, 1f));
+            TooltipEdge = CardVisuals.Solid(new Color(0.42f, 0.47f, 0.58f, 1f));
+            Tooltip = new GUIStyle(GUI.skin.box)
+            {
+                fontSize = 13, wordWrap = true, alignment = TextAnchor.UpperLeft, richText = true,
+                border = new RectOffset(0, 0, 0, 0), padding = new RectOffset(10, 10, 8, 8)
+            };
+            Tooltip.normal.background = TooltipBackground;
             Tooltip.normal.textColor = Color.white;
             Title = new GUIStyle(GUI.skin.label) { fontSize = 16, fontStyle = FontStyle.Bold, wordWrap = true };
             Header = new GUIStyle(GUI.skin.label) { fontSize = 20, fontStyle = FontStyle.Bold, wordWrap = true };
@@ -46,7 +54,18 @@ namespace PokemonTCG.Presentation
             float h = Tooltip.CalcHeight(new GUIContent(text), w);
             float x = Mathf.Min(mouse.x + 18, UiScale.Width - w - 10);
             float y = Mathf.Min(mouse.y + 18, UiScale.Height - h - 10);
+            // Full strength whatever the screen around it is doing (a disabled panel or a faded colour would show the board through).
+            var color = GUI.color;
+            var background = GUI.backgroundColor;
+            bool enabled = GUI.enabled;
+            GUI.color = Color.white;
+            GUI.backgroundColor = Color.white;
+            GUI.enabled = true;
+            GUI.DrawTexture(new Rect(x - 1, y - 1, w + 2, h + 2), TooltipEdge);
             GUI.Box(new Rect(x, y, w, h), text, Tooltip);
+            GUI.color = color;
+            GUI.backgroundColor = background;
+            GUI.enabled = enabled;
         }
     }
 
