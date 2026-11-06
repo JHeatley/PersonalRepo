@@ -177,6 +177,7 @@ namespace PokemonTCG.Core
             nextCardId = 1;
             sourceStack.Clear();
             endTurnRequested = false;
+            concedingPlayer = -1;
             ForgetLookedAt();
             LearnEvolutionLines(deck0);
             LearnEvolutionLines(deck1);
@@ -976,8 +977,31 @@ namespace PokemonTCG.Core
             redirectDecisionsTo = -1;
         }
 
+        private volatile int concedingPlayer = -1;
+
+        /// <summary>
+        /// A player concedes (from any thread: the screen's Concede button, an online friend's): the game ends at the next
+        /// decision, or at once if that player is being asked now (their Decide then throws ConcedeException), and the other
+        /// player wins. It counts as a loss like any other.
+        /// </summary>
+        public void Concede(int player)
+        {
+            if (player < 0 || player > 1 || State == null || State.IsOver) return;
+            concedingPlayer = player;
+        }
+
+        /// <summary>Ends the game if a player has conceded.</summary>
+        private void CheckConcede()
+        {
+            int p = concedingPlayer;
+            if (p < 0 || State == null || State.IsOver) return;
+            concedingPlayer = -1;
+            EndGame(1 - p, PlayerName(p) + " conceded.");
+        }
+
         private List<int> Ask(int player, DecisionKind kind, string prompt, List<DecisionOption> options, int min, int max, CardDef source)
         {
+            CheckConcede();
             if (redirectDecisionsOf >= 0 && player == redirectDecisionsOf) player = redirectDecisionsTo;
             if (lookedAt != null && player == lookedAtPlayer) lookedAtAsked = true;
             // Bodyguard (v94): a choice about the cards of a shielded hand is made without asking, so they're never shown
@@ -1011,7 +1035,17 @@ namespace PokemonTCG.Core
             seenTitleForNextAsk = null;
             var agent = agents[player];
             if (agent == null) throw new InvalidOperationException("No agent for " + PlayerName(player));
-            var result = agent.Decide(req);
+            List<int> result;
+            try
+            {
+                result = agent.Decide(req);
+            }
+            catch (ConcedeException)
+            {
+                CheckConcede(); // ends the game
+                throw;
+            }
+            CheckConcede();
             Validate(req, result);
             return result;
         }

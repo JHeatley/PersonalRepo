@@ -100,7 +100,9 @@ namespace PokemonTCG.AI
         /// <summary>Guest to host: a different deck for the next game.</summary>
         Deck = 11,
         /// <summary>Guest to host: ready for their next Regional Sim game.</summary>
-        Ready = 12
+        Ready = 12,
+        /// <summary>Guest to host: they concede the game in progress.</summary>
+        Concede = 13
     }
 
     /// <summary>One message as read from the connection.</summary>
@@ -438,6 +440,11 @@ namespace PokemonTCG.AI
         /// <summary>Stops waiting for the friend (the game is being closed).</summary>
         public CancellationToken Cancel;
         public string Lost { get; private set; }
+        /// <summary>The friend conceded this game.</summary>
+        public bool Conceded { get; private set; }
+        /// <summary>Only one reader of the connection at a time: a decision waiting for the answer, or a check for a concession.</summary>
+        private readonly object readLock = new object();
+        private GameEngine engine;
 
         public RemoteSeat(NetConnection connection, NetCodec codec, int seat, IPlayerAgent fallback)
         {
@@ -449,7 +456,9 @@ namespace PokemonTCG.AI
 
         public void OnEvent(GameEngine engine, GameEvent ev)
         {
+            this.engine = engine;
             if (Lost != null) return;
+            PollConcede();
             try
             {
                 var view = PlayerView.Create(engine, Seat);
@@ -465,8 +474,42 @@ namespace PokemonTCG.AI
             }
         }
 
+        /// <summary>
+        /// Checks for a concession from the friend while no decision of theirs is waiting (the host's copy calls it each frame,
+        /// the engine at each event): true when they conceded (the engine is told; release your own waiting decision too).
+        /// </summary>
+        public bool PollConcede()
+        {
+            if (Lost != null || Conceded || !Monitor.TryEnter(readLock)) return false;
+            try
+            {
+                NetMessage m;
+                while ((m = connection.Receive(0)) != null)
+                {
+                    if (m.Type == NetMessageType.Concede)
+                    {
+                        Conceded = true;
+                        if (engine != null) engine.Concede(Seat);
+                        return true;
+                    }
+                    if (m.Type == NetMessageType.Bye) Lose();
+                }
+                return false;
+            }
+            finally
+            {
+                Monitor.Exit(readLock);
+            }
+        }
+
         public List<int> Decide(DecisionRequest r)
         {
+            lock (readLock) return DecideLocked(r);
+        }
+
+        private List<int> DecideLocked(DecisionRequest r)
+        {
+            if (Conceded) throw new ConcedeException();
             for (int attempt = 0; attempt < 3 && Lost == null; attempt++)
             {
                 try
@@ -482,6 +525,12 @@ namespace PokemonTCG.AI
                             continue;
                         }
                         if (m.Type == NetMessageType.Bye || m.Type == NetMessageType.Reject) break;
+                        if (m.Type == NetMessageType.Concede)
+                        {
+                            Conceded = true;
+                            if (engine != null) engine.Concede(Seat);
+                            throw new ConcedeException();
+                        }
                         if (m.Type != NetMessageType.Answer) continue; // anything else is out of place here
                         var picks = codec.FromBytes<List<int>>(m.Body);
                         if (Valid(r, picks)) return picks;

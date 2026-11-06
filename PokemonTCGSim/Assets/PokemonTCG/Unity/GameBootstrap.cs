@@ -364,6 +364,8 @@ namespace PokemonTCG.Presentation
 
         private void StopGame()
         {
+            concedeConfirm = false;
+            conceded = false;
             gameRecord = null;
             CancelReview();
             finalView = null;
@@ -929,7 +931,8 @@ namespace PokemonTCG.Presentation
             DrawPickerReturn(ui);
 
             // Pop-ups go on top of everything else.
-            if (mulliganSeat >= 0) DrawMulliganScreen(ui);
+            if (concedeConfirm) DrawConcedeConfirm(ui);
+            else if (mulliganSeat >= 0) DrawMulliganScreen(ui);
             else if (CoinCallVisible) DrawCoinCall(ui);
             else if (PickerVisible) DrawCardPicker(ui);
             else if (pileSeat >= 0) DrawPileViewer(ui);
@@ -944,6 +947,48 @@ namespace PokemonTCG.Presentation
 
             foreach (var a in guiActions) a();
             guiActions.Clear();
+        }
+
+        // ------------------------------------------------------------------ Conceding
+
+        private bool concedeConfirm, conceded;
+
+        /// <summary>You're playing a game that isn't over: the HUD offers Concede.</summary>
+        private bool CanConcede
+        {
+            get { return host != null && !host.Finished && human != null && viewerSeat >= 0 && current != null && !current.IsOver && !conceded; }
+        }
+
+        /// <summary>"Are you sure?" before conceding: your opponent wins, and it counts as a loss.</summary>
+        private void DrawConcedeConfirm(UiStyles ui)
+        {
+            var r = new Rect(UiScale.Width / 2f - 220, UiScale.Height / 2f - 85, 440, 170);
+            GUI.Box(r, GUIContent.none);
+            GUILayout.BeginArea(new Rect(r.x + 14, r.y + 12, r.width - 28, r.height - 24));
+            GUILayout.Label("Are you sure you want to concede?", ui.Title);
+            GUILayout.Label("Your opponent wins this game, and it counts as a loss"
+                            + (regionalGame ? " in your Regional Sim match." : OnlineGame ? " (your friend sees you conceded)." : " (and in your rating)."), ui.Label);
+            GUILayout.FlexibleSpace();
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Concede", GUILayout.Height(32)))
+                guiActions.Add(() =>
+                {
+                    concedeConfirm = false;
+                    ConcedeGame();
+                });
+            if (GUILayout.Button("Keep playing", GUILayout.Height(32))) guiActions.Add(() => concedeConfirm = false);
+            GUILayout.EndHorizontal();
+            GUILayout.EndArea();
+        }
+
+        /// <summary>Concedes the game on the board: the engine (or, online, the host's copy) ends it with your opponent winning.</summary>
+        private void ConcedeGame()
+        {
+            if (!CanConcede) return;
+            conceded = true;
+            shownRequest = null;
+            multiSelection.Clear();
+            host.Concede(viewerSeat);
         }
 
         /// <summary>Over one of the IMGUI panels (clicks there shouldn't reach the board).</summary>
@@ -974,9 +1019,10 @@ namespace PokemonTCG.Presentation
                 if (hudStyle == null) hudStyle = new GUIStyle(ui.Label) { fontSize = 13, wordWrap = false, richText = true, clipping = TextClipping.Clip };
                 GUI.Label(new Rect(18, 12, 455, 68), sb.ToString(), hudStyle);
             }
-            if (GUI.Button(new Rect(18, 82, 120, 24), regionalGame ? "Back to event" : "Quit to menu")) pendingMenu = true;
-            GUI.Label(new Rect(150, 83, 50, 22), "Pace", ui.Label);
-            int newPace = GUI.Toolbar(new Rect(195, 82, 270, 24), pace, PaceNames);
+            if (GUI.Button(new Rect(18, 82, 110, 24), regionalGame ? "Back to event" : "Quit to menu")) pendingMenu = true;
+            if (CanConcede && GUI.Button(new Rect(132, 82, 80, 24), "Concede")) guiActions.Add(() => concedeConfirm = true);
+            GUI.Label(new Rect(218, 83, 40, 22), "Pace", ui.Label);
+            int newPace = GUI.Toolbar(new Rect(258, 82, 207, 24), pace, PaceNames);
             if (newPace != pace) guiActions.Add(() => ApplyPace(newPace));
         }
 

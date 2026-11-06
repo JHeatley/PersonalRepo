@@ -55,7 +55,7 @@ namespace PokemonTCG.Presentation
 
         private GUIStyle tabStyle, doneStyle, darkCentered, whiteSmall;
 
-        private bool ModalOpen { get { return mulliganSeat >= 0 || PickerVisible || CoinCallVisible || pileSeat >= 0 || popupUid >= 0; } }
+        private bool ModalOpen { get { return concedeConfirm || mulliganSeat >= 0 || PickerVisible || CoinCallVisible || pileSeat >= 0 || popupUid >= 0; } }
 
         private bool PickerVisible { get { return shownRequest != null && human != null && !pickerHidden && IsCardChoice(shownRequest); } }
 
