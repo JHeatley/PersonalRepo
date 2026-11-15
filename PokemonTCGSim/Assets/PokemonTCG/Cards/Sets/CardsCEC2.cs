@@ -186,7 +186,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Life Drain: on heads, put damage counters on the opponent's Active Pokémon until its remaining HP is 10.</summary>
-        private sealed class LifeDrainMon : Mon
+        internal sealed class LifeDrainMon : Mon
         {
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {

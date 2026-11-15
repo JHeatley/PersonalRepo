@@ -390,7 +390,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Dream Eater: does nothing unless the Defending Pokémon is Asleep.</summary>
-        private sealed class DreamEaterMon : Mon
+        internal sealed class DreamEaterMon : Mon
         {
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {
@@ -479,7 +479,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Defense Curl: flip a coin; heads, no damage to this Pokémon during the opponent's next turn.</summary>
-        private sealed class DefenseCurlMon : Mon
+        internal sealed class DefenseCurlMon : Mon
         {
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {
