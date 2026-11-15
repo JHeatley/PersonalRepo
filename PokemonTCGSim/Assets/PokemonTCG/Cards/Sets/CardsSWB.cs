@@ -92,7 +92,7 @@ namespace PokemonTCG.Cards
             r.RegisterByKey("SW-93", new ConditionAttackMon("Smog", SpecialCondition.Poisoned));
             r.RegisterByKey("SW-94", new ParalyzeFlipMon("Thundershock"));
             r.RegisterByKey("SW-95", new CardsCES1.FeintAttackMon("Feint Attack", 20));
-            r.RegisterByKey("SW-96", new ComboMon(new BotheringWaveMon(), new FutureSightMon()));
+            r.RegisterByKey("SW-96", new ComboMon(new BotheringWaveMon("Bothering Wave"), new FutureSightMon()));
             r.RegisterByKey("SW-97", new ComboMon(new DrawAttackMon("Collect", 1), new PoisonSkinMon()));
             r.RegisterByKey("SW-98", new ComboMon(new CardsASR1.TimesMon("Flail", CardsCG.SelfCounters), new RecoilMon("Take Down", 10)));
             r.RegisterByKey("SW-99", new CardsMEG.WeakenDefendingMon("Growl", 20));
@@ -514,22 +514,28 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 ctx.DamageDefending(atk.Damage);
                 if (TefPokemon.StillDefending(ctx, defending) && ctx.CanAffect(defending))
-                    ctx.AddEffect(new SilverWindEffect(defending.Name + " takes 40 more damage from attacks during the next turn (Silver Wind)", ctx.Player, defending.Uid, ctx.Turn + 2));
+                    ctx.AddEffect(new SilverWindEffect(defending.Name + " takes 40 more damage from attacks during the next turn (Silver Wind)", ctx.Player, defending.Uid, ctx.Turn + 2, 40));
                 return true;
             }
         }
 
-        private sealed class SilverWindEffect : ContinuousEffect
+        /// <summary>"During your next turn, if an attack does damage to the Defending Pokémon (after W/R), it does N more" (Silver Wind, Jaw Bite).</summary>
+        internal sealed class SilverWindEffect : ContinuousEffect
         {
             private readonly int turn;
+            private readonly int amount;
 
-            public SilverWindEffect(string name, int owner, int targetUid, int expiresAfterTurn) : base(name, owner, targetUid, expiresAfterTurn, true) { turn = expiresAfterTurn; }
+            public SilverWindEffect(string name, int owner, int targetUid, int expiresAfterTurn, int amount) : base(name, owner, targetUid, expiresAfterTurn, true)
+            {
+                turn = expiresAfterTurn;
+                this.amount = amount;
+            }
 
             public override int ModifyDamageTaken(GameEngine engine, DamageInfo info, int damage)
             {
                 if (info.Target == null || info.Target.Uid != TargetUid || damage <= 0 || info.Attacker == null || info.Attacker.Owner != Owner) return damage;
                 if (engine.State.TurnNumber != turn || engine.CurrentSourceKind != EffectSourceKind.Attack || !info.TargetIsActive) return damage;
-                return damage + 40;
+                return damage + amount;
             }
         }
 
@@ -935,27 +941,30 @@ namespace PokemonTCG.Cards
                 var defending = ctx.Defending;
                 ctx.DamageDefending(atk.Damage);
                 if (ctx.InPlay(ctx.Pokemon) && defending != null)
-                    ctx.AddEffect(new DrillEffect(ctx.Pokemon.Name + "'s attacks do 20 more to " + defending.Name + " next turn (Spirited Drill)", ctx.Player, ctx.Pokemon.Uid, ctx.Turn + 2, defending.Uid));
+                    ctx.AddEffect(new DrillEffect(ctx.Pokemon.Name + "'s attacks do 20 more to " + defending.Name + " next turn (Spirited Drill)", ctx.Player, ctx.Pokemon.Uid, ctx.Turn + 2, defending.Uid, 20));
                 return true;
             }
         }
 
-        private sealed class DrillEffect : ContinuousEffect
+        /// <summary>"During your next turn, each of this Pokémon's attacks does N more to the Defending Pokémon (before W/R)" (Spirited Drill, Bulk Up). It stays on the attacker.</summary>
+        internal sealed class DrillEffect : ContinuousEffect
         {
             private readonly int turn;
             private readonly int defendingUid;
+            private readonly int amount;
 
-            public DrillEffect(string name, int owner, int targetUid, int expiresAfterTurn, int defendingUid) : base(name, owner, targetUid, expiresAfterTurn, false)
+            public DrillEffect(string name, int owner, int targetUid, int expiresAfterTurn, int defendingUid, int amount) : base(name, owner, targetUid, expiresAfterTurn, false)
             {
                 turn = expiresAfterTurn;
                 this.defendingUid = defendingUid;
+                this.amount = amount;
             }
 
             public override int ModifyDamageBeforeWeakness(GameEngine engine, PokemonInPlay attacker, PokemonInPlay target, int damage)
             {
                 if (attacker == null || attacker.Uid != TargetUid || target == null || target.Uid != defendingUid || damage <= 0) return damage;
                 if (engine.State.TurnNumber != turn || engine.CurrentSourceKind != EffectSourceKind.Attack || engine.State.Players[target.Owner].Active != target) return damage;
-                return damage + 20;
+                return damage + amount;
             }
         }
 
@@ -1268,16 +1277,20 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Bothering Wave: tails, nothing; heads, discard an Energy card from the Defending Pokémon.</summary>
-        private sealed class BotheringWaveMon : Mon
+        internal sealed class BotheringWaveMon : Mon
         {
+            private readonly string attack;
+
+            public BotheringWaveMon(string attack) { this.attack = attack; }
+
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {
-                if (atk.Name != "Bothering Wave") return false;
+                if (atk.Name != attack) return false;
                 if (!ctx.Flip()) return Nothing(ctx);
                 var defending = ctx.Defending;
                 ctx.DamageDefending(atk.Damage);
                 if (TefPokemon.StillDefending(ctx, defending) && defending.Energy.Count > 0 && ctx.CanAffect(defending))
-                    ctx.DiscardEnergyFrom(defending, 1, "Bothering Wave: discard an Energy card from " + defending.Name);
+                    ctx.DiscardEnergyFrom(defending, 1, attack + ": discard an Energy card from " + defending.Name);
                 return true;
             }
         }
