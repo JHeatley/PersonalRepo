@@ -365,7 +365,8 @@ namespace PokemonTCG.Cards
         internal static bool EvolveFromDeck(EffectContext ctx, PokemonInPlay target, Func<CardDef, bool> filter, string prompt)
         {
             if (target == null) return false;
-            var picks = ctx.SearchMyDeck(d => d.IsPokemon && filter(d) && ctx.Engine.CanEvolveInto(target, d, false), 1, prompt);
+            // An attack's own evolution overrides the timing rules (HS:Unleashed FAQ: Speed Evolution on the first turn).
+            var picks = ctx.SearchMyDeck(d => d.IsPokemon && filter(d) && (d.EvolvesFrom == target.Name || ctx.Engine.CanEvolveInto(target, d, false)), 1, prompt);
             ctx.ShuffleMyDeck();
             if (picks.Count == 0) return false;
             ctx.Engine.EvolvePokemon(target, picks[0]);
@@ -418,7 +419,8 @@ namespace PokemonTCG.Cards
             private readonly int onTurn;
             private readonly string attackName;
 
-            public AttackBonusEffect(string name, int owner, int targetUid, int onTurn, int amount, string attackName = null) : base(name, owner, targetUid, onTurn, true)
+            // It stays on the Pokémon if it moves to the Bench and back (Cheerful Voice, Bulk Up rulings).
+            public AttackBonusEffect(string name, int owner, int targetUid, int onTurn, int amount, string attackName = null) : base(name, owner, targetUid, onTurn, false)
             {
                 this.amount = amount;
                 this.onTurn = onTurn;
