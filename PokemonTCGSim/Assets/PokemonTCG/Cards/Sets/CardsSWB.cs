@@ -22,7 +22,7 @@ namespace PokemonTCG.Cards
             r.RegisterByKey("SW-24", new ComboMon(new DigTrapMon(), new PitTrapMon()));
             r.RegisterByKey("SW-25", new ElectivireMotorDrive());
             r.RegisterByKey("SW-26", new ElectrodeEnergyShift());
-            r.RegisterByKey("SW-27", new ComboMon(new KeenEyeMon(), new BatonPassMon()));
+            r.RegisterByKey("SW-27", new ComboMon(new KeenEyeMon(), new BatonPassMon("Baton Pass")));
             r.RegisterByKey("SW-28", new ComboMon(new EncoreMon(), new BreakBeamMon()));
             r.RegisterByKey("SW-29", new ComboMon(new CardsCES1.TwoTargetsMon("Double Throw", 30), new MegatonRockMon()));
             r.RegisterByKey("SW-30", new ComboMon(new IcyKissMon(), new LovelyKissMon()));
@@ -328,19 +328,23 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Baton Pass: you may switch this Pokémon with a Benched Pokémon and move any of its Energy cards to the new Active Pokémon.</summary>
-        private sealed class BatonPassMon : Mon
+        internal sealed class BatonPassMon : Mon
         {
+            private readonly string attack;
+
+            public BatonPassMon(string attack) { this.attack = attack; }
+
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {
-                if (atk.Name != "Baton Pass") return false;
+                if (atk.Name != attack) return false;
                 var me = ctx.Pokemon;
                 ctx.DamageDefending(atk.Damage);
-                if (!ctx.InPlay(me) || ctx.Me.Bench.Count == 0 || !ctx.AskYesNo("Baton Pass: switch " + me.Name + " with 1 of your Benched Pokémon?")) return true;
-                var target = ctx.ChoosePokemon(ctx.MyBench(), "Baton Pass: switch in which Pokémon?");
+                if (!ctx.InPlay(me) || ctx.Me.Bench.Count == 0 || !ctx.AskYesNo(attack + ": switch " + me.Name + " with 1 of your Benched Pokémon?")) return true;
+                var target = ctx.ChoosePokemon(ctx.MyBench(), attack + ": switch in which Pokémon?");
                 if (target == null || !ctx.Engine.SwitchActive(ctx.Player, target)) return true;
                 for (int i = 0; i < 20 && me.Energy.Count > 0; i++)
                 {
-                    var picks = ctx.ChooseCards(me.Energy.ToList(), 0, 1, "Baton Pass: move which Energy card to " + target.Name + "? (none to stop)");
+                    var picks = ctx.ChooseCards(me.Energy.ToList(), 0, 1, attack + ": move which Energy card to " + target.Name + "? (none to stop)");
                     if (picks.Count == 0) break;
                     ctx.Engine.MoveEnergy(me, target, picks[0]);
                 }
@@ -1296,7 +1300,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Future Sight: look at the top 5 cards of either player's deck and put them back in any order.</summary>
-        private sealed class FutureSightMon : Mon
+        internal sealed class FutureSightMon : Mon
         {
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {

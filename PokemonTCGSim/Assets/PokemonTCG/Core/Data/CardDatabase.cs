@@ -417,6 +417,11 @@ namespace PokemonTCG.Core
                 d.IsBasicEnergy = dto.basicEnergy;
                 d.IsAceSpec = dto.aceSpec; // Legacy, Enriching and Neo Upper Energy are ACE SPECs
                 d.EnergyProvides = EnergyTypes.ParseType(dto.provides) ?? EnergyType.Colorless;
+                // v172: a Special Energy card with an effect its owner chooses to use (Call Energy).
+                if (dto.abilities != null)
+                    foreach (var a in dto.abilities)
+                        if (a != null && !string.IsNullOrEmpty(a.name))
+                            d.Abilities.Add(new AbilityDef { Name = a.name, Text = a.text ?? "", Kind = a.kind ?? "" });
             }
             return d;
         }

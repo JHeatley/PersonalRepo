@@ -105,6 +105,9 @@ namespace PokemonTCG.Core
                 if (!ToolsDisabled() || StadiumShielded(mon))
                     foreach (var tool in mon.Tools)
                         if (tool.Def.Abilities.Count > 0 && ToolWorks(mon, tool)) sourceCards.Add(tool);
+                // v172: a Special Energy card with an effect its owner uses (Call Energy).
+                foreach (var energy in mon.Energy)
+                    if (energy.Def.IsSpecialEnergy && energy.Def.Abilities.Count > 0 && !SpecialEnergyOff(mon)) sourceCards.Add(energy);
                 foreach (var sourceCard in sourceCards)
                 {
                     var def = sourceCard.Def;
@@ -408,7 +411,7 @@ namespace PokemonTCG.Core
                     // an attached Tool that gives it an Ability (Sky Seal Stone).
                     // v126: or the card whose Powers it has (a Shapeshift Evolution card, or the Pokémon a Ditto is a copy of).
                     var inheritedCard = InheritedPowersCard(mon);
-                    var sourceCard = mon.Stack.FirstOrDefault(c => c.Id == opt.CardId) ?? mon.Tools.FirstOrDefault(c => c.Id == opt.CardId)
+                    var sourceCard = mon.Stack.FirstOrDefault(c => c.Id == opt.CardId) ?? mon.Tools.FirstOrDefault(c => c.Id == opt.CardId) ?? mon.Energy.FirstOrDefault(c => c.Id == opt.CardId)
                                      ?? (inheritedCard != null && inheritedCard.Id == opt.CardId ? inheritedCard : null) ?? mon.Top;
                     var ability = sourceCard.Def.Abilities[opt.Index];
                     string kind = ability.IsAbility ? "Ability" : ability.Kind;

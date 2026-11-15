@@ -51,7 +51,7 @@ namespace PokemonTCG.Cards
             r.RegisterByKey("GE-33", new ComboMon(new DeadlyPoisonMon(), new ParalyzeFlipMon("Wrap")));
             r.RegisterByKey("GE-34", new ComboMon(new CoinsMon("Pin Missile", 3), new CardsFST2.ConditionBonusMon("Needle Arm", 20, c => c.Defending != null && c.Defending.DamageCounters > 0)));
             r.RegisterByKey("GE-35", new ComboMon(new BulkUpMon(), new CoinsMon("Double Kick", 2)));
-            r.RegisterByKey("GE-36", new PresentMon());
+            r.RegisterByKey("GE-36", new PresentMon("Present"));
             r.RegisterByKey("GE-37", new ComboMon(new DodgeMon("Agility", false), new FlipGateMon("Aqua Jet", new Cards30CC.BenchHitMon("Aqua Jet", 10))));
             r.RegisterByKey("GE-38", new ComboMon(new SweetTemptationMon(), new PsychicSnapMon()));
             r.RegisterByKey("GE-39", new ComboMon(new CardsMEG.WeakenDefendingMon("Daunt", 20), new Cards30C.SelfCounterBonusMon("Rage", 10)));
@@ -738,13 +738,18 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Present: heads, any 1 card from your deck into your hand.</summary>
-        private sealed class PresentMon : Mon
+        internal sealed class PresentMon : Mon
         {
+            private readonly string attack;
+
+            public PresentMon(string attack) { this.attack = attack; }
+
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {
-                if (atk.Name != "Present") return false;
+                if (atk.Name != attack) return false;
+                ctx.DamageDefending(atk.Damage);
                 if (!ctx.Flip() || ctx.Me.Deck.Count == 0) return true;
-                ctx.DeckToHand(ctx.ChooseCards(ctx.Me.Deck.ToList(), 1, 1, "Present: put which card into your hand?"));
+                ctx.DeckToHand(ctx.ChooseCards(ctx.Me.Deck.ToList(), 1, 1, attack + ": put which card into your hand?"));
                 ctx.ShuffleMyDeck();
                 return true;
             }
