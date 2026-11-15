@@ -481,16 +481,7 @@ namespace PokemonTCG.Cards
                 }));
             r.RegisterByKey("PL-97", new ComboMon(new ConditionAttackMon("Sing", SpecialCondition.Asleep), new SwitchSelfMon("Run Around", true)));
             r.RegisterByKey("PL-98", new ComboMon(new SearchAttackMon("Show Off", d => d.IsBasicEnergy, 1), new CardsXYP1.FlipTailsRecoilMon("Take Down", 10)));
-            r.RegisterByKey("PL-99", new Fx()
-                .Effect("Focus Energy", (c, a) => c.Pokemon.Markers["Focus Energy"] = c.Turn + 2)
-                .On("Fire Shard", (c, a) =>
-                {
-                    int t;
-                    int dmg = c.Pokemon.Markers.TryGetValue("Focus Energy", out t) && t == c.Turn ? 80 : a.Damage;
-                    if (!c.Flip()) return DidNothing(c);
-                    c.DamageDefending(dmg);
-                    return true;
-                }));
+            r.RegisterByKey("PL-99", FocusEnergy("Fire Shard", 80, true));
             r.RegisterByKey("PL-100", new Fx()
                 .With(new CardsPAR2.FlipConditionMon("Super Singe", SpecialCondition.Burned))
                 .After("Flame Ball", (c, a) => EnergyToBench(c, "Flame Ball")));

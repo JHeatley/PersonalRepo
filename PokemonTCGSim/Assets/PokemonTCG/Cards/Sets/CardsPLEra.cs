@@ -491,6 +491,83 @@ namespace PokemonTCG.Cards
             public override bool PreventsRetreat(GameEngine engine, PokemonInPlay mon) { return mon != null && mon.Uid == TargetUid; }
         }
 
+        /// <summary>The Pokémon can't use any Poké-Powers or Poké-Bodies (Seal Off).</summary>
+        internal sealed class SealOffEffect : ContinuousEffect
+        {
+            public SealOffEffect(string name, int owner, int targetUid, int expiresAfterTurn) : base(name, owner, targetUid, expiresAfterTurn, true) { }
+
+            public override bool StopsPokePower(GameEngine engine, PokemonInPlay mon, string powerName) { return mon != null && mon.Uid == TargetUid; }
+
+            public override bool StopsPokeBody(GameEngine engine, PokemonInPlay mon, string bodyName) { return mon != null && mon.Uid == TargetUid; }
+        }
+
+        /// <summary>The opponent can't play Pokémon from their hand to evolve or level up this Pokémon (Primal Breath).</summary>
+        internal sealed class NoEvolveTargetEffect : ContinuousEffect
+        {
+            public NoEvolveTargetEffect(string name, int owner, int targetUid, int expiresAfterTurn) : base(name, owner, targetUid, expiresAfterTurn, true) { }
+
+            public override bool BlocksEvolutionFromHand(GameEngine engine, PokemonInPlay target) { return target != null && target.Uid == TargetUid; }
+        }
+
+        /// <summary>The Pokémon can't attack or retreat (Scary Face).</summary>
+        internal sealed class NoAttackNoRetreatEffect : ContinuousEffect
+        {
+            public NoAttackNoRetreatEffect(string name, int owner, int targetUid, int expiresAfterTurn) : base(name, owner, targetUid, expiresAfterTurn, true) { }
+
+            public override bool PreventsAttacks(GameEngine engine, PokemonInPlay mon) { return mon != null && mon.Uid == TargetUid; }
+
+            public override bool PreventsRetreat(GameEngine engine, PokemonInPlay mon) { return mon != null && mon.Uid == TargetUid; }
+        }
+
+        /// <summary>"Each player shuffles their hand into their deck and draws up to N cards (you draw first)."</summary>
+        internal static void EachShufflesAndDraws(EffectContext ctx, int n, string what)
+        {
+            foreach (int p in new[] { ctx.Player, ctx.Opponent })
+            {
+                var ps = ctx.State.Players[p];
+                foreach (var c in ps.Hand.ToList()) { ps.Hand.Remove(c); ps.Deck.Add(c); }
+                ctx.Engine.ShuffleDeck(p);
+                int k = ctx.Engine.AskNumber(p, Math.Min(1, ps.Deck.Count), Math.Min(n, ps.Deck.Count), what + ": draw how many cards (up to " + n + ")?", ctx.Source);
+                ctx.Engine.DrawCards(p, k);
+            }
+        }
+
+        /// <summary>"Undevelop": devolve this Pokémon, putting its top card into your hand.</summary>
+        internal static PowerFx Undevelop(Mon attacks)
+        {
+            return new PowerFx("Undevelop", c => c.Pokemon.Stack.Count >= 2, c => c.Engine.Devolve(c.Pokemon, 1), attacks);
+        }
+
+        /// <summary>"[Type] Shift": this Pokémon's type is [type] until the end of your turn (Rotom).</summary>
+        internal static PowerFx Shift(string power, EnergyType type, Mon attacks)
+        {
+            return new PowerFx(power, null, c => c.AddEffect(new CardsGE.TypeIsEffect(c.Pokemon.Name + " is " + type + " this turn (" + power + ")", c.Player, c.Pokemon.Uid, c.Turn, type)), attacks, true);
+        }
+
+        /// <summary>"If this Pokémon was damaged by an attack during your opponent's last turn, this attack does the same amount of damage."</summary>
+        internal static bool ReturnBlow(EffectContext c)
+        {
+            var me = c.Pokemon;
+            if (me.AttackDamageTurn != c.OpponentsLastTurn || me.AttackDamageThatTurn <= 0) return DidNothing(c);
+            c.DamageDefending(me.AttackDamageThatTurn);
+            return true;
+        }
+
+        /// <summary>"During your next turn, this Pokémon's [attack]'s base damage is N" (Focus Energy).</summary>
+        internal static Fx FocusEnergy(string attack, int damage, bool tailsNothing)
+        {
+            return new Fx()
+                .Effect("Focus Energy", (c, a) => c.Pokemon.Markers["Focus Energy"] = c.Turn + 2)
+                .On(attack, (c, a) =>
+                {
+                    int t;
+                    int dmg = c.Pokemon.Markers.TryGetValue("Focus Energy", out t) && t == c.Turn ? damage : a.Damage;
+                    if (tailsNothing && !c.Flip()) return DidNothing(c);
+                    c.DamageDefending(dmg);
+                    return true;
+                });
+        }
+
         /// <summary>The player can't play Pokémon from their hand to evolve their Pokémon (or only the Active one).</summary>
         internal sealed class NoEvolveEffect : ContinuousEffect
         {

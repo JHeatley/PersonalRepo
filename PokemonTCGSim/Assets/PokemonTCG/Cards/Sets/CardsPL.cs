@@ -395,7 +395,8 @@ namespace PokemonTCG.Cards
         {
             public override void OnPokemonBenchedFromHand(EffectContext src, PokemonInPlay benched)
             {
-                if (benched == null || !benched.Def.IsBasicPokemon || benched.Def.HasType(EnergyType.Grass) || benched.Def.HasType(EnergyType.Psychic)) return;
+                // Its type right now: Kecleon's Colorful Body makes it Grass and Psychic too (PUI Rules Team, 2009-07-23).
+                if (benched == null || !benched.Def.IsBasicPokemon || src.Engine.IsType(benched, EnergyType.Grass) || src.Engine.IsType(benched, EnergyType.Psychic)) return;
                 src.Engine.PlaceDamageCounters(benched, 2, "Miasma Valley");
             }
         }
