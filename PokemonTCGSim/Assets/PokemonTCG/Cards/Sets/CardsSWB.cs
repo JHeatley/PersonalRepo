@@ -1501,7 +1501,7 @@ namespace PokemonTCG.Cards
                 if (me.DamageCounters > 0) ctx.Heal(me, me.DamageCounters * 10);
                 if (ctx.Me.Deck.Count == 0) return true;
                 var found = ctx.SearchMyDeck(d => d.IsPokemon && d.EvolvesFrom == me.Name && !d.IsLevelUp, 1, "Sun Soak: choose a card that evolves from " + me.Name);
-                if (found.Count > 0 && ctx.InPlay(me) && ctx.Me.Deck.Remove(found[0])) ctx.Engine.EvolvePokemon(me, found[0]);
+                if (found.Count > 0 && ctx.InPlay(me)) ctx.Engine.EvolvePokemon(me, found[0]);
                 ctx.ShuffleMyDeck();
                 return true;
             }

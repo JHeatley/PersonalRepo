@@ -54,7 +54,7 @@ namespace PokemonTCG.Cards
             r.RegisterByKey("MT-58", new ComboMon(new WildSporesMon(), new CardsE3B.HealSelfMon("Extend Fungus", 20)));
             r.RegisterByKey("MT-59", new ComboMon(new CardsSS.EachOpponentMon("Pressurized Gas", 10), new RocketTackleMon()));
             r.RegisterByKey("MT-60", new CardsDR.FlipDiscardSelfMon("Fireworks", EnergyType.Fire));
-            r.RegisterByKey("MT-61", new ComboMon(new SpikeArmorMon(), new CardsCG.IfDefendingConditionMon("Poison Spike", SpecialCondition.Poisoned, m => m.DamageCounters > 0)));
+            r.RegisterByKey("MT-61", new ComboMon(new SpikeArmorMon("Spike Armor", 4), new CardsCG.IfDefendingConditionMon("Poison Spike", SpecialCondition.Poisoned, m => m.DamageCounters > 0)));
             r.RegisterByKey("MT-62", new CardsSSB.AnyOpponentTextMon("Ice Rider", 30));
             r.RegisterByKey("MT-64", new ComboMon(new BonusLeafMon(), new CardsDRI1.WhirlwindMon("Whirlwind")));
             r.RegisterByKey("MT-65", new UnownEquip());
@@ -872,16 +872,23 @@ namespace PokemonTCG.Cards
             }
         }
 
-        /// <summary>Spike Armor: during the opponent's next turn, if this Pokémon is damaged by their attack (even if Knocked Out), 4 damage counters on the Attacking Pokémon.</summary>
-        private sealed class SpikeArmorMon : Mon
+        /// <summary>"During your opponent's next turn, if this Pokémon is damaged by an attack (even if Knocked Out), put N damage counters on the Attacking Pokémon" (Spike Armor, Counter Punch).</summary>
+        internal sealed class SpikeArmorMon : Mon
         {
-            private const string Marker = "Spike Armor";
+            private readonly string attack;
+            private readonly int counters;
+
+            public SpikeArmorMon(string attack, int counters)
+            {
+                this.attack = attack;
+                this.counters = counters;
+            }
 
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {
-                if (atk.Name != Marker) return false;
+                if (atk.Name != attack) return false;
                 ctx.DamageDefending(atk.Damage);
-                if (ctx.InPlay(ctx.Pokemon)) ctx.Pokemon.Markers[Marker] = ctx.Turn + 1;
+                if (ctx.InPlay(ctx.Pokemon)) ctx.Pokemon.Markers[attack] = ctx.Turn + 1;
                 return true;
             }
 
@@ -889,9 +896,9 @@ namespace PokemonTCG.Cards
             {
                 int turn;
                 var me = ctx.Pokemon;
-                if (me == null || !me.Markers.TryGetValue(Marker, out turn) || turn != ctx.Turn || attacker == null || attacker.Owner == ctx.Player || !ctx.InPlay(attacker) || damage <= 0) return;
-                ctx.Log("Spike Armor: 4 damage counters on " + attacker.Name + ".");
-                ctx.Engine.PlaceDamageCounters(attacker, 4, "Spike Armor");
+                if (me == null || !me.Markers.TryGetValue(attack, out turn) || turn != ctx.Turn || attacker == null || attacker.Owner == ctx.Player || !ctx.InPlay(attacker) || damage <= 0) return;
+                ctx.Log(attack + ": " + counters + " damage counters on " + attacker.Name + ".");
+                ctx.Engine.PlaceDamageCounters(attacker, counters, attack);
             }
 
             public override bool ReactsToOwnDamageWithoutAbility { get { return true; } }
@@ -1055,7 +1062,7 @@ namespace PokemonTCG.Cards
                 var me = ctx.Pokemon;
                 if (ctx.Me.Deck.Count == 0) return true;
                 var found = ctx.SearchMyDeck(d => d.Name == "Alakazam" && d.IsPokemon && !d.IsLevelUp, 1, "Ultra Evolution: choose Alakazam");
-                if (found.Count > 0 && ctx.InPlay(me) && ctx.Me.Deck.Remove(found[0])) ctx.Engine.EvolvePokemon(me, found[0]);
+                if (found.Count > 0 && ctx.InPlay(me)) ctx.Engine.EvolvePokemon(me, found[0]);
                 ctx.ShuffleMyDeck();
                 return true;
             }

@@ -332,7 +332,8 @@ namespace PokemonTCG.Cards
                     var card = found[0];
                     var targets = ctx.MyPokemon(m => m.Name == card.Def.EvolvesFrom);
                     var target = targets.Count == 0 ? null : ctx.ChoosePokemon(targets, "Evolution Wish: evolve which Pokémon?");
-                    if (target != null && ctx.Me.Deck.Remove(card)) ctx.Engine.EvolvePokemon(target, card);
+                    if (target != null) ctx.Engine.EvolvePokemon(target, card);
+                    else ctx.Me.Deck.Add(card);
                 }
                 ctx.ShuffleMyDeck();
                 return true;
@@ -818,7 +819,7 @@ namespace PokemonTCG.Cards
                     return;
                 }
                 var found = ctx.SearchMyDeck(d => FossilNames.Contains(d.Name), 1, power + ": choose Helix Fossil, Dome Fossil or Old Amber");
-                if (found.Count > 0 && ctx.Me.Deck.Remove(found[0])) ctx.Engine.PutOntoBench(ctx.Player, found[0], false);
+                if (found.Count > 0) ctx.Engine.PutOntoBench(ctx.Player, found[0], false);
                 ctx.ShuffleMyDeck();
             }
 
