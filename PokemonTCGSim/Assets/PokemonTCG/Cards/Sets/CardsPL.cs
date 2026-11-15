@@ -384,7 +384,8 @@ namespace PokemonTCG.Cards
                 var p = ctx.State.Players[who];
                 foreach (var c in p.Hand.ToList()) { p.Hand.Remove(c); p.Deck.Add(c); }
                 ctx.Engine.ShuffleDeck(who);
-                int n = ctx.Engine.AskNumber(who, 0, Math.Min(5, p.Deck.Count), "Looker's Investigation: draw how many cards (up to 5)?", ctx.Source);
+                // At least 1 card if they can (PUI Rules Team, 2009-02-19).
+                int n = ctx.Engine.AskNumber(who, Math.Min(1, p.Deck.Count), Math.Min(5, p.Deck.Count), "Looker's Investigation: draw how many cards (up to 5)?", ctx.Source);
                 ctx.Engine.DrawCards(who, n);
             }
         }

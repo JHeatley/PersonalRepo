@@ -12,19 +12,22 @@ namespace PokemonTCG.Cards
         private static void RegisterCommons(CardScriptRegistry r)
         {
             r.RegisterByKey("PL-18", new Fx()
-                .After("Midnight Eyes", (c, a) =>
+                .On("Midnight Eyes", (c, a) =>
                 {
                     var d = c.Defending;
-                    if (d == null || !c.CanAffect(d)) return;
-                    c.ApplyCondition(d, SpecialCondition.Asleep);
-                    d.Markers["Midnight Eyes"] = c.Turn;
+                    if (d == null) return true;
+                    int done = c.DamageDefending(a.Damage);
+                    if (!c.InPlay(d) || !c.CanAffect(d)) return true;
+                    // Perish Song checks that this same Pokémon (leveling up keeps it; evolving doesn't) was hit by Midnight Eyes.
+                    if (c.ApplyCondition(d, SpecialCondition.Asleep) || done > 0) d.Markers["Midnight Eyes"] = c.Turn;
+                    return true;
                 })
                 .Effect("Perish Song", (c, a) =>
                 {
                     var d = c.Defending;
                     int t;
                     if (d == null || !d.Has(SpecialCondition.Asleep) || !c.CanAffect(d)) return;
-                    if ((d.Markers.TryGetValue("Midnight Eyes", out t) && t == c.MyLastTurn) || d.AttackDamageTurn == c.MyLastTurn) c.Engine.KnockOut(d, "Perish Song");
+                    if (d.Markers.TryGetValue("Midnight Eyes", out t) && t == c.MyLastTurn) c.Engine.KnockOut(d, "Perish Song");
                 })
                 .After("Healing Song", (c, a) => HealEach(c, 10)));
             r.RegisterByKey("PL-19", new PowerFx("Temper Tantrum", c => c.Me.Hand.Count > 0, c =>
@@ -63,11 +66,12 @@ namespace PokemonTCG.Cards
                     return true;
                 })
                 .Damage("Silver Scale", (c, a) => c.Defending != null && c.Engine.ResistanceOf(c.Defending) != null ? 60 : a.Damage));
-            r.RegisterByKey("PL-22", new PowerFx("Nurse Call", c => c.Me.Hand.Count > 0 && c.MyPokemon(m => m.DamageCounters > 0).Count > 0, c =>
+            r.RegisterByKey("PL-22", new PowerFx("Nurse Call", c => c.Me.Hand.Count > 0, c =>
                 {
                     var card = c.ChooseCards(c.Me.Hand.ToList(), 1, 1, "Nurse Call: discard a card from your hand")[0];
                     c.Engine.DiscardFromHand(c.Player, card);
-                    var t = c.ChoosePokemon(c.MyPokemon(m => m.DamageCounters > 0), "Nurse Call: remove 2 damage counters from which Pokémon?");
+                    var hurt = c.MyPokemon(m => m.DamageCounters > 0);
+                    var t = hurt.Count == 0 ? null : c.ChoosePokemon(hurt, "Nurse Call: remove 2 damage counters from which Pokémon?");
                     if (t != null) c.Heal(t, 20);
                 }, new Fx()
                 .After("Return", (c, a) => c.DrawUntil(6))

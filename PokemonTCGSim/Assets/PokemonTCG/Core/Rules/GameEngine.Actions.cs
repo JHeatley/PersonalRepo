@@ -424,7 +424,12 @@ namespace PokemonTCG.Core
                     try
                     {
                         var abilityCtx = new EffectContext(this, player, sourceCard, mon);
-                        if (ability.Kind == AbilityDef.PokePower && PokePowerCancelled(player, mon, ability.Name)) abilityCtx.MarkAbilityUsed(ability.Name);
+                        if (ability.Kind == AbilityDef.PokePower && PokePowerCancelled(player, mon, ability.Name))
+                        {
+                            abilityCtx.MarkAbilityUsed(ability.Name);
+                            // v173 (errata, 2009-05-01): a Poké-Power that ends your turn still ends it when it's cancelled (Cheerful Voice).
+                            if (ability.Text != null && ability.Text.Contains("your turn ends")) RequestEndTurn();
+                        }
                         else Scripts.For(sourceCard.Def).UseAbility(abilityCtx, opt.Index);
                     }
                     finally { EndDiscardShield(powerShield); PopSource(); }
