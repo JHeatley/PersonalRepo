@@ -420,6 +420,7 @@ namespace PokemonTCG.Core
                     var powerShield = ability.Kind == AbilityDef.PokemonPower ? BeginDiscardShield() : null;
                     try { Scripts.For(sourceCard.Def).UseAbility(new EffectContext(this, player, sourceCard, mon), opt.Index); }
                     finally { EndDiscardShield(powerShield); PopSource(); }
+                    if (ability.Kind == AbilityDef.PokePower) NotifyPokePowerUsed(mon, ability.Name);
                     // v90: an Active Pokémon that left play through its own Ability (Wishiwashi's Cowardice) is replaced right away;
                     // with no Benched Pokémon the player has none left in play and loses (like a Fossil, v68).
                     if (p.Active == null && p.Bench.Count > 0) PromoteActive(player);
@@ -867,6 +868,19 @@ namespace PokemonTCG.Core
             return false;
         }
 
+        /// <summary>v171: a Pokémon used a Poké-Power: every working source hears of it (Shiftry ex's Dark Eyes).</summary>
+        public void NotifyPokePowerUsed(PokemonInPlay user, string power)
+        {
+            if (user == null || State.FindPokemon(user.Uid) != user) return;
+            foreach (var src in Sources())
+            {
+                if (State.IsOver || State.FindPokemon(user.Uid) != user) break;
+                PushSource(src.Kind, src.Ctx.Player, src.Ctx.Pokemon);
+                try { src.Script.OnPokePowerUsed(src.Ctx, user, power); }
+                finally { PopSource(); }
+            }
+        }
+
         /// <summary>The attack being resolved right now, or null (Celesteela-GX's Force Canceler checks for a GX attack; v73).</summary>
         public AttackDef ResolvingAttack { get; private set; }
 
@@ -879,6 +893,15 @@ namespace PokemonTCG.Core
             // The announcement doesn't name a target (v55.1): many attacks hit a Benched Pokémon or none at all (Cruel Arrow,
             // snipes, searches), so "on [the Active Pokémon]" was misleading. The damage lines that follow say who was hit.
             Emit(GameEventType.Attack, player, OwnedName(attacker) + " used " + atk.Name + fromBench + "!", attacker.Top.Id, attacker.Uid);
+            // v171: Holon Circle: the attack ends as soon as it's announced, before anything else (Compendium, 2006-11-16).
+            foreach (var endSrc in Sources())
+            {
+                if (!endSrc.Script.EndsAnnouncedAttack(endSrc.Ctx, attacker)) continue;
+                PushSource(endSrc.Kind, endSrc.Ctx.Player, endSrc.Ctx.Pokemon);
+                try { endSrc.Script.OnAnnouncedAttackEnded(endSrc.Ctx, attacker); }
+                finally { PopSource(); }
+                return false;
+            }
             // Baby Rule (Neo era, v48): "If this Baby Pokémon is your Active Pokémon and your opponent announces an attack, your
             // opponent flips a coin (before doing anything else). If tails, your opponent's turn ends." So it comes before Confusion.
             if (defending != null && defending.Def.IsBaby && !FlipCoin(player, "Baby Rule (" + defending.Name + ")"))

@@ -67,6 +67,7 @@ namespace PokemonTCG.Core
         public bool PokemonPowerStoppedByEffect(PokemonInPlay mon, string powerName)
         {
             if (mon == null) return false;
+            if (EveryPowerAndBodyStopped()) return true;
             foreach (var e in State.Effects)
                 if (e.ActiveFromTurn <= State.TurnNumber && e.StopsPokemonPower(this, mon, powerName)) return true;
             // v142: a Pokémon Power in play that stops other Pokémon's Pokémon Powers (Dark Feraligatr's Scare).
@@ -86,6 +87,7 @@ namespace PokemonTCG.Core
         public bool PokePowerStoppedByEffect(PokemonInPlay mon, string powerName)
         {
             if (mon == null) return false;
+            if (EveryPowerAndBodyStopped()) return true;
             foreach (var e in State.Effects)
                 if (e.ActiveFromTurn <= State.TurnNumber && e.StopsPokePower(this, mon, powerName)) return true;
             // v162: a Stadium that stops Poké-Powers (Mt. Moon: Pokémon with less than 70 HP).
@@ -102,10 +104,24 @@ namespace PokemonTCG.Core
             return false;
         }
 
+        /// <summary>v171: a Tool in play stops every Pokémon's Poké-Powers, Poké-Bodies and Pokémon Powers (Cessation Crystal).</summary>
+        private bool EveryPowerAndBodyStopped()
+        {
+            for (int i = 0; i < 2; i++)
+                foreach (var holder in State.Players[i].InPlay())
+                    foreach (var tool in holder.Tools)
+                    {
+                        var script = Scripts.For(tool.Def);
+                        if (Overrides(script, "StopsEveryPowerAndBody") && script.StopsEveryPowerAndBody(new EffectContext(this, holder.Owner, tool, holder))) return true;
+                    }
+            return false;
+        }
+
         /// <summary>v147: a timed effect stops this Pokémon's Poké-Body (Skyridge Aerodactyl's Ancient Wind). Only Poké-Bodies.</summary>
         public bool PokeBodyStoppedByEffect(PokemonInPlay mon, string bodyName)
         {
             if (mon == null) return false;
+            if (EveryPowerAndBodyStopped()) return true;
             foreach (var e in State.Effects)
                 if (e.ActiveFromTurn <= State.TurnNumber && e.StopsPokeBody(this, mon, bodyName)) return true;
             // v165: a Stadium that has Poké-Bodies ignored (Space Center: Basic Pokémon's, except Pokémon-ex and owners' Pokémon).

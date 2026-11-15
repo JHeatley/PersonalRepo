@@ -151,7 +151,7 @@ namespace PokemonTCG.Cards
         /// "Choose 1 card from your opponent's hand without looking and discard it" (Knock Off; Brush Aside only with a Holon Energy
         /// card on this Pokémon).
         /// </summary>
-        private sealed class KnockOffMon : Mon
+        internal sealed class KnockOffMon : Mon
         {
             private readonly string attack;
             private readonly bool needsHolonEnergy;

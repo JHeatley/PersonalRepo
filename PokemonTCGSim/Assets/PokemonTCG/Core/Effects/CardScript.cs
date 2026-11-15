@@ -302,6 +302,11 @@ namespace PokemonTCG.Core
         public virtual bool GoesToHandWhenKnockedOut(EffectContext src, PokemonInPlay mon, bool byOpponentsAttack) { return false; }
         /// <summary>Celebi's Leap Through Time (v107): "If this Pokémon would be Knocked Out" - true when it is shuffled into the deck instead (not Knocked Out).</summary>
         public virtual bool EscapesKnockOut(EffectContext src, PokemonInPlay mon) { return false; }
+        /// <summary>
+        /// v171: with EscapesKnockOut, its attached cards are discarded and the Pokémon goes on the bottom of its owner's deck
+        /// instead of everything being shuffled in (Crystal Guardians' Celebi ★'s Time Travel).
+        /// </summary>
+        public virtual bool EscapeDiscardsAttachedToDeckBottom { get { return false; } }
         /// <summary>Malamar's Contrary (v107): every coin flip that player makes during their own turn is tails.</summary>
         public virtual bool ForcesTailsFor(EffectContext src, int player) { return false; }
         /// <summary>Team Plasma Badge (v110): the Pokémon this card is attached to is a Team Plasma Pokémon.</summary>
@@ -595,6 +600,19 @@ namespace PokemonTCG.Core
         /// Asked of every Pokémon with Abilities; the script checks that its own body works (GameEngine.AbilityBlocked).
         /// </summary>
         public virtual bool StopsPokePowersOf(EffectContext src, PokemonInPlay mon) { return false; }
+        /// <summary>
+        /// v171: the attack just announced ends before anything else happens, Baby Rule and Confusion included (Crystal Guardians'
+        /// Holon Circle). Asked of every working source; OnAnnouncedAttackEnded runs for the one that ended it.
+        /// </summary>
+        /// <summary>
+        /// v171: a Pokémon Tool that stops every Pokémon's Poké-Powers, Poké-Bodies and old Pokémon Powers (both players') while it
+        /// works (Crystal Guardians' Cessation Crystal, on an Active Pokémon). Asked of the Tools on every Pokémon in play.
+        /// </summary>
+        public virtual bool StopsEveryPowerAndBody(EffectContext src) { return false; }
+        public virtual bool EndsAnnouncedAttack(EffectContext src, PokemonInPlay attacker) { return false; }
+        public virtual void OnAnnouncedAttackEnded(EffectContext src, PokemonInPlay attacker) { }
+        /// <summary>v171: a Pokémon in play just used a Poké-Power from the Powers menu (Shiftry ex's Dark Eyes). Asked of every working source.</summary>
+        public virtual void OnPokePowerUsed(EffectContext src, PokemonInPlay user, string power) { }
         /// <summary>
         /// v159: a Poké-Body in play that stops another Pokémon's Poké-Bodies (Muk ex's Toxic Gas). bodyName is the Poké-Body
         /// being checked, so a blocker can leave its own kind alone without checking itself in a loop.

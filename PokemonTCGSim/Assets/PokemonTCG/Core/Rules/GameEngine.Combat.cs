@@ -441,7 +441,8 @@ namespace PokemonTCG.Core
                     finally { PopSource(); }
                     if (!escapes) continue;
                     knocked.RemoveAt(k);
-                    ShufflePokemonIntoDeck(mon);
+                    if (src.Script.EscapeDiscardsAttachedToDeckBottom) PutPokemonOnDeckBottom(mon);
+                    else ShufflePokemonIntoDeck(mon);
                     break;
                 }
             }
