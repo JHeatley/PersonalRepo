@@ -195,6 +195,22 @@ namespace PokemonTCG.Cards
                 if (part.HandleAttack(ctx, atk)) return true;
             return false;
         }
+
+        // v172: an attack's lasting effect that the engine reports to a Pokémon with no Ability (Destiny Bond, Spike Armor) works
+        // when that attack's script is one part of a combo.
+        public override bool ReactsToOwnKnockOutWithoutAbility { get { return parts.Any(p => p.ReactsToOwnKnockOutWithoutAbility); } }
+
+        public override bool ReactsToOwnDamageWithoutAbility { get { return parts.Any(p => p.ReactsToOwnDamageWithoutAbility); } }
+
+        public override void OnHolderKnockedOut(EffectContext src, bool byOpponentsAttack, bool wasActive)
+        {
+            foreach (var part in parts) if (part.ReactsToOwnKnockOutWithoutAbility) part.OnHolderKnockedOut(src, byOpponentsAttack, wasActive);
+        }
+
+        public override void OnHolderDamagedByAttack(EffectContext ctx, PokemonInPlay attacker, bool holderWasActive, int damage)
+        {
+            foreach (var part in parts) if (part.ReactsToOwnDamageWithoutAbility) part.OnHolderDamagedByAttack(ctx, attacker, holderWasActive, damage);
+        }
     }
 
     /// <summary>Hide 'n' Sneak: prevent all effects of the opponent's Pokémon's attacks and Abilities on this Pokémon.</summary>

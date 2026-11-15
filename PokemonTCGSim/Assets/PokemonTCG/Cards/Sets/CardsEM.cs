@@ -205,7 +205,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Scary Face: heads, the Defending Pokémon can't attack or retreat during the opponent's next turn.</summary>
-        private sealed class ScaryFaceMon : Mon
+        internal sealed class ScaryFaceMon : Mon
         {
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {

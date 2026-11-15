@@ -50,6 +50,26 @@ namespace PokemonTCG.Cards
         /// <summary>"Pokémon that has δ on its card".</summary>
         internal static bool Delta(PokemonInPlay mon) { return mon != null && mon.Def.IsDeltaSpecies; }
 
+        /// <summary>
+        /// v171: has δ on its card, or counts as having it: Dragon Frontiers Ampharos's Holon Veil (Poké-Body) treats its owner's
+        /// Pokémon in play (and Basic Pokémon and Evolution cards in their deck, discard pile and hand) as δ Pokémon.
+        /// </summary>
+        internal static bool Delta(EffectContext ctx, PokemonInPlay mon) { return mon != null && (mon.Def.IsDeltaSpecies || HolonVeil(ctx.Engine, mon.Owner)); }
+
+        /// <summary>v171: a Pokémon card of that player's (deck, discard pile, hand) that has δ or counts as having it (Holon Veil).</summary>
+        internal static bool DeltaCard(EffectContext ctx, int owner, CardDef d) { return d != null && d.IsPokemon && (d.IsDeltaSpecies || HolonVeil(ctx.Engine, owner)); }
+
+        [ThreadStatic] private static bool veilChecking;
+
+        /// <summary>v171: that player has a Pokémon in play whose Holon Veil works.</summary>
+        internal static bool HolonVeil(GameEngine engine, int owner)
+        {
+            if (veilChecking || owner < 0 || owner > 1) return false;
+            veilChecking = true;
+            try { return engine.State.Players[owner].InPlay().Any(m => engine.HasAbilityNamed(m, "Holon Veil")); }
+            finally { veilChecking = false; }
+        }
+
         /// <summary>A Holon Energy card (FF, GL, WP...). A Holon's Pokémon attached as Energy isn't one (Compendium, 2005-11-03).</summary>
         internal static bool IsHolonEnergy(CardDef d) { return d != null && d.IsSpecialEnergy && d.Name.StartsWith("Holon Energy", StringComparison.Ordinal); }
 
@@ -410,11 +430,11 @@ namespace PokemonTCG.Cards
 
             protected override bool OnePerPlayer { get { return true; } }
 
-            protected override bool AbilityReady(EffectContext ctx) { return PowerReady(ctx) && ctx.MyPokemon(m => Delta(m) && m.DamageCounters > 0).Count > 0; }
+            protected override bool AbilityReady(EffectContext ctx) { return PowerReady(ctx) && ctx.MyPokemon(m => Delta(ctx, m) && m.DamageCounters > 0).Count > 0; }
 
             protected override void Ability(EffectContext ctx)
             {
-                foreach (var mon in ctx.MyPokemon(m => Delta(m) && m.DamageCounters > 0)) ctx.Heal(mon, 10);
+                foreach (var mon in ctx.MyPokemon(m => Delta(ctx, m) && m.DamageCounters > 0)) ctx.Heal(mon, 10);
             }
 
             protected override bool Attack(EffectContext ctx, AttackDef atk) { return Psyshock.HandleAttack(ctx, atk); }

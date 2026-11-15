@@ -155,7 +155,7 @@ namespace PokemonTCG.Cards
 
             private static List<PokemonInPlay> Targets(EffectContext ctx, CardInstance card)
             {
-                return ctx.MyPokemon(m => CardsDS.Delta(m) && !ctx.Engine.EnergyFromHandBlockedTo(card, m));
+                return ctx.MyPokemon(m => CardsDS.Delta(ctx, m) && !ctx.Engine.EnergyFromHandBlockedTo(card, m));
             }
 
             protected override string Activated { get { return Power; } }
@@ -182,7 +182,7 @@ namespace PokemonTCG.Cards
             public override int ModifyDamageDealt(EffectContext src, DamageInfo info, int damage)
             {
                 var a = info.Attacker;
-                if (a == null || a.Owner != src.Player || !CardsDS.Delta(a) || !info.ToOpponentsActive || damage <= 0) return damage;
+                if (a == null || a.Owner != src.Player || !CardsDS.Delta(src, a) || !info.ToOpponentsActive || damage <= 0) return damage;
                 return src.Engine.CurrentSourceKind == EffectSourceKind.Attack && HolonStadium(src) ? damage + 10 : damage;
             }
 
@@ -264,9 +264,9 @@ namespace PokemonTCG.Cards
             public override bool StopsPokePowersOf(EffectContext src, PokemonInPlay mon)
             {
                 var me = src.Pokemon;
-                if (checking || me == null || mon == null || CardsDS.Delta(mon) || CardsDS.HolonEnergyCount(me) == 0) return false;
+                if (checking || me == null || mon == null || CardsDS.HolonEnergyCount(me) == 0) return false;
                 checking = true;
-                try { return !src.Engine.AbilityBlocked(me, "Delta Reserve"); }
+                try { return !CardsDS.Delta(src, mon) && !src.Engine.AbilityBlocked(me, "Delta Reserve"); }
                 finally { checking = false; }
             }
 

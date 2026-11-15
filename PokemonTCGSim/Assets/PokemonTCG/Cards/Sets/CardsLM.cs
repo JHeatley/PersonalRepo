@@ -288,7 +288,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Enraged Linear Attack: 10 damage per damage counter on this Pokémon to 1 of the opponent's Pokémon (no W/R on the Bench).</summary>
-        private sealed class EnragedLinearAttackMon : Mon
+        internal sealed class EnragedLinearAttackMon : Mon
         {
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {

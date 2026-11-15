@@ -61,6 +61,8 @@ namespace PokemonTCG.Core
         public bool SleepKnocksOut;
         public int TurnEnteredPlay;
         public int TurnEvolved = -1;
+        /// <summary>Its Special Conditions just before it last evolved (Vigoroth's Wake-up Punch: "Slakoth was Asleep").</summary>
+        public SpecialCondition ConditionsBeforeEvolve;
         /// <summary>The last attack this Pokémon used and the turn it used it ("if this Pokémon used X during your last turn"). Set after the attack resolves.</summary>
         public string LastAttackName;
         public int LastAttackTurn = -100;
@@ -220,6 +222,7 @@ namespace PokemonTCG.Core
             c.SleepCoins = SleepCoins;
             c.SleepKnocksOut = SleepKnocksOut;
             c.TurnEvolved = TurnEvolved;
+            c.ConditionsBeforeEvolve = ConditionsBeforeEvolve;
             c.LastAttackName = LastAttackName;
             c.LastAttackTurn = LastAttackTurn;
             c.MovedToActiveOnTurn = MovedToActiveOnTurn;

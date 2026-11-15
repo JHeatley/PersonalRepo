@@ -116,7 +116,7 @@ namespace PokemonTCG.Cards
 
             protected override void Effect(EffectContext ctx)
             {
-                ctx.SearchToHand(d => (d.IsEnergy && d.Name == "Metal Energy") || (d.IsPokemon && d.IsDeltaSpecies), 1,
+                ctx.SearchToHand(d => (d.IsEnergy && d.Name == "Metal Energy") || CardsDS.DeltaCard(ctx, ctx.Player, d), 1,
                     "Holon Researcher: choose a Metal Energy card or a δ Pokémon");
             }
         }
@@ -171,7 +171,7 @@ namespace PokemonTCG.Cards
         {
             public override void ModifyProvidedEnergy(EffectContext src, CardInstance energy, PokemonInPlay holder, List<int> units)
             {
-                if (energy == null || holder == null || !energy.Def.IsBasicEnergy || !holder.Def.IsDeltaSpecies) return;
+                if (energy == null || holder == null || !energy.Def.IsBasicEnergy || !CardsDS.Delta(src, holder)) return;
                 for (int i = 0; i < units.Count; i++)
                     if (units[i] != 0) units[i] |= EnergyMask.Of(EnergyType.Metal);
             }
@@ -184,7 +184,7 @@ namespace PokemonTCG.Cards
 
             public override bool CanUseStadium(EffectContext ctx)
             {
-                return !ctx.NamedLimitUsedThisTurn(Limit) && ctx.Me.Deck.Count > 0 && ctx.Me.InPlay().Any(m => m.Def.IsDeltaSpecies);
+                return !ctx.NamedLimitUsedThisTurn(Limit) && ctx.Me.Deck.Count > 0 && ctx.Me.InPlay().Any(m => CardsDS.Delta(ctx, m));
             }
 
             public override bool UseStadium(EffectContext ctx)

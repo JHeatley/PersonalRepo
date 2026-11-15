@@ -34,7 +34,7 @@ namespace PokemonTCG.Cards
                 var others = ctx.Me.Hand.Where(c => c != ctx.Card).ToList();
                 if (others.Count == 0) return;
                 var pick = ctx.ChooseCards(others, 1, 1, "Holon Adventurer: discard a card from your hand (a δ Pokémon draws 4)")[0];
-                bool delta = pick.Def.IsPokemon && pick.Def.IsDeltaSpecies;
+                bool delta = CardsDS.DeltaCard(ctx, ctx.Player, pick.Def);
                 ctx.Engine.DiscardFromHand(ctx.Player, pick);
                 ctx.Draw(delta ? 4 : 3);
             }
@@ -86,13 +86,13 @@ namespace PokemonTCG.Cards
             public override IEnumerable<KeyValuePair<CardDef, int>> ExtraAttacksFor(EffectContext src, PokemonInPlay mon)
             {
                 var lake = src.Card;
-                if (lake == null || mon == null || lake.Def.Attacks.Count == 0 || !CardsDS.Delta(mon)) return Enumerable.Empty<KeyValuePair<CardDef, int>>();
+                if (lake == null || mon == null || lake.Def.Attacks.Count == 0 || !CardsDS.Delta(src, mon)) return Enumerable.Empty<KeyValuePair<CardDef, int>>();
                 return new[] { new KeyValuePair<CardDef, int>(lake.Def, 0) };
             }
 
             public override void ResolveAttack(EffectContext ctx, int attackIndex)
             {
-                if (ctx.Me.Deck.Count > 0) ctx.SearchToHand(d => d.IsPokemon && d.IsDeltaSpecies, 1, "Delta Call: choose a δ Pokémon");
+                if (ctx.Me.Deck.Count > 0) ctx.SearchToHand(d => CardsDS.DeltaCard(ctx, ctx.Player, d), 1, "Delta Call: choose a δ Pokémon");
             }
         }
 
@@ -121,7 +121,7 @@ namespace PokemonTCG.Cards
         {
             public override List<int> ProvidedEnergy(EffectContext ctx)
             {
-                return new List<int> { CardsDS.Delta(ctx.Pokemon) ? EnergyMask.AnyType : EnergyMask.Colorless };
+                return new List<int> { CardsDS.Delta(ctx, ctx.Pokemon) ? EnergyMask.AnyType : EnergyMask.Colorless };
             }
         }
     }

@@ -140,7 +140,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Tunneling: 10 to each of up to 2 of the opponent's Benched Pokémon; Onix can't attack during your next turn.</summary>
-        private sealed class TunnelingMon : Mon
+        internal sealed class TunnelingMon : Mon
         {
             private static readonly Mon Hit = new CardsG1.ChooseBenchedMon("Tunneling", 2, 10, false);
 

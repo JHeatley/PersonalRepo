@@ -84,7 +84,7 @@ namespace PokemonTCG.Core
                     var weakness2 = SecondWeaknessOf(target);
                     if ((weakness.HasValue && types.Contains(weakness.Value)) || (weakness2.HasValue && types.Contains(weakness2.Value)))
                     {
-                        if (StatsCardOf(target).WeaknessAmount > 0)
+                        if (StatsCardOf(target).WeaknessAmount > 0 && !sources.Any(s => s.Script.AppliesWeaknessAsDouble(s.Ctx)))
                         {
                             dmg += StatsCardOf(target).WeaknessAmount; // older cards: Weakness "+20"
                         }
@@ -441,7 +441,8 @@ namespace PokemonTCG.Core
                     finally { PopSource(); }
                     if (!escapes) continue;
                     knocked.RemoveAt(k);
-                    ShufflePokemonIntoDeck(mon);
+                    if (src.Script.EscapeDiscardsAttachedToDeckBottom) PutPokemonOnDeckBottom(mon);
+                    else ShufflePokemonIntoDeck(mon);
                     break;
                 }
             }
@@ -493,6 +494,14 @@ namespace PokemonTCG.Core
                         try { src.Script.OnHolderKnockedOut(src.Ctx, byOpponentsAttack, wasActive); }
                         finally { PopSource(); }
                     }
+                    if (byOpponentsAttack)
+                        foreach (var src in Sources())
+                        {
+                            if (src.Ctx.Player == mon.Owner) continue;
+                            PushSource(src.Kind, src.Ctx.Player, src.Ctx.Pokemon);
+                            try { src.Script.OnOpponentPokemonKnockedOutByAttack(src.Ctx, mon); }
+                            finally { PopSource(); }
+                        }
                     // v121 fix: an attack's own effect on a Pokémon with no Ability or Power (Base Set Gastly's Destiny Bond) isn't
                     // in SourcesOn, so its script is told here when it asks to be.
                     if (mon.Def.Abilities.Count == 0)

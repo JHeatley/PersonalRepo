@@ -560,6 +560,7 @@ namespace PokemonTCG.Core
             target.Stack.Add(evolution);
             target.TurnEvolved = State.TurnNumber;
             target.PlaySeq = NextLockSeq();
+            target.ConditionsBeforeEvolve = target.Conditions;
             target.Conditions = ConditionsAfterEvolving(target);
             // A BREAK Pokémon keeps the Abilities it had, so a once-per-turn one already used this turn stays used (Greninja
             // BREAK's Water Shuriken: Compendium, 2016-02-11; v92).
