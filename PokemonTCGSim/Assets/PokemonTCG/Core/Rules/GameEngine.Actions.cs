@@ -418,7 +418,12 @@ namespace PokemonTCG.Core
                     PushSource(ability.IsAbility ? EffectSourceKind.Ability : EffectSourceKind.PokemonPower, player, mon);
                     // Parasect's Allergic Pollen (v141): an old-style Pokémon Power can't take cards out of discard piles.
                     var powerShield = ability.Kind == AbilityDef.PokemonPower ? BeginDiscardShield() : null;
-                    try { Scripts.For(sourceCard.Def).UseAbility(new EffectContext(this, player, sourceCard, mon), opt.Index); }
+                    try
+                    {
+                        var abilityCtx = new EffectContext(this, player, sourceCard, mon);
+                        if (ability.Kind == AbilityDef.PokePower && PokePowerCancelled(player, mon, ability.Name)) abilityCtx.MarkAbilityUsed(ability.Name);
+                        else Scripts.For(sourceCard.Def).UseAbility(abilityCtx, opt.Index);
+                    }
                     finally { EndDiscardShield(powerShield); PopSource(); }
                     if (ability.Kind == AbilityDef.PokePower) NotifyPokePowerUsed(mon, ability.Name);
                     // v90: an Active Pokémon that left play through its own Ability (Wishiwashi's Cowardice) is replaced right away;
@@ -865,6 +870,19 @@ namespace PokemonTCG.Core
             if (HasAncientTrait(attacker, OmegaBarrage)) return true;
             foreach (var src in SourcesOn(attacker))
                 if ((src.Kind == EffectSourceKind.Ability || src.Kind == EffectSourceKind.PokemonPower) && src.Script.AttacksTwice(src.Ctx)) return true;
+            return false;
+        }
+
+        /// <summary>v172: the other player's sources may cancel this Poké-Power before it does anything (Alakazam's Power Cancel).</summary>
+        private bool PokePowerCancelled(int player, PokemonInPlay user, string power)
+        {
+            foreach (var src in Sources())
+            {
+                if (src.Ctx.Player == player) continue;
+                PushSource(src.Kind, src.Ctx.Player, src.Ctx.Pokemon);
+                try { if (src.Script.CancelsPokePower(src.Ctx, user, power)) return true; }
+                finally { PopSource(); }
+            }
             return false;
         }
 

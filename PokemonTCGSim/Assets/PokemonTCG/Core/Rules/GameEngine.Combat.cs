@@ -84,7 +84,7 @@ namespace PokemonTCG.Core
                     var weakness2 = SecondWeaknessOf(target);
                     if ((weakness.HasValue && types.Contains(weakness.Value)) || (weakness2.HasValue && types.Contains(weakness2.Value)))
                     {
-                        if (StatsCardOf(target).WeaknessAmount > 0)
+                        if (StatsCardOf(target).WeaknessAmount > 0 && !sources.Any(s => s.Script.AppliesWeaknessAsDouble(s.Ctx)))
                         {
                             dmg += StatsCardOf(target).WeaknessAmount; // older cards: Weakness "+20"
                         }

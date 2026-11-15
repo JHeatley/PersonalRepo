@@ -609,6 +609,13 @@ namespace PokemonTCG.Core
         /// works (Crystal Guardians' Cessation Crystal, on an Active Pokémon). Asked of the Tools on every Pokémon in play.
         /// </summary>
         public virtual bool StopsEveryPowerAndBody(EffectContext src) { return false; }
+        /// <summary>v172: Weakness is applied as ×2 for every Pokémon, "+N" Weakness included (Mysterious Treasures' Lake Boundary).</summary>
+        public virtual bool AppliesWeaknessAsDouble(EffectContext src) { return false; }
+        /// <summary>
+        /// v172: the other player's Pokémon is about to use a Poké-Power from the Powers menu; returning true prevents all its effects
+        /// (it still counts as used). Asked of the other player's working sources (Mysterious Treasures Alakazam's Power Cancel).
+        /// </summary>
+        public virtual bool CancelsPokePower(EffectContext src, PokemonInPlay user, string power) { return false; }
         public virtual bool EndsAnnouncedAttack(EffectContext src, PokemonInPlay attacker) { return false; }
         public virtual void OnAnnouncedAttackEnded(EffectContext src, PokemonInPlay attacker) { }
         /// <summary>v171: a Pokémon in play just used a Poké-Power from the Powers menu (Shiftry ex's Dark Eyes). Asked of every working source.</summary>
