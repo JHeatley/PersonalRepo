@@ -6,7 +6,8 @@ namespace PokemonTCG.Tests
 {
     /// <summary>
     /// v154: the Japanese Storm Emeralda (M6) and ex Starter Set Zorua &amp; Zoroark ex (MEZ) cards: their own set codes with the
-    /// Japanese numbers (your choice), the prints, and the new effects.
+    /// Japanese numbers (your choice), the prints, and the new effects. v157: Delta Reign is out in English, so they're prints of
+    /// the Delta Reign cards, with the English names.
     /// </summary>
     public class M6Tests : ScenarioTestBase
     {
@@ -17,11 +18,11 @@ namespace PokemonTCG.Tests
         const string Chansey = "E2-69";
         const string MegaDragonite = "MEP-91";
         const string MegaRayquaza = "DLR-84";
-        const string Giratina = "M6-31";
-        const string Talonflame = "M6-62";
-        const string RiceBall = "M6-63";
-        const string Cap = "M6-66";
-        const string Zoroark = "MEZ-7";
+        const string Giratina = "DLR-45";
+        const string Talonflame = "DLR-88";
+        const string RiceBall = "DLR-101";
+        const string Cap = "DLR-100";
+        const string Zoroark = "DLR-67";
 
         private void Attach(GameEngine e, PokemonInPlay mon, string energy, int count)
         {
@@ -34,21 +35,27 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
-        public void Storm_Emeralda_And_The_Zoroark_Starter_Are_Japanese_Sets_With_Prints()
+        public void Storm_Emeralda_And_The_Zoroark_Starter_Cards_Are_Prints_Of_Delta_Reign()
         {
-            Assert.AreEqual(9, db.Cards.Count(d => d.SetCode == "M6"));
-            Assert.AreEqual(2, db.Cards.Count(d => d.SetCode == "MEZ"));
-            Assert.IsTrue(C(Giratina).PrintSetName.Contains("Japan"));
-            Assert.IsTrue(C(Zoroark).PrintSetName.Contains("Japan"));
+            Assert.AreEqual(0, db.Cards.Count(d => d.SetCode == "M6" || d.SetCode == "MEZ"), "every one is out in English now");
+            var jp = new[]
+            {
+                new[] { "M6-29", "DLR-43" }, new[] { "M6-31", "DLR-45" }, new[] { "M6-32", "DLR-46" }, new[] { "M6-47", "DLR-68" },
+                new[] { "M6-85", "DLR-68" }, new[] { "M6-60", "DLR-86" }, new[] { "M6-61", "DLR-87" }, new[] { "M6-62", "DLR-88" },
+                new[] { "M6-96", "DLR-88" }, new[] { "M6-63", "DLR-101" }, new[] { "M6-66", "DLR-100" }, new[] { "MEZ-3", "DLR-63" },
+                new[] { "MEZ-7", "DLR-67" }, new[] { "M6-104", "POR-86" }, new[] { "M6-105", "CRI-86" }, new[] { "MEZ-6", "DLR-112" },
+                new[] { "MEZ-20", "DLR-112" },
+            };
+            foreach (var pair in jp)
+            {
+                Assert.AreEqual(pair[1], db.MainPrinting(C(pair[0])).Key, pair[0]);
+                StringAssert.Contains("Japan", C(pair[0]).PrintSetName, pair[0]);
+                StringAssert.DoesNotContain("not yet in English", C(pair[0]).PrintSetName, pair[0]);
+            }
+            Assert.AreEqual("Tasty Rice Ball", C("M6-63").Name, "the English name");
             Assert.IsTrue(C(Talonflame).IsEx && C(Zoroark).IsEx);
             Assert.AreEqual("Fletchinder", C(Talonflame).EvolvesFrom);
             Assert.IsTrue(C(Cap).IsTool && C(RiceBall).IsItem);
-            Assert.AreEqual("M6-47", db.MainPrinting(C("M6-85")).Key);
-            Assert.AreEqual("M6-62", db.MainPrinting(C("M6-96")).Key);
-            Assert.AreEqual("POR-86", db.MainPrinting(C("M6-104")).Key, "Grow Grass Energy");
-            Assert.AreEqual("CRI-86", db.MainPrinting(C("M6-105")).Key, "Nitro Fire Energy");
-            Assert.AreEqual("DLR-112", db.MainPrinting(C("MEZ-6")).Key, "same Zorua as Delta Reign's");
-            Assert.AreEqual("DLR-112", db.MainPrinting(C("MEZ-20")).Key);
         }
 
         [Test]
@@ -71,16 +78,16 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
-        public void Excite_Dive_Benches_Talonflame_ex_With_A_Colorless_Mega_Evolution_ex()
+        public void Excited_Dive_Benches_Talonflame_ex_With_A_Colorless_Mega_Evolution_ex()
         {
             foreach (bool mega in new[] { true, false })
             {
-                var e = Scenario(new ScriptedAgent().Then("Use Excite Dive"), new ScriptedAgent());
+                var e = Scenario(new ScriptedAgent().Then("Use Excited Dive"), new ScriptedAgent());
                 e.ScenarioActive(0, C(mega ? MegaRayquaza : Chansey));
                 e.ScenarioAddToHand(0, C(Talonflame));
                 e.ScenarioActive(1, C(Chansey));
                 e.ScenarioSetTurn(0, 3);
-                Assert.AreEqual(mega, Offered(e, 0, "Use Excite Dive"));
+                Assert.AreEqual(mega, Offered(e, 0, "Use Excited Dive"));
                 if (!mega) continue;
                 Step(e);
                 Assert.AreEqual(1, e.State.Players[0].Bench.Count(m => m.Name == "Talonflame ex"));
@@ -88,9 +95,9 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
-        public void Delicious_Rice_Ball_Heals_30_More_For_Each_Other_In_The_Discard()
+        public void Tasty_Rice_Ball_Heals_30_More_For_Each_Other_In_The_Discard()
         {
-            var e = Scenario(new ScriptedAgent().Then("Play Delicious Rice Ball"), new ScriptedAgent());
+            var e = Scenario(new ScriptedAgent().Then("Play Tasty Rice Ball"), new ScriptedAgent());
             var dragonite = e.ScenarioActive(0, C(MegaDragonite));
             dragonite.DamageCounters = 10;
             e.ScenarioAddToDiscard(0, C(RiceBall), 2);
@@ -122,9 +129,9 @@ namespace PokemonTCG.Tests
         }
 
         [Test]
-        public void Riot_Beat_Counts_Your_Pokemon_In_Play()
+        public void Riotous_Beating_Counts_Your_Pokemon_In_Play()
         {
-            var e = Scenario(new ScriptedAgent().Then("Attack: Riot Beat"), new ScriptedAgent());
+            var e = Scenario(new ScriptedAgent().Then("Attack: Riotous Beating"), new ScriptedAgent());
             var zoroark = e.ScenarioActive(0, C(Zoroark));
             Attach(e, zoroark, Darkness, 1);
             e.ScenarioBench(0, C(Chansey));

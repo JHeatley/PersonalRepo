@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using PokemonTCG.Core;
@@ -69,6 +70,59 @@ namespace PokemonTCG.Cards
                                                    new ConditionAttackMon("Hypnoblast", SpecialCondition.Asleep)));
             r.RegisterByKey("DLR-83", new ColorfulWhipMon());
             r.RegisterByKey("DLR-112", new PlainMon());
+
+            // v157: the rest of Delta Reign (the cards shown since). Alternate arts and reprints are prints (printings.json); the
+            // Japanese Storm Emeralda (M6) and Zorua & Zoroark ex starter (MEZ) cards became prints of these (CardsM6).
+            r.RegisterByKey("DLR-1", new ComboMon(new DrawAttackMon("Spike Draw", 2), new RecoilMon("High Horsepower", 30)));
+            r.RegisterByKey("DLR-2", new CardsUNM1.NamedBenchSearchMon("Multiply", "Surskit", 2));
+            r.RegisterByKey("DLR-4", new FlipBonusMon("Knock Away", 10));
+            r.RegisterByKey("DLR-5", new ComboMon(new CardsMEG.SnipeMon("Linear Attack", 30),
+                                                  new CardsASR1.PlusMon("Punishing Needles", 50, c => c.OpponentPokemon(m => c.Engine.HasAbility(m)).Count)));
+            r.RegisterByKey("DLR-6", new ComboMon(new CardsPAF1.ReturnSelfMon("Fade Out"), new BugOutMon()));
+            r.RegisterByKey("DLR-7", new CardsFST2.ConditionBonusMon("Clean Hit", 80, c => c.Defending != null && c.Defending.Def.IsEvolution));
+            r.RegisterByKey("DLR-8", new Cards30CC.BenchHitMon("Overrun", 20));
+            r.RegisterByKey("DLR-9", new DrawAttackMon("Double Draw", 2));
+            r.RegisterByKey("DLR-10", new CardsMP.WimpodMP()); // Punk Out: same as Wimpod 138/M-P's
+            r.RegisterByKey("DLR-15", new PlainMon());
+            r.RegisterByKey("DLR-16", new PlainMon());
+            r.RegisterByKey("DLR-17", new ArbolivaDLR());
+            r.RegisterByKey("DLR-20", new SearchAttackMon("Gather Strength", d => d.IsBasicEnergy, 2));
+            r.RegisterByKey("DLR-22", new ComboMon(new ConditionAttackMon("Searing Flame", SpecialCondition.Burned), new LockAfterAttackMon("Combustion Blast", true)));
+            r.RegisterByKey("DLR-24", new CardsASC.FlipDiscardDefendingEnergyMon("Destructive Flame"));
+            r.RegisterByKey("DLR-25", new ComboMon(new MakeWavesMon(), new CardsTWM1.HealSelfMon("Bubble Drain", 30)));
+            r.RegisterByKey("DLR-26", new BrutalWhirlpoolMon());
+            r.RegisterByKey("DLR-27", new PlainMon());
+            r.RegisterByKey("DLR-28", new JellicentDLR());
+            r.RegisterByKey("DLR-30", new BenchSearchAttackMon("Call for Family", 2));
+            r.RegisterByKey("DLR-34", new ParalyzeFlipMon("Thunder Shock"));
+            r.RegisterByKey("DLR-37", new FlipBonusMon("Quick Attack", 20));
+            r.RegisterByKey("DLR-38", new PlainMon());
+            r.RegisterByKey("DLR-39", new PawmotDLR());
+            r.RegisterByKey("DLR-40", new DodgeMon("Agility", false));
+            r.RegisterByKey("DLR-41", new RaidMon());
+            r.RegisterByKey("DLR-42", new LockAfterAttackMon("Flashing Bolt", true));
+            r.RegisterByKey("DLR-49", new CardsSIT1.AscensionMon());
+            r.RegisterByKey("DLR-50", new CardsASC.CounterattackMon("Counterattack Quills", 3, new CardsSSP2.StompOffMon("Digging Claw", 1)));
+            r.RegisterByKey("DLR-51", new CardsASC.SelfGuardMon("Guard Press", 30));
+            r.RegisterByKey("DLR-52", new SteelixDLR());
+            r.RegisterByKey("DLR-56", new PlainMon());
+            r.RegisterByKey("DLR-57", new NidoqueenDLR());
+            r.RegisterByKey("DLR-59", new ComboMon(new TormentingPoisonMon(), new CardsCRI.BasicShieldAttackMon("Stealthy Sting")));
+            r.RegisterByKey("DLR-60", new ComboMon(new LureOutMon(), new CardsRCL1.CountersOnOneMon("Ominous Eyes", 5)));
+            r.RegisterByKey("DLR-61", new FlipBonusMon("Ambush", 20));
+            r.RegisterByKey("DLR-62", new CardsASC.FlipDiscardDefendingEnergyMon("Crunch"));
+            r.RegisterByKey("DLR-64", new PlainMon());
+            r.RegisterByKey("DLR-65", new CardsASR1.TimesMon("Follow-Up Claw", c => c.Defending == null ? 0 : c.Defending.DamageCounters));
+            r.RegisterByKey("DLR-71", new CardsDRX.BothHeadsBonusMon("Deadly Whip", 150));
+            r.RegisterByKey("DLR-73", new CardsASC.SelfGuardMon("Hard Head", 30));
+            r.RegisterByKey("DLR-74", new CoinsMon("Double Smash", 2));
+            r.RegisterByKey("DLR-76", new Cards30CC.BenchHitMon("Break Through", 30));
+            r.RegisterByKey("DLR-77", new Cards30C.SelfCounterBonusMon("Raging Horns", 10));
+            r.RegisterByKey("DLR-80", new BouncyBounceChargeMon());
+            r.RegisterByKey("DLR-81", new SwitchSelfMon("Run Around", false));
+            r.RegisterByKey("DLR-82", new AltariaDLR());
+            r.RegisterByKey("DLR-91", new CustomVest());
+            r.RegisterByKey("DLR-102", new TateAndLizasTraining());
         }
 
         /// <summary>Restricted Activation: this Pokémon can't attack unless you have 10 or more cards in your hand. Goliath's Punch: 30 to itself.</summary>
@@ -487,6 +541,238 @@ namespace PokemonTCG.Cards
         private sealed class LegendaryAbyss : CardScript
         {
             public override int ModifyHealAmount(EffectContext src, PokemonInPlay target, int amount) { return amount * 2; }
+        }
+
+        // ================================================================== v157: the rest of Delta Reign
+
+        /// <summary>Slippery Oil: once during your turn, switch out your opponent's Active Pokémon (they choose the new one). Mega Drain: heal 30.</summary>
+        private sealed class ArbolivaDLR : Mon
+        {
+            private static readonly Mon Drain = new CardsTWM1.HealSelfMon("Mega Drain", 30);
+
+            protected override string Activated { get { return "Slippery Oil"; } }
+
+            protected override bool AbilityReady(EffectContext ctx) { return ctx.Opp.Active != null && ctx.Opp.Bench.Count > 0; }
+
+            protected override void Ability(EffectContext ctx) { ctx.OpponentSwitchesActive(); }
+
+            protected override bool Attack(EffectContext ctx, AttackDef atk) { return Drain.HandleAttack(ctx, atk); }
+        }
+
+        /// <summary>Make Waves: each player shuffles their hand into their deck and draws 4 cards (you draw first).</summary>
+        private sealed class MakeWavesMon : Mon
+        {
+            protected override bool Attack(EffectContext ctx, AttackDef atk)
+            {
+                if (atk.Name != "Make Waves") return false;
+                if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
+                ctx.Engine.ShuffleHandIntoDeck(ctx.Player);
+                ctx.Engine.ShuffleHandIntoDeck(ctx.Opponent);
+                ctx.Draw(4);
+                ctx.Engine.DrawCards(ctx.Opponent, 4);
+                return true;
+            }
+        }
+
+        /// <summary>Brutal Whirlpool: with a Stadium that has "Legendary" in its name in play, also 50 to each of your opponent's Benched Pokémon.</summary>
+        private sealed class BrutalWhirlpoolMon : Mon
+        {
+            protected override bool Attack(EffectContext ctx, AttackDef atk)
+            {
+                if (atk.Name != "Brutal Whirlpool") return false;
+                ctx.DamageDefending(atk.Damage);
+                if (ctx.State.Stadium != null && ctx.State.Stadium.Def.Name.Contains("Legendary"))
+                    foreach (var mon in ctx.Opp.Bench.ToList())
+                        if (ctx.InPlay(mon)) ctx.DamageTarget(mon, 50);
+                return true;
+            }
+        }
+
+        /// <summary>Deep Sea Draw: once during your turn, draw a card; if you do, you may put a card from your hand on the bottom of your deck.</summary>
+        private sealed class JellicentDLR : Mon
+        {
+            protected override string Activated { get { return "Deep Sea Draw"; } }
+
+            protected override bool AbilityReady(EffectContext ctx) { return ctx.Me.Deck.Count > 0; }
+
+            protected override void Ability(EffectContext ctx)
+            {
+                if (ctx.Draw(1) == 0 || ctx.Me.Hand.Count == 0) return;
+                var pick = ctx.ChooseCards(ctx.Me.Hand.ToList(), 0, 1, "Deep Sea Draw: you may put a card from your hand on the bottom of your deck");
+                if (pick.Count == 0 || !ctx.Me.Hand.Remove(pick[0])) return;
+                ctx.Me.Deck.Add(pick[0]);
+                ctx.Log(ctx.Engine.PlayerName(ctx.Player) + " put a card on the bottom of " + ctx.Engine.Their(ctx.Player) + " deck.");
+            }
+        }
+
+        /// <summary>Generator's Touch: once during your turn, attach a Basic Lightning Energy card from your discard pile to 1 of your Pokémon.</summary>
+        private sealed class PawmotDLR : Mon
+        {
+            protected override string Activated { get { return "Generator's Touch"; } }
+
+            private static List<CardInstance> Pile(EffectContext ctx) { return ctx.BasicEnergyInDiscard(d => d.EnergyProvides == EnergyType.Lightning); }
+
+            protected override bool AbilityReady(EffectContext ctx) { return Pile(ctx).Count > 0 && ctx.Me.InPlay().Any(); }
+
+            protected override void Ability(EffectContext ctx)
+            {
+                var pile = Pile(ctx);
+                if (pile.Count == 0) return;
+                var target = ctx.ChoosePokemon(ctx.MyPokemon(), "Generator's Touch: attach a Basic Lightning Energy from your discard pile to which of your Pokémon?");
+                if (target != null && ctx.Me.Discard.Remove(pile[0])) ctx.Engine.AttachEnergyCard(pile[0], target);
+            }
+        }
+
+        /// <summary>Raid: 90 more if this Pokémon evolved from Wattrel during this turn.</summary>
+        private sealed class RaidMon : Mon
+        {
+            protected override bool Attack(EffectContext ctx, AttackDef atk)
+            {
+                if (atk.Name != "Raid") return false;
+                var me = ctx.Pokemon;
+                bool fresh = me != null && me.TurnEvolved == ctx.Turn && me.Stack.Count >= 2 && me.Stack[me.Stack.Count - 2].Def.Name == "Wattrel";
+                ctx.DamageDefending(atk.Damage + (fresh ? 90 : 0));
+                return true;
+            }
+        }
+
+        /// <summary>High Density Armor: at full HP, 60 less damage from the opponent's attacks (after Weakness and Resistance). Tough Swing: ignores Resistance.</summary>
+        private sealed class SteelixDLR : Mon
+        {
+            private static readonly Mon Swing = new CardsFLF1.NoResistanceMon("Tough Swing");
+
+            public override int ModifyDamageTaken(EffectContext src, DamageInfo info, int damage)
+            {
+                if (src.Pokemon == null || info.Target != src.Pokemon || !info.AgainstOpponent || src.Pokemon.DamageCounters > 0) return damage;
+                if (src.Engine.CurrentSourceKind != EffectSourceKind.Attack) return damage;
+                return damage - 60;
+            }
+
+            protected override bool Attack(EffectContext ctx, AttackDef atk) { return Swing.HandleAttack(ctx, atk); }
+        }
+
+        /// <summary>Maternal Call: once during your turn, flip a coin; heads, switch in 1 of your opponent's Benched Pokémon. Giga Impact: can't attack next turn.</summary>
+        private sealed class NidoqueenDLR : Mon
+        {
+            private static readonly Mon Impact = new LockAfterAttackMon("Giga Impact", false);
+
+            protected override string Activated { get { return "Maternal Call"; } }
+
+            protected override bool AbilityReady(EffectContext ctx) { return ctx.GustTargets().Count > 0; }
+
+            protected override void Ability(EffectContext ctx)
+            {
+                if (ctx.Flip()) ctx.GustOpponent("Maternal Call: choose 1 of your opponent's Benched Pokémon to switch in");
+                else ctx.Log("Maternal Call: tails.");
+            }
+
+            protected override bool Attack(EffectContext ctx, AttackDef atk) { return Impact.HandleAttack(ctx, atk); }
+        }
+
+        /// <summary>Tormenting Poison: the opponent's Active Pokémon is Poisoned, 4 damage counters at each Pokémon Checkup instead of 1.</summary>
+        private sealed class TormentingPoisonMon : Mon
+        {
+            protected override bool Attack(EffectContext ctx, AttackDef atk)
+            {
+                if (atk.Name != "Tormenting Poison") return false;
+                if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
+                var defending = ctx.Defending;
+                if (defending != null && ctx.InPlay(defending) && ctx.ApplyCondition(defending, SpecialCondition.Poisoned)) defending.PoisonCounterBase = 4;
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Lure Out: reveal the top 5 cards of your opponent's deck; put any number of Basic Pokémon there onto their Bench (as many as
+        /// fit); they shuffle the rest back into their deck.
+        /// </summary>
+        private sealed class LureOutMon : Mon
+        {
+            protected override bool Attack(EffectContext ctx, AttackDef atk)
+            {
+                if (atk.Name != "Lure Out") return false;
+                if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
+                var deck = ctx.Opp.Deck;
+                if (deck.Count == 0) return true;
+                var top = deck.Take(Math.Min(5, deck.Count)).ToList();
+                ctx.Engine.NoteLookedAt(top, "Top " + top.Count + (top.Count == 1 ? " card" : " cards") + " of your opponent's deck (Lure Out)", ctx.Player);
+                ctx.Engine.NoteLookedAt(top, "Top " + top.Count + (top.Count == 1 ? " card" : " cards") + " of your deck (Lure Out)", ctx.Opponent);
+                var basics = top.Where(c => c.Def.IsBasicPokemon && !ctx.Engine.PutIntoPlayBlocked(ctx.Opponent, c.Def)).ToList();
+                int room = ctx.Engine.BenchSpace(ctx.Opponent);
+                if (basics.Count > 0 && room > 0)
+                {
+                    var picks = ctx.ChooseCards(basics, 0, Math.Min(room, basics.Count), "Lure Out: put any number of these Basic Pokémon onto your opponent's Bench");
+                    foreach (var card in picks)
+                    {
+                        if (ctx.Engine.BenchSpace(ctx.Opponent) <= 0 || !deck.Remove(card)) continue;
+                        ctx.Engine.PutOntoBench(ctx.Opponent, card, false);
+                    }
+                }
+                ctx.Engine.ShuffleDeck(ctx.Opponent);
+                return true;
+            }
+        }
+
+        /// <summary>Bouncy-Bounce Charge: search your deck for an Energy card and attach it to 1 of your Benched Pokémon.</summary>
+        private sealed class BouncyBounceChargeMon : Mon
+        {
+            protected override bool Attack(EffectContext ctx, AttackDef atk)
+            {
+                if (atk.Name != "Bouncy-Bounce Charge") return false;
+                if (atk.Damage > 0) ctx.DamageDefending(atk.Damage);
+                if (ctx.Me.Bench.Count == 0 || ctx.Me.Deck.Count == 0) return true;
+                var found = ctx.SearchMyDeck(d => d.IsEnergy, 1, "Bouncy-Bounce Charge: choose an Energy card to attach to 1 of your Benched Pokémon");
+                foreach (var card in found)
+                {
+                    var target = ctx.Me.Bench.Count == 0 ? null : ctx.ChoosePokemon(ctx.MyBench(), "Bouncy-Bounce Charge: attach " + card.Def.Name + " to which of your Benched Pokémon?");
+                    if (target == null || !ctx.Engine.AttachEnergyCard(card, target))
+                        if (!ctx.Me.Deck.Contains(card)) ctx.Me.Deck.Add(card);
+                }
+                ctx.ShuffleMyDeck();
+                return true;
+            }
+        }
+
+        /// <summary>Cottony Carrier: your Basic Pokémon in play have no Retreat Cost.</summary>
+        private sealed class AltariaDLR : Mon
+        {
+            public override int ModifyRetreatCost(EffectContext src, PokemonInPlay mon, int cost)
+            {
+                return src.Pokemon != null && mon != null && mon.Owner == src.Player && mon.Def.IsBasicPokemon ? 0 : cost;
+            }
+        }
+
+        /// <summary>
+        /// Custom Vest (Tool): unless the holder is a Mega Evolution Pokémon ex, it takes 60 less damage from attacks from your
+        /// opponent's Mega Evolution Pokémon ex (after Weakness and Resistance).
+        /// </summary>
+        private sealed class CustomVest : CardScript
+        {
+            public override int ModifyDamageTaken(EffectContext src, DamageInfo info, int damage)
+            {
+                var holder = src.Pokemon;
+                if (holder == null || info.Target != holder || !info.AgainstOpponent || damage <= 0 || holder.Def.IsMegaEx) return damage;
+                if (info.Attacker == null || !info.Attacker.Def.IsMegaEx || src.Engine.CurrentSourceKind != EffectSourceKind.Attack) return damage;
+                return damage - 60;
+            }
+        }
+
+        /// <summary>
+        /// Tate &amp; Liza's Training (Supporter): draw 2 cards; if you drew any and a Stadium with "Legendary" in its name is in play,
+        /// this card goes into your hand instead of the discard pile.
+        /// </summary>
+        private sealed class TateAndLizasTraining : CardScript
+        {
+            public override bool CanPlayTrainer(EffectContext ctx) { return ctx.Me.Deck.Count > 0; }
+
+            public override void ResolveTrainer(EffectContext ctx)
+            {
+                int drew = ctx.Draw(2);
+                if (drew == 0 || ctx.Card == null || ctx.State.Stadium == null || !ctx.State.Stadium.Def.Name.Contains("Legendary")) return;
+                ctx.Me.Hand.Add(ctx.Card);
+                ctx.CardPlacedElsewhere = true;
+                ctx.Log(ctx.Card.Def.Name + " went back into " + ctx.Engine.Their(ctx.Player) + " hand (a Legendary Stadium is in play).");
+            }
         }
     }
 }

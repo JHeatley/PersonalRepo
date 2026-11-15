@@ -41,7 +41,7 @@ namespace PokemonTCG.Tests
         [Test]
         public void Delta_Reign_Cards_And_Legendary_Stadium_Halves()
         {
-            Assert.AreEqual(38, db.Cards.Count(d => d.SetCode == "DLR"));
+            Assert.AreEqual(98, db.Cards.Count(d => d.SetCode == "DLR"), "v157: every Delta Reign card (alternate arts and reprints are prints)");
             // v153.2: Enamorus 110 is the Delta Reign promo's card, Aarune 139 a print of Aarune 89.
             Assert.AreEqual("MEP-113", db.MainPrinting(C("DLR-110")).Key);
             Assert.AreEqual("DLR-89", db.MainPrinting(C("DLR-139")).Key);
