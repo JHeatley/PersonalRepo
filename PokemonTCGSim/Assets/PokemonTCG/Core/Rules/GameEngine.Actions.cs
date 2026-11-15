@@ -895,6 +895,14 @@ namespace PokemonTCG.Core
                 try { if (src.Script.CancelsPokePower(src.Ctx, user, power)) return true; }
                 finally { PopSource(); }
             }
+            // v173: a card the other player may play from their hand right then (Team Galactic's Invention G-103 Power Spray).
+            int other = 1 - player;
+            foreach (var card in State.Players[other].Hand.ToList())
+            {
+                var script = Scripts.For(card.Def);
+                if (!script.CancelsPokePowerFromHand) continue;
+                if (script.CancelPokePowerFromHand(new EffectContext(this, other, card, null), user, power)) return true;
+            }
             return false;
         }
 

@@ -616,6 +616,10 @@ namespace PokemonTCG.Core
         /// (it still counts as used). Asked of the other player's working sources (Mysterious Treasures Alakazam's Power Cancel).
         /// </summary>
         public virtual bool CancelsPokePower(EffectContext src, PokemonInPlay user, string power) { return false; }
+        /// <summary>v173: this card may be played from the hand during the opponent's turn to stop a Poké-Power (Power Spray).</summary>
+        public virtual bool CancelsPokePowerFromHand { get { return false; } }
+        /// <summary>v173: asks the card's owner and, if they play it, stops the Poké-Power (returns true).</summary>
+        public virtual bool CancelPokePowerFromHand(EffectContext ctx, PokemonInPlay user, string power) { return false; }
         public virtual bool EndsAnnouncedAttack(EffectContext src, PokemonInPlay attacker) { return false; }
         public virtual void OnAnnouncedAttackEnded(EffectContext src, PokemonInPlay attacker) { }
         /// <summary>v171: a Pokémon in play just used a Poké-Power from the Powers menu (Shiftry ex's Dark Eyes). Asked of every working source.</summary>
