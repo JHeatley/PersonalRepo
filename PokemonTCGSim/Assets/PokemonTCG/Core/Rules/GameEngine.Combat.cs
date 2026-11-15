@@ -361,6 +361,9 @@ namespace PokemonTCG.Core
         }
 
         /// <summary>"This Pokémon is Knocked Out" / "Both Active Pokémon are Knocked Out". Resolved with the other Knock Outs.</summary>
+        /// <summary>v173: a Knocked Out Pokémon with this marker goes to its owner's hand with every attached card (Water Rescue).</summary>
+        public const string AllToHandOnKnockOut = "All cards to hand on Knock Out";
+
         public bool KnockOut(PokemonInPlay mon, string reason)
         {
             if (mon == null || State.FindPokemon(mon.Uid) != mon) return false;
@@ -547,6 +550,16 @@ namespace PokemonTCG.Core
                         if (lost >= 2) owner.LostZone.AddRange(attached);
                         else DiscardFromPlay(attached);
                         Emit(GameEventType.Info, mon.Owner, mon.Name + " went to the Lost Zone" + (lost >= 2 ? " with every card attached to it." : "; its attached cards were discarded."), -1, mon.Uid);
+                    }
+                    else if (mon.Markers.ContainsKey(AllToHandOnKnockOut))
+                    {
+                        // v173: Floatzel GL LV.X's Water Rescue: the Pokémon and every card attached to it go to the hand.
+                        owner.Hand.AddRange(mon.Stack);
+                        owner.Hand.AddRange(mon.Energy);
+                        owner.Hand.AddRange(mon.Tools);
+                        mon.Energy.Clear();
+                        mon.Tools.Clear();
+                        Emit(GameEventType.Info, mon.Owner, mon.Name + " and all cards attached to it went to " + PlayerName(mon.Owner) + "'s hand.", mon.Top.Id, mon.Uid);
                     }
                     else if (toHand)
                     {

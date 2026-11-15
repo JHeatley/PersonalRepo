@@ -176,6 +176,9 @@ namespace PokemonTCG.Core
         /// </summary>
         public virtual Func<CardDef, bool> SecondEnergyAttachment(GameEngine engine, int player, PokemonInPlay target, CardInstance first) { return null; }
         /// <summary>v126, Koga's Ditto's Giant Growth: the Pokémon's maximum HP.</summary>
+        /// <summary>v173: a Pokémon was put onto its owner's Bench from their hand (Silver Feather).</summary>
+        public virtual void OnPokemonBenchedFromHand(GameEngine engine, PokemonInPlay benched) { }
+
         public virtual int ModifyMaxHp(GameEngine engine, PokemonInPlay mon, int hp) { return hp; }
     }
 

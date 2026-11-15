@@ -736,7 +736,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Detour: with a Supporter card in play (played this turn), use its effect as this attack's effect.</summary>
-        private sealed class DetourMon : Mon
+        internal sealed class DetourMon : Mon
         {
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {

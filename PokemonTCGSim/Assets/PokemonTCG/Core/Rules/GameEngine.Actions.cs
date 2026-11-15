@@ -424,7 +424,12 @@ namespace PokemonTCG.Core
                     try
                     {
                         var abilityCtx = new EffectContext(this, player, sourceCard, mon);
-                        if (ability.Kind == AbilityDef.PokePower && PokePowerCancelled(player, mon, ability.Name)) abilityCtx.MarkAbilityUsed(ability.Name);
+                        if (ability.Kind == AbilityDef.PokePower && PokePowerCancelled(player, mon, ability.Name))
+                        {
+                            abilityCtx.MarkAbilityUsed(ability.Name);
+                            // v173 (errata, 2009-05-01): a Poké-Power that ends your turn still ends it when it's cancelled (Cheerful Voice).
+                            if (ability.Text != null && ability.Text.Contains("your turn ends")) RequestEndTurn();
+                        }
                         else Scripts.For(sourceCard.Def).UseAbility(abilityCtx, opt.Index);
                     }
                     finally { EndDiscardShield(powerShield); PopSource(); }
@@ -894,6 +899,14 @@ namespace PokemonTCG.Core
                 PushSource(src.Kind, src.Ctx.Player, src.Ctx.Pokemon);
                 try { if (src.Script.CancelsPokePower(src.Ctx, user, power)) return true; }
                 finally { PopSource(); }
+            }
+            // v173: a card the other player may play from their hand right then (Team Galactic's Invention G-103 Power Spray).
+            int other = 1 - player;
+            foreach (var card in State.Players[other].Hand.ToList())
+            {
+                var script = Scripts.For(card.Def);
+                if (!script.CancelsPokePowerFromHand) continue;
+                if (script.CancelPokePowerFromHand(new EffectContext(this, other, card, null), user, power)) return true;
             }
             return false;
         }
