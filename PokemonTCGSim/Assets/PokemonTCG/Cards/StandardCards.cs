@@ -367,6 +367,12 @@ namespace PokemonTCG.Cards
             CardsHP.Register(r);
             CardsHPB.Register(r);
             CardsHPT.Register(r);
+            CardsP3.Register(r);
+            CardsCG.Register(r);
+            CardsP4.Register(r);
+            CardsDF.Register(r);
+            CardsPK.Register(r);
+            CardsP5.Register(r);
 
             return r;
         }
