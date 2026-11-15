@@ -1,0 +1,226 @@
+{
+ "format": "POP Series 8 (P8, 2008): cards not already in the pool. Unlimited only. Cherrim 6 (Diamond & Pearl's), Carnivine 7 (Diamond & Pearl's), Night Maintenance 9 (Mysterious Treasures'), Rare Candy 10 (Mega Evolution's), Roseanne's Research 11 (Secret Wonders'), Chimchar 12 (DP Black Star Promos'), Croagunk 13 (Mysterious Treasures'), Happiny 14 (Mysterious Treasures'), Piplup 15 (DP Black Star Promos'), Turtwig 17 (DP Black Star Promos') are prints of cards already in the pool.",
+ "cards": [
+  {
+   "set": "P8",
+   "number": "1",
+   "name": "Heatran",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Fire",
+   "weakness": "Water",
+   "weaknessAmount": 30,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Body Slam",
+     "cost": "CC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    },
+    {
+     "name": "Fire Spin",
+     "cost": "RRRC",
+     "damage": 90,
+     "text": "Discard 2 Basic Energy cards attached to this Pokémon. (If you can't discard cards, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "P8",
+   "number": "2",
+   "name": "Lucario",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Riolu",
+   "hp": 90,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "weaknessAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Blocking Punch",
+     "cost": "MC",
+     "damage": 40,
+     "text": "During your opponent's next turn, any damage done to this Pokémon by attacks is reduced by 20 (after applying Weakness and Resistance)."
+    },
+    {
+     "name": "Striking Kick",
+     "cost": "FCC",
+     "damage": 60,
+     "text": "This attack's damage isn't affected by Resistance, Poké-Powers, Poké-Bodies, or any other effects on the Defending Pokémon"
+    }
+   ]
+  },
+  {
+   "set": "P8",
+   "number": "3",
+   "name": "Luxray",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Luxio",
+   "hp": 120,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "weaknessAmount": 30,
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Intimidating Fang",
+     "text": "As long as this Pokémon is your Active Pokémon, any damage done by an opponent's attack is reduced by 10 (before applying Weakness and Resistance).",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Thunder",
+     "cost": "LLLC",
+     "damage": 120,
+     "text": "Flip a coin. If tails, this Pokémon does 40 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "P8",
+   "number": "4",
+   "name": "Probopass",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Nosepass",
+   "hp": 90,
+   "type": "Metal",
+   "weakness": "Fire",
+   "weaknessAmount": 30,
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Rock Slide",
+     "cost": "FC",
+     "damage": 20,
+     "text": "Does 10 damage to 2 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Triple Nose",
+     "cost": "MCC",
+     "damage": 50,
+     "damageSuffix": "+",
+     "text": "Flip 3 coins. This attack does 50 damage plus 20 more damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "P8",
+   "number": "5",
+   "name": "Yanmega",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Yanma",
+   "hp": 90,
+   "type": "Grass",
+   "weakness": "Lightning",
+   "weaknessAmount": 20,
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Supersonic",
+     "cost": "G",
+     "damage": 0,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Confused."
+    },
+    {
+     "name": "Air Slash",
+     "cost": "CCCC",
+     "damage": 70,
+     "text": "Flip a coin. If tails, discard an Energy attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "P8",
+   "number": "8",
+   "name": "Luxio",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Shinx",
+   "hp": 80,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "weaknessAmount": 20,
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Fasten Claw",
+     "cost": "C",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 damage plus 30 more damage."
+    },
+    {
+     "name": "Thunder Fang",
+     "cost": "LL",
+     "damage": 30,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "P8",
+   "number": "16",
+   "name": "Riolu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fighting",
+   "weakness": "Psychic",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Inner Focus",
+     "text": "This Pokémon can't be Paralyzed.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Quick Attack",
+     "cost": "F",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 damage plus 10 more damage."
+    }
+   ]
+  }
+ ]
+}

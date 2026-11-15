@@ -1,0 +1,82 @@
+{
+ "format": "POP Series 6 (P6, 2007): cards not already in the pool. Unlimited only. Bastiodon 1 (Mysterious Treasures'), Lucario 2 (Diamond & Pearl's), Manaphy 3 (Diamond & Pearl's), Pachirisu 4 (DP Black Star Promos'), Rampardos 5 (Mysterious Treasures'), Drifloon 6 (Diamond & Pearl's), Riolu 8 (Diamond & Pearl's), Staravia 10 (Diamond & Pearl's), Bidoof 11 (Diamond & Pearl's), Buneary 12 (DP Black Star Promos'), Cherubi 13 (Diamond & Pearl's), Chimchar 14 (DP Black Star Promos'), Starly 16 (Diamond & Pearl's), Turtwig 17 (DP Black Star Promos') are prints of cards already in the pool.",
+ "cards": [
+  {
+   "set": "P6",
+   "number": "7",
+   "name": "Gible",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "Oran Berry: Remove 1 damage counter from this card at the end of your turn.",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Colorless",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Surprise Attack",
+     "cost": "CC",
+     "damage": 30,
+     "text": "Flip a coin. If tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "P6",
+   "number": "9",
+   "name": "Pikachu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "Oran Berry: Remove 1 damage counter from this card at the end of your turn.",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "weaknessAmount": 10,
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Spark",
+     "cost": "LC",
+     "damage": 10,
+     "text": "Does 10 damage to 2 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "P6",
+   "number": "15",
+   "name": "Piplup",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Water",
+   "weakness": "Lightning",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Peck",
+     "cost": "",
+     "damage": 10
+    },
+    {
+     "name": "Water Spash",
+     "cost": "WC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 20 damage plus 10 more damage."
+    }
+   ]
+  }
+ ]
+}
