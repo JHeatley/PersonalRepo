@@ -645,6 +645,15 @@ namespace PokemonTCG.Core
                 }
                 else if (!ctx.CardPlacedElsewhere) p.Discard.Add(card);
             }
+            // v172: Ampharos's Jamming: after a Supporter from the hand has resolved.
+            if (d.IsSupporter && string.IsNullOrEmpty(from) && !State.IsOver)
+                foreach (var src in Sources())
+                {
+                    if (src.Ctx.Player == player) continue;
+                    PushSource(src.Kind, src.Ctx.Player, src.Ctx.Pokemon);
+                    try { src.Script.OnOpponentPlayedSupporter(src.Ctx, player, d); }
+                    finally { PopSource(); }
+                }
         }
 
         /// <summary>

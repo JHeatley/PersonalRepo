@@ -620,6 +620,10 @@ namespace PokemonTCG.Core
         public virtual void OnAnnouncedAttackEnded(EffectContext src, PokemonInPlay attacker) { }
         /// <summary>v171: a Pokémon in play just used a Poké-Power from the Powers menu (Shiftry ex's Dark Eyes). Asked of every working source.</summary>
         public virtual void OnPokePowerUsed(EffectContext src, PokemonInPlay user, string power) { }
+        /// <summary>v172: the opponent of this source's owner played a Supporter card from their hand and it resolved (Ampharos's Jamming).</summary>
+        public virtual void OnOpponentPlayedSupporter(EffectContext src, int player, CardDef supporter) { }
+        /// <summary>v172: 1 of the opponent's Pokémon was Knocked Out by damage from an attack of this source's owner (Entei's Burning Coat). The Pokémon is still in play; HitByAttackerUid names the attacker.</summary>
+        public virtual void OnOpponentPokemonKnockedOutByAttack(EffectContext src, PokemonInPlay knockedOut) { }
         /// <summary>
         /// v159: a Poké-Body in play that stops another Pokémon's Poké-Bodies (Muk ex's Toxic Gas). bodyName is the Poké-Body
         /// being checked, so a blocker can leave its own kind alone without checking itself in a loop.

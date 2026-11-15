@@ -18,7 +18,7 @@ namespace PokemonTCG.Cards
             r.RegisterByKey("MT-21", new BastiodonProtectiveWall());
             r.RegisterByKey("MT-22", new ComboMon(new CallInMon(), new CardsCG.IfDefendingConditionMon("Strange Bell", SpecialCondition.Confused, m => m.IsBasic)));
             r.RegisterByKey("MT-23", new CardsDS.EvolutionaryMon("Evolutionary Toxic", EvolutionaryToxic, c => c.Opp.Active != null, new StrikeAndFadeMon()));
-            r.RegisterByKey("MT-24", new ComboMon(new StringBombMon(), new NutritionalSupportMon()));
+            r.RegisterByKey("MT-24", new ComboMon(new StringBombMon(), new SearchAttachAnyWayMon("Nutritional Support", EnergyType.Grass, 2)));
             r.RegisterByKey("MT-25", new GlalieCraggyFace());
             r.RegisterByKey("MT-26", new GyaradosDragonDna());
             r.RegisterByKey("MT-27", new CardsASR1.PlusMon("Concerto", 10, c => c.MyPokemon(m => m.Name == "Kricketot" || m.Name == "Kricketune").Count));
@@ -51,7 +51,7 @@ namespace PokemonTCG.Cards
             r.RegisterByKey("MT-55", new ComboMon(new CardsOBF1.RetreatCostDamageMon("Centrifugal Force", 20, true), new SwirlingRippleMon()));
             r.RegisterByKey("MT-56", new SearchDiscardToHandMon("Rescue", d => d.IsPokemon, 2));
             r.RegisterByKey("MT-57", new ComboMon(new CrashBomberMon(), new CardsMA.BenchOnlyMon("Aqua Liner", 40)));
-            r.RegisterByKey("MT-58", new ComboMon(new WildSporesMon(), new CardsE3B.HealSelfMon("Extend Fungus", 2)));
+            r.RegisterByKey("MT-58", new ComboMon(new WildSporesMon(), new CardsE3B.HealSelfMon("Extend Fungus", 20)));
             r.RegisterByKey("MT-59", new ComboMon(new CardsSS.EachOpponentMon("Pressurized Gas", 10), new RocketTackleMon()));
             r.RegisterByKey("MT-60", new CardsDR.FlipDiscardSelfMon("Fireworks", EnergyType.Fire));
             r.RegisterByKey("MT-61", new ComboMon(new SpikeArmorMon(), new CardsCG.IfDefendingConditionMon("Poison Spike", SpecialCondition.Poisoned, m => m.DamageCounters > 0)));
@@ -222,16 +222,28 @@ namespace PokemonTCG.Cards
             }
         }
 
-        /// <summary>Nutritional Support: up to 2 Grass Energy cards from your deck attached to your Pokémon in any way you like.</summary>
-        private sealed class NutritionalSupportMon : Mon
+        /// <summary>"Search your deck for up to N [type] Energy cards and attach them to your Pokémon in any way you like" (Nutritional Support, Shadow Charge).</summary>
+        internal sealed class SearchAttachAnyWayMon : Mon
         {
+            private readonly string attack;
+            private readonly EnergyType type;
+            private readonly int max;
+
+            public SearchAttachAnyWayMon(string attack, EnergyType type, int max)
+            {
+                this.attack = attack;
+                this.type = type;
+                this.max = max;
+            }
+
             protected override bool Attack(EffectContext ctx, AttackDef atk)
             {
-                if (atk.Name != "Nutritional Support") return false;
+                if (atk.Name != attack) return false;
+                ctx.DamageDefending(atk.Damage);
                 if (ctx.Me.Deck.Count == 0) return true;
-                var picks = ctx.SearchMyDeck(d => CardsRS.BasicOf(d, EnergyType.Grass), 2, "Nutritional Support: choose up to 2 Grass Energy cards");
+                var picks = ctx.SearchMyDeck(d => CardsRS.BasicOf(d, type), max, attack + ": choose up to " + max + " " + type + " Energy cards");
                 foreach (var card in picks) ctx.Me.Deck.Remove(card);
-                if (picks.Count > 0) ctx.AttachCardsAnyWay(picks, picks.Count, (c, m) => true, "Nutritional Support: attach this Grass Energy card to which Pokémon?", false);
+                if (picks.Count > 0) ctx.AttachCardsAnyWay(picks, picks.Count, (c, m) => true, attack + ": attach this " + type + " Energy card to which Pokémon?", false);
                 foreach (var card in picks) if (!ctx.Me.Hand.Contains(card) && !ctx.Me.Discard.Contains(card) && !ctx.MyPokemon().Any(m => m.Energy.Contains(card))) ctx.Me.Deck.Add(card);
                 ctx.ShuffleMyDeck();
                 return true;

@@ -494,6 +494,14 @@ namespace PokemonTCG.Core
                         try { src.Script.OnHolderKnockedOut(src.Ctx, byOpponentsAttack, wasActive); }
                         finally { PopSource(); }
                     }
+                    if (byOpponentsAttack)
+                        foreach (var src in Sources())
+                        {
+                            if (src.Ctx.Player == mon.Owner) continue;
+                            PushSource(src.Kind, src.Ctx.Player, src.Ctx.Pokemon);
+                            try { src.Script.OnOpponentPokemonKnockedOutByAttack(src.Ctx, mon); }
+                            finally { PopSource(); }
+                        }
                     // v121 fix: an attack's own effect on a Pokémon with no Ability or Power (Base Set Gastly's Destiny Bond) isn't
                     // in SourcesOn, so its script is told here when it asks to be.
                     if (mon.Def.Abilities.Count == 0)
