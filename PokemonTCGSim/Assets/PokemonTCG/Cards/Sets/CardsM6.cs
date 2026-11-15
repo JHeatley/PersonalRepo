@@ -6,30 +6,29 @@ using PokemonTCG.Core;
 namespace PokemonTCG.Cards
 {
     /// <summary>
-    /// v154: Japanese cards not yet in English (your choice: their own set codes and Japanese numbers, labelled "Japan, not yet in
-    /// English", Standard now; they become prints when the English cards show up). Storm Emeralda (M6, the Japanese Delta Reign)
-    /// and the ex Starter Set Zorua &amp; Zoroark ex (MEZ). Card, attack and Ability names are translations until the English
-    /// cards are out (Pokémon names are the English ones).
+    /// v154: Japanese cards from before their English release, under their own set codes and Japanese numbers (your choice: they
+    /// become prints when the English cards show up). v157: Delta Reign is out in English, so the Storm Emeralda (M6) and Zorua
+    /// &amp; Zoroark ex starter (MEZ) cards are now prints of their Delta Reign cards, with the English names. Their scripts stay here.
     /// </summary>
     public static class CardsM6
     {
         public static void Register(CardScriptRegistry r)
         {
-            // MEZ (6 and 20 Zorua are prints of DLR-112).
-            r.RegisterByKey("MEZ-3", new CardsMEG.ChargeSelfMon("Shadow Cloak", EnergyType.Darkness, 2));
-            r.RegisterByKey("MEZ-7", new ComboMon(new CardsASR1.TimesMon("Riot Beat", c => c.MyPokemon().Count),
-                                                  new LockAfterAttackMon("Slash Down", true)));
+            // Darkrai (MEZ 3) and Zoroark ex (MEZ 7); MEZ 6 and 20 Zorua are prints of DLR-112.
+            r.RegisterByKey("DLR-63", new CardsMEG.ChargeSelfMon("Shadow-Clad", EnergyType.Darkness, 2));
+            r.RegisterByKey("DLR-67", new ComboMon(new CardsASR1.TimesMon("Riotous Beating", c => c.MyPokemon().Count),
+                                                   new LockAfterAttackMon("Slashing Strike", true)));
 
-            // M6 (85 Inkay and 96 Talonflame ex are prints; 104 is a print of Grow Grass Energy POR-86, 105 of Nitro Fire
-            // Energy CRI-86).
-            r.RegisterByKey("M6-29", new PlainMon());
-            r.RegisterByKey("M6-31", new ChaosCrawlerMon());
-            r.RegisterByKey("M6-32", new PlainMon());
-            r.RegisterByKey("M6-47", new KnockOffMon("Knock Off"));
-            r.RegisterByKey("M6-60", new TailsNothingMon("Ambush"));
-            r.RegisterByKey("M6-61", new NoRetreatMon("Clutch"));
-            r.RegisterByKey("M6-62", new TalonflameExM6());
-            r.RegisterByName("Delicious Rice Ball", new DeliciousRiceBall());
+            // M6 29 Drowzee, 31 Giratina, 32 Golett, 47 and 85 Inkay, 60 Fletchling, 61 Fletchinder, 62 and 96 Talonflame ex,
+            // 63 Tasty Rice Ball, 66 Mega Rayquaza Cap (104 is a print of Grow Grass Energy POR-86, 105 of Nitro Fire Energy CRI-86).
+            r.RegisterByKey("DLR-43", new PlainMon());
+            r.RegisterByKey("DLR-45", new ChaosCrawlerMon());
+            r.RegisterByKey("DLR-46", new PlainMon());
+            r.RegisterByKey("DLR-68", new KnockOffMon("Knock Off"));
+            r.RegisterByKey("DLR-86", new TailsNothingMon("Surprise Attack"));
+            r.RegisterByKey("DLR-87", new NoRetreatMon("Clutch"));
+            r.RegisterByKey("DLR-88", new TalonflameExM6());
+            r.RegisterByName("Tasty Rice Ball", new RiceBall("Tasty Rice Ball"));
             r.RegisterByName("Mega Rayquaza Cap", new MegaRayquazaCap());
         }
 
@@ -50,7 +49,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>
-        /// Chaos Crawler (Giratina M6 31): during the opponent's next turn this Pokémon takes no damage from attacks (effects still
+        /// Chaos Crawler (Giratina DLR 45): during the opponent's next turn this Pokémon takes no damage from attacks (effects still
         /// apply); it can't be used if any of your Pokémon used Chaos Crawler during your last turn.
         /// </summary>
         private sealed class ChaosCrawlerMon : Mon
@@ -77,12 +76,12 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>
-        /// Talonflame ex (M6 62). Excite Dive (from your hand): once during your turn, if you have a Colorless Mega Evolution
+        /// Talonflame ex (DLR 88). Excited Dive (from your hand): once during your turn, if you have a Colorless Mega Evolution
         /// Pokémon ex in play, put this card onto your Bench. Talon Hunt: you may search your deck for up to 2 cards.
         /// </summary>
         private sealed class TalonflameExM6 : Mon
         {
-            private static string Limit(EffectContext ctx) { return "Excite Dive#" + ctx.Card.Id; }
+            private static string Limit(EffectContext ctx) { return "Excited Dive#" + ctx.Card.Id; }
 
             public override bool CanUseFromHand(EffectContext ctx)
             {
@@ -110,11 +109,15 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>
-        /// Delicious Rice Ball (Item): heal 30 from your Active Pokémon, and 30 more for each other Delicious Rice Ball in your
-        /// discard pile. Like other healing cards, it needs a damaged Active Pokémon.
+        /// Tasty Rice Ball (Item; the Japanese Delicious Rice Ball): heal 30 from your Active Pokémon, and 30 more for each other
+        /// card of the same name in your discard pile. Like other healing cards, it needs a damaged Active Pokémon.
         /// </summary>
-        private sealed class DeliciousRiceBall : CardScript
+        private sealed class RiceBall : CardScript
         {
+            private readonly string name;
+
+            public RiceBall(string name) { this.name = name; }
+
             public override bool CanPlayTrainer(EffectContext ctx)
             {
                 var active = ctx.Me.Active;
@@ -125,7 +128,7 @@ namespace PokemonTCG.Cards
             {
                 var active = ctx.Me.Active;
                 if (active == null) return;
-                int others = ctx.Me.Discard.Count(c => c != ctx.Card && c.Def.Name == "Delicious Rice Ball");
+                int others = ctx.Me.Discard.Count(c => c != ctx.Card && c.Def.Name == name);
                 ctx.Heal(active, 30 + 30 * others);
             }
         }

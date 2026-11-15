@@ -21,7 +21,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Wimp Out (Wimpod 138/M-P): while the opponent has any Pokémon ex in play, this Pokémon has no Retreat Cost.</summary>
-        private sealed class WimpodMP : Mon
+        internal sealed class WimpodMP : Mon
         {
             public override int ModifyRetreatCost(EffectContext src, PokemonInPlay mon, int cost)
             {
