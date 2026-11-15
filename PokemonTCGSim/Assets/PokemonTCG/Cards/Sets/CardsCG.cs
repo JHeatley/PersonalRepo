@@ -237,7 +237,7 @@ namespace PokemonTCG.Cards
             {
                 var a = info.Attacker;
                 if (src.Pokemon == null || info.Target != src.Pokemon || a == null || a.Owner == src.Player || src.Engine.CurrentSourceKind != EffectSourceKind.Attack) return damage;
-                return CardsDS.Delta(a) ? damage - 40 : damage;
+                return CardsDS.Delta(src, a) ? damage - 40 : damage;
             }
 
             protected override bool Attack(EffectContext ctx, AttackDef atk) { return Linear.HandleAttack(ctx, atk); }
@@ -560,7 +560,7 @@ namespace PokemonTCG.Cards
 
             protected override void Ability(EffectContext ctx)
             {
-                ctx.SearchToHand(d => d.IsPokemon && d.IsDeltaSpecies, 1, "Delta Sign: choose a Pokémon that has δ on its card");
+                ctx.SearchToHand(d => CardsDS.DeltaCard(ctx, ctx.Player, d), 1, "Delta Sign: choose a Pokémon that has δ on its card");
             }
         }
 
@@ -609,7 +609,7 @@ namespace PokemonTCG.Cards
 
             protected override bool AbilityReady(EffectContext ctx)
             {
-                return ctx.Pokemon != null && ctx.Me.Bench.Contains(ctx.Pokemon) && ctx.Me.Active != null && CardsDS.Delta(ctx.Me.Active);
+                return ctx.Pokemon != null && ctx.Me.Bench.Contains(ctx.Pokemon) && ctx.Me.Active != null && CardsDS.Delta(ctx, ctx.Me.Active);
             }
 
             protected override void Ability(EffectContext ctx) { ctx.SwitchMyActive("Delta Transport: switch your Active Pokémon with which of your Benched Pokémon?"); }
