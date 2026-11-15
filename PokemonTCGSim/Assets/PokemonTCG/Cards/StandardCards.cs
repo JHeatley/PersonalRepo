@@ -387,6 +387,7 @@ namespace PokemonTCG.Cards
             CardsRR.Register(r);
             CardsSV.Register(r);
             CardsAR.Register(r);
+            CardsHS.Register(r);
 
             return r;
         }

@@ -213,6 +213,49 @@ namespace PokemonTCG.Cards
             }
         }
 
+        /// <summary>Sweet Sleeping Face (Poké-Body, the HGSS Baby Pokémon): while Asleep, prevent all damage done to it by attacks.</summary>
+        internal sealed class SweetSleepingFaceMon : BodyMon
+        {
+            public SweetSleepingFaceMon(Mon attacks) : base(attacks) { }
+
+            public override bool PreventsFinalDamage(EffectContext src, DamageInfo info, int damage)
+            {
+                return info.Target == src.Pokemon && src.Pokemon.Has(SpecialCondition.Asleep) && src.Engine.CurrentSourceKind == EffectSourceKind.Attack && Works(src, "Sweet Sleeping Face");
+            }
+        }
+
+        /// <summary>"As long as this Pokémon is on your Bench, prevent all damage done to it by attacks" (Shell Barricade, Submerge).</summary>
+        internal sealed class BenchGuardMon : BodyMon
+        {
+            private readonly string body;
+
+            public BenchGuardMon(string body, Mon attacks) : base(attacks) { this.body = body; }
+
+            public override bool PreventsFinalDamage(EffectContext src, DamageInfo info, int damage)
+            {
+                return info.Target == src.Pokemon && src.Me.Bench.Contains(src.Pokemon) && src.Engine.CurrentSourceKind == EffectSourceKind.Attack && Works(src, body);
+            }
+        }
+
+        /// <summary>Look at the top N cards of either player's deck and put them back in any order (Second Sight).</summary>
+        internal static void ReorderTop(EffectContext c, int n, string what, bool either)
+        {
+            bool mine = !either || c.Opp.Deck.Count == 0 || (c.Me.Deck.Count > 0 && c.ChooseOption(what + ": look at whose deck?", "Your deck", "Your opponent's deck") == 0);
+            var deck = mine ? c.Me.Deck : c.Opp.Deck;
+            var top = deck.Take(n).ToList();
+            foreach (var x in top) deck.Remove(x);
+            var order = new List<CardInstance>();
+            var left = top.ToList();
+            while (left.Count > 1)
+            {
+                var pick = c.ChooseCards(left, 1, 1, what + ": which card goes next from the top?")[0];
+                order.Add(pick);
+                left.Remove(pick);
+            }
+            order.AddRange(left);
+            deck.InsertRange(0, order);
+        }
+
         // ------------------------------------------------------------------ Small shared pieces
 
         /// <summary>"This attack does nothing": logs it and returns true (the attack was handled).</summary>
