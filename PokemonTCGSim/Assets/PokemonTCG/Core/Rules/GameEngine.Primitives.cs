@@ -491,6 +491,12 @@ namespace PokemonTCG.Core
                     try { src.Script.OnPokemonBenchedFromHand(src.Ctx, mon); }
                     finally { PopSource(); }
                 }
+                // v173: a lasting effect of an attack (Skarmory FB's Silver Feather).
+                foreach (var e in ActiveEffects().ToList())
+                {
+                    if (State.IsOver || !p.Bench.Contains(mon)) break;
+                    e.OnPokemonBenchedFromHand(this, mon);
+                }
             }
             return mon;
         }

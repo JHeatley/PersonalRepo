@@ -568,6 +568,70 @@ namespace PokemonTCG.Cards
                 });
         }
 
+        /// <summary>The Pokémon is Knocked Out at the end of the given turn (Doom News).</summary>
+        internal sealed class DelayedKnockOutEffect : ContinuousEffect
+        {
+            private readonly int turn;
+            private readonly string reason;
+
+            // An effect on the Defending Pokémon: it ends if that Pokémon leaves the Active Spot (Supreme Victors FAQ, 2009-08-27).
+            public DelayedKnockOutEffect(string name, int owner, int targetUid, int turn, string reason) : base(name, owner, targetUid, turn, true)
+            {
+                this.turn = turn;
+                this.reason = reason;
+            }
+
+            public override void OnEndOfTurn(GameEngine engine)
+            {
+                if (engine.State.TurnNumber != turn) return;
+                var target = engine.State.FindPokemon(TargetUid);
+                if (target != null) engine.KnockOut(target, reason);
+            }
+        }
+
+        /// <summary>The Pokémon can use only this attack (Encore).</summary>
+        internal sealed class OnlyAttackEffect : ContinuousEffect
+        {
+            private readonly string allowed;
+
+            public OnlyAttackEffect(string name, int owner, int targetUid, int expiresAfterTurn, string allowed) : base(name, owner, targetUid, expiresAfterTurn, true) { this.allowed = allowed; }
+
+            public override bool PreventsAttackNamed(GameEngine engine, PokemonInPlay mon, string attackName) { return mon != null && mon.Uid == TargetUid && attackName != allowed; }
+        }
+
+        /// <summary>The Pokémon's Retreat Cost is changed (set to 0 when delta is null).</summary>
+        internal sealed class RetreatChangeEffect : ContinuousEffect
+        {
+            private readonly int? delta;
+
+            public RetreatChangeEffect(string name, int owner, int targetUid, int expiresAfterTurn, int? delta) : base(name, owner, targetUid, expiresAfterTurn, true) { this.delta = delta; }
+
+            public override int ModifyRetreatCost(GameEngine engine, PokemonInPlay mon, int cost)
+            {
+                if (mon == null || mon.Uid != TargetUid) return cost;
+                return delta == null ? 0 : Math.Max(0, cost + delta.Value);
+            }
+        }
+
+        /// <summary>During the player's next turn, each Basic Pokémon they put onto their Bench from their hand gets 2 damage counters (Silver Feather).</summary>
+        internal sealed class BenchTrapEffect : ContinuousEffect
+        {
+            private readonly int affected;
+            private readonly string reason;
+
+            public BenchTrapEffect(string name, int owner, int affectedPlayer, int expiresAfterTurn, string reason) : base(name, owner, -1, expiresAfterTurn, false)
+            {
+                affected = affectedPlayer;
+                this.reason = reason;
+            }
+
+            public override void OnPokemonBenchedFromHand(GameEngine engine, PokemonInPlay benched)
+            {
+                if (benched == null || benched.Owner != affected || !benched.Def.IsBasicPokemon || engine.State.CurrentPlayer != affected) return;
+                engine.PlaceDamageCounters(benched, 2, reason);
+            }
+        }
+
         /// <summary>The player can't play Pokémon from their hand to evolve their Pokémon (or only the Active one).</summary>
         internal sealed class NoEvolveEffect : ContinuousEffect
         {
