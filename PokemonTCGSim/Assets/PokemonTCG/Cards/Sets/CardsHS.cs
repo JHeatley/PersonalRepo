@@ -327,11 +327,13 @@ namespace PokemonTCG.Cards
         /// <summary>During the opponent's next turn, the attacks of the Pokémon cost [C] more (Graffiti).</summary>
         internal sealed class CostUpEffect : ContinuousEffect
         {
-            public CostUpEffect(string name, int owner, int targetUid, int expiresAfterTurn) : base(name, owner, targetUid, expiresAfterTurn, true) { }
+            private readonly int count;
+
+            public CostUpEffect(string name, int owner, int targetUid, int expiresAfterTurn, int count = 1) : base(name, owner, targetUid, expiresAfterTurn, true) { this.count = count; }
 
             public override void ModifyAttackCost(GameEngine engine, PokemonInPlay mon, AttackDef attack, List<EnergyType> cost)
             {
-                if (mon != null && mon.Uid == TargetUid) cost.Add(EnergyType.Colorless);
+                if (mon != null && mon.Uid == TargetUid) for (int i = 0; i < count; i++) cost.Add(EnergyType.Colorless);
             }
         }
 

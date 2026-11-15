@@ -390,6 +390,7 @@ namespace PokemonTCG.Cards
             CardsHS.Register(r);
             CardsUL.Register(r);
             CardsUD.Register(r);
+            CardsTM.Register(r);
 
             return r;
         }
