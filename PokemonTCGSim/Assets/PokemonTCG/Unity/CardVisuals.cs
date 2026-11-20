@@ -626,6 +626,9 @@ namespace PokemonTCG.Presentation
         /// </summary>
         public static string KeyFor(string fileNameWithoutExtension, IList<string> foldersInnermostFirst)
         {
+            // v174: Aura Seeker (ASK) images, by Japanese card ID or by the m7 set code. Whatever folder they're in.
+            var ask = KeyFromAuraSeekerName(fileNameWithoutExtension);
+            if (ask != null) return ask;
             // A name pkmncards.com gave the file says the set itself, whatever folder it's in (v69).
             var pk = KeyFromPkmncardsName(fileNameWithoutExtension);
             if (pk != null) return pk;
@@ -840,6 +843,27 @@ namespace PokemonTCG.Presentation
             int n;
             if (!int.TryParse(m.Groups["num"].Value, NumberStyles.None, CultureInfo.InvariantCulture, out n) || n < 1 || n > PkMainEnergyKeys.Length) return null;
             return PkMainEnergyKeys[n - 1];
+        }
+
+        // v174: Aura Seeker's Japanese card IDs run 050856 (#1) to 050933 (#78): "050856_P_MADATSUBOMI", "050929_T_KIZUNANOTASUKI".
+        private static readonly Regex AuraSeekerId = new Regex(@"^(?<id>0508\d{2})_[PTE]_", RegexOptions.IgnoreCase);
+        // v174: "m7-017-n8hgm", "m7-075-h3g27", "m7-017": m7 is Aura Seeker's Japanese code (not M7A, Mega x Mega Parade).
+        private static readonly Regex AuraSeekerM7 = new Regex(@"^m7[-_](?<num>\d{1,3})(?:[-_]|$)", RegexOptions.IgnoreCase);
+        const int AuraSeekerFirstId = 50856, AuraSeekerCount = 78;
+
+        /// <summary>The ASK key for an Aura Seeker image name ("050856_P_MADATSUBOMI" = ASK-1, "m7-017-n8hgm" = ASK-17), else null.</summary>
+        public static string KeyFromAuraSeekerName(string fileNameWithoutExtension)
+        {
+            string name = fileNameWithoutExtension ?? "";
+            int n = 0;
+            var id = AuraSeekerId.Match(name);
+            if (id.Success) n = int.Parse(id.Groups["id"].Value) - AuraSeekerFirstId + 1;
+            else
+            {
+                var m7 = AuraSeekerM7.Match(name);
+                if (m7.Success) n = int.Parse(m7.Groups["num"].Value);
+            }
+            return n >= 1 && n <= AuraSeekerCount ? CardDatabase.MakeKey("ASK", n.ToString()) : null;
         }
 
         /// <summary>The size WordPress adds to a thumbnail's name (-312x436), and -scaled on a big original.</summary>
