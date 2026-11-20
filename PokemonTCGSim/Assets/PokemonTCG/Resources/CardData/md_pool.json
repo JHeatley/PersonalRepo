@@ -1,0 +1,2636 @@
+{
+ "format": "Majestic Dawn (MD, 2008): cards not already in the pool. Unlimited only. Dusk Ball 80 (Surging Sparks'), Energy Restore 81 (Expedition Base Set's), Fossil Excavator 82 (Mysterious Treasures'), Poké Ball 85 (Perfect Order's), Quick Ball 86 (Mysterious Treasures'), Super Scoop Up 87 (Celestial Storm's), Warp Point 88 (Gym Challenge's), Energy Search 90 (Perfect Order's), Darkness Energy 93 (Neo Genesis'), Metal Energy 95 (Neo Genesis') are prints of cards already in the pool.",
+ "cards": [
+  {
+   "set": "MD",
+   "number": "1",
+   "name": "Articuno",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Water",
+   "weakness": "Metal",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Freezing Screech",
+     "text": "Once during your turn, when you put this Pokémon from your hand onto your Bench, you may flip a coin. If heads, choose 1 of the Defending Pokémon. That Pokémon is now Paralyzed.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Blizzard",
+     "cost": "WWC",
+     "damage": 60,
+     "text": "Flip a coin. If heads, this attack does 10 damage to each of your opponent's Benched Pokémon. If tails, this attack does 10 damage to each of your Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "2",
+   "name": "Cresselia",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "weaknessAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Future Sight",
+     "cost": "C",
+     "damage": 0,
+     "text": "Look at the top 5 cards of either player's deck and put them back on top of that player's deck in any order."
+    },
+    {
+     "name": "Healing Light",
+     "cost": "PPC",
+     "damage": 40,
+     "text": "Remove 1 damage counter from each of your Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "3",
+   "name": "Darkrai",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "weaknessAmount": 20,
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Darkness Shade",
+     "text": "Once during your turn, when you put this Pokémon from your hand onto your Bench, you may choose 1 of the Defending Pokémon. That Pokémon is now Asleep.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Dark Slumber",
+     "cost": "D",
+     "damage": 10,
+     "text": "At the end of your opponent's next turn, the Defending Pokémon is now Asleep."
+    },
+    {
+     "name": "Dark Resolve",
+     "cost": "DDC",
+     "damage": 40,
+     "text": "If the Defending Pokémon is Asleep, remove 4 damage counters from this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "4",
+   "name": "Dialga",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "Adamant Orb: If an Active Pokémon has Weakness to Metal type, this card's attacks do 20 more damage to that Pokémon (before applying Weakness and Resistance).",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Metal",
+   "weakness": "Fire",
+   "weaknessAmount": 20,
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Time Shift",
+     "cost": "M",
+     "damage": 0,
+     "text": "Draw cards until you have 6 cards in your hand."
+    },
+    {
+     "name": "Diamond Blast",
+     "cost": "MMCC",
+     "damage": 60,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 60 damage plus 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "5",
+   "name": "Glaceon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 80,
+   "type": "Water",
+   "weakness": "Metal",
+   "weaknessAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Snow Cloak",
+     "cost": "W",
+     "damage": 30,
+     "text": "Flip a coin. If heads, prevent all effects of an attack, including damage, done to this Pokémon during your opponent's next turn."
+    },
+    {
+     "name": "Speed Slide",
+     "cost": "WCC",
+     "damage": 60,
+     "text": "This attack's damage isn't affected by Resistance, Poké-Powers, Poké-Bodies, or any other effects on the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "6",
+   "name": "Kabutops",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Kabuto",
+   "hp": 120,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "weaknessAmount": 30,
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Primal Shell",
+     "text": "As long as this Pokémon is your Active Pokémon, your opponent can't play any Trainer cards from their hand.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Chop Up",
+     "cost": "FFC",
+     "damage": 70,
+     "text": "Does 10 damage to each of your opponent's Benched Pokémon that has any damage counters on it. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "7",
+   "name": "Leafeon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 90,
+   "type": "Grass",
+   "weakness": "Fire",
+   "weaknessAmount": 20,
+   "resistance": "Water",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Bind Down",
+     "cost": "G",
+     "damage": 30,
+     "text": "The Defending Pokémon can't retreat during your opponent's next turn."
+    },
+    {
+     "name": "Leaf Guard",
+     "cost": "GCC",
+     "damage": 60,
+     "text": "During your opponent's next turn, any damage done to this Pokémon by attacks is reduced by 20 (after applying Weakness and Resistance)."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "8",
+   "name": "Manaphy",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Lightning",
+   "weaknessAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Aqua Skin",
+     "text": "When you attach a Water Energy card from your hand to this Pokémon, remove 2 damage counters from this Pokémon.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Chase Up",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. If heads, search your deck for any 1 card and put it into your hand. Shuffle your deck afterward."
+    },
+    {
+     "name": "Fountain",
+     "cost": "WW",
+     "damage": 30,
+     "text": "You may attach up to 2 basic Water Energy cards from your hand to your Benched Pokémon in any way you like."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "9",
+   "name": "Mewtwo",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Energy Absorption",
+     "cost": "",
+     "damage": 0,
+     "text": "Search your discard pile for up to 2 Energy cards and attach them to this Pokémon."
+    },
+    {
+     "name": "Recover",
+     "cost": "P",
+     "damage": 0,
+     "text": "Discard a Psychic Energy attached to this Pokémon and remove 6 damage counters from this Pokémon."
+    },
+    {
+     "name": "Psyburn",
+     "cost": "PPC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "10",
+   "name": "Moltres",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Fire",
+   "weakness": "Water",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Flame Charge",
+     "text": "Once during your turn, when you put this Pokémon from your hand onto your Bench, you may flip a coin. If heads, search your discard pile for up to 3 Fire Energy cards and attach them to this Pokémon.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Scorching Wing",
+     "cost": "RRC",
+     "damage": 100,
+     "text": "Discard all Fire Energy attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "11",
+   "name": "Palkia",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "Lustrous Orb: If an Active Pokémon has Weakness to Water type, this card's attacks do 20 more damage to that Pokémon (before applying Weakness and Resistance).",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Water",
+   "weakness": "Lightning",
+   "weaknessAmount": 20,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Zone Shift",
+     "cost": "W",
+     "damage": 0,
+     "text": "Your opponent switches the Defending Pokémon with 1 of their Benched Pokémon."
+    },
+    {
+     "name": "Pearl Blast",
+     "cost": "WWCC",
+     "damage": 60,
+     "text": "You may return an Energy card attached to this Pokémon to your hand. If you do, choose an Energy card attached to the Defending Pokémon and return it to your opponent's hand."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "12",
+   "name": "Phione",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Water",
+   "weakness": "Lightning",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Evolution Wish",
+     "cost": "C",
+     "damage": 0,
+     "text": "Search your deck for a card that evolves from 1 of your Pokémon and put it onto that Pokémon. (This counts as evolving that Pokémon.) Shuffle your deck afterward."
+    },
+    {
+     "name": "Water Pulse",
+     "cost": "WW",
+     "damage": 30,
+     "text": "The Defending Pokémon is now Asleep."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "13",
+   "name": "Rotom",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Darkness",
+   "weaknessAmount": 20,
+   "resistance": "Colorless",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Dual Trans",
+     "cost": "",
+     "damage": 0,
+     "text": "Search your discard pile for up to 2 basic Energy cards and attach them to 1 of your Pokémon."
+    },
+    {
+     "name": "Reflect Energy",
+     "cost": "LC",
+     "damage": 30,
+     "text": "Move an Energy card attached to this Pokémon to 1 of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "14",
+   "name": "Zapdos",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 100,
+   "type": "Lightning",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Sheet Lightning",
+     "text": "Once during your turn, when you put this Pokémon from your hand onto your Bench, you may flip a coin. If heads, put 1 damage counter on each of your opponent's Pokémon.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Raging Thunder",
+     "cost": "LLC",
+     "damage": 80,
+     "text": "Does 40 damage to 1 of your Pokémon, and don't apply Weakness and Resistance to this damage."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "15",
+   "name": "Aerodactyl",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Old Amber",
+   "hp": 80,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "weaknessAmount": 20,
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Primal Claw",
+     "text": "After your opponent's Pokémon uses a Poké-Power, put 2 damage counters on that Pokémon.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Supersonic",
+     "cost": "CC",
+     "damage": 30,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Confused."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "16",
+   "name": "Bronzong",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Bronzor",
+   "hp": 90,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "weaknessAmount": 20,
+   "resistance": "Fire",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "abilities": [
+    {
+     "name": "Cursed Alloy",
+     "text": "As long as this Pokémon is your Active Pokémon, put 1 damage counter on each of your opponent's Pokémon that has any Poké-Powers between turns.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Pain Amplifier",
+     "cost": "",
+     "damage": 0,
+     "text": "Put 1 damage counter on each of your opponent's Pokémon that already has damage counters on it."
+    },
+    {
+     "name": "Coating",
+     "cost": "PCC",
+     "damage": 60,
+     "text": "During your opponent's next turn, any damage done to this Pokémon by attacks is reduced by 20 (after applying Weakness and Resistance)."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "17",
+   "name": "Empoleon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Prinplup",
+   "hp": 130,
+   "type": "Water",
+   "weakness": "Lightning",
+   "weaknessAmount": 30,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Dual Splash",
+     "cost": "WC",
+     "damage": 0,
+     "text": "Choose 2 of your opponent's Pokémon. This attack does 30 damage to each of them. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Surf Together",
+     "cost": "WWC",
+     "damage": 50,
+     "damageSuffix": "+",
+     "text": "Does 50 damage plus 10 more damage for each of your Benched Pokémon. Flip a coin. If tails, this attack does 10 damage to each of your Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "18",
+   "name": "Espeon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 80,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "weaknessAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Sunlight Veil",
+     "text": "Each of your Pokémon that evolves from Eevee gets +20 HP. You can't use more than 1 Sunlight Veil Poké-Body each turn.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Morning Sun",
+     "cost": "PCC",
+     "damage": 60,
+     "text": "You may move an Energy card attached to this Pokémon to 1 of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "19",
+   "name": "Flareon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 90,
+   "type": "Fire",
+   "weakness": "Water",
+   "weaknessAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Fire Fang",
+     "cost": "R",
+     "damage": 30,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Burned."
+    },
+    {
+     "name": "Kindle",
+     "cost": "RCC",
+     "damage": 70,
+     "text": "Discard an Energy card attached to this Pokémon and then discard an Energy card attached to the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "20",
+   "name": "Glaceon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 90,
+   "type": "Water",
+   "weakness": "Metal",
+   "weaknessAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Ice Shot",
+     "cost": "WC",
+     "damage": 30,
+     "text": "Does 10 damage to 1 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Icy Wind",
+     "cost": "WCC",
+     "damage": 60,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Asleep."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "21",
+   "name": "Hippowdon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Hippopotas",
+   "hp": 100,
+   "type": "Fighting",
+   "weakness": "Water",
+   "weaknessAmount": 20,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Vacuum Sand",
+     "cost": "",
+     "damage": 20,
+     "text": "Search your discard pile for a Fighting Energy card and attach it to this Pokémon."
+    },
+    {
+     "name": "Sand Impact",
+     "cost": "FCC",
+     "damage": 50,
+     "damageSuffix": "+",
+     "text": "Flip a coin for each Fighting Energy attached to this Pokémon. This attack does 50 damage plus 20 more damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "22",
+   "name": "Infernape",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Monferno",
+   "hp": 110,
+   "type": "Fire",
+   "weakness": "Water",
+   "weaknessAmount": 30,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Mach Punch",
+     "cost": "C",
+     "damage": 30,
+     "text": "Does 10 damage to 1 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Mega Bravo",
+     "cost": "R",
+     "damage": 40,
+     "damageSuffix": "x",
+     "text": "Discard all Fire Energy attached to this Pokémon. This attack does 40 damage times the amount of Fire Energy you discarded."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "23",
+   "name": "Jolteon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 80,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "weaknessAmount": 20,
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Thunder Fang",
+     "cost": "L",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    },
+    {
+     "name": "Lightning Strike",
+     "cost": "LLC",
+     "damage": 50,
+     "text": "You may discard 2 Energy attached to this Pokémon. If you do, this attack's base damage is 90 instead of 50."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "24",
+   "name": "Leafeon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 90,
+   "type": "Grass",
+   "weakness": "Fire",
+   "weaknessAmount": 20,
+   "resistance": "Water",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sprial Drain",
+     "cost": "GC",
+     "damage": 40,
+     "text": "Remove 1 damage counter from this Pokémon."
+    },
+    {
+     "name": "Leaf Blade",
+     "cost": "GCC",
+     "damage": 50,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 50 damage plus 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "25",
+   "name": "Minun",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "weaknessAmount": 10,
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Pound",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "(+) Spark",
+     "cost": "LC",
+     "damage": 20,
+     "text": "If Plusle is on your Bench, this attack does 20 damage to 1 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "26",
+   "name": "Omastar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Omanyte",
+   "hp": 110,
+   "type": "Water",
+   "weakness": "Grass",
+   "weaknessAmount": 30,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Primal Swirl",
+     "text": "Once during your turn, when you play this Pokémon from your hand to evolve 1 of your Pokémon, you may remove the highest Stage Evolution card from each of your opponent's Benched Evolved Pokémon and put those cards back into their hand. You can't use more than 1 Primal Swirl Poké-Power each turn.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Send Back",
+     "cost": "WC",
+     "damage": 40,
+     "text": "Your opponent switches the Defending Pokémon with 1 of their Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "27",
+   "name": "Phione",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Lightning",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Charm",
+     "cost": "C",
+     "damage": 0,
+     "text": "During your opponent's next turn, any damage done by attacks from the Defending Pokémon is reduced by 20 (before applying Weakness and Resistance)."
+    },
+    {
+     "name": "Whirlpool",
+     "cost": "WW",
+     "damage": 30,
+     "text": "Flip a coin. If heads, discard an Energy card attached to the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "28",
+   "name": "Plusle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "weaknessAmount": 10,
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Call for Family",
+     "cost": "C",
+     "damage": 0,
+     "text": "Search your deck for a Basic Pokémon and put it onto your Bench. Shuffle your deck afterward."
+    },
+    {
+     "name": "– Boost",
+     "cost": "LC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "If Minun is on your Bench, this attack does 20 damage plus 20 more damage."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "29",
+   "name": "Scizor",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Scyther",
+   "hp": 90,
+   "type": "Metal",
+   "weakness": "Fire",
+   "weaknessAmount": 30,
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Special Blow",
+     "cost": "M",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "If the Defending Pokémon has any Special Energy cards attached to it, this attack does 30 damage plus 50 more damage."
+    },
+    {
+     "name": "X-Scissor",
+     "cost": "MCC",
+     "damage": 50,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 50 damage plus 40 more damage."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "30",
+   "name": "Torterra",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Grotle",
+   "hp": 140,
+   "type": "Grass",
+   "weakness": "Fire",
+   "weaknessAmount": 30,
+   "retreat": 4,
+   "attacks": [
+    {
+     "name": "Earthquake",
+     "cost": "CC",
+     "damage": 60,
+     "text": "Does 10 damage to each of your Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Frenzy Plant",
+     "cost": "GGCC",
+     "damage": 100,
+     "text": "This Pokémon can't use Frenzy Plant during your next turn."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "31",
+   "name": "Toxicroak",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Croagunk",
+   "hp": 90,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "weaknessAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Paralyze Poison",
+     "cost": "P",
+     "damage": 20,
+     "text": "The Defending Pokémon is now Poisoned. Flip a coin. If heads, the Defending Pokémon is now Paralyzed and Poisoned."
+    },
+    {
+     "name": "Slash",
+     "cost": "PCC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "32",
+   "name": "Umbreon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 80,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "weaknessAmount": 20,
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Moonlight Veil",
+     "text": "Each of your Pokémon that evolves from Eevee has no Weakness, and that Pokémon's Retreat Cost is 0.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Confuse Ray",
+     "cost": "DCC",
+     "damage": 50,
+     "text": "The Defending Pokémon is now Confused."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "33",
+   "name": "Unown [P]",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "PUT",
+     "text": "Once during your turn (before your attack), if Unown P is on your Bench, you may put 1 damage counter on 1 of your Pokémon (excluding any Unown).",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Hidden Power",
+     "cost": "P",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Each player discards the top card of their deck. This attack does 20 damage plus 20 more damage for each Unown discarded in this way."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "34",
+   "name": "Vaporeon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 90,
+   "type": "Water",
+   "weakness": "Lightning",
+   "weaknessAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Cleanse Away",
+     "cost": "W",
+     "damage": 30,
+     "text": "Remove 2 damage counters from each of your Benched Pokémon."
+    },
+    {
+     "name": "Hyper Whirlpool",
+     "cost": "WCC",
+     "damage": 60,
+     "text": "Flip a coin until you get tails. For each heads, discard an Energy card attached to the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "35",
+   "name": "Ambipom",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Aipom",
+   "hp": 80,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "weaknessAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Astonish",
+     "cost": "CC",
+     "damage": 20,
+     "text": "Choose 1 card from your opponent's hand without looking. Look at that card you chose, then have your opponent shuffle that card into their deck."
+    },
+    {
+     "name": "Hang High",
+     "cost": "CCC",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon. This attack does 40 damage to that Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "36",
+   "name": "Fearow",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Spearow",
+   "hp": 80,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "weaknessAmount": 20,
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Fury Attack",
+     "cost": "C",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Flip 3 coins. This attack does 20 damage times the number of heads."
+    },
+    {
+     "name": "Drill Peck",
+     "cost": "CCC",
+     "damage": 60
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "37",
+   "name": "Grotle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Turtwig",
+   "hp": 90,
+   "type": "Grass",
+   "weakness": "Fire",
+   "weaknessAmount": 20,
+   "resistance": "Water",
+   "resistanceAmount": 20,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Planting",
+     "cost": "C",
+     "damage": 20,
+     "text": "Attach a Grass Energy card from your hand to 1 of your Pokémon."
+    },
+    {
+     "name": "Body Slam",
+     "cost": "GGC",
+     "damage": 40,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "38",
+   "name": "Kangaskhan",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 90,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "weaknessAmount": 20,
+   "retreat": 3,
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "CC",
+     "damage": 30
+    },
+    {
+     "name": "Comet Punch",
+     "cost": "CCC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Flip 4 coins. This attack does 20 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "39",
+   "name": "Lickitung",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "weaknessAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Lap Up",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw a card."
+    },
+    {
+     "name": "Slam",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Flip 2 coins. This attack does 20 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "40",
+   "name": "Manectric",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Electrike",
+   "hp": 80,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "weaknessAmount": 20,
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Thunder Wave",
+     "cost": "L",
+     "damage": 30,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    },
+    {
+     "name": "Volt Crush",
+     "cost": "LC",
+     "damage": 40,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, discard an Energy attached to this Pokémon and this attack does 40 damage plus 30 more damage."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "41",
+   "name": "Monferno",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Chimchar",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "weaknessAmount": 20,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Fire Fang",
+     "cost": "R",
+     "damage": 30,
+     "text": "The Defending Pokémon is now Burned."
+    },
+    {
+     "name": "Mid-air Strike",
+     "cost": "CC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 30 damage plus 30 more damage."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "42",
+   "name": "Mothim",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Burmy",
+   "hp": 80,
+   "type": "Grass",
+   "weakness": "Fire",
+   "weaknessAmount": 20,
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 0,
+   "abilities": [
+    {
+     "name": "Disturbance Scales",
+     "text": "Any damage done by attacks from your Pokémon to the Defending Pokémon isn't affected by Resistance.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Get Help",
+     "cost": "G",
+     "damage": 30,
+     "damageSuffix": "x",
+     "text": "Does 30 damage times the number of different types of Wormadam on your Bench."
+    },
+    {
+     "name": "Quick Touch",
+     "cost": "GC",
+     "damage": 40,
+     "text": "You may switch this Pokémon with 1 of your Benched Pokémon. If you do, move as many Energy cards attached to this Pokémon as you like to the new Active Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "43",
+   "name": "Pachirisu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "weaknessAmount": 20,
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Trans Tail",
+     "cost": "",
+     "damage": 0,
+     "text": "Search your discard pile for a Lightning Energy card, show it to your opponent, and put it into your hand."
+    },
+    {
+     "name": "Thundershock",
+     "cost": "LC",
+     "damage": 30,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "44",
+   "name": "Prinplup",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Piplup",
+   "hp": 80,
+   "type": "Water",
+   "weakness": "Lightning",
+   "weaknessAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Ice Blade",
+     "cost": "WC",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon. This attack does 30 damage to that Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Wash Over",
+     "cost": "WCC",
+     "damage": 50,
+     "text": "Does 10 damage to 2 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "45",
+   "name": "Raichu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Pikachu",
+   "hp": 90,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "weaknessAmount": 20,
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Agility",
+     "cost": "C",
+     "damage": 20,
+     "text": "Flip a coin. If heads, prevent all effects of an attack, including damage, done to this Pokémon during your opponent's next turn."
+    },
+    {
+     "name": "Thunderbolt",
+     "cost": "LLC",
+     "damage": 100,
+     "text": "Discard all Energy cards attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "46",
+   "name": "Scyther",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Grass",
+   "weakness": "Fire",
+   "weaknessAmount": 20,
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Slash",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Fury Cutter",
+     "cost": "GC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip 3 coins. If 1 of them is heads, this attack does 10 damage plus 10 more damage. If 2 of them are heads, this attack does 10 damage plus 20 more damage. If all of them are heads, this attack does 10 damage plus 40 more damage."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "47",
+   "name": "Staravia",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Starly",
+   "hp": 80,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "weaknessAmount": 20,
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Quick Attack",
+     "cost": "C",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 damage plus 30 more damage."
+    },
+    {
+     "name": "Drill Peck",
+     "cost": "CCC",
+     "damage": 50
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "48",
+   "name": "Sudowoodo",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Fighting",
+   "weakness": "Water",
+   "weaknessAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Flail",
+     "cost": "C",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Does 10 damage times the number of damage counters on this Pokémon."
+    },
+    {
+     "name": "Wood Hammer",
+     "cost": "FF",
+     "damage": 50,
+     "text": "This Pokémon does 30 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "49",
+   "name": "Unown [Q]",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 30,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "weaknessAmount": 10,
+   "retreat": 0,
+   "abilities": [
+    {
+     "name": "QUICK",
+     "text": "Once during your turn (before your attack), if Unown Q is on your Bench, you may discard all cards attached to Unown Q and attach Unown Q to 1 of your Pokémon as a Pokémon Tool card. As long as Unown Q is attached to a Pokémon, you pay Colorless less to retreat that Pokémon.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Hidden Power",
+     "cost": "C",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "50",
+   "name": "Aipom",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Collect",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw a card."
+    },
+    {
+     "name": "Hand Trick",
+     "cost": "CC",
+     "damage": 20,
+     "text": "Return this Pokémon and all cards attached to it to your hand. (If you don't have any Benched Pokémon, this attack does nothing.)"
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "51",
+   "name": "Aipom",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Scratch",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Last Resort",
+     "cost": "CC",
+     "damage": 30,
+     "text": "Flip a coin. If tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "52",
+   "name": "Bronzor",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "weaknessAmount": 10,
+   "resistance": "Fire",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Hypnosis",
+     "cost": "C",
+     "damage": 0,
+     "text": "The Defending Pokémon is now Asleep."
+    },
+    {
+     "name": "Confuse Ray",
+     "cost": "P",
+     "damage": 10,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Confused."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "53",
+   "name": "Buneary",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Drawup Power",
+     "cost": "",
+     "damage": 0,
+     "text": "Search your deck for an Energy card, show it to your opponent, and put it into your hand. Shuffle your deck afterward."
+    },
+    {
+     "name": "Extend Ears",
+     "cost": "C",
+     "damage": 10,
+     "text": "Remove 1 damage counter from each of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "54",
+   "name": "Burmy Sandy Cloak",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Fire",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Iron Defense",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. If heads, prevent all effects of an attack, including damage, done to this Pokémon during your opponent's next turn."
+    },
+    {
+     "name": "Tackle",
+     "cost": "FC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "55",
+   "name": "Chatot",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "weaknessAmount": 20,
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Mimic",
+     "cost": "",
+     "damage": 0,
+     "text": "Shuffle your hand into your deck. Then, draw a number of cards equal to the number of cards in your opponent's hand."
+    },
+    {
+     "name": "Chatter",
+     "cost": "CC",
+     "damage": 20,
+     "text": "The Defending Pokémon can't retreat during your opponent's next turn."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "56",
+   "name": "Chimchar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Fire",
+   "weakness": "Water",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Flare",
+     "cost": "R",
+     "damage": 20
+    },
+    {
+     "name": "Lunge",
+     "cost": "CC",
+     "damage": 40,
+     "text": "Flip a coin. If tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "57",
+   "name": "Chimchar",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "Cheri Berry: If this card is Paralyzed, remove the Special Condition Paralyzed from this card at the end of each player's turn.",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Fire",
+   "weakness": "Water",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Fury Swipes",
+     "cost": "C",
+     "damage": 10,
+     "damageSuffix": "x",
+     "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "58",
+   "name": "Chingling",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Baby Evolution",
+     "text": "Once during your turn (before your attack), you may put Chimecho from your hand onto this Pokémon (this counts as evolving this Pokémon) and remove all damage counters from this Pokémon.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Uproar",
+     "cost": "",
+     "damage": 0,
+     "text": "Flip a coin. If heads, this attack does 10 damage to each of your opponent's Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "59",
+   "name": "Combee",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Grass",
+   "weakness": "Fire",
+   "weaknessAmount": 10,
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Honey Scent",
+     "cost": "C",
+     "damage": 0,
+     "text": "Remove 2 damage counters from 1 of your Pokémon."
+    },
+    {
+     "name": "Flitter",
+     "cost": "GG",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon. This attack does 20 damage to that Pokémon. This attack's damage isn't affected by Weakness or Resistance."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "60",
+   "name": "Croagunk",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Light Punch",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Poison Sting",
+     "cost": "P",
+     "damage": 0,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Poisoned."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "61",
+   "name": "Drifloon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Psychic",
+   "weakness": "Darkness",
+   "weaknessAmount": 10,
+   "resistance": "Colorless",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Delivery",
+     "cost": "",
+     "damage": 0,
+     "text": "Flip a coin. If heads, put any 1 card from your discard pile into your hand."
+    },
+    {
+     "name": "Reaction",
+     "cost": "P",
+     "damage": 20,
+     "text": "Switch this Pokémon with 1 of your Benched Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "62",
+   "name": "Eevee",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Call for Family",
+     "cost": "C",
+     "damage": 0,
+     "text": "Search your deck for as many this Pokémon as you like and put them onto your Bench. Shuffle your deck afterward."
+    },
+    {
+     "name": "Lunge",
+     "cost": "C",
+     "damage": 20,
+     "text": "Flip a coin. If tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "63",
+   "name": "Eevee",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Gnaw",
+     "cost": "",
+     "damage": 10
+    },
+    {
+     "name": "Sand Attack",
+     "cost": "C",
+     "damage": 0,
+     "text": "If the Defending Pokémon tries to attack during your opponent's next turn, your opponent flips a coin. If tails, that attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "64",
+   "name": "Electrike",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "weaknessAmount": 10,
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Random Spark",
+     "cost": "L",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon. This attack does 10 damage to that Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    },
+    {
+     "name": "Tackle",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "65",
+   "name": "Glameow",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Call for Family",
+     "cost": "C",
+     "damage": 0,
+     "text": "Search your deck for a Basic Pokémon and put it onto your Bench. Shuffle your deck afterward."
+    },
+    {
+     "name": "Rip Claw",
+     "cost": "CC",
+     "damage": 10,
+     "text": "Flip a coin. If heads, discard an Energy attached to the Defending Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "66",
+   "name": "Hippopotas",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fighting",
+   "weakness": "Water",
+   "weaknessAmount": 10,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Grainy Sand",
+     "cost": "F",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 damage plus 10 more damage."
+    },
+    {
+     "name": "Double-edge",
+     "cost": "CCC",
+     "damage": 40,
+     "text": "This Pokémon does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "67",
+   "name": "Kabuto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Dome Fossil",
+   "hp": 80,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "weaknessAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Ancient Guidance",
+     "text": "Once during your turn (before your attack), you may flip a coin. If heads, search your deck for Helix Fossil, Dome Fossil, or Old Amber and put it onto your Bench. Shuffle your deck afterward. This power can't be used if this Pokémon is affected by a Special Condition.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Shell Attack",
+     "cost": "F",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "68",
+   "name": "Munchlax",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "weaknessAmount": 10,
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Baby Evolution",
+     "text": "Once during your turn (before your attack), you may put Snorlax from your hand onto this Pokémon (this counts as evolving this Pokémon) and remove all damage counters from this Pokémon.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Lick",
+     "cost": "CC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "69",
+   "name": "Omanyte",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Helix Fossil",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Grass",
+   "weaknessAmount": 20,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Call Up",
+     "text": "Once during your turn (before your attack), you may flip a coin. If heads, search your discard pile for Helix Fossil, Dome Fossil, or Old Amber and put it onto your Bench. This power can't be used if this Pokémon is affected by a Special Condition.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Wash Over",
+     "cost": "WC",
+     "damage": 20,
+     "text": "Does 10 damage to 2 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "70",
+   "name": "Pikachu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "weaknessAmount": 10,
+   "resistance": "Metal",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Quick Attack",
+     "cost": "C",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 damage plus 10 more damage."
+    },
+    {
+     "name": "Volt Tackle",
+     "cost": "LCC",
+     "damage": 50,
+     "text": "This Pokémon does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "71",
+   "name": "Piplup",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Water",
+   "weakness": "Lightning",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Water Splash",
+     "cost": "W",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 damage plus 10 more damage."
+    },
+    {
+     "name": "Headbutt",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "72",
+   "name": "Piplup",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "Pecha Berry: If this card is Poisoned, remove the Special Condition Poisoned from this card at the end of each player's turn.",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Water",
+   "weakness": "Lightning",
+   "weaknessAmount": 10,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Splatter",
+     "cost": "W",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon. This attack does 10 damage to that Pokémon. This attack's damage isn't affected by Weakness or Resistance."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "73",
+   "name": "Shellos East Sea",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Water",
+   "weakness": "Lightning",
+   "weaknessAmount": 10,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Surf",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Muddy Water",
+     "cost": "WC",
+     "damage": 20,
+     "text": "Does 10 damage to 1 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "74",
+   "name": "Spearow",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "weaknessAmount": 10,
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Wing Attack",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Claw",
+     "cost": "CC",
+     "damage": 30,
+     "text": "Flip a coin. If tails, this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "75",
+   "name": "Starly",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "weaknessAmount": 10,
+   "resistance": "Fighting",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Whirlwind",
+     "cost": "C",
+     "damage": 10,
+     "text": "Your opponent switches the Defending Pokémon with 1 of their Benched Pokémon."
+    },
+    {
+     "name": "Flap",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "76",
+   "name": "Stunky",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "weaknessAmount": 10,
+   "resistance": "Psychic",
+   "resistanceAmount": 20,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Poison Gas",
+     "cost": "D",
+     "damage": 0,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Poisoned."
+    },
+    {
+     "name": "Slash",
+     "cost": "CC",
+     "damage": 20
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "77",
+   "name": "Turtwig",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Fire",
+   "weaknessAmount": 10,
+   "resistance": "Water",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Rollout",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Razor Leaf",
+     "cost": "GC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "78",
+   "name": "Turtwig",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "Persim Berry: If this card is Confused, remove the Special Condition Confused from this card at the end of each player's turn.",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Grass",
+   "weakness": "Fire",
+   "weaknessAmount": 10,
+   "resistance": "Water",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "GC",
+     "damage": 30
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "79",
+   "name": "Dawn Stadium",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Stadium",
+   "text": "This card stays in play when you play it. Discard this card if another Stadium card comes into play. If another card with the same name is in play, you can't play this card. Whenever any player attaches an Energy card from their hand to Grass Pokémon or Water Pokémon, remove 1 damage counter and all Special Conditions from that Pokémon."
+  },
+  {
+   "set": "MD",
+   "number": "83",
+   "name": "Mom's Kindness",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Supporter",
+   "text": "Draw 2 cards."
+  },
+  {
+   "set": "MD",
+   "number": "84",
+   "name": "Old Amber",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Play this card as if it were a Colorless Basic Pokémon. (this card counts as a Trainer card as well, but if this card is Knocked Out, this counts as a Knocked Out Pokémon.) This card can't be affected by any Special Conditions and can't retreat. At any time during your turn before your attack, you may discard this card from play. (This doesn't count as a Knocked Out Pokémon.)",
+   "fossil": true,
+   "hp": 50,
+   "abilities": [
+    {
+     "name": "Hard Amber",
+     "text": "As long as this Pokémon is on your Bench, prevent all damage done to this Pokémon by attacks (both yours and your opponent's).",
+     "kind": "Poké-Body"
+    }
+   ],
+   "fossilPrize": true
+  },
+  {
+   "set": "MD",
+   "number": "89",
+   "name": "Dome Fossil",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Play this card as if it were a Colorless Basic Pokémon. (this card counts as a Trainer card as well, but if this card is Knocked Out, this counts as a Knocked Out Pokémon.) This card can't be affected by any Special Conditions and can't retreat. At any time during your turn before your attack, you may discard this card from play. (This doesn't count as a Knocked Out Pokémon.)",
+   "fossil": true,
+   "hp": 50,
+   "abilities": [
+    {
+     "name": "Rock Reaction",
+     "text": "When you attach a Fighting Energy card from your hand to this Pokémon (excluding effects of attacks or Poké-Powers), search your deck for a card that evolves from this Pokémon and put it onto this Pokémon (this counts as evolving this Pokémon). Shuffle your deck afterward.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "fossilPrize": true
+  },
+  {
+   "set": "MD",
+   "number": "91",
+   "name": "Helix Fossil",
+   "kind": "Trainer",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "trainerType": "Item",
+   "text": "Play this card as if it were a Colorless Basic Pokémon. (this card counts as a Trainer card as well, but if this card is Knocked Out, this counts as a Knocked Out Pokémon.) This card can't be affected by any Special Conditions and can't retreat. At any time during your turn before your attack, you may discard this card from play. (This doesn't count as a Knocked Out Pokémon.)",
+   "fossil": true,
+   "hp": 50,
+   "abilities": [
+    {
+     "name": "Aqua Reaction",
+     "text": "When you attach a Water Energy card from your hand to this Pokémon (excluding effects of attacks or Poké-Powers), search your deck for a card that evolves from this Pokémon and put it onto this Pokémon (this counts as evolving this Pokémon). Shuffle your deck afterward.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "fossilPrize": true
+  },
+  {
+   "set": "MD",
+   "number": "92",
+   "name": "Call Energy",
+   "kind": "Energy",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "basicEnergy": false,
+   "provides": "Colorless",
+   "text": "This card provides Colorless Energy. Once during your turn, if the Pokémon this card is attached to is your Active Pokémon, you may search your deck for up to 2 Basic Pokémon and put them onto your Bench. If you do, shuffle your deck and your turn ends.",
+   "abilities": [
+    {
+     "name": "Call Energy",
+     "text": "Once during your turn, if the Pokémon this card is attached to is your Active Pokémon, you may search your deck for up to 2 Basic Pokémon and put them onto your Bench. If you do, shuffle your deck and your turn ends.",
+     "kind": "Energy"
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "94",
+   "name": "Health Energy",
+   "kind": "Energy",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "basicEnergy": false,
+   "provides": "Colorless",
+   "text": "This card provides Colorless Energy. When you attach this card from your hand to 1 of your Pokémon, remove 1 damage counter from that Pokémon."
+  },
+  {
+   "set": "MD",
+   "number": "96",
+   "name": "Recover Energy",
+   "kind": "Energy",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "basicEnergy": false,
+   "provides": "Colorless",
+   "text": "This card provides Colorless Energy. When you attach this card from your hand to 1 of your Pokémon, remove all Special Conditions from that Pokémon."
+  },
+  {
+   "set": "MD",
+   "number": "97",
+   "name": "Garchomp LV.X",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "Put this card onto your Active Garchomp. Garchomp LV.X can use any attack, Poké-Power or Poké-Body from its previous Level.",
+   "mechanic": "LV.X",
+   "stage": "Stage1",
+   "evolvesFrom": "Garchomp",
+   "hp": 140,
+   "type": "Colorless",
+   "weakness": "Colorless",
+   "retreat": 0,
+   "abilities": [
+    {
+     "name": "Dragon Pulse",
+     "text": "Once during your turn (before your attack), when you put this Pokémon from your hand onto your Active Garchomp, you may flip 3 coins. For each heads, put 1 damage counter on each of your opponent's Benched Pokémon.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Restore",
+     "cost": "",
+     "damage": 0,
+     "text": "Search your discard pile for a Pokémon (excluding Pokémon LV.X) and put it onto your Bench as a Basic Pokémon. Then, you may search your discard pile for up to 3 basic Energy cards and attach them to that Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "98",
+   "name": "Glaceon LV.X",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "Put this card onto your Active Glaceon. Glaceon LV.X can use any attack, Poké-Power or Poké-Body from its previous Level.",
+   "mechanic": "LV.X",
+   "stage": "Stage1",
+   "evolvesFrom": "Glaceon",
+   "hp": 100,
+   "type": "Water",
+   "weakness": "Metal",
+   "weaknessAmount": 30,
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Chilly Breath",
+     "text": "As long as Glaceon is your Active Pokémon, your opponent's Pokémon can't use any Poké-Powers.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Avalanche",
+     "cost": "WWC",
+     "damage": 70,
+     "text": "Flip a coin. If heads, this attack does 20 damage to each of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "99",
+   "name": "Leafeon LV.X",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "Put this card onto your Active Leafeon. Leafeon LV.X can use any attack, Poké-Power or Poké-Body from its previous Level.",
+   "mechanic": "LV.X",
+   "stage": "Stage1",
+   "evolvesFrom": "Leafeon",
+   "hp": 110,
+   "type": "Grass",
+   "weakness": "Fire",
+   "weaknessAmount": 30,
+   "resistance": "Water",
+   "resistanceAmount": 20,
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Energy Forcing",
+     "text": "Once during your turn (before your attack), you may attach an Energy card from your hand to 1 of your Pokémon. This power can't be used if Leafeon is affected by a Special Condition.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Verdant Dance",
+     "cost": "GC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Does 30 damage plus 10 more damage for each Energy attached to all of your Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "MD",
+   "number": "100",
+   "name": "Porygon-Z LV.X",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "Put this card onto your Active Porygon-Z. Porygon-Z LV.X can use any attack, Poké-Power or Poké-Body from its previous Level.",
+   "mechanic": "LV.X",
+   "stage": "Stage1",
+   "evolvesFrom": "Porygon-Z",
+   "hp": 130,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Mode Crash",
+     "text": "Once during your turn (before your attack), when you put this Pokémon from your hand onto your Active Porygon-Z, you may discard all of your opponent's Special Energy cards in play.",
+     "kind": "Poké-Power"
+    },
+    {
+     "name": "Decode",
+     "text": "Once during your turn (before your attack), you may search your deck for up to any 2 cards and shuffle your deck afterward. Then, put those cards on top of your deck in any order. This power can't be used if Porygon-Z is affected by a Special Condition.",
+     "kind": "Poké-Power"
+    }
+   ]
+  }
+ ]
+}

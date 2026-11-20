@@ -1,0 +1,268 @@
+{
+ "format": "POP Series 5 (P5, 2007): cards not already in the pool. Unlimited only. Double Rainbow Energy 4 (Emerald's), Charmeleon 5 (Crystal Guardians'), Bill's Maintenance 6 (Celestial Storm's), Rare Candy 7 (Mega Evolution's), Boost Energy 8 (Aquapolis'), δ Rainbow Energy 9 (Holon Phantoms'), Charmander 10 (Crystal Guardians'), Umbreon ★ 17 (Celebrations') are prints of cards already in the pool.",
+ "cards": [
+  {
+   "set": "P5",
+   "number": "1",
+   "name": "Ho-Oh",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Fire Wing",
+     "cost": "RC",
+     "damage": 20
+    },
+    {
+     "name": "Fire Blast",
+     "cost": "RRRC",
+     "damage": 60,
+     "text": "Discard a Fire Energy attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "P5",
+   "number": "2",
+   "name": "Lugia",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Super Psy Bolt",
+     "cost": "PC",
+     "damage": 20
+    },
+    {
+     "name": "Aerowing",
+     "cost": "PCC",
+     "damage": 30,
+     "text": "Before doing damage, you may flip a coin. If tails, this attack does nothing. If heads, this attack does 60 damage instead."
+    }
+   ]
+  },
+  {
+   "set": "P5",
+   "number": "3",
+   "name": "Mew",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Fire",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Copy",
+     "cost": "C",
+     "damage": 0,
+     "text": "Choose 1 of the Defending Pokémon's attacks. Copy copies that attack. This attack does nothing if this Pokémon doesn't have the Energy necessary to use that attack. (You must still do anything else required for that attack.) This Pokémon performs that attack."
+    },
+    {
+     "name": "Extra Draw",
+     "cost": "R",
+     "damage": 0,
+     "text": "If your opponent has any Pokémon-ex in play, search your deck for up to 2 basic Energy cards and attach them to this Pokémon. Shuffle your deck afterward."
+    }
+   ]
+  },
+  {
+   "set": "P5",
+   "number": "11",
+   "name": "Meowth",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Darkness",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Feint Attack",
+     "cost": "D",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon. This attack does 10 damage to that Pokémon. This attack's damage isn't affected by Weakness, Resistance, Poké-Powers, Poké-Bodies, or any other effects on that Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "P5",
+   "number": "12",
+   "name": "Pikachu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Lightning Ball",
+     "cost": "L",
+     "damage": 10
+    },
+    {
+     "name": "Thunderbolt",
+     "cost": "LCC",
+     "damage": 50,
+     "text": "Discard all Energy cards attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "P5",
+   "number": "13",
+   "name": "Pikachu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Metal",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Electric Punch",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Heavy Metal",
+     "cost": "CC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin for each Metal Energy attached to this Pokémon. This attack does 10 damage plus 20 more damage for each heads."
+    }
+   ]
+  },
+  {
+   "set": "P5",
+   "number": "14",
+   "name": "Pelipper",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Stage1",
+   "evolvesFrom": "Wingull",
+   "hp": 70,
+   "type": "Lightning",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 0,
+   "abilities": [
+    {
+     "name": "Mist",
+     "text": "Any damage done to this Pokémon by attacks from Stage 2 Evolved Pokémon (both yours and your opponent's) is reduced by 30 (after applying Weakness and Resistance).",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Lightning Wing",
+     "cost": "LCC",
+     "damage": 50,
+     "text": "Does 10 damage to 1 of your Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "P5",
+   "number": "15",
+   "name": "Zangoose",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Metal",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Detect",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. If heads, prevent all effects of an attack, including damage, done to this Pokémon during your opponent's next turn."
+    },
+    {
+     "name": "Metal Claw",
+     "cost": "MCC",
+     "damage": 40
+    }
+   ]
+  },
+  {
+   "set": "P5",
+   "number": "16",
+   "name": "Espeon ★",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Purple Ray",
+     "text": "Once during your turn, when you put Espeon Star from your hand onto your Bench, you may use this power. Each Active Pokémon (both yours and your opponent's) is now Confused.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Psychic Boom",
+     "cost": "PPC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Does 30 damage plus 10 more damage for each Energy attached to the Defending Pokémon."
+    }
+   ]
+  }
+ ]
+}

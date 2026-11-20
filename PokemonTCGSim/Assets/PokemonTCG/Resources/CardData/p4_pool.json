@@ -1,0 +1,258 @@
+{
+ "format": "POP Series 4 (P4, 2006): cards not already in the pool. Unlimited only. Deoxys 2 (Holon Phantoms'), Sceptile 5 (Ruby & Sapphire's), Heal Energy 8 (Deoxys'), Pokémon Fan Club 9 (Aquapolis'), Scramble Energy 10 (Deoxys'), Squirtle 14 (Team Magma vs Team Aqua's), Treecko 15 (Crystal Guardians'), Deoxys ex 17 (Emerald's) are prints of cards already in the pool.",
+ "cards": [
+  {
+   "set": "P4",
+   "number": "1",
+   "name": "Chimecho",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "δ Delta Species (the δ isn't part of the name).",
+   "tags": [
+    "Delta Species"
+   ],
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Metal",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Wrap",
+     "cost": "C",
+     "damage": 0,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    },
+    {
+     "name": "Sonicboom",
+     "cost": "MC",
+     "damage": 30,
+     "text": "This attack's damage isn't affected by Weakness or Resistance."
+    }
+   ]
+  },
+  {
+   "set": "P4",
+   "number": "3",
+   "name": "Flygon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Vibrava",
+   "hp": 120,
+   "type": "Fighting",
+   "weakness": "Water",
+   "retreat": 2,
+   "abilities": [
+    {
+     "name": "Levitate",
+     "text": "As long as this Pokémon has any Energy attached to it, the Retreat Cost for this Pokémon is 0.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "FC",
+     "damage": 30
+    },
+    {
+     "name": "Sand Pit",
+     "cost": "FCCC",
+     "damage": 70,
+     "text": "The Defending Pokémon can't retreat during your opponent's next turn."
+    }
+   ]
+  },
+  {
+   "set": "P4",
+   "number": "4",
+   "name": "Mew",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 70,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Reactive Barrier",
+     "text": "As long as this Pokémon has any React Energy cards attached to it, prevent all effects, excluding damage, done to this Pokémon by attacks from your opponent's Pokémon.",
+     "kind": "Poké-Body"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Psyshock",
+     "cost": "PC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    }
+   ]
+  },
+  {
+   "set": "P4",
+   "number": "6",
+   "name": "Combusken",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Torchic",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Smokescreen",
+     "cost": "R",
+     "damage": 10,
+     "text": "If the Defending Pokémon tries to attack during your opponent's next turn, your opponent flips a coin. If tails, that attack does nothing."
+    },
+    {
+     "name": "Sky Uppercut",
+     "cost": "RCC",
+     "damage": 40,
+     "text": "This attack's damage isn't affected by Resistance."
+    }
+   ]
+  },
+  {
+   "set": "P4",
+   "number": "7",
+   "name": "Grovyle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Treecko",
+   "hp": 70,
+   "type": "Grass",
+   "weakness": "Fire",
+   "resistance": "Water",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Quick Attack",
+     "cost": "C",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 damage plus 10 more damage."
+    },
+    {
+     "name": "Blot",
+     "cost": "GC",
+     "damage": 20,
+     "text": "Remove 2 damage counters from this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "P4",
+   "number": "11",
+   "name": "Mudkip",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Water",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Super Hypno Wave",
+     "cost": "WC",
+     "damage": 20,
+     "text": "The Defending Pokémon is now Asleep."
+    }
+   ]
+  },
+  {
+   "set": "P4",
+   "number": "12",
+   "name": "Pidgey",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 40,
+   "type": "Colorless",
+   "weakness": "Lightning",
+   "resistance": "Fighting",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Quick Attack",
+     "cost": "CC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 20 damage plus 10 more damage."
+    }
+   ]
+  },
+  {
+   "set": "P4",
+   "number": "13",
+   "name": "Pikachu",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Spark",
+     "cost": "LC",
+     "damage": 20,
+     "text": "Does 10 damage to 1 of your opponent's Benched Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "P4",
+   "number": "16",
+   "name": "Wobbuffet",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 80,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Nap",
+     "cost": "C",
+     "damage": 0,
+     "text": "Remove 2 damage counters from this Pokémon."
+    },
+    {
+     "name": "Expand",
+     "cost": "PC",
+     "damage": 20,
+     "text": "During your opponent's next turn, any damage done to this Pokémon is reduced by 20 (after applying Weakness and Resistance)."
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,421 @@
+{
+ "format": "POP Series 3 (P3, 2006): cards not already in the pool. Unlimited only. High Pressure System 10 (Dragon's), Low Pressure System 11 (Dragon's), Ho-Oh ex 17 (Unseen Forces') are prints of cards already in the pool.",
+ "cards": [
+  {
+   "set": "P3",
+   "number": "1",
+   "name": "Blastoise",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage2",
+   "evolvesFrom": "Wartortle",
+   "hp": 120,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Smash Turn",
+     "cost": "CC",
+     "damage": 30,
+     "text": "After your attack, you may switch this Pokémon with 1 of your Benched Pokémon."
+    },
+    {
+     "name": "Rocket Tackle",
+     "cost": "WWCC",
+     "damage": 60,
+     "text": "This Pokémon does 10 damage to itself. Flip a coin. If heads, prevent all damage done to this Pokémon by attacks during your opponent's next turn."
+    }
+   ]
+  },
+  {
+   "set": "P3",
+   "number": "2",
+   "name": "Flareon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Quick Attack",
+     "cost": "CC",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 damage plus 20 more damage."
+    },
+    {
+     "name": "Fire Spin",
+     "cost": "RRC",
+     "damage": 70,
+     "text": "Discard 2 basic Energy cards attached to this Pokémon or this attack does nothing."
+    }
+   ]
+  },
+  {
+   "set": "P3",
+   "number": "3",
+   "name": "Jolteon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 70,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 30,
+   "retreat": 0,
+   "attacks": [
+    {
+     "name": "Thundershock",
+     "cost": "LC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+    },
+    {
+     "name": "Pin Missile",
+     "cost": "LCC",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Flip 4 coins. This attack does 20 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "P3",
+   "number": "4",
+   "name": "Minun",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Cheer Up",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw a card. If you have Plusle in play, draw 2 cards instead."
+    },
+    {
+     "name": "Negative Ion",
+     "cost": "LC",
+     "damage": 20,
+     "text": "During your opponent's next turn, any damage done by attacks from the Defending Pokémon is reduced by 10 (before applying Weakness and Resistance)."
+    },
+    {
+     "name": "Power Bolt",
+     "cost": "LL",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon that has any Poké-Powers. This attack does 30 damage to that Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "P3",
+   "number": "5",
+   "name": "Plusle",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "resistance": "Metal",
+   "resistanceAmount": 30,
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Cheer Up",
+     "cost": "C",
+     "damage": 0,
+     "text": "Draw a card. If you have Minun in play, draw 2 cards instead."
+    },
+    {
+     "name": "Positive Ion",
+     "cost": "LC",
+     "damage": 20,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 20 damage plus 10 more damage."
+    },
+    {
+     "name": "Body Bolt",
+     "cost": "LL",
+     "damage": 0,
+     "text": "Choose 1 of your opponent's Pokémon that has any Poké-Bodies. This attack does 30 damage to that Pokémon. (No Weakness or Resistance for Benched Pokémon.)"
+    }
+   ]
+  },
+  {
+   "set": "P3",
+   "number": "6",
+   "name": "Vaporeon",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Eevee",
+   "hp": 70,
+   "type": "Water",
+   "weakness": "Lightning",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bite",
+     "cost": "C",
+     "damage": 20
+    },
+    {
+     "name": "Water Gun",
+     "cost": "WC",
+     "damage": 30,
+     "damageSuffix": "+",
+     "text": "Does 30 damage plus 20 more damage for each Water Energy attached to this Pokémon but not used to pay for this attack's Energy cost. You can't add more than 40 damage in this way."
+    }
+   ]
+  },
+  {
+   "set": "P3",
+   "number": "7",
+   "name": "Combusken",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Torchic",
+   "hp": 70,
+   "type": "Fire",
+   "weakness": "Water",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Scratch",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Flamethrower",
+     "cost": "RCC",
+     "damage": 50,
+     "text": "Discard a Fire Energy attached to this Pokémon."
+    }
+   ]
+  },
+  {
+   "set": "P3",
+   "number": "8",
+   "name": "Donphan",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Phanpy",
+   "hp": 80,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Sniff Out",
+     "cost": "C",
+     "damage": 0,
+     "text": "Put any 1 card from your discard pile into your hand."
+    },
+    {
+     "name": "Fury Attack",
+     "cost": "FCC",
+     "damage": 30,
+     "damageSuffix": "x",
+     "text": "Flip 3 coins. This attack does 30 damage times the number of heads."
+    }
+   ]
+  },
+  {
+   "set": "P3",
+   "number": "9",
+   "name": "Forretress",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Pineco",
+   "hp": 70,
+   "type": "Grass",
+   "weakness": "Fire",
+   "retreat": 2,
+   "attacks": [
+    {
+     "name": "Tackle",
+     "cost": "CC",
+     "damage": 20
+    },
+    {
+     "name": "Toxic",
+     "cost": "GGC",
+     "damage": 20,
+     "text": "The Defending Pokémon is now Poisoned. Put 2 damage counters instead of 1 on the Defending Pokémon between turns."
+    }
+   ]
+  },
+  {
+   "set": "P3",
+   "number": "12",
+   "name": "Ditto",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Psychic",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "abilities": [
+    {
+     "name": "Duplicate",
+     "text": "Once during your turn (before your attack), you may search your deck for another Ditto and switch it with this Pokémon. (Any cards attached to this Pokémon, damage counters, Special Conditions, and effects on it are now on the new Pokémon.) If you do, put this Pokémon on top of your deck. Shuffle your deck afterward. You can't use more than 1 Duplicate Poké-Power each turn.",
+     "kind": "Poké-Power"
+    }
+   ],
+   "attacks": [
+    {
+     "name": "Psybeam",
+     "cost": "PC",
+     "damage": 20,
+     "text": "Flip a coin. If heads, the Defending Pokémon is now Confused."
+    }
+   ]
+  },
+  {
+   "set": "P3",
+   "number": "13",
+   "name": "Eevee",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 50,
+   "type": "Colorless",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Tackle",
+     "cost": "C",
+     "damage": 10
+    },
+    {
+     "name": "Take Down",
+     "cost": "CC",
+     "damage": 30,
+     "text": "This Pokémon does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "P3",
+   "number": "14",
+   "name": "Ivysaur",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Bulbasaur",
+   "hp": 70,
+   "type": "Grass",
+   "weakness": "Psychic",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Gouge",
+     "cost": "C",
+     "damage": 10,
+     "damageSuffix": "+",
+     "text": "Flip a coin. If heads, this attack does 10 damage plus 10 more damage."
+    },
+    {
+     "name": "Poisonpowder",
+     "cost": "GCC",
+     "damage": 40,
+     "text": "The Defending Pokémon is now Poisoned."
+    }
+   ]
+  },
+  {
+   "set": "P3",
+   "number": "15",
+   "name": "Marshtomp",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Stage1",
+   "evolvesFrom": "Mudkip",
+   "hp": 70,
+   "type": "Fighting",
+   "weakness": "Grass",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Mud Slap",
+     "cost": "F",
+     "damage": 20
+    },
+    {
+     "name": "Double-edge",
+     "cost": "CCC",
+     "damage": 40,
+     "text": "This Pokémon does 10 damage to itself."
+    }
+   ]
+  },
+  {
+   "set": "P3",
+   "number": "16",
+   "name": "Pichu Bros.",
+   "kind": "Pokemon",
+   "regulationMark": "",
+   "unlimitedOnly": true,
+   "text": "",
+   "stage": "Basic",
+   "hp": 60,
+   "type": "Lightning",
+   "weakness": "Fighting",
+   "retreat": 1,
+   "attacks": [
+    {
+     "name": "Bustle",
+     "cost": "LL",
+     "damage": 20,
+     "damageSuffix": "x",
+     "text": "Flip 2 coins. This attack does 20 damage times the number of heads. If either coin is heads, the Defending Pokémon is now Confused."
+    }
+   ]
+  }
+ ]
+}
