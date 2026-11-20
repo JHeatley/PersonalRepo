@@ -323,6 +323,8 @@ namespace PokemonTCG.Presentation
                 }
             }
             UpdateRegionalFriend();
+            // Host: your friend conceded (their concession can arrive while the game waits for you).
+            if (onlineSeat != null && onlineMatch != null && host is EngineHost && !host.Finished && onlineSeat.PollConcede() && human != null) human.Concede();
             // Host: tell the friend once this game is over.
             if (onlineMatch != null && !onlineEndSent && host != null && host.Finished && host.QueuedCount == 0)
             {

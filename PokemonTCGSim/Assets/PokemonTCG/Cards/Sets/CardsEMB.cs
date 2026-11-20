@@ -79,7 +79,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Submerge / Feathery (Poké-Body): while this Pokémon is on your Bench, no attack damage to it (Submerge: anyone's attacks; Feathery: only the opponent's).</summary>
-        private sealed class BenchShieldMon : Mon
+        internal sealed class BenchShieldMon : Mon
         {
             private readonly bool opponentOnly;
             private readonly Mon attacks;
@@ -101,7 +101,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Dig Under: N damage to 1 of the opponent's Pokémon, not affected by Weakness or Resistance.</summary>
-        private sealed class DigUnderMon : Mon
+        internal sealed class DigUnderMon : Mon
         {
             private readonly int amount;
 

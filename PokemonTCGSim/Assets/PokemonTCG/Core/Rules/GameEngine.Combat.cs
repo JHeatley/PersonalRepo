@@ -84,7 +84,7 @@ namespace PokemonTCG.Core
                     var weakness2 = SecondWeaknessOf(target);
                     if ((weakness.HasValue && types.Contains(weakness.Value)) || (weakness2.HasValue && types.Contains(weakness2.Value)))
                     {
-                        if (StatsCardOf(target).WeaknessAmount > 0)
+                        if (StatsCardOf(target).WeaknessAmount > 0 && !sources.Any(s => s.Script.AppliesWeaknessAsDouble(s.Ctx)))
                         {
                             dmg += StatsCardOf(target).WeaknessAmount; // older cards: Weakness "+20"
                         }
@@ -361,6 +361,9 @@ namespace PokemonTCG.Core
         }
 
         /// <summary>"This Pokémon is Knocked Out" / "Both Active Pokémon are Knocked Out". Resolved with the other Knock Outs.</summary>
+        /// <summary>v173: a Knocked Out Pokémon with this marker goes to its owner's hand with every attached card (Water Rescue).</summary>
+        public const string AllToHandOnKnockOut = "All cards to hand on Knock Out";
+
         public bool KnockOut(PokemonInPlay mon, string reason)
         {
             if (mon == null || State.FindPokemon(mon.Uid) != mon) return false;
@@ -441,7 +444,8 @@ namespace PokemonTCG.Core
                     finally { PopSource(); }
                     if (!escapes) continue;
                     knocked.RemoveAt(k);
-                    ShufflePokemonIntoDeck(mon);
+                    if (src.Script.EscapeDiscardsAttachedToDeckBottom) PutPokemonOnDeckBottom(mon);
+                    else ShufflePokemonIntoDeck(mon);
                     break;
                 }
             }
@@ -493,6 +497,14 @@ namespace PokemonTCG.Core
                         try { src.Script.OnHolderKnockedOut(src.Ctx, byOpponentsAttack, wasActive); }
                         finally { PopSource(); }
                     }
+                    if (byOpponentsAttack)
+                        foreach (var src in Sources())
+                        {
+                            if (src.Ctx.Player == mon.Owner) continue;
+                            PushSource(src.Kind, src.Ctx.Player, src.Ctx.Pokemon);
+                            try { src.Script.OnOpponentPokemonKnockedOutByAttack(src.Ctx, mon); }
+                            finally { PopSource(); }
+                        }
                     // v121 fix: an attack's own effect on a Pokémon with no Ability or Power (Base Set Gastly's Destiny Bond) isn't
                     // in SourcesOn, so its script is told here when it asks to be.
                     if (mon.Def.Abilities.Count == 0)
@@ -538,6 +550,16 @@ namespace PokemonTCG.Core
                         if (lost >= 2) owner.LostZone.AddRange(attached);
                         else DiscardFromPlay(attached);
                         Emit(GameEventType.Info, mon.Owner, mon.Name + " went to the Lost Zone" + (lost >= 2 ? " with every card attached to it." : "; its attached cards were discarded."), -1, mon.Uid);
+                    }
+                    else if (mon.Markers.ContainsKey(AllToHandOnKnockOut))
+                    {
+                        // v173: Floatzel GL LV.X's Water Rescue: the Pokémon and every card attached to it go to the hand.
+                        owner.Hand.AddRange(mon.Stack);
+                        owner.Hand.AddRange(mon.Energy);
+                        owner.Hand.AddRange(mon.Tools);
+                        mon.Energy.Clear();
+                        mon.Tools.Clear();
+                        Emit(GameEventType.Info, mon.Owner, mon.Name + " and all cards attached to it went to " + PlayerName(mon.Owner) + "'s hand.", mon.Top.Id, mon.Uid);
                     }
                     else if (toHand)
                     {

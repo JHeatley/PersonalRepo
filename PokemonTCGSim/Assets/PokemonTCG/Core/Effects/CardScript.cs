@@ -302,6 +302,11 @@ namespace PokemonTCG.Core
         public virtual bool GoesToHandWhenKnockedOut(EffectContext src, PokemonInPlay mon, bool byOpponentsAttack) { return false; }
         /// <summary>Celebi's Leap Through Time (v107): "If this Pokémon would be Knocked Out" - true when it is shuffled into the deck instead (not Knocked Out).</summary>
         public virtual bool EscapesKnockOut(EffectContext src, PokemonInPlay mon) { return false; }
+        /// <summary>
+        /// v171: with EscapesKnockOut, its attached cards are discarded and the Pokémon goes on the bottom of its owner's deck
+        /// instead of everything being shuffled in (Crystal Guardians' Celebi ★'s Time Travel).
+        /// </summary>
+        public virtual bool EscapeDiscardsAttachedToDeckBottom { get { return false; } }
         /// <summary>Malamar's Contrary (v107): every coin flip that player makes during their own turn is tails.</summary>
         public virtual bool ForcesTailsFor(EffectContext src, int player) { return false; }
         /// <summary>Team Plasma Badge (v110): the Pokémon this card is attached to is a Team Plasma Pokémon.</summary>
@@ -595,6 +600,34 @@ namespace PokemonTCG.Core
         /// Asked of every Pokémon with Abilities; the script checks that its own body works (GameEngine.AbilityBlocked).
         /// </summary>
         public virtual bool StopsPokePowersOf(EffectContext src, PokemonInPlay mon) { return false; }
+        /// <summary>
+        /// v171: the attack just announced ends before anything else happens, Baby Rule and Confusion included (Crystal Guardians'
+        /// Holon Circle). Asked of every working source; OnAnnouncedAttackEnded runs for the one that ended it.
+        /// </summary>
+        /// <summary>
+        /// v171: a Pokémon Tool that stops every Pokémon's Poké-Powers, Poké-Bodies and old Pokémon Powers (both players') while it
+        /// works (Crystal Guardians' Cessation Crystal, on an Active Pokémon). Asked of the Tools on every Pokémon in play.
+        /// </summary>
+        public virtual bool StopsEveryPowerAndBody(EffectContext src) { return false; }
+        /// <summary>v172: Weakness is applied as ×2 for every Pokémon, "+N" Weakness included (Mysterious Treasures' Lake Boundary).</summary>
+        public virtual bool AppliesWeaknessAsDouble(EffectContext src) { return false; }
+        /// <summary>
+        /// v172: the other player's Pokémon is about to use a Poké-Power from the Powers menu; returning true prevents all its effects
+        /// (it still counts as used). Asked of the other player's working sources (Mysterious Treasures Alakazam's Power Cancel).
+        /// </summary>
+        public virtual bool CancelsPokePower(EffectContext src, PokemonInPlay user, string power) { return false; }
+        /// <summary>v173: this card may be played from the hand during the opponent's turn to stop a Poké-Power (Power Spray).</summary>
+        public virtual bool CancelsPokePowerFromHand { get { return false; } }
+        /// <summary>v173: asks the card's owner and, if they play it, stops the Poké-Power (returns true).</summary>
+        public virtual bool CancelPokePowerFromHand(EffectContext ctx, PokemonInPlay user, string power) { return false; }
+        public virtual bool EndsAnnouncedAttack(EffectContext src, PokemonInPlay attacker) { return false; }
+        public virtual void OnAnnouncedAttackEnded(EffectContext src, PokemonInPlay attacker) { }
+        /// <summary>v171: a Pokémon in play just used a Poké-Power from the Powers menu (Shiftry ex's Dark Eyes). Asked of every working source.</summary>
+        public virtual void OnPokePowerUsed(EffectContext src, PokemonInPlay user, string power) { }
+        /// <summary>v172: the opponent of this source's owner played a Supporter card from their hand and it resolved (Ampharos's Jamming).</summary>
+        public virtual void OnOpponentPlayedSupporter(EffectContext src, int player, CardDef supporter) { }
+        /// <summary>v172: 1 of the opponent's Pokémon was Knocked Out by damage from an attack of this source's owner (Entei's Burning Coat). The Pokémon is still in play; HitByAttackerUid names the attacker.</summary>
+        public virtual void OnOpponentPokemonKnockedOutByAttack(EffectContext src, PokemonInPlay knockedOut) { }
         /// <summary>
         /// v159: a Poké-Body in play that stops another Pokémon's Poké-Bodies (Muk ex's Toxic Gas). bodyName is the Poké-Body
         /// being checked, so a blocker can leave its own kind alone without checking itself in a loop.

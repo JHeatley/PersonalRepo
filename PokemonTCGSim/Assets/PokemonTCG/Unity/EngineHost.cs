@@ -25,7 +25,7 @@ namespace PokemonTCG.Presentation
         private readonly object gate = new object();
         private DecisionRequest pending;
         private List<int> answer;
-        private bool cancelled;
+        private bool cancelled, conceding;
 
         public DecisionRequest Pending
         {
@@ -38,9 +38,15 @@ namespace PokemonTCG.Presentation
             {
                 pending = request;
                 answer = null;
-                while (answer == null && !cancelled) Monitor.Wait(gate);
+                while (answer == null && !cancelled && !conceding) Monitor.Wait(gate);
                 pending = null;
                 if (cancelled) throw new OperationCanceledException("Game closed.");
+                if (conceding)
+                {
+                    conceding = false;
+                    answer = null;
+                    throw new ConcedeException();
+                }
                 var result = answer;
                 answer = null;
                 return result;
@@ -65,6 +71,20 @@ namespace PokemonTCG.Presentation
                 Monitor.PulseAll(gate);
             }
         }
+
+        /// <summary>
+        /// The player concedes: a decision they're being asked now stops there (Decide throws ConcedeException). Tell the
+        /// engine first (GameEngine.Concede), or send the concession to the host online.
+        /// </summary>
+        public void Concede()
+        {
+            lock (gate)
+            {
+                if (pending == null) return; // not being asked: the engine ends the game at its next decision
+                conceding = true;
+                Monitor.PulseAll(gate);
+            }
+        }
     }
 
     /// <summary>
@@ -83,6 +103,8 @@ namespace PokemonTCG.Presentation
         string PlayerName(int seat);
         /// <summary>"Your" for a player named "You", otherwise "Name's" (for the battle log).</summary>
         string Possessive(int seat);
+        /// <summary>The player at this seat concedes the game (the other player wins; it counts as a loss).</summary>
+        void Concede(int seat);
     }
 
     /// <summary>
@@ -155,6 +177,12 @@ namespace PokemonTCG.Presentation
             return Engine.PlayerName(seat);
         }
 
+        public void Concede(int seat)
+        {
+            Engine.Concede(seat);
+            if (Human != null) Human.Concede();
+        }
+
         public string Possessive(int seat)
         {
             return Engine.Possessive(seat);
@@ -173,7 +201,7 @@ namespace PokemonTCG.Presentation
         private readonly NetCodec codec;
         private readonly string[] names;
         private Thread thread;
-        private volatile bool finished, stopping;
+        private volatile bool finished, stopping, conceded;
 
         public GameEngine Engine { get { return null; } }
         public HumanAgent Human { get; private set; }
@@ -222,8 +250,16 @@ namespace PokemonTCG.Presentation
                             break;
                         case NetMessageType.Decide:
                             var request = codec.FromBytes<DecisionRequest>(m.Body);
-                            var picks = Human.Decide(request); // waits for you
-                            connection.Send(NetMessageType.Answer, codec.ToBytes(picks));
+                            List<int> picks;
+                            try
+                            {
+                                picks = Human.Decide(request); // waits for you
+                            }
+                            catch (ConcedeException)
+                            {
+                                break; // conceded: the host ends the game (no answer is sent)
+                            }
+                            if (!conceded) connection.Send(NetMessageType.Answer, codec.ToBytes(picks));
                             break;
                         case NetMessageType.End:
                             Ended = true;
@@ -269,6 +305,21 @@ namespace PokemonTCG.Presentation
         {
             string name = PlayerName(seat);
             return name == "You" ? "Your" : name + "'s";
+        }
+
+        /// <summary>You concede: the host's copy is told (it ends the game, you losing) and a decision you're being asked stops.</summary>
+        public void Concede(int seat)
+        {
+            if (conceded) return;
+            conceded = true;
+            try
+            {
+                connection.Send(NetMessageType.Concede, (byte[])null);
+            }
+            catch (IOException)
+            {
+            }
+            if (Human != null) Human.Concede();
         }
     }
 }

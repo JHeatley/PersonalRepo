@@ -105,6 +105,9 @@ namespace PokemonTCG.Core
                 if (!ToolsDisabled() || StadiumShielded(mon))
                     foreach (var tool in mon.Tools)
                         if (tool.Def.Abilities.Count > 0 && ToolWorks(mon, tool)) sourceCards.Add(tool);
+                // v172: a Special Energy card with an effect its owner uses (Call Energy).
+                foreach (var energy in mon.Energy)
+                    if (energy.Def.IsSpecialEnergy && energy.Def.Abilities.Count > 0 && !SpecialEnergyOff(mon)) sourceCards.Add(energy);
                 foreach (var sourceCard in sourceCards)
                 {
                     var def = sourceCard.Def;
@@ -408,7 +411,7 @@ namespace PokemonTCG.Core
                     // an attached Tool that gives it an Ability (Sky Seal Stone).
                     // v126: or the card whose Powers it has (a Shapeshift Evolution card, or the Pokémon a Ditto is a copy of).
                     var inheritedCard = InheritedPowersCard(mon);
-                    var sourceCard = mon.Stack.FirstOrDefault(c => c.Id == opt.CardId) ?? mon.Tools.FirstOrDefault(c => c.Id == opt.CardId)
+                    var sourceCard = mon.Stack.FirstOrDefault(c => c.Id == opt.CardId) ?? mon.Tools.FirstOrDefault(c => c.Id == opt.CardId) ?? mon.Energy.FirstOrDefault(c => c.Id == opt.CardId)
                                      ?? (inheritedCard != null && inheritedCard.Id == opt.CardId ? inheritedCard : null) ?? mon.Top;
                     var ability = sourceCard.Def.Abilities[opt.Index];
                     string kind = ability.IsAbility ? "Ability" : ability.Kind;
@@ -418,8 +421,19 @@ namespace PokemonTCG.Core
                     PushSource(ability.IsAbility ? EffectSourceKind.Ability : EffectSourceKind.PokemonPower, player, mon);
                     // Parasect's Allergic Pollen (v141): an old-style Pokémon Power can't take cards out of discard piles.
                     var powerShield = ability.Kind == AbilityDef.PokemonPower ? BeginDiscardShield() : null;
-                    try { Scripts.For(sourceCard.Def).UseAbility(new EffectContext(this, player, sourceCard, mon), opt.Index); }
+                    try
+                    {
+                        var abilityCtx = new EffectContext(this, player, sourceCard, mon);
+                        if (ability.Kind == AbilityDef.PokePower && PokePowerCancelled(player, mon, ability.Name))
+                        {
+                            abilityCtx.MarkAbilityUsed(ability.Name);
+                            // v173 (errata, 2009-05-01): a Poké-Power that ends your turn still ends it when it's cancelled (Cheerful Voice).
+                            if (ability.Text != null && ability.Text.Contains("your turn ends")) RequestEndTurn();
+                        }
+                        else Scripts.For(sourceCard.Def).UseAbility(abilityCtx, opt.Index);
+                    }
                     finally { EndDiscardShield(powerShield); PopSource(); }
+                    if (ability.Kind == AbilityDef.PokePower) NotifyPokePowerUsed(mon, ability.Name);
                     // v90: an Active Pokémon that left play through its own Ability (Wishiwashi's Cowardice) is replaced right away;
                     // with no Benched Pokémon the player has none left in play and loses (like a Fossil, v68).
                     if (p.Active == null && p.Bench.Count > 0) PromoteActive(player);
@@ -639,6 +653,15 @@ namespace PokemonTCG.Core
                 }
                 else if (!ctx.CardPlacedElsewhere) p.Discard.Add(card);
             }
+            // v172: Ampharos's Jamming: after a Supporter from the hand has resolved.
+            if (d.IsSupporter && string.IsNullOrEmpty(from) && !State.IsOver)
+                foreach (var src in Sources())
+                {
+                    if (src.Ctx.Player == player) continue;
+                    PushSource(src.Kind, src.Ctx.Player, src.Ctx.Pokemon);
+                    try { src.Script.OnOpponentPlayedSupporter(src.Ctx, player, d); }
+                    finally { PopSource(); }
+                }
         }
 
         /// <summary>
@@ -867,6 +890,40 @@ namespace PokemonTCG.Core
             return false;
         }
 
+        /// <summary>v172: the other player's sources may cancel this Poké-Power before it does anything (Alakazam's Power Cancel).</summary>
+        private bool PokePowerCancelled(int player, PokemonInPlay user, string power)
+        {
+            foreach (var src in Sources())
+            {
+                if (src.Ctx.Player == player) continue;
+                PushSource(src.Kind, src.Ctx.Player, src.Ctx.Pokemon);
+                try { if (src.Script.CancelsPokePower(src.Ctx, user, power)) return true; }
+                finally { PopSource(); }
+            }
+            // v173: a card the other player may play from their hand right then (Team Galactic's Invention G-103 Power Spray).
+            int other = 1 - player;
+            foreach (var card in State.Players[other].Hand.ToList())
+            {
+                var script = Scripts.For(card.Def);
+                if (!script.CancelsPokePowerFromHand) continue;
+                if (script.CancelPokePowerFromHand(new EffectContext(this, other, card, null), user, power)) return true;
+            }
+            return false;
+        }
+
+        /// <summary>v171: a Pokémon used a Poké-Power: every working source hears of it (Shiftry ex's Dark Eyes).</summary>
+        public void NotifyPokePowerUsed(PokemonInPlay user, string power)
+        {
+            if (user == null || State.FindPokemon(user.Uid) != user) return;
+            foreach (var src in Sources())
+            {
+                if (State.IsOver || State.FindPokemon(user.Uid) != user) break;
+                PushSource(src.Kind, src.Ctx.Player, src.Ctx.Pokemon);
+                try { src.Script.OnPokePowerUsed(src.Ctx, user, power); }
+                finally { PopSource(); }
+            }
+        }
+
         /// <summary>The attack being resolved right now, or null (Celesteela-GX's Force Canceler checks for a GX attack; v73).</summary>
         public AttackDef ResolvingAttack { get; private set; }
 
@@ -879,6 +936,15 @@ namespace PokemonTCG.Core
             // The announcement doesn't name a target (v55.1): many attacks hit a Benched Pokémon or none at all (Cruel Arrow,
             // snipes, searches), so "on [the Active Pokémon]" was misleading. The damage lines that follow say who was hit.
             Emit(GameEventType.Attack, player, OwnedName(attacker) + " used " + atk.Name + fromBench + "!", attacker.Top.Id, attacker.Uid);
+            // v171: Holon Circle: the attack ends as soon as it's announced, before anything else (Compendium, 2006-11-16).
+            foreach (var endSrc in Sources())
+            {
+                if (!endSrc.Script.EndsAnnouncedAttack(endSrc.Ctx, attacker)) continue;
+                PushSource(endSrc.Kind, endSrc.Ctx.Player, endSrc.Ctx.Pokemon);
+                try { endSrc.Script.OnAnnouncedAttackEnded(endSrc.Ctx, attacker); }
+                finally { PopSource(); }
+                return false;
+            }
             // Baby Rule (Neo era, v48): "If this Baby Pokémon is your Active Pokémon and your opponent announces an attack, your
             // opponent flips a coin (before doing anything else). If tails, your opponent's turn ends." So it comes before Confusion.
             if (defending != null && defending.Def.IsBaby && !FlipCoin(player, "Baby Rule (" + defending.Name + ")"))

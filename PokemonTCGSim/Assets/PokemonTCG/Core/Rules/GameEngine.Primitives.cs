@@ -491,6 +491,12 @@ namespace PokemonTCG.Core
                     try { src.Script.OnPokemonBenchedFromHand(src.Ctx, mon); }
                     finally { PopSource(); }
                 }
+                // v173: a lasting effect of an attack (Skarmory FB's Silver Feather).
+                foreach (var e in ActiveEffects().ToList())
+                {
+                    if (State.IsOver || !p.Bench.Contains(mon)) break;
+                    e.OnPokemonBenchedFromHand(this, mon);
+                }
             }
             return mon;
         }
@@ -560,6 +566,7 @@ namespace PokemonTCG.Core
             target.Stack.Add(evolution);
             target.TurnEvolved = State.TurnNumber;
             target.PlaySeq = NextLockSeq();
+            target.ConditionsBeforeEvolve = target.Conditions;
             target.Conditions = ConditionsAfterEvolving(target);
             // A BREAK Pokémon keeps the Abilities it had, so a once-per-turn one already used this turn stays used (Greninja
             // BREAK's Water Shuriken: Compendium, 2016-02-11; v92).

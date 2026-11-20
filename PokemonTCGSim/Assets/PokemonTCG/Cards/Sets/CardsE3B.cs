@@ -183,7 +183,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>Drag Off: before the damage, (you may) switch 1 of the opponent's Benched Pokémon with the Defending Pokémon.</summary>
-        private sealed class DragOffMon : Mon
+        internal sealed class DragOffMon : Mon
         {
             private readonly bool optional;
 

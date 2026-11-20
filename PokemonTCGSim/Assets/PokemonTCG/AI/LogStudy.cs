@@ -137,7 +137,9 @@ namespace PokemonTCG.AI
             }
             catch (ReplayEndedException e)
             {
-                report.Note = e.Message + " The decisions up to there were studied.";
+                // A conceded game's record ends where the player conceded.
+                bool conceded = (record.Reason ?? "").EndsWith(" conceded.", StringComparison.Ordinal);
+                report.Note = (conceded ? record.Reason : e.Message) + " The decisions up to there were studied.";
                 if (engine.State != null) report.Turns = engine.State.TurnNumber;
             }
             catch (Exception e)

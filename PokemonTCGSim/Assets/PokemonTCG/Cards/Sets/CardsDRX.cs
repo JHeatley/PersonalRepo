@@ -496,7 +496,7 @@ namespace PokemonTCG.Cards
         }
 
         /// <summary>"Flip 2 coins. If both of them are heads, this attack does N more damage" (Unstoppable Roll).</summary>
-        private sealed class BothHeadsBonusMon : Mon
+        internal sealed class BothHeadsBonusMon : Mon
         {
             private readonly string attack;
             private readonly int bonus;

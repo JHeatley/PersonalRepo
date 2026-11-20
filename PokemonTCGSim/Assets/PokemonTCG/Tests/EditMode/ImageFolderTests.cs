@@ -218,5 +218,22 @@ namespace PokemonTCG.Tests
             Assert.AreEqual("UF-117", CardVisuals.KeyFor("117", new[] { "UF" }), "numbered cards as before");
             Assert.IsNull(CardVisuals.KeyFor("V", new[] { "Base Set" }), "only sets with a card numbered that way");
         }
+
+        [Test]
+        public void Aura_Seeker_Images_Are_Found_By_Japanese_Card_Id_Or_M7_Code()
+        {
+            // v174: the Japanese card ID (050856 is #1), wherever the file is.
+            Assert.AreEqual("ASK-1", CardVisuals.KeyFor("050856_P_MADATSUBOMI", new string[0]));
+            Assert.AreEqual("ASK-16", CardVisuals.KeyFor("050871_P_KAMEKKUSU", new[] { "Base Set" }));
+            Assert.AreEqual("ASK-74", CardVisuals.KeyFor("050929_T_KIZUNANOTASUKI", new string[0]));
+            Assert.AreEqual("ASK-77", CardVisuals.KeyFor("050932_T_REPOTA", new string[0]));
+            Assert.AreEqual("ASK-78", CardVisuals.KeyFor("050933_T_FAITOARIINA", new string[0]));
+            Assert.IsNull(CardVisuals.KeyFromAuraSeekerName("050934_T_NEXTSET"), "past the end of the set");
+            // The m7 code with the card number and a hash.
+            Assert.AreEqual("ASK-17", CardVisuals.KeyFor("m7-017-n8hgm", new string[0]));
+            Assert.AreEqual("ASK-75", CardVisuals.KeyFor("m7-075-h3g27", new string[0]));
+            Assert.AreEqual("ASK-5", CardVisuals.KeyFor("M7-005", new string[0]));
+            Assert.IsNull(CardVisuals.KeyFromAuraSeekerName("m7a-017-n8hgm"), "M7A is Mega x Mega Parade, not Aura Seeker");
+        }
     }
 }
