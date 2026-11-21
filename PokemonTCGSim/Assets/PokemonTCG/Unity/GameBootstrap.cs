@@ -401,11 +401,19 @@ namespace PokemonTCG.Presentation
 
         private void Update()
         {
+            UpdateAiBuild(); // v175: a deck the AI finished building
             CardVisuals.PumpLoads(); // v134.6: card images decoded in the background are finished a couple per frame
             if (pendingStart)
             {
                 pendingStart = false;
-                if (myDeck >= 0 && oppDeck >= 0)
+                if (myDeck >= 0 && AiBuildsDeck)
+                {
+                    // v175: the AI's own deck; it's built first when there isn't one ready.
+                    PlayerPrefs.SetString(PrefMyDeck, decks[myDeck].Name);
+                    if (AiDeckNeeded) StartAiBuild(true);
+                    else StartGame(decks[myDeck], TakeAiDeck());
+                }
+                else if (myDeck >= 0 && oppDeck >= 0)
                 {
                     PlayerPrefs.SetString(PrefMyDeck, decks[myDeck].Name);
                     PlayerPrefs.SetString(PrefOppDeck, decks[oppDeck].Name);
@@ -415,7 +423,18 @@ namespace PokemonTCG.Presentation
             if (pendingRestart)
             {
                 pendingRestart = false;
-                if (lastMine != null && lastTheirs != null) StartGame(lastMine, lastTheirs);
+                // v175: with "A new deck every game", playing again against the AI's own deck gets it a new one.
+                if (lastMine != null && lastTheirs != null && aiBuilds && lastTheirs == aiBuiltRecord && AiDeckNeeded)
+                {
+                    int mine = decks.FindIndex(d => d.Name == lastMine.Name);
+                    if (mine >= 0)
+                    {
+                        myDeck = mine;
+                        StartAiBuild(true);
+                    }
+                    else StartGame(lastMine, lastTheirs);
+                }
+                else if (lastMine != null && lastTheirs != null) StartGame(lastMine, lastTheirs);
             }
             if (pendingMenu)
             {
@@ -770,10 +789,19 @@ namespace PokemonTCG.Presentation
 
             GUILayout.BeginVertical(GUILayout.Width(colW));
             GUILayout.Label(botVsBot ? "Bot 2's deck" : "Opponent's deck (bot)", ui.Title);
-            oppScroll = GUILayout.BeginScrollView(oppScroll, GUILayout.Height(Mathf.Max(160f, r.height - 382f)));
-            for (int i = 0; i < decks.Count; i++)
-                if (InMenuFormat(i) && GUILayout.Toggle(oppDeck == i, DeckLabel(i), ui.Button) && oppDeck != i) pickTheirs = i;
-            GUILayout.EndScrollView();
+            // v175: the AI can build its own deck (a random one, or around a card you name).
+            LoadAiDeckPrefs();
+            var aiActions = new List<Action>();
+            bool newAiBuilds = GUILayout.Toggle(aiBuilds, " The AI builds its own deck");
+            if (newAiBuilds != aiBuilds) aiActions.Add(() => { aiBuilds = newAiBuilds; SaveAiDeckPrefs(); });
+            if (aiBuilds) DrawAiDeckPanel(ui, Mathf.Max(160f, r.height - 382f), aiActions);
+            else
+            {
+                oppScroll = GUILayout.BeginScrollView(oppScroll, GUILayout.Height(Mathf.Max(160f, r.height - 410f)));
+                for (int i = 0; i < decks.Count; i++)
+                    if (InMenuFormat(i) && GUILayout.Toggle(oppDeck == i, DeckLabel(i), ui.Button) && oppDeck != i) pickTheirs = i;
+                GUILayout.EndScrollView();
+            }
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
 
@@ -815,8 +843,8 @@ namespace PokemonTCG.Presentation
             DrawSkipCpuRow(ui, cpuActions, 170);
             GUILayout.Space(6);
 
-            bool ready = myDeck >= 0 && oppDeck >= 0 && deckProblems[myDeck].Count == 0 && deckProblems[oppDeck].Count == 0
-                         && InMenuFormat(myDeck) && InMenuFormat(oppDeck);
+            bool oppReady = aiBuilds ? !aiBuildBusy : oppDeck >= 0 && deckProblems[oppDeck].Count == 0 && InMenuFormat(oppDeck);
+            bool ready = myDeck >= 0 && deckProblems[myDeck].Count == 0 && InMenuFormat(myDeck) && oppReady;
             GUILayout.BeginHorizontal();
             GUI.enabled = ready;
             if (GUILayout.Button("Start game", GUILayout.Height(34))) pendingStart = true;
@@ -828,9 +856,9 @@ namespace PokemonTCG.Presentation
             if (GUILayout.Button("Save folders", GUILayout.Height(34))) pendingFolders = true;
             GUILayout.EndHorizontal();
 
-            if (!ready && myDeck >= 0 && oppDeck >= 0)
+            if (!ready && myDeck >= 0 && (aiBuilds || oppDeck >= 0))
             {
-                foreach (var i in new[] { myDeck, oppDeck }.Distinct())
+                foreach (var i in (aiBuilds ? new[] { myDeck } : new[] { myDeck, oppDeck }).Distinct())
                     foreach (var p in deckProblems[i]) GUILayout.Label(decks[i].Name + ": " + p, ui.Error);
             }
             if (menuError != null) GUILayout.Label(menuError, ui.Error);
@@ -852,6 +880,7 @@ namespace PokemonTCG.Presentation
             if (saverPick != PowerSaver.Mode) PowerSaver.Mode = saverPick;
             if (newPace != pace) ApplyPace(newPace);
             foreach (var a in cpuActions) a();
+            foreach (var a in aiActions) a();
             if (aiPick != OpponentPick) SetOpponentPick(aiPick);
             if (newBirthday != birthday)
             {
