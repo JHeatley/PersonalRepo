@@ -46,6 +46,45 @@ namespace PokemonTCG.Presentation
         private readonly object aiGate = new object();
         private int aiBuildCount;
 
+        // ------------------------------------------------------------------ v175.1: a random deck from the list
+
+        private const string PrefMyRandomDeck = "PokemonTCG.MyRandomDeck";
+        private const string PrefOppRandomDeck = "PokemonTCG.OppRandomDeck";
+        private bool randomPrefsLoaded, myRandomDeck, oppRandomDeck;
+        /// <summary>Your random deck was picked for a start that's waiting for the AI to build its deck.</summary>
+        private bool randomMinePicked;
+        /// <summary>The opponent's deck was picked at random: its name stays hidden during the game (you find out by playing it).</summary>
+        private bool hideTheirsNext, theirsHidden;
+        private readonly System.Random listPicker = new System.Random();
+
+        private void LoadRandomDeckPrefs()
+        {
+            if (randomPrefsLoaded) return;
+            randomPrefsLoaded = true;
+            myRandomDeck = PlayerPrefs.GetInt(PrefMyRandomDeck, 0) == 1;
+            oppRandomDeck = PlayerPrefs.GetInt(PrefOppRandomDeck, 0) == 1;
+        }
+
+        private void SaveRandomDeckPrefs()
+        {
+            PlayerPrefs.SetInt(PrefMyRandomDeck, myRandomDeck ? 1 : 0);
+            PlayerPrefs.SetInt(PrefOppRandomDeck, oppRandomDeck ? 1 : 0);
+        }
+
+        /// <summary>The decks a random pick chooses from: the menu's list (its format), ready to play.</summary>
+        private List<int> ListDecksReady()
+        {
+            if (decks == null || deckProblems == null) return new List<int>();
+            return Enumerable.Range(0, decks.Count).Where(i => InMenuFormat(i) && i < deckProblems.Count && deckProblems[i].Count == 0).ToList();
+        }
+
+        /// <summary>A random deck from the menu's list, or -1 if there's none.</summary>
+        private int RandomListDeck()
+        {
+            var ok = ListDecksReady();
+            return ok.Count == 0 ? -1 : ok[listPicker.Next(ok.Count)];
+        }
+
         private void LoadAiDeckPrefs()
         {
             if (aiPrefsLoaded) return;

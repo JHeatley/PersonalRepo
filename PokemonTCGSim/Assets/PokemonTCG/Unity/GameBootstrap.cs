@@ -253,6 +253,8 @@ namespace PokemonTCG.Presentation
             }
             lastMine = mine;
             lastTheirs = theirs;
+            theirsHidden = hideTheirsNext && reg == null && online == null;
+            hideTheirsNext = false;
             regionalGame = reg != null;
             regionalWatch = reg != null && reg.Watch;
             // Two bots: "Watch two bots play each other" from the menu, or a Regional Sim table you watch.
@@ -347,7 +349,7 @@ namespace PokemonTCG.Presentation
             if (online != null) SendOnlineStart(online, 1 - seat, engine.PlayerNames, new[] { deckNames[0], deckNames[1] });
             local.Start(d0, d1, currentSeed);
             // v134.7: in your own Regional Sim match you find out your opponent's deck by playing it.
-            string theirLabel = reg != null && !reg.Watch ? "your opponent's deck" : theirs.Name;
+            string theirLabel = (reg != null && !reg.Watch) || theirsHidden ? "your opponent's deck" : theirs.Name;
             log.Add((reg != null ? "Regional Sim, " + reg.Label + ": " : "New game: ") + mine.Name + " vs " + theirLabel + " (seed " + currentSeed + ").");
             mode = Mode.Game;
         }
@@ -359,6 +361,8 @@ namespace PokemonTCG.Presentation
         private string ShownDeckName(int seat)
         {
             if (regionalGame && !regionalWatch && viewerSeat >= 0 && seat != viewerSeat) return null;
+            if (theirsHidden && viewerSeat >= 0 && seat != viewerSeat) return null; // v175.1: a random deck from the list
+
             return deckNames[seat];
         }
 
@@ -406,17 +410,34 @@ namespace PokemonTCG.Presentation
             if (pendingStart)
             {
                 pendingStart = false;
+                // v175.1: random decks from the list are picked for each game (the AI's own deck keeps its pick while it's built).
+                LoadRandomDeckPrefs();
+                if (myRandomDeck && !aiBuildBusy && !randomMinePicked)
+                {
+                    int pick = RandomListDeck();
+                    if (pick >= 0) myDeck = pick;
+                    randomMinePicked = AiBuildsDeck && AiDeckNeeded; // kept while the AI builds, then this start runs again
+                }
+                else if (!AiBuildsDeck || !AiDeckNeeded) randomMinePicked = false;
+                hideTheirsNext = false;
+                if (oppRandomDeck && !AiBuildsDeck)
+                {
+                    int pick = RandomListDeck();
+                    if (pick >= 0) oppDeck = pick;
+                    hideTheirsNext = !botVsBot;
+                }
                 if (myDeck >= 0 && AiBuildsDeck)
                 {
                     // v175: the AI's own deck; it's built first when there isn't one ready.
-                    PlayerPrefs.SetString(PrefMyDeck, decks[myDeck].Name);
+                    if (!myRandomDeck) PlayerPrefs.SetString(PrefMyDeck, decks[myDeck].Name);
                     if (AiDeckNeeded) StartAiBuild(true);
                     else StartGame(decks[myDeck], TakeAiDeck());
                 }
                 else if (myDeck >= 0 && oppDeck >= 0)
                 {
-                    PlayerPrefs.SetString(PrefMyDeck, decks[myDeck].Name);
-                    PlayerPrefs.SetString(PrefOppDeck, decks[oppDeck].Name);
+                    // A random pick doesn't replace the deck you chose last.
+                    if (!myRandomDeck) PlayerPrefs.SetString(PrefMyDeck, decks[myDeck].Name);
+                    if (!oppRandomDeck) PlayerPrefs.SetString(PrefOppDeck, decks[oppDeck].Name);
                     StartGame(decks[myDeck], decks[oppDeck]);
                 }
             }
@@ -424,7 +445,17 @@ namespace PokemonTCG.Presentation
             {
                 pendingRestart = false;
                 // v175: with "A new deck every game", playing again against the AI's own deck gets it a new one.
-                if (lastMine != null && lastTheirs != null && aiBuilds && lastTheirs == aiBuiltRecord && AiDeckNeeded)
+                if (lastMine != null && lastTheirs != null && (myRandomDeck || (oppRandomDeck && !aiBuilds)))
+                {
+                    // v175.1: Play again with a random deck picks again (through the menu's start).
+                    int mine = decks.FindIndex(d => d.Name == lastMine.Name);
+                    int theirs = decks.FindIndex(d => d.Name == lastTheirs.Name);
+                    if (mine >= 0) myDeck = mine;
+                    if (theirs >= 0) oppDeck = theirs;
+                    if (myDeck >= 0 && (aiBuilds || oppDeck >= 0)) pendingStart = true;
+                    else StartGame(lastMine, lastTheirs);
+                }
+                else if (lastMine != null && lastTheirs != null && aiBuilds && lastTheirs == aiBuiltRecord && AiDeckNeeded)
                 {
                     int mine = decks.FindIndex(d => d.Name == lastMine.Name);
                     if (mine >= 0)
@@ -780,9 +811,17 @@ namespace PokemonTCG.Presentation
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical(GUILayout.Width(colW));
             GUILayout.Label(botVsBot ? "Bot 1's deck" : "Your deck", ui.Title);
-            myScroll = GUILayout.BeginScrollView(myScroll, GUILayout.Height(Mathf.Max(160f, r.height - 382f)));
+            // v175.1: a random deck from the list each game.
+            LoadRandomDeckPrefs();
+            var randomActions = new List<Action>();
+            bool newMyRandom = GUILayout.Toggle(myRandomDeck, " Random deck from the list");
+            if (newMyRandom != myRandomDeck) randomActions.Add(() => { myRandomDeck = newMyRandom; SaveRandomDeckPrefs(); });
+            myScroll = GUILayout.BeginScrollView(myScroll, GUILayout.Height(Mathf.Max(160f, r.height - 410f)));
+            if (myRandomDeck) GUILayout.Label("Each game you get one of these at random:", Hint(ui));
+            GUI.enabled = !myRandomDeck;
             for (int i = 0; i < decks.Count; i++)
-                if (InMenuFormat(i) && GUILayout.Toggle(myDeck == i, DeckLabel(i), ui.Button) && myDeck != i) pickMine = i;
+                if (InMenuFormat(i) && GUILayout.Toggle(myDeck == i && !myRandomDeck, DeckLabel(i), ui.Button) && myDeck != i) pickMine = i;
+            GUI.enabled = true;
             if (!Enumerable.Range(0, decks.Count).Any(InMenuFormat)) GUILayout.Label("No decks for this format yet. Build one in the deck builder.", Hint(ui));
             GUILayout.EndScrollView();
             GUILayout.EndVertical();
@@ -797,9 +836,14 @@ namespace PokemonTCG.Presentation
             if (aiBuilds) DrawAiDeckPanel(ui, Mathf.Max(160f, r.height - 382f), aiActions);
             else
             {
-                oppScroll = GUILayout.BeginScrollView(oppScroll, GUILayout.Height(Mathf.Max(160f, r.height - 410f)));
+                bool newOppRandom = GUILayout.Toggle(oppRandomDeck, " Random deck from the list");
+                if (newOppRandom != oppRandomDeck) randomActions.Add(() => { oppRandomDeck = newOppRandom; SaveRandomDeckPrefs(); });
+                oppScroll = GUILayout.BeginScrollView(oppScroll, GUILayout.Height(Mathf.Max(160f, r.height - 438f)));
+                if (oppRandomDeck) GUILayout.Label("Each game the bot gets one of these at random" + (botVsBot ? "." : " (you find out which by playing it)."), Hint(ui));
+                GUI.enabled = !oppRandomDeck;
                 for (int i = 0; i < decks.Count; i++)
-                    if (InMenuFormat(i) && GUILayout.Toggle(oppDeck == i, DeckLabel(i), ui.Button) && oppDeck != i) pickTheirs = i;
+                    if (InMenuFormat(i) && GUILayout.Toggle(oppDeck == i && !oppRandomDeck, DeckLabel(i), ui.Button) && oppDeck != i) pickTheirs = i;
+                GUI.enabled = true;
                 GUILayout.EndScrollView();
             }
             GUILayout.EndVertical();
@@ -843,8 +887,10 @@ namespace PokemonTCG.Presentation
             DrawSkipCpuRow(ui, cpuActions, 170);
             GUILayout.Space(6);
 
-            bool oppReady = aiBuilds ? !aiBuildBusy : oppDeck >= 0 && deckProblems[oppDeck].Count == 0 && InMenuFormat(oppDeck);
-            bool ready = myDeck >= 0 && deckProblems[myDeck].Count == 0 && InMenuFormat(myDeck) && oppReady;
+            bool anyListDeck = ListDecksReady().Count > 0;
+            bool oppReady = aiBuilds ? !aiBuildBusy : oppRandomDeck ? anyListDeck : oppDeck >= 0 && deckProblems[oppDeck].Count == 0 && InMenuFormat(oppDeck);
+            bool myReady = myRandomDeck ? anyListDeck : myDeck >= 0 && deckProblems[myDeck].Count == 0 && InMenuFormat(myDeck);
+            bool ready = myReady && oppReady;
             GUILayout.BeginHorizontal();
             GUI.enabled = ready;
             if (GUILayout.Button("Start game", GUILayout.Height(34))) pendingStart = true;
@@ -856,9 +902,14 @@ namespace PokemonTCG.Presentation
             if (GUILayout.Button("Save folders", GUILayout.Height(34))) pendingFolders = true;
             GUILayout.EndHorizontal();
 
+            if (!ready && (myRandomDeck || (aiBuilds || oppRandomDeck)) && !anyListDeck)
+                GUILayout.Label("No deck in this format's list is ready to play for a random pick.", ui.Error);
             if (!ready && myDeck >= 0 && (aiBuilds || oppDeck >= 0))
             {
-                foreach (var i in (aiBuilds ? new[] { myDeck } : new[] { myDeck, oppDeck }).Distinct())
+                var picked = new List<int>();
+                if (!myRandomDeck) picked.Add(myDeck);
+                if (!aiBuilds && !oppRandomDeck) picked.Add(oppDeck);
+                foreach (var i in picked.Distinct())
                     foreach (var p in deckProblems[i]) GUILayout.Label(decks[i].Name + ": " + p, ui.Error);
             }
             if (menuError != null) GUILayout.Label(menuError, ui.Error);
@@ -881,6 +932,7 @@ namespace PokemonTCG.Presentation
             if (newPace != pace) ApplyPace(newPace);
             foreach (var a in cpuActions) a();
             foreach (var a in aiActions) a();
+            foreach (var a in randomActions) a();
             if (aiPick != OpponentPick) SetOpponentPick(aiPick);
             if (newBirthday != birthday)
             {
