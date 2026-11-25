@@ -4,7 +4,7 @@ The game's Japanese option reads two files in `Assets/PokemonTCG/Resources/Lang`
 
 - `ui_ja.txt`: the screens. One line per English template, a tab, the Japanese. `{0}`, `{1}`... are the parts the code fills in
   (the Japanese may reorder them). Edit this file directly to change or add a translation.
-- `names_ja.txt`: official Japanese names (`species`, `card`, `attack`, `ability`, `trainer`, `word` lines). Built by these scripts.
+- `names_ja.txt`: official Japanese names (`species`, `card`, `attack`, `ability`, `trainer`, `text`, `word` lines; `text` is a card effect text, the official Japanese text of a matching printing, checked by `textcheck.py`). Built by these scripts.
   `match_trainers.py` matches Trainer and Energy cards by illustrator, kind, era and what the text does (needs
   pokemon-tcg-data for the English artists), checked against the games' item names (PokeAPI `item_names.csv`).
 

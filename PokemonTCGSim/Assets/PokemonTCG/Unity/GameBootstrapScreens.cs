@@ -637,7 +637,7 @@ namespace PokemonTCG.Presentation
             int clicked = -1;
             bool close = false;
             GUILayout.BeginArea(new Rect(panel.x + 12f, panel.y + 10f, panel.width - 24f, panel.height - 20f));
-            GUILayout.Label(Loc.T("<size=22><b>" + def.Name + "</b></size>     <size=18>HP " + Mathf.Max(0, pv.RemainingHp) + " / " + pv.MaxHp + "</size>"), text);
+            GUILayout.Label(Loc.T("<size=22><b>" + Loc.NameOf(def) + "</b></size>     <size=18>HP " + Mathf.Max(0, pv.RemainingHp) + " / " + pv.MaxHp + "</size>"), text);
             bool active = current.Sides[pv.Owner].Active == pv;
             string whose = host != null ? host.Possessive(pv.Owner) : "";
             GUILayout.Label(Loc.T(def.Stage + " " + def.PokemonType + (def.IsEx ? " ex" : "") + "   ·   " + whose + (active ? " Active Pokémon" : " Benched Pokémon")), text);
@@ -645,7 +645,7 @@ namespace PokemonTCG.Presentation
             {
                 var energyNames = pv.Energy.GroupBy(c => c.Def.Name).Select(g => g.Key + (g.Count() > 1 ? " ×" + g.Count() : "")).ToArray();
                 string attached = "<b>Energy (" + pv.Energy.Count + "):</b> " + (pv.Energy.Count == 0 ? "none" : string.Join(", ", energyNames));
-                foreach (var tool in pv.Tools) attached += "\n<b>Tool:</b> " + tool.Def.Name + " – " + tool.Def.Text;
+                foreach (var tool in pv.Tools) attached += "\n<b>Tool:</b> " + Loc.TrainerName(tool.Def.Name) + " – " + Loc.Text(tool.Def.Text);
                 foreach (var extra in pv.Attached) attached += "\n<b>Attached:</b> " + extra.Def.Name;
                 GUILayout.Box(Loc.T(attached), CardDraw.Panel());
             }
@@ -659,7 +659,7 @@ namespace PokemonTCG.Presentation
                 int index = i;
                 int opt = canAct ? req.Options.FindIndex(o => o.Action == ActionType.UseAbility && o.PokemonUid == pv.Uid && o.Card == def && o.Index == index) : -1;
                 string kindLabel = (a.VstarPower ? "VSTAR Power " : "") + (a.IsAbility ? "Ability" : a.Kind);
-                string body = "<color=#FF7A7A><b>" + kindLabel + "</b></color>   <b>" + a.Name + "</b>" + (pv.AbilitiesActive || !a.IsAbility ? "" : "   <i>(blocked right now)</i>") + "\n" + a.Text;
+                string body = "<color=#FF7A7A><b>" + kindLabel + "</b></color>   <b>" + Loc.AbilityName(a.Name) + "</b>" + (pv.AbilitiesActive || !a.IsAbility ? "" : "   <i>(blocked right now)</i>") + "\n" + Loc.Text(a.Text);
                 if (opt >= 0)
                 {
                     if (GUILayout.Button(Loc.T(body), CardDraw.PanelHot())) clicked = opt;
@@ -675,7 +675,7 @@ namespace PokemonTCG.Presentation
                     if (o.Action != ActionType.UseAbility || o.PokemonUid != pv.Uid || o.Card == null || o.Card == def) continue;
                     if (o.Index < 0 || o.Index >= o.Card.Abilities.Count) continue;
                     var inherited = o.Card.Abilities[o.Index];
-                    string label = "<color=#FF7A7A><b>" + (inherited.VstarPower ? "VSTAR Power " : "") + inherited.Kind + "</b></color>   <b>" + inherited.Name + "</b>   <i>(" + o.Card.Name + ")</i>\n" + inherited.Text;
+                    string label = "<color=#FF7A7A><b>" + (inherited.VstarPower ? "VSTAR Power " : "") + inherited.Kind + "</b></color>   <b>" + Loc.AbilityName(inherited.Name) + "</b>   <i>(" + Loc.NameOf(o.Card) + ")</i>\n" + Loc.Text(inherited.Text);
                     if (GUILayout.Button(Loc.T(label), CardDraw.PanelHot())) clicked = i;
                 }
             }
@@ -762,9 +762,9 @@ namespace PokemonTCG.Presentation
         {
             string dmg = atk.Damage > 0 ? atk.Damage + atk.DamageSuffix : "";
             string cost = atk.Cost.Length == 0 ? "free" : atk.CostString;
-            return "<b>[" + cost + "]   " + (atk.VstarPower ? "VSTAR Power: " : "") + atk.Name + "</b>" + (dmg.Length > 0 ? "     <size=18><b>" + dmg + "</b></size>" : "")
+            return "<b>[" + cost + "]   " + (atk.VstarPower ? "VSTAR Power: " : "") + Loc.AttackName(atk.Name) + "</b>" + (dmg.Length > 0 ? "     <size=18><b>" + dmg + "</b></size>" : "")
                    + (fromCard != null ? "   <i>(from " + fromCard + ")</i>" : "")
-                   + (string.IsNullOrEmpty(atk.Text) ? "" : "\n" + atk.Text);
+                   + (string.IsNullOrEmpty(atk.Text) ? "" : "\n" + Loc.Text(atk.Text));
         }
 
         // ================================================================== Card picker (Valid / All)

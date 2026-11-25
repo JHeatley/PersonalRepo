@@ -4,6 +4,8 @@ regulation mark. Among those, the one whose text does the same things (search, d
 wins when it's clearly the best. A name is kept when its printings agree, and each Japanese name goes to the English name with the
 most evidence."""
 import collections, glob, json, os, re, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from textcheck import same_effect
 work, res, ptcg, out = sys.argv[1:5]
 good = set(json.load(open(os.path.join(work, 'good_sets.json'))))
 def ill(s): return re.sub(r'[^a-z0-9]', '', (s or '').lower())
@@ -41,13 +43,16 @@ BOILER = re.compile(r'You may play only 1 (Supporter|Stadium) card[^.]*\.|You ma
 JBOIL = re.compile(r'サポートは自分の番に1枚しか使えない。|グッズは、自分の番に何枚でも使える。|ポケモンのどうぐは、自分のポケモンにつけて使う。[^。]*。|スタジアムは[^。]*。')
 
 ja = collections.defaultdict(list)
+effects = collections.defaultdict(collections.Counter)  # (Japanese name, regulation mark or None) -> official effect texts
 for line in open(os.path.join(work, 'ja_cards.jsonl'), encoding='utf-8'):
     c = json.loads(line)
     if c.get('category') not in ('Trainer', 'Energy') or c['_serie'] + '/' + c['_set'] not in good: continue
     name = (c.get('name') or {}).get('ja')
     if not name or not c.get('illustrator'): continue
     kind = KIND.get(c.get('trainerType') or '', '') if c['category'] == 'Trainer' else 'Energy'
-    entry = (name, ja_feats(JBOIL.sub('', (c.get('effect') or {}).get('ja') or '')), c.get('regulationMark'))
+    effect = ((c.get('effect') or {}).get('ja') or '').strip()
+    if effect: effects[(name, c.get('regulationMark'))][effect] += 1; effects[(name, '*')][effect] += 1
+    entry = (name, ja_feats(JBOIL.sub('', effect)), c.get('regulationMark'))
     ja[(kind, ill(c['illustrator']))].append(entry)
 
 pool_names = set()
@@ -118,7 +123,19 @@ BASIC = {'Grass': '草', 'Fire': '炎', 'Water': '水', 'Lightning': '雷', 'Psy
 for t, j in BASIC.items(): OVERRIDES['%s Energy' % t] = '基本%sエネルギー' % j; OVERRIDES['Basic %s Energy' % t] = '基本%sエネルギー' % j
 for k, v in OVERRIDES.items():
     if k in pool_names: result[k] = v
-json.dump(result, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=0, sort_keys=True)
+# The official Japanese text of each Trainer and Energy, keyed by the English text the game shows: from a Japanese printing of the
+# same era when there is one.
+texts = {}
+for f in glob.glob(os.path.join(res, 'CardData', '*_pool.json')):
+    for c in json.load(open(f, encoding='utf-8'))['cards']:
+        if c.get('kind') not in ('Trainer', 'Energy') or not c.get('text') or c['name'] not in result: continue
+        jn = result[c['name']]
+        cnt = effects.get((jn, c.get('regulationMark'))) or effects.get((jn, '*'))
+        if cnt:
+            ok = [t for t, n in cnt.most_common() if same_effect(c['text'], t)]
+            if ok: texts.setdefault(c['text'], ok[0])
+print('trainer/energy texts', len(texts))
+json.dump({'names': result, 'texts': texts}, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=0, sort_keys=True)
 print('pool trainer/energy names', len(pool_names), 'translated', len(result), 'from', prints, 'printings')
 for k in ["Boss's Orders", 'Ultra Ball', 'Rare Candy', 'Nest Ball', "Professor's Research", 'Switch', 'Iono', 'Arven', 'Super Rod',
           'Double Colorless Energy', 'Path to the Peak', 'Electric Generator', 'Computer Search', 'Choice Belt', 'Battle VIP Pass',

@@ -84,6 +84,14 @@ namespace PokemonTCG.Tests
             Assert.AreEqual("ラムのみ", t.TrainerName("Lum Berry"), "the games' item name checks the match");
             Assert.AreEqual("基本炎エネルギー", t.TrainerName("Fire Energy"));
             Assert.AreEqual("Play ハイパーボール", t.Translate("Play Ultra Ball"));
+            // Effect texts: the official text of the matching Japanese printing.
+            Assert.Greater(t.CardTextCount, 3000);
+            Assert.AreEqual("相手のポケモン2匹に、それぞれ残りHPが「60」になるように、ダメカンをのせる。",
+                            t.CardText("Place damage counters on 2 of your opponent's Pokémon until their remaining HP is 60 each."), "Mega Glimmora ex's Toxic Gem");
+            Assert.AreEqual("相手のバトルポケモンがこんらんでないなら、このワザは失敗。", t.CardText("If your opponent's Active Pokémon isn't Confused, this attack does nothing."));
+            Assert.AreEqual("相手のバトルポケモンにダメカンがのっているなら、30ダメージ追加。",
+                            t.CardText("If your opponent's Active Pokémon already has damage counters on it, it does 30 more damage."), "a mismatched pair is caught");
+            Assert.AreEqual("A text nobody has matched yet.", t.CardText("A text nobody has matched yet."));
         }
 
         [Test]

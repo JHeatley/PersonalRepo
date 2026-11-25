@@ -2,6 +2,8 @@
 English -> Japanese dictionaries for attack names, ability names and Pokémon card names. A name is kept only when the
 matching Japanese printings agree on it."""
 import collections, csv, glob, json, os, re, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from textcheck import same_effect
 dl, tcgdex, pcc, res, out = sys.argv[1:6]
 
 def lang_table(table, key):
@@ -42,6 +44,8 @@ for line in open(tcgdex, encoding='utf-8'):
                      'atk': tuple((tuple(sorted(t(x) for x in a.get('cost') or [])), dmg(a.get('damage'))) for a in atks),
                      'atk_names': tuple(a['name']['ja'] for a in atks),
                      'ab_names': tuple((a.get('name') or {}).get('ja') or '' for a in c.get('abilities') or []),
+                     'atk_texts': tuple(((a.get('effect') or {}).get('ja') or '') for a in atks),
+                     'ab_texts': tuple(((a.get('effect') or {}).get('ja') or '') for a in c.get('abilities') or []),
                      'stage': STAGE.get(str(c.get('stage', '')).lower()), 'weak': t(w[0]['type']) if w else None,
                      'retreat': c.get('retreat'), 'reg': c.get('regulationMark')})
 n_tcgdex = len(ja_cards)
@@ -56,6 +60,8 @@ if os.path.exists(pcc_file):
                          'atk': tuple((tuple(sorted(t(x) for x in a['cost'])), dmg(a['damage'])) for a in c.get('attacks') or []),
                          'atk_names': tuple(a['name'] for a in c.get('attacks') or []),
                          'ab_names': tuple(x if isinstance(x, str) else x.get('name', '') for x in c.get('abilities') or []),
+                         'atk_texts': tuple(a.get('text', '') for a in c.get('attacks') or []),
+                         'ab_texts': tuple('' if isinstance(x, str) else x.get('text', '') for x in c.get('abilities') or []),
                          'stage': STAGE.get(c.get('stage', '')), 'weak': t(c['weakness'][0]) if c.get('weakness') else None,
                          'retreat': c.get('retreat'), 'reg': None})
 print('japanese printings: tcgdex', n_tcgdex, 'official site', len(ja_cards) - n_tcgdex)
@@ -71,6 +77,7 @@ def compatible(e, j):
 atk_votes = collections.defaultdict(collections.Counter)
 ab_votes = collections.defaultdict(collections.Counter)
 name_votes = collections.defaultdict(collections.Counter)
+text_votes = collections.defaultdict(collections.Counter)
 total = matched = ambiguous = 0
 for f in sorted(glob.glob(os.path.join(res, 'CardData', '*_pool.json'))):
     for c in json.load(open(f, encoding='utf-8'))['cards']:
@@ -92,6 +99,13 @@ for f in sorted(glob.glob(os.path.join(res, 'CardData', '*_pool.json'))):
         for a, b in zip(c.get('abilities') or [], ab_ja):
             if b: ab_votes[a['name']][b] += 1
         name_votes[c['name']][name_ja] += 1
+        # The official Japanese text of each attack and Ability, from the printings that agreed (keyed by the English text shown).
+        for j in hits:
+            if (j['atk_names'], j['ab_names'], j['name']) != (atk_ja, ab_ja, name_ja): continue
+            for a, tx in zip(atks, j['atk_texts']):
+                if a.get('text') and tx and same_effect(a['text'], tx): text_votes[a['text']][tx] += 1
+            for a, tx in zip(c.get('abilities') or [], j['ab_texts']):
+                if a.get('text') and tx and same_effect(a['text'], tx): text_votes[a['text']][tx] += 1
 
 def agreed(votes):
     out, dropped = {}, 0
@@ -101,6 +115,7 @@ def agreed(votes):
         else: dropped += 1
     return out, dropped
 atk, da = agreed(atk_votes); ab, db_ = agreed(ab_votes); nm, dn = agreed(name_votes)
-json.dump({'attacks': atk, 'abilities': ab, 'cards': nm}, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=0, sort_keys=True)
+texts = {k: cnt.most_common(1)[0][0] for k, cnt in text_votes.items()}
+json.dump({'attacks': atk, 'abilities': ab, 'cards': nm, 'texts': texts}, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=0, sort_keys=True)
 print('english pokemon cards', total, 'matched', matched, 'ambiguous', ambiguous)
-print('attack names', len(atk), '(disagreeing', da, ') abilities', len(ab), '(', db_, ') card names', len(nm), '(', dn, ')')
+print('effect texts', len(texts)); print('attack names', len(atk), '(disagreeing', da, ') abilities', len(ab), '(', db_, ') card names', len(nm), '(', dn, ')')

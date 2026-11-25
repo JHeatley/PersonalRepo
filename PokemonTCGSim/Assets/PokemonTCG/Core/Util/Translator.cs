@@ -34,6 +34,8 @@ namespace PokemonTCG.Core
         /// <summary>Trainer and Energy names swapped only where text names a card ("Play Switch", the whole text): one-word names
         /// and Energy are ordinary words in sentences too ("Switch your Active Pokémon", "attach a Fire Energy").</summary>
         private readonly Dictionary<string, string> namedOnly = new Dictionary<string, string>(StringComparer.Ordinal);
+        /// <summary>v176: card effect texts, English as the game shows it to the official Japanese text.</summary>
+        private readonly Dictionary<string, string> texts = new Dictionary<string, string>(StringComparer.Ordinal);
         private Regex nameRegex, moveRegex;
 
         /// <summary>English to Japanese words in Pokémon card names (prefixes, owners, forms), for names the tables don't have.</summary>
@@ -143,6 +145,7 @@ namespace PokemonTCG.Core
                     case "attack": atk[f[1]] = f[2]; break;
                     case "ability": ab[f[1]] = f[2]; break;
                     case "word": words.Add(new KeyValuePair<string, string>(f[1], f[2])); break;
+                    case "text": texts[Unescape(f[1])] = Unescape(f[2]); break;
                     case "trainer":
                         if (f[1].IndexOf(' ') < 0 || f[1].EndsWith(" Energy", StringComparison.Ordinal)) namedOnly[f[1]] = f[2];
                         else cards[f[1]] = f[2];
@@ -212,6 +215,15 @@ namespace PokemonTCG.Core
             string ja;
             return english != null && attacks.TryGetValue(english, out ja) ? ja : english;
         }
+
+        /// <summary>A card's effect text in Japanese (the official text of a matching Japanese printing), or the English text.</summary>
+        public string CardText(string english)
+        {
+            string ja;
+            return english != null && texts.TryGetValue(english, out ja) ? ja : english;
+        }
+
+        public int CardTextCount { get { return texts.Count; } }
 
         /// <summary>The Japanese name of a Trainer or Energy card, or the English name.</summary>
         public string TrainerName(string english)
@@ -284,7 +296,7 @@ namespace PokemonTCG.Core
         private string TranslateUncached(string text, int depth)
         {
             string ja;
-            if (exact.TryGetValue(text, out ja)) return ja;
+            if (exact.TryGetValue(text, out ja) || texts.TryGetValue(text, out ja)) return ja;
             // Spaces around a translated piece are kept (" The AI builds its own deck" in a toggle).
             string trimmed = text.Trim();
             if (trimmed.Length != text.Length && trimmed.Length > 0 && exact.TryGetValue(trimmed, out ja))

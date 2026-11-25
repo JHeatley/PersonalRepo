@@ -66,9 +66,13 @@ for k, v in sorted(matched['cards'].items()): out.append('card\t%s\t%s' % (k, v)
 for k, v in sorted(attacks.items()): out.append('attack\t%s\t%s' % (k, v))
 for k, v in sorted(abil.items()): out.append('ability\t%s\t%s' % (k, v))
 tr_path = os.path.join(work, 'trainers.json')
-trainers = json.load(open(tr_path, encoding='utf-8')) if os.path.exists(tr_path) else {}
+tr_data = json.load(open(tr_path, encoding='utf-8')) if os.path.exists(tr_path) else {}
+trainers = tr_data.get('names', tr_data) if isinstance(tr_data, dict) and 'names' in tr_data else tr_data
+texts = dict(matched.get('texts', {}))
+texts.update(tr_data.get('texts', {}) if 'names' in tr_data else {})
 for k, v in sorted(trainers.items()): out.append('trainer\t%s\t%s' % (k, v))
 for k, v in WORDS: out.append('word\t%s\t%s' % (k, v))
+for k, v in sorted(texts.items()): out.append('text\t%s\t%s' % (esc(k), esc(v)))
 open(os.path.join(langdir, 'names_ja.txt'), 'w', encoding='utf-8', newline='\n').write('\n'.join(out) + '\n')
-print('trainers', len(trainers), 'species', len(species), 'cards', len(matched['cards']), 'attacks', len(attacks), 'of', len(pool_attacks), src,
+print('texts', len(texts), 'trainers', len(trainers), 'species', len(species), 'cards', len(matched['cards']), 'attacks', len(attacks), 'of', len(pool_attacks), src,
       'abilities', len(abil), 'of', len(pool_abilities))
