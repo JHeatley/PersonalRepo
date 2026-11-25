@@ -31,6 +31,9 @@ namespace PokemonTCG.Core
         private readonly Dictionary<string, string> cardNames = new Dictionary<string, string>(StringComparer.Ordinal);
         private readonly Dictionary<string, string> attacks = new Dictionary<string, string>(StringComparer.Ordinal);
         private readonly Dictionary<string, string> abilities = new Dictionary<string, string>(StringComparer.Ordinal);
+        /// <summary>Trainer and Energy names swapped only where text names a card ("Play Switch", the whole text): one-word names
+        /// and Energy are ordinary words in sentences too ("Switch your Active Pokémon", "attach a Fire Energy").</summary>
+        private readonly Dictionary<string, string> namedOnly = new Dictionary<string, string>(StringComparer.Ordinal);
         private Regex nameRegex, moveRegex;
 
         /// <summary>English to Japanese words in Pokémon card names (prefixes, owners, forms), for names the tables don't have.</summary>
@@ -115,7 +118,7 @@ namespace PokemonTCG.Core
             if (words != null) nameWords.AddRange(words.OrderByDescending(w => w.Key.Length));
             speciesRegex = WordRegex(species.Keys);
             nameRegex = null;
-            moveRegex = WordRegex(attacks.Keys.Concat(abilities.Keys).Distinct());
+            moveRegex = WordRegex(attacks.Keys.Concat(abilities.Keys).Concat(namedOnly.Keys).Distinct());
             cache.Clear();
         }
 
@@ -140,6 +143,10 @@ namespace PokemonTCG.Core
                     case "attack": atk[f[1]] = f[2]; break;
                     case "ability": ab[f[1]] = f[2]; break;
                     case "word": words.Add(new KeyValuePair<string, string>(f[1], f[2])); break;
+                    case "trainer":
+                        if (f[1].IndexOf(' ') < 0 || f[1].EndsWith(" Energy", StringComparison.Ordinal)) namedOnly[f[1]] = f[2];
+                        else cards[f[1]] = f[2];
+                        break;
                 }
             }
             LoadNames(sp, cards, atk, ab, words);
@@ -206,6 +213,15 @@ namespace PokemonTCG.Core
             return english != null && attacks.TryGetValue(english, out ja) ? ja : english;
         }
 
+        /// <summary>The Japanese name of a Trainer or Energy card, or the English name.</summary>
+        public string TrainerName(string english)
+        {
+            string ja;
+            if (english == null) return null;
+            if (namedOnly.TryGetValue(english, out ja) || cardNames.TryGetValue(english, out ja)) return ja;
+            return english;
+        }
+
         public string AbilityName(string english)
         {
             string ja;
@@ -243,10 +259,10 @@ namespace PokemonTCG.Core
         private string MoveIn(string text, Match m)
         {
             string ja;
-            if (!attacks.TryGetValue(m.Value, out ja) && !abilities.TryGetValue(m.Value, out ja)) return m.Value;
+            if (!attacks.TryGetValue(m.Value, out ja) && !abilities.TryGetValue(m.Value, out ja) && !namedOnly.TryGetValue(m.Value, out ja)) return m.Value;
             if (m.Index == 0 && m.Length == text.Length) return ja;
             string before = text.Substring(0, m.Index);
-            if (Regex.IsMatch(before, @"(Attack: |Ability: |Ability |used |uses |Use |use |'s |’s |\(|\[|""|「|の)$")) return ja;
+            if (Regex.IsMatch(before, @"(Attack: |Ability: |Ability |used |uses |Use |use |Play |play |played |Attach |attach |attached |'s |’s |\(|\[|""|「|の|: )$")) return ja;
             if (Regex.IsMatch(before, @"[•·] ?$")) return ja; // a list line: "• Tackle 10"
             return m.Value;
         }

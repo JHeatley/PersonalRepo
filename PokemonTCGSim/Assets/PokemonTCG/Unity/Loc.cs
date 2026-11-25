@@ -8,8 +8,8 @@ namespace PokemonTCG.Presentation
     /// <summary>
     /// v176: the game's language (English or 日本語), chosen on the menu and remembered. Every piece of text the screens draw goes
     /// through T: in Japanese the screens are translated (Resources/Lang/ui_ja.txt), and Pokémon card names, attack names and
-    /// Ability names are the official Japanese ones (Resources/Lang/names_ja.txt). Card text, Trainer names, the prompts and the
-    /// battle log are still in English. Japanese text is drawn with Noto Sans JP (Resources/Fonts), so it shows on every device.
+    /// Ability names are the official Japanese ones (Resources/Lang/names_ja.txt). Trainer and Energy names are Japanese too (the
+    /// official ones the matching found). Card text, the prompts and the battle log are still in English. Japanese text is drawn with Noto Sans JP (Resources/Fonts), so it shows on every device.
     /// </summary>
     public static class Loc
     {
@@ -129,6 +129,14 @@ namespace PokemonTCG.Presentation
         public static string CardName(string english) { return IsJapanese ? Japanese.CardName(english) : english; }
         public static string AttackName(string english) { return IsJapanese ? Japanese.AttackName(english) : english; }
         public static string AbilityName(string english) { return IsJapanese ? Japanese.AbilityName(english) : english; }
+        public static string TrainerName(string english) { return IsJapanese ? Japanese.TrainerName(english) : english; }
+
+        /// <summary>A card's name in the game's language (Pokémon, Trainer or Energy).</summary>
+        public static string NameOf(CardDef d)
+        {
+            if (d == null) return null;
+            return d.IsPokemon ? CardName(d.Name) : TrainerName(d.Name);
+        }
 
         // ------------------------------------------------------------------ Font
 

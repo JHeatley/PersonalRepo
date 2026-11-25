@@ -76,7 +76,7 @@ namespace PokemonTCG.Presentation
         public static string Describe(CardDef d)
         {
             var sb = new StringBuilder();
-            sb.Append("<b>" + (d.IsPokemon ? Loc.CardName(d.Name) : d.Name) + "</b>  <size=11>" + d.SetCode + " " + d.Number + "</size>\n");
+            sb.Append("<b>" + Loc.NameOf(d) + "</b>  <size=11>" + d.SetCode + " " + d.Number + "</size>\n");
             if (d.IsPokemon)
             {
                 sb.Append(StageText(d) + " " + TypeText(d) + "  HP " + d.Hp + (d.IsEx ? "  (ex: 2 Prizes)" : "") + "\n");

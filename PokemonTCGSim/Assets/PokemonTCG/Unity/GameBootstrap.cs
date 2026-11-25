@@ -876,7 +876,7 @@ namespace PokemonTCG.Presentation
             GUILayout.BeginHorizontal();
             GUILayout.Label(Loc.T("Language"), GUILayout.Width(170));
             int langPick = GUILayout.Toolbar((int)Loc.Current, Loc.Choices, GUILayout.Width(240));
-            GUILayout.Label(Loc.T("  Screens and Pokémon, attack and Ability names. Card text and the battle log stay in English."), Hint(ui));
+            GUILayout.Label(Loc.T("  Screens and card, attack and Ability names. Card text and the battle log stay in English."), Hint(ui));
             GUILayout.EndHorizontal();
             if (langPick != (int)Loc.Current) aiActions.Add(() => Loc.Set((Loc.Language)langPick));
             // v118: UI size (Auto makes the interface bigger on phones and tablets).

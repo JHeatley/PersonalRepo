@@ -79,6 +79,24 @@ namespace PokemonTCG.Tests
             Assert.AreEqual("ファントムダイブ", t.AttackName("Phantom Dive"));
             Assert.AreEqual("10まんボルト", t.AttackName("Thunderbolt"));
             Assert.AreEqual("ウツボット", t.CardName("Victreebel"));
+            Assert.AreEqual("ボスの指令", t.TrainerName("Boss's Orders"));
+            Assert.AreEqual("ふしぎなアメ", t.TrainerName("Rare Candy"));
+            Assert.AreEqual("ラムのみ", t.TrainerName("Lum Berry"), "the games' item name checks the match");
+            Assert.AreEqual("基本炎エネルギー", t.TrainerName("Fire Energy"));
+            Assert.AreEqual("Play ハイパーボール", t.Translate("Play Ultra Ball"));
+        }
+
+        [Test]
+        public void Trainer_And_Energy_Names_Are_Swapped_Only_Where_Text_Names_A_Card()
+        {
+            var t = new Translator();
+            t.LoadNameTable("trainer\tSwitch\tポケモンいれかえ\ntrainer\tFire Energy\t基本炎エネルギー\ntrainer\tBoss's Orders\tボスの指令\n");
+            t.SetKnownCardNames(new string[0]);
+            Assert.AreEqual("ポケモンいれかえ", t.Translate("Switch"));
+            Assert.AreEqual("Play ポケモンいれかえ", t.Translate("Play Switch"));
+            Assert.AreEqual("Switch your Active Pokémon with 1 of your Benched Pokémon.", t.Translate("Switch your Active Pokémon with 1 of your Benched Pokémon."));
+            Assert.AreEqual("Attach a Fire Energy to 1 of your Pokémon.", t.Translate("Attach a Fire Energy to 1 of your Pokémon."));
+            Assert.AreEqual("You played ボスの指令.", t.Translate("You played Boss's Orders."), "a name of more than one word is swapped anywhere");
         }
 
         [Test]

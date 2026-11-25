@@ -4,7 +4,9 @@ The game's Japanese option reads two files in `Assets/PokemonTCG/Resources/Lang`
 
 - `ui_ja.txt`: the screens. One line per English template, a tab, the Japanese. `{0}`, `{1}`... are the parts the code fills in
   (the Japanese may reorder them). Edit this file directly to change or add a translation.
-- `names_ja.txt`: official Japanese names (`species`, `card`, `attack`, `ability`, `word` lines). Built by these scripts.
+- `names_ja.txt`: official Japanese names (`species`, `card`, `attack`, `ability`, `trainer`, `word` lines). Built by these scripts.
+  `match_trainers.py` matches Trainer and Energy cards by illustrator, kind, era and what the text does (needs
+  pokemon-tcg-data for the English artists), checked against the games' item names (PokeAPI `item_names.csv`).
 
 ## Rebuilding the names
 
@@ -18,6 +20,6 @@ The game's Japanese option reads two files in `Assets/PokemonTCG/Resources/Lang`
 4. `python3 -I match2.py <work>/dl <work>/ja_cards.jsonl <work>/pcc_data <Resources> <work>/matched.json` matches every English
    Pokémon card to its Japanese printings (species, HP, attack costs and damage, stage, Weakness, Retreat, regulation mark) and keeps a
    name only when the printings agree.
-5. `build_lang.py` writes the files (run from `<work>`, with `ui_ordered.json` and `tr/` for the screen text).
+5. `build_lang.py` writes names_ja.txt (run from `<work>`); with `--ui` it also rebuilds ui_ja.txt from `ui_ordered.json` and `tr/`.
 
 `templates.py` lists the strings the UI code can show; `wrap_calls.py` wrapped the UI's drawing calls in `Loc.T(...)`.

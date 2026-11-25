@@ -5,18 +5,19 @@ os.makedirs(langdir, exist_ok=True)
 
 def esc(s): return s.replace('\\', '\\\\').replace('\t', '\\t').replace('\n', '\\n').replace('\r', '')
 
-# Screens
-d = json.load(open(os.path.join(work, 'ui_ordered.json')))
-tr = {}
-for f in sorted(glob.glob(os.path.join(work, 'tr', 'b*.json'))): tr.update({int(k): v for k, v in json.load(open(f)).items()})
-lines = ['# v176: Japanese for the game\'s screens. English template, a tab, the Japanese. {0}, {1}... are filled in by the code.']
-seen = set()
-for i, x in enumerate(d):
-    if i not in tr or x['en'] in seen: continue
-    seen.add(x['en'])
-    lines.append(esc(x['en']) + '\t' + esc(tr[i]))
-open(os.path.join(langdir, 'ui_ja.txt'), 'w', encoding='utf-8', newline='\n').write('\n'.join(lines) + '\n')
-print('ui templates', len(lines) - 1)
+# Screens: only with --ui (ui_ja.txt is edited by hand after the first build).
+if '--ui' in sys.argv:
+  d = json.load(open(os.path.join(work, 'ui_ordered.json')))
+  tr = {}
+  for f in sorted(glob.glob(os.path.join(work, 'tr', 'b*.json'))): tr.update({int(k): v for k, v in json.load(open(f)).items()})
+  lines = ['# v176: Japanese for the game\'s screens. English template, a tab, the Japanese. {0}, {1}... are filled in by the code.']
+  seen = set()
+  for i, x in enumerate(d):
+      if i not in tr or x['en'] in seen: continue
+      seen.add(x['en'])
+      lines.append(esc(x['en']) + '\t' + esc(tr[i]))
+  open(os.path.join(langdir, 'ui_ja.txt'), 'w', encoding='utf-8', newline='\n').write('\n'.join(lines) + '\n')
+  print('ui templates', len(lines) - 1)
 
 # Names
 dl = os.path.join(work, 'dl')
@@ -64,7 +65,10 @@ for k, v in sorted(species.items()): out.append('species\t%s\t%s' % (k, v))
 for k, v in sorted(matched['cards'].items()): out.append('card\t%s\t%s' % (k, v))
 for k, v in sorted(attacks.items()): out.append('attack\t%s\t%s' % (k, v))
 for k, v in sorted(abil.items()): out.append('ability\t%s\t%s' % (k, v))
+tr_path = os.path.join(work, 'trainers.json')
+trainers = json.load(open(tr_path, encoding='utf-8')) if os.path.exists(tr_path) else {}
+for k, v in sorted(trainers.items()): out.append('trainer\t%s\t%s' % (k, v))
 for k, v in WORDS: out.append('word\t%s\t%s' % (k, v))
 open(os.path.join(langdir, 'names_ja.txt'), 'w', encoding='utf-8', newline='\n').write('\n'.join(out) + '\n')
-print('species', len(species), 'cards', len(matched['cards']), 'attacks', len(attacks), 'of', len(pool_attacks), src,
+print('trainers', len(trainers), 'species', len(species), 'cards', len(matched['cards']), 'attacks', len(attacks), 'of', len(pool_attacks), src,
       'abilities', len(abil), 'of', len(pool_abilities))
