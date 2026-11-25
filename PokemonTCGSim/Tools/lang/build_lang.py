@@ -31,6 +31,14 @@ species = table('species_names', 'pokemon_species_id')
 moves = table('move_names', 'move_id')
 abilities_game = table('ability_names', 'ability_id')
 matched = json.load(open(os.path.join(work, 'matched.json'), encoding='utf-8'))
+# Bulbapedia's per-card Japanese names (tools/bulba.py) come first: one page per card, so no matching guesses.
+bp = os.path.join(work, 'bulba_names.json')
+bulba = json.load(open(bp, encoding='utf-8')) if os.path.exists(bp) else {}
+def ok(v): return v and not re.search(r'[{}<>|=]|&nbsp;', v) and re.search(r'[\u3040-\u30ff\u4e00-\u9fff]', v)
+for kind in ('cards', 'attacks', 'abilities'):
+    merged = dict(matched.get(kind, {}))
+    merged.update({k: v for k, v in bulba.get(kind, {}).items() if ok(v)})
+    matched[kind] = merged
 
 # Attack and Ability names used in the pool, so the file only has what the game can show.
 pool_attacks, pool_abilities = set(), set()
@@ -68,6 +76,8 @@ for k, v in sorted(abil.items()): out.append('ability\t%s\t%s' % (k, v))
 tr_path = os.path.join(work, 'trainers.json')
 tr_data = json.load(open(tr_path, encoding='utf-8')) if os.path.exists(tr_path) else {}
 trainers = tr_data.get('names', tr_data) if isinstance(tr_data, dict) and 'names' in tr_data else tr_data
+trainers = dict(trainers)
+trainers.update({k: v for k, v in bulba.get('trainers', {}).items() if ok(v)})
 texts = dict(matched.get('texts', {}))
 texts.update(tr_data.get('texts', {}) if 'names' in tr_data else {})
 for k, v in sorted(trainers.items()): out.append('trainer\t%s\t%s' % (k, v))

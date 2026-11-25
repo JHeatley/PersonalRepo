@@ -10,6 +10,8 @@ The game's Japanese option reads two files in `Assets/PokemonTCG/Resources/Lang`
 
 ## Rebuilding the names
 
+0. `bulba.py` reads official Japanese card, attack, Ability and Trainer names from Bulbapedia's MediaWiki API (one page per card;
+   about 1 request a second); those come first.
 1. Download PokeAPI's `pokemon_species_names.csv`, `move_names.csv` and `ability_names.csv` (github.com/PokeAPI/pokeapi,
    data/v2/csv) into `<work>/dl`.
 2. Clone TCGdex's cards-database (MIT) with only `data-asia`, then `python3 -I parse_tcgdex.py <repo>/data-asia <work>/ja_cards.jsonl`
