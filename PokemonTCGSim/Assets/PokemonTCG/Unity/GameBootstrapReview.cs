@@ -186,24 +186,24 @@ namespace PokemonTCG.Presentation
 
             float w = Mathf.Min(470f, UiScale.Width * 0.42f);
             reviewRect = new Rect(UiScale.Width - w - 10f, 10f, w, UiScale.Height - 20f);
-            GUI.Box(reviewRect, GUIContent.none);
-            GUI.Box(reviewRect, GUIContent.none);
+            GUI.Box(reviewRect, Loc.T(GUIContent.none));
+            GUI.Box(reviewRect, Loc.T(GUIContent.none));
             GUILayout.BeginArea(new Rect(reviewRect.x + 10, reviewRect.y + 8, reviewRect.width - 20, reviewRect.height - 16));
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Areas of Improvement", ui.Title);
-            if (GUILayout.Button("Close", GUILayout.Width(70))) actions.Add(() => { EndPreview(); reviewOpen = false; });
+            GUILayout.Label(Loc.T("Areas of Improvement"), ui.Title);
+            if (GUILayout.Button(Loc.T("Close"), GUILayout.Width(70))) actions.Add(() => { EndPreview(); reviewOpen = false; });
             GUILayout.EndHorizontal();
             var status = learnStatusShown;
-            if (!string.IsNullOrEmpty(status)) GUILayout.Label(status, reviewSmall);
+            if (!string.IsNullOrEmpty(status)) GUILayout.Label(Loc.T(status), reviewSmall);
 
             if (!reviewFinished)
             {
-                GUILayout.Label(reviewPhase ?? "Working...", reviewText);
+                GUILayout.Label(Loc.T(reviewPhase ?? "Working..."), reviewText);
                 float frac = reviewTotal <= 0 ? 0f : Mathf.Clamp01((float)reviewDone / reviewTotal);
                 var bar = GUILayoutUtility.GetRect(reviewRect.width - 30f, 16f);
-                GUI.Box(bar, GUIContent.none);
+                GUI.Box(bar, Loc.T(GUIContent.none));
                 GUI.DrawTexture(new Rect(bar.x + 2, bar.y + 2, (bar.width - 4) * frac, bar.height - 4), ui.Selected);
-                GUILayout.Label("The AI is replaying the key moments of your game many times to compare your plays with other options. This takes a little while; you can close this window and reopen it from the end-of-game box.", reviewSmall);
+                GUILayout.Label(Loc.T("The AI is replaying the key moments of your game many times to compare your plays with other options. This takes a little while; you can close this window and reopen it from the end-of-game box."), reviewSmall);
             }
             else if (review != null)
             {
@@ -211,11 +211,11 @@ namespace PokemonTCG.Presentation
                 DrawReviewBody(ui, actions);
                 GUILayout.EndScrollView();
             }
-            if (reviewError != null) GUILayout.Label("Part of the review failed: " + reviewError, ui.Error);
+            if (reviewError != null) GUILayout.Label(Loc.T("Part of the review failed: " + reviewError), ui.Error);
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Play again")) actions.Add(() => pendingRestart = true);
-            if (GUILayout.Button("Back to menu")) actions.Add(() => pendingMenu = true);
+            if (GUILayout.Button(Loc.T("Play again"))) actions.Add(() => pendingRestart = true);
+            if (GUILayout.Button(Loc.T("Back to menu"))) actions.Add(() => pendingMenu = true);
             GUILayout.EndHorizontal();
             GUILayout.EndArea();
             foreach (var a in actions) a();
@@ -224,28 +224,28 @@ namespace PokemonTCG.Presentation
         private void DrawReviewBody(UiStyles ui, List<Action> actions)
         {
             var r = review;
-            GUILayout.Label(r.Headline, reviewBold);
-            if (lastRated != null) GUILayout.Label("Your Elo: " + lastRated.ChangeText + ". Play quality " + (lastRated.Quality >= 0 ? Math.Round(lastRated.Quality) + "/100" : "not measured") + ".", reviewSmall);
+            GUILayout.Label(Loc.T(r.Headline), reviewBold);
+            if (lastRated != null) GUILayout.Label(Loc.T("Your Elo: " + lastRated.ChangeText + ". Play quality " + (lastRated.Quality >= 0 ? Math.Round(lastRated.Quality) + "/100" : "not measured") + "."), reviewSmall);
             bool won = r.Headline.StartsWith("You won");
-            GUILayout.Label(won ? "How the game went" : "What went wrong", ui.Title);
-            foreach (var line in r.Summary) GUILayout.Label("• " + line, reviewText);
+            GUILayout.Label(Loc.T(won ? "How the game went" : "What went wrong"), ui.Title);
+            foreach (var line in r.Summary) GUILayout.Label(Loc.T("• " + line), reviewText);
 
             var better = r.Items.Where(i => i.Section == ReviewItem.BetterPlays).ToList();
             var habits = r.Items.Where(i => i.Section != ReviewItem.BetterPlays).ToList();
 
             GUILayout.Space(6);
-            GUILayout.Label(ReviewItem.BetterPlays, ui.Title);
+            GUILayout.Label(Loc.T(ReviewItem.BetterPlays), ui.Title);
             if (better.Count == 0)
-                GUILayout.Label("None found: where the AI would have played differently, playing it out didn't change your chances by much.", reviewSmall);
+                GUILayout.Label(Loc.T("None found: where the AI would have played differently, playing it out didn't change your chances by much."), reviewSmall);
             foreach (var item in better) DrawReviewItem(ui, item, actions);
 
             GUILayout.Space(6);
-            GUILayout.Label(ReviewItem.Habits, ui.Title);
-            if (habits.Count == 0) GUILayout.Label("Nothing stood out: the " + r.Judge + " agreed with your plays, or rated them about as well as its own.", reviewSmall);
+            GUILayout.Label(Loc.T(ReviewItem.Habits), ui.Title);
+            if (habits.Count == 0) GUILayout.Label(Loc.T("Nothing stood out: the " + r.Judge + " agreed with your plays, or rated them about as well as its own."), reviewSmall);
             foreach (var item in habits) DrawReviewItem(ui, item, actions);
 
             GUILayout.Space(8);
-            GUILayout.Label("How this was worked out: the " + r.Judge + " looked at " + r.DecisionsCompared + " of your decisions and would have done something else in " + r.Differences
+            GUILayout.Label(Loc.T("How this was worked out: the " + r.Judge + " looked at " + r.DecisionsCompared + " of your decisions and would have done something else in " + r.Differences
                             + (r.Judge == "Neural AI" ? " (it only counts a play when it clearly prefers another; it gets sharper as you train it)" : "")
                             + ". It replayed the " + r.Simulated + " most important ones many times each, from the exact position, with the cards you couldn't see (your deck and Prize cards, "
                             + "your opponent's hand and deck) shuffled each time, and the same luck for both plays. The percentages are estimates (about ±10 points). "
@@ -254,40 +254,40 @@ namespace PokemonTCG.Presentation
                             + (r.Items.Any(i => i.CanGiveFeedback)
                                 ? "If you think a suggestion is wrong, press \"I disagree\" under it: the AI learns your play for spots like that."
                                 : "The \"Makes sense\" and \"I disagree\" buttons come with the plays in the first section, and there were none this game. "
-                                  + "The notes under \"" + ReviewItem.Habits + "\" are about your patterns, so they don't have them."), reviewSmall);
+                                  + "The notes under \"" + ReviewItem.Habits + "\" are about your patterns, so they don't have them.")), reviewSmall);
         }
 
         private void DrawReviewItem(UiStyles ui, ReviewItem item, List<Action> actions)
         {
             GUILayout.BeginVertical(GUI.skin.box);
-            GUILayout.Label(item.Title, reviewBold);
-            GUILayout.Label(item.Detail, reviewText);
+            GUILayout.Label(Loc.T(item.Title), reviewBold);
+            GUILayout.Label(Loc.T(item.Detail), reviewText);
             if (item.YourChance >= 0 && item.SuggestedChance >= 0)
             {
-                GUILayout.Label("Your play: " + item.YourPlay + "  →  about " + Math.Round(item.YourChance * 100) + "% to win", reviewSmall);
-                GUILayout.Label("Better: " + item.SuggestedPlay + "  →  about " + Math.Round(item.SuggestedChance * 100) + "% to win", reviewSmall);
+                GUILayout.Label(Loc.T("Your play: " + item.YourPlay + "  →  about " + Math.Round(item.YourChance * 100) + "% to win"), reviewSmall);
+                GUILayout.Label(Loc.T("Better: " + item.SuggestedPlay + "  →  about " + Math.Round(item.SuggestedChance * 100) + "% to win"), reviewSmall);
             }
             if (item.YourTurn.Count > 0)
-                GUILayout.Label("What you did that turn: " + string.Join(" → ", item.YourTurn.ToArray()), reviewSmall);
+                GUILayout.Label(Loc.T("What you did that turn: " + string.Join(" → ", item.YourTurn.ToArray())), reviewSmall);
 
             if (item.CanPreview)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Show me:", GUILayout.Width(70));
+                GUILayout.Label(Loc.T("Show me:"), GUILayout.Width(70));
                 for (int s = 0; s < PreviewNames.Length; s++)
                 {
                     int stage = s;
                     bool available = PreviewAvailable(item, stage);
                     GUI.enabled = available;
                     bool on = previewItem == item && previewStage == stage;
-                    if (GUILayout.Toggle(on, PreviewNames[s], GUI.skin.button) && !on) actions.Add(() => ShowPreview(item, stage));
+                    if (GUILayout.Toggle(on, Loc.T(PreviewNames[s]), GUI.skin.button) && !on) actions.Add(() => ShowPreview(item, stage));
                     GUI.enabled = true;
                 }
                 GUILayout.EndHorizontal();
                 if (previewItem == item && previewStage == 3 && item.SuggestedTurn.Count > 0)
                 {
-                    GUILayout.Label("What the AI would do from here (the preview uses the real order of your deck):", reviewSmall);
-                    foreach (var line in item.SuggestedTurn.Take(14)) GUILayout.Label("   " + line, reviewSmall);
+                    GUILayout.Label(Loc.T("What the AI would do from here (the preview uses the real order of your deck):"), reviewSmall);
+                    foreach (var line in item.SuggestedTurn.Take(14)) GUILayout.Label(Loc.T("   " + line), reviewSmall);
                 }
             }
 
@@ -296,19 +296,19 @@ namespace PokemonTCG.Presentation
                 if (item.Feedback == 0)
                 {
                     GUILayout.BeginHorizontal();
-                    if (GUILayout.Button("Makes sense")) actions.Add(() => GiveFeedback(item, false));
-                    if (GUILayout.Button("I disagree")) actions.Add(() => GiveFeedback(item, true));
+                    if (GUILayout.Button(Loc.T("Makes sense"))) actions.Add(() => GiveFeedback(item, false));
+                    if (GUILayout.Button(Loc.T("I disagree"))) actions.Add(() => GiveFeedback(item, true));
                     GUILayout.EndHorizontal();
                 }
                 else
                 {
-                    GUILayout.Label(item.Feedback < 0
+                    GUILayout.Label(Loc.T(item.Feedback < 0
                         ? "Noted: the AI will lean toward your play in spots like this."
-                        : "Noted: the AI will lean a little more toward the suggested play.", ui.Good);
+                        : "Noted: the AI will lean a little more toward the suggested play."), ui.Good);
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label("Note (optional)", GUILayout.Width(100));
+                    GUILayout.Label(Loc.T("Note (optional)"), GUILayout.Width(100));
                     item.Note = GUILayout.TextField(item.Note ?? "");
-                    if (GUILayout.Button("Save", GUILayout.Width(50)) && !string.IsNullOrEmpty(item.Note))
+                    if (GUILayout.Button(Loc.T("Save"), GUILayout.Width(50)) && !string.IsNullOrEmpty(item.Note))
                     {
                         string note = item.Note;
                         actions.Add(() => AppendFeedback(item, "note", note));
@@ -337,20 +337,20 @@ namespace PokemonTCG.Presentation
             float w = Mathf.Min(620f, UiScale.Width - 520f);
             if (w < 300f) w = 300f;
             previewBarRect = new Rect(UiScale.Width / 2f - w / 2f - 120f, 10f, w, 64f);
-            GUI.Box(previewBarRect, GUIContent.none);
-            GUI.Box(previewBarRect, GUIContent.none);
+            GUI.Box(previewBarRect, Loc.T(GUIContent.none));
+            GUI.Box(previewBarRect, Loc.T(GUIContent.none));
             GUILayout.BeginArea(new Rect(previewBarRect.x + 8, previewBarRect.y + 6, previewBarRect.width - 16, previewBarRect.height - 12));
             string what = previewStage == 1 ? item.YourPlay : previewStage >= 2 ? item.SuggestedPlay : "";
-            GUILayout.Label("<b>Preview, turn " + item.Turn + ": " + PreviewNames[Mathf.Clamp(previewStage, 0, 3)] + "</b>" + (string.IsNullOrEmpty(what) ? "" : "  (" + what + ")"), reviewText);
+            GUILayout.Label(Loc.T("<b>Preview, turn " + item.Turn + ": " + PreviewNames[Mathf.Clamp(previewStage, 0, 3)] + "</b>" + (string.IsNullOrEmpty(what) ? "" : "  (" + what + ")")), reviewText);
             GUILayout.BeginHorizontal();
             for (int s = 0; s < PreviewNames.Length; s++)
             {
                 int stage = s;
                 GUI.enabled = PreviewAvailable(item, stage) && previewStage != stage;
-                if (GUILayout.Button(PreviewNames[s])) actions.Add(() => ShowPreview(item, stage));
+                if (GUILayout.Button(Loc.T(PreviewNames[s]))) actions.Add(() => ShowPreview(item, stage));
             }
             GUI.enabled = true;
-            if (GUILayout.Button("Back to the final board")) actions.Add(EndPreview);
+            if (GUILayout.Button(Loc.T("Back to the final board"))) actions.Add(EndPreview);
             GUILayout.EndHorizontal();
             GUILayout.EndArea();
         }

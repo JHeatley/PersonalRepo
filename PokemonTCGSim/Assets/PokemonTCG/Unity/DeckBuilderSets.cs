@@ -131,16 +131,16 @@ namespace PokemonTCG.Presentation
         private void DrawSetRow(UiStyles ui, List<System.Action> actions)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Set", GUILayout.Width(50));
-            if (GUILayout.Button(SetButtonLabel(), SetItem(ui))) actions.Add(OpenSetMenu);
+            GUILayout.Label(Loc.T("Set"), GUILayout.Width(50));
+            if (GUILayout.Button(Loc.T(SetButtonLabel()), SetItem(ui))) actions.Add(OpenSetMenu);
             bool wasEnabled = GUI.enabled;
             GUI.enabled = wasEnabled && setFilter != null;
-            if (GUILayout.Button("All sets", GUILayout.Width(80))) actions.Add(() => ChooseSet(null));
+            if (GUILayout.Button(Loc.T("All sets"), GUILayout.Width(80))) actions.Add(() => ChooseSet(null));
             GUI.enabled = wasEnabled;
             GUILayout.EndHorizontal();
             var chosen = ChosenSet();
             if (chosen != null)
-                GUILayout.Label("Showing the cards printed in " + chosen.Name + ", reprints included. A card your deck doesn't use yet shows (and adds) its " + chosen.Name + " printing.", Hint(ui));
+                GUILayout.Label(Loc.T("Showing the cards printed in " + chosen.Name + ", reprints included. A card your deck doesn't use yet shows (and adds) its " + chosen.Name + " printing."), Hint(ui));
         }
 
         /// <summary>The set list: every set with a card in the pool, a box to narrow it down, and All sets.</summary>
@@ -159,14 +159,14 @@ namespace PokemonTCG.Presentation
             DrawFrame(box, CardVisuals.Solid(new Color(0.5f, 0.5f, 0.55f, 1f)), 1f);
 
             GUILayout.BeginArea(new Rect(box.x + 12f, box.y + 12f, box.width - 24f, box.height - 24f));
-            GUILayout.Label("Show the cards of one set", ui.Title);
-            GUILayout.Label("A card is in a set when any of its printings is from that set, so reprints are included.", Hint(ui));
+            GUILayout.Label(Loc.T("Show the cards of one set"), ui.Title);
+            GUILayout.Label(Loc.T("A card is in a set when any of its printings is from that set, so reprints are included."), Hint(ui));
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Find", GUILayout.Width(40));
+            GUILayout.Label(Loc.T("Find"), GUILayout.Width(40));
             setSearch = GUILayout.TextField(setSearch ?? "");
             GUILayout.EndHorizontal();
             GUILayout.Space(4f);
-            if (GUILayout.Button((setFilter == null ? "● " : "") + "All sets  ·  " + pool.Count + " cards", SetItem(ui))) actions.Add(() => ChooseSet(null));
+            if (GUILayout.Button(Loc.T((setFilter == null ? "● " : "") + "All sets  ·  " + pool.Count + " cards"), SetItem(ui))) actions.Add(() => ChooseSet(null));
             setScroll = GUILayout.BeginScrollView(setScroll);
             string find = (setSearch ?? "").Trim();
             int shown = 0;
@@ -178,11 +178,11 @@ namespace PokemonTCG.Presentation
                 string code = s.Code;
                 string label = (code == setFilter ? "● " : "") + s.Name + "  (" + code + ")  ·  " + s.Cards + " card" + (s.Cards == 1 ? "" : "s")
                     + (s.Tab == 2 ? "  ·  Unlimited" : s.Tab == 1 ? "  ·  Expanded" : "");
-                if (GUILayout.Button(label, SetItem(ui))) actions.Add(() => ChooseSet(code));
+                if (GUILayout.Button(Loc.T(label), SetItem(ui))) actions.Add(() => ChooseSet(code));
             }
-            if (shown == 0) GUILayout.Label("No set matches \"" + find + "\".", Hint(ui));
+            if (shown == 0) GUILayout.Label(Loc.T("No set matches \"" + find + "\"."), Hint(ui));
             GUILayout.EndScrollView();
-            if (GUILayout.Button("Close", GUILayout.Height(28f))) actions.Add(() => setMenuOpen = false);
+            if (GUILayout.Button(Loc.T("Close"), GUILayout.Height(28f))) actions.Add(() => setMenuOpen = false);
             GUILayout.EndArea();
 
             if (ev.type == EventType.KeyDown && ev.keyCode == KeyCode.Escape)

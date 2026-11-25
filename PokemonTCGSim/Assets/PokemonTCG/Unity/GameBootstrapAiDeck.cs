@@ -212,8 +212,8 @@ namespace PokemonTCG.Presentation
         private void DrawAiDeckPanel(UiStyles ui, float listHeight, List<Action> actions)
         {
             LoadAiDeckPrefs();
-            GUILayout.Label("Format for the AI's deck", Hint(ui));
-            int fmtPick = GUILayout.Toolbar((int)aiFormat, AiFormatNames);
+            GUILayout.Label(Loc.T("Format for the AI's deck"), Hint(ui));
+            int fmtPick = GUILayout.Toolbar((int)aiFormat, Loc.T(AiFormatNames));
             if (fmtPick != (int)aiFormat)
             {
                 var picked = (DeckFormat)fmtPick;
@@ -227,11 +227,11 @@ namespace PokemonTCG.Presentation
             }
 
             GUILayout.Space(4);
-            GUILayout.Label(aiAround != null ? "Built around: " + aiAround.Name + " (" + aiAround.Key + ")" : "Built around: a random Pokémon", ui.Label);
+            GUILayout.Label(Loc.T(aiAround != null ? "Built around: " + aiAround.Name + " (" + aiAround.Key + ")" : "Built around: a random Pokémon"), ui.Label);
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Find a card", GUILayout.Width(90));
+            GUILayout.Label(Loc.T("Find a card"), GUILayout.Width(90));
             string text = GUILayout.TextField(aiAroundText ?? "");
-            if (aiAround != null && GUILayout.Button("Random", GUILayout.Width(80))) actions.Add(() => { aiAround = null; SaveAiDeckPrefs(); });
+            if (aiAround != null && GUILayout.Button(Loc.T("Random"), GUILayout.Width(80))) actions.Add(() => { aiAround = null; SaveAiDeckPrefs(); });
             GUILayout.EndHorizontal();
             if (text != aiAroundText) actions.Add(() => aiAroundText = text);
             if (aiMatchesFor != aiAroundText)
@@ -241,11 +241,11 @@ namespace PokemonTCG.Presentation
             }
             if (!string.IsNullOrWhiteSpace(aiAroundText))
             {
-                if (aiMatches.Count == 0) GUILayout.Label("No card with that name in " + Formats.Label(aiFormat) + ".", Hint(ui));
+                if (aiMatches.Count == 0) GUILayout.Label(Loc.T("No card with that name in " + Formats.Label(aiFormat) + "."), Hint(ui));
                 foreach (var match in aiMatches)
                 {
                     var m = match;
-                    if (GUILayout.Button(m.Name + "  (" + m.Key + ")", ui.Button))
+                    if (GUILayout.Button(Loc.T(m.Name + "  (" + m.Key + ")"), ui.Button))
                         actions.Add(() =>
                         {
                             aiAround = m;
@@ -255,32 +255,32 @@ namespace PokemonTCG.Presentation
                 }
             }
 
-            bool newEach = GUILayout.Toggle(aiNewEachGame, " A new deck every game");
+            bool newEach = GUILayout.Toggle(aiNewEachGame, Loc.T(" A new deck every game"));
             if (newEach != aiNewEachGame) actions.Add(() => { aiNewEachGame = newEach; SaveAiDeckPrefs(); });
 
             GUILayout.BeginHorizontal();
             GUI.enabled = !aiBuildBusy;
-            if (GUILayout.Button(aiBuildBusy ? "Building..." : aiBuilt != null && aiBuilt.Ok ? "Build another" : "Build it now", GUILayout.Height(26)))
+            if (GUILayout.Button(Loc.T(aiBuildBusy ? "Building..." : aiBuilt != null && aiBuilt.Ok ? "Build another" : "Build it now"), GUILayout.Height(26)))
                 actions.Add(() => StartAiBuild(false));
             GUI.enabled = !aiBuildBusy && aiBuilt != null && aiBuilt.Ok;
-            if (GUILayout.Button("Save to my decks", GUILayout.Height(26))) actions.Add(SaveAiDeck);
+            if (GUILayout.Button(Loc.T("Save to my decks"), GUILayout.Height(26))) actions.Add(SaveAiDeck);
             GUI.enabled = true;
             GUILayout.EndHorizontal();
-            if (aiStatus != null) GUILayout.Label(aiStatus, aiStatusIsError ? ui.Error : ui.Good);
+            if (aiStatus != null) GUILayout.Label(Loc.T(aiStatus), aiStatusIsError ? ui.Error : ui.Good);
 
             float height = Mathf.Max(90f, listHeight - 200f);
             aiScroll = GUILayout.BeginScrollView(aiScroll, GUILayout.Height(height));
             if (aiBuilt != null && aiBuilt.Ok)
             {
-                GUILayout.Label(aiBuilt.Name + " (" + Formats.Label(aiBuilt.Format) + ")" + (aiBuiltPlayed && aiNewEachGame ? ": played; the next game gets a new one" : ""), ui.Title);
+                GUILayout.Label(Loc.T(aiBuilt.Name + " (" + Formats.Label(aiBuilt.Format) + ")" + (aiBuiltPlayed && aiNewEachGame ? ": played; the next game gets a new one" : "")), ui.Title);
                 foreach (var entry in Decklist.Group(aiBuilt.Cards).OrderBy(e => e.Card.IsPokemon ? 0 : e.Card.IsTrainer ? 1 : 2))
-                    GUILayout.Label(entry.Count + "  " + entry.Card.Name + (entry.Card.IsPokemon ? "  " + entry.Card.Key : ""), ui.Label);
-                foreach (var note in aiBuilt.Notes.Take(3)) GUILayout.Label(note, Hint(ui));
+                    GUILayout.Label(Loc.T(entry.Count + "  " + entry.Card.Name + (entry.Card.IsPokemon ? "  " + entry.Card.Key : "")), ui.Label);
+                foreach (var note in aiBuilt.Notes.Take(3)) GUILayout.Label(Loc.T(note), Hint(ui));
             }
             else
             {
-                GUILayout.Label(aiBuildBusy ? "The AI is building its deck..."
-                    : "The AI builds its deck when the game starts (or press Build it now to see it first). Leave the card blank for a random one.", Hint(ui));
+                GUILayout.Label(Loc.T(aiBuildBusy ? "The AI is building its deck..."
+                    : "The AI builds its deck when the game starts (or press Build it now to see it first). Leave the card blank for a random one."), Hint(ui));
             }
             GUILayout.EndScrollView();
         }

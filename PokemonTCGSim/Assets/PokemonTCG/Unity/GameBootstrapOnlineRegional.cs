@@ -34,9 +34,9 @@ namespace PokemonTCG.Presentation
         {
             if (regAiOnly || !FriendConnected) return;
             var h = onlineHost;
-            bool with = GUILayout.Toggle(regWithFriend, " " + h.GuestName + " (online) plays in this event too, with "
+            bool with = GUILayout.Toggle(regWithFriend, Loc.T(" " + h.GuestName + " (online) plays in this event too, with "
                                                   + (string.IsNullOrEmpty(h.GuestDeckName) ? "their deck" : h.GuestDeckName)
-                                                  + ": their games against AI players are played on their screen, and your match against them is played between you");
+                                                  + ": their games against AI players are played on their screen, and your match against them is played between you"));
             if (with != regWithFriend) actions.Add(() => regWithFriend = with);
         }
 

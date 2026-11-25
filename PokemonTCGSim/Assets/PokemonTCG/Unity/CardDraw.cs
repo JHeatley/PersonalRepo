@@ -45,11 +45,11 @@ namespace PokemonTCG.Presentation
             GUI.DrawTexture(inner, CardVisuals.Solid(Color.Lerp(color, Color.white, 0.55f)));
             var ns = NameStyle();
             ns.fontSize = Mathf.Clamp(Mathf.RoundToInt(r.width / 8f), 10, 26);
-            GUI.Label(new Rect(inner.x + 2f, inner.y + 4f, inner.width - 4f, inner.height * 0.6f), def.Name, ns);
+            GUI.Label(new Rect(inner.x + 2f, inner.y + 4f, inner.width - 4f, inner.height * 0.6f), Loc.T(def.Name), ns);
             var ss = SmallStyle();
             ss.fontSize = Mathf.Clamp(Mathf.RoundToInt(r.width / 11f), 9, 18);
             GUI.Label(new Rect(inner.x + 2f, inner.yMax - inner.height * 0.32f, inner.width - 4f, inner.height * 0.3f),
-                def.SetCode + " " + def.Number + "\n" + CardText.Short(def), ss);
+                Loc.T(def.SetCode + " " + def.Number + "\n" + CardText.Short(def)), ss);
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace PokemonTCG.Presentation
                 iconStyle = new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter, clipping = TextClipping.Overflow, padding = new RectOffset(0, 0, 0, 0) };
             iconStyle.fontSize = Mathf.Max(8, Mathf.RoundToInt(inner.height * 0.6f));
             iconStyle.normal.textColor = col.grayscale > 0.6f ? Color.black : Color.white;
-            GUI.Label(inner, CardVisuals.TypeLetter(energy.EnergyProvides), iconStyle);
+            GUI.Label(inner, Loc.T(CardVisuals.TypeLetter(energy.EnergyProvides)), iconStyle);
         }
 
         public static void Frame(Rect r, Texture2D tex, float t)

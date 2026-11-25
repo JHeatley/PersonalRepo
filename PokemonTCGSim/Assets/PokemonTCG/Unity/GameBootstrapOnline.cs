@@ -388,28 +388,28 @@ namespace PokemonTCG.Presentation
             var actions = new List<Action>();
             float w = Mathf.Min(900f, UiScale.Width - 40f);
             var box = new Rect(UiScale.Width / 2f - w / 2f, 30f, w, UiScale.Height - 60f);
-            GUI.Box(box, GUIContent.none);
+            GUI.Box(box, Loc.T(GUIContent.none));
             GUILayout.BeginArea(new Rect(box.x + 16, box.y + 16, box.width - 32, box.height - 32));
             onlineScroll = GUILayout.BeginScrollView(onlineScroll, false, false, GUIStyle.none, GUI.skin.verticalScrollbar);
-            GUILayout.Label("Play online", ui.Header);
-            GUILayout.Label("Play a friend over the internet for free. One of you hosts and the other types the host's address. The host's copy runs "
-                            + "the game; nothing hidden (your hand, your deck) is ever sent to the other player. Both of you need the same version of the game.", Hint(ui));
+            GUILayout.Label(Loc.T("Play online"), ui.Header);
+            GUILayout.Label(Loc.T("Play a friend over the internet for free. One of you hosts and the other types the host's address. The host's copy runs "
+                            + "the game; nothing hidden (your hand, your deck) is ever sent to the other player. Both of you need the same version of the game."), Hint(ui));
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Your name", GUILayout.Width(110));
+            GUILayout.Label(Loc.T("Your name"), GUILayout.Width(110));
             onlineName = GUILayout.TextField(onlineName ?? "", 24, GUILayout.Width(220));
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Your deck", GUILayout.Width(110));
+            GUILayout.Label(Loc.T("Your deck"), GUILayout.Width(110));
             string deckLabel = onlineDeck >= 0 && onlineDeck < decks.Count ? decks[onlineDeck].Name : "(none)";
-            if (GUILayout.Button("◀", GUILayout.Width(30)) && decks.Count > 0) actions.Add(() => onlineDeck = (onlineDeck - 1 + decks.Count) % decks.Count);
-            GUILayout.Label(deckLabel, ui.Label, GUILayout.Width(420));
-            if (GUILayout.Button("▶", GUILayout.Width(30)) && decks.Count > 0) actions.Add(() => onlineDeck = (onlineDeck + 1) % decks.Count);
+            if (GUILayout.Button(Loc.T("◀"), GUILayout.Width(30)) && decks.Count > 0) actions.Add(() => onlineDeck = (onlineDeck - 1 + decks.Count) % decks.Count);
+            GUILayout.Label(Loc.T(deckLabel), ui.Label, GUILayout.Width(420));
+            if (GUILayout.Button(Loc.T("▶"), GUILayout.Width(30)) && decks.Count > 0) actions.Add(() => onlineDeck = (onlineDeck + 1) % decks.Count);
             GUILayout.EndHorizontal();
             if (onlineDeck >= 0 && onlineDeck < decks.Count)
-                foreach (var p in deckProblems[onlineDeck]) GUILayout.Label(p, ui.Error);
+                foreach (var p in deckProblems[onlineDeck]) GUILayout.Label(Loc.T(p), ui.Error);
             var g = onlineGuest;
-            if (g != null && !g.Closed && OnlineDeckReady && GUILayout.Button("Use this deck for the next game", GUILayout.Width(300)))
+            if (g != null && !g.Closed && OnlineDeckReady && GUILayout.Button(Loc.T("Use this deck for the next game"), GUILayout.Width(300)))
             {
                 var d = decks[onlineDeck];
                 actions.Add(() =>
@@ -430,69 +430,69 @@ namespace PokemonTCG.Presentation
             }
 
             GUILayout.Space(10);
-            GUILayout.Label("Host a game", ui.Title);
+            GUILayout.Label(Loc.T("Host a game"), ui.Title);
             var h = onlineHost;
             if (h == null)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Port", GUILayout.Width(110));
+                GUILayout.Label(Loc.T("Port"), GUILayout.Width(110));
                 onlinePortText = GUILayout.TextField(onlinePortText ?? "", 5, GUILayout.Width(80));
                 GUI.enabled = onlineGuest == null && !onlineJoining;
-                if (GUILayout.Button("Start hosting", GUILayout.Width(160))) actions.Add(StartHosting);
+                if (GUILayout.Button(Loc.T("Start hosting"), GUILayout.Width(160))) actions.Add(StartHosting);
                 GUI.enabled = true;
                 GUILayout.EndHorizontal();
             }
             else
             {
                 var addresses = OnlinePlay.LocalAddresses();
-                GUILayout.Label("Your friend types one of these (with the port):", ui.Label);
-                foreach (var a in addresses) GUILayout.Label("   " + a + ":" + h.Port, ui.Good);
-                if (addresses.Count == 0) GUILayout.Label("   (no network address found)", ui.Error);
-                GUILayout.Label("Same home network: the address starting 192.168 or 10. works. Over the internet, either install a free virtual network "
+                GUILayout.Label(Loc.T("Your friend types one of these (with the port):"), ui.Label);
+                foreach (var a in addresses) GUILayout.Label(Loc.T("   " + a + ":" + h.Port), ui.Good);
+                if (addresses.Count == 0) GUILayout.Label(Loc.T("   (no network address found)"), ui.Error);
+                GUILayout.Label(Loc.T("Same home network: the address starting 192.168 or 10. works. Over the internet, either install a free virtual network "
                                 + "(Tailscale, ZeroTier or Radmin VPN) on both computers and use the address it gives you (Tailscale's start with 100.), "
                                 + "or open port " + h.Port + " (TCP) on your router to this computer and give your friend your public IP. Windows may ask "
-                                + "to allow the game through its firewall the first time: allow it.", Hint(ui));
+                                + "to allow the game through its firewall the first time: allow it."), Hint(ui));
                 if (h.Guest != null && !h.Guest.Closed)
                 {
-                    GUILayout.Label(h.GuestName + " has joined with " + (string.IsNullOrEmpty(h.GuestDeckName) ? "a deck" : h.GuestDeckName) + ".", ui.Good);
+                    GUILayout.Label(Loc.T(h.GuestName + " has joined with " + (string.IsNullOrEmpty(h.GuestDeckName) ? "a deck" : h.GuestDeckName) + "."), ui.Good);
                     GUILayout.BeginHorizontal();
                     GUI.enabled = OnlineDeckReady;
-                    if (GUILayout.Button("Start the game", GUILayout.Height(34), GUILayout.Width(200))) pendingOnlineStart = true;
+                    if (GUILayout.Button(Loc.T("Start the game"), GUILayout.Height(34), GUILayout.Width(200))) pendingOnlineStart = true;
                     GUI.enabled = true;
                     GUILayout.EndHorizontal();
                 }
-                if (GUILayout.Button("Stop hosting", GUILayout.Width(160))) actions.Add(StopOnline);
+                if (GUILayout.Button(Loc.T("Stop hosting"), GUILayout.Width(160))) actions.Add(StopOnline);
             }
 
             GUILayout.Space(10);
-            GUILayout.Label("Join a friend's game", ui.Title);
+            GUILayout.Label(Loc.T("Join a friend's game"), ui.Title);
             if (g == null)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Address", GUILayout.Width(110));
+                GUILayout.Label(Loc.T("Address"), GUILayout.Width(110));
                 onlineAddress = GUILayout.TextField(onlineAddress ?? "", 80, GUILayout.Width(300));
                 GUI.enabled = onlineHost == null && !onlineJoining && OnlineDeckReady && (onlineAddress ?? "").Trim().Length > 0;
-                if (GUILayout.Button(onlineJoining ? "Connecting..." : "Join", GUILayout.Width(160))) actions.Add(JoinGame);
+                if (GUILayout.Button(Loc.T(onlineJoining ? "Connecting..." : "Join"), GUILayout.Width(160))) actions.Add(JoinGame);
                 GUI.enabled = true;
                 GUILayout.EndHorizontal();
-                GUILayout.Label("Type what your friend's screen shows, like 100.64.0.5:7777 (without a port, " + OnlinePlay.DefaultPort + " is used).", Hint(ui));
+                GUILayout.Label(Loc.T("Type what your friend's screen shows, like 100.64.0.5:7777 (without a port, " + OnlinePlay.DefaultPort + " is used)."), Hint(ui));
             }
             else
             {
-                GUILayout.Label("Connected to " + onlineHostName + ". They start each game; you'll go to the board when they do.", ui.Good);
+                GUILayout.Label(Loc.T("Connected to " + onlineHostName + ". They start each game; you'll go to the board when they do."), ui.Good);
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button("Ready for my next Regional game", GUILayout.Width(280))) actions.Add(SendOnlineReady);
-                if (GUILayout.Button("Leave", GUILayout.Width(160))) actions.Add(StopOnline);
+                if (GUILayout.Button(Loc.T("Ready for my next Regional game"), GUILayout.Width(280))) actions.Add(SendOnlineReady);
+                if (GUILayout.Button(Loc.T("Leave"), GUILayout.Width(160))) actions.Add(StopOnline);
                 GUILayout.EndHorizontal();
             }
 
             GUILayout.Space(10);
-            if (!string.IsNullOrEmpty(onlineStatus)) GUILayout.Label(onlineStatus, ui.Label);
-            if (!string.IsNullOrEmpty(onlineError)) GUILayout.Label(onlineError, ui.Error);
+            if (!string.IsNullOrEmpty(onlineStatus)) GUILayout.Label(Loc.T(onlineStatus), ui.Label);
+            if (!string.IsNullOrEmpty(onlineError)) GUILayout.Label(Loc.T(onlineError), ui.Error);
             GUILayout.Space(10);
-            GUILayout.Label("You stay connected on the other screens (hosting, you can start a Regional Sim event your friend plays in). "
-                            + "Stop hosting or Leave ends it.", Hint(ui));
-            if (GUILayout.Button("Back to menu", GUILayout.Width(160)))
+            GUILayout.Label(Loc.T("You stay connected on the other screens (hosting, you can start a Regional Sim event your friend plays in). "
+                            + "Stop hosting or Leave ends it."), Hint(ui));
+            if (GUILayout.Button(Loc.T("Back to menu"), GUILayout.Width(160)))
                 actions.Add(() =>
                 {
                     RefreshDecks();

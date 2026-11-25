@@ -125,12 +125,12 @@ namespace PokemonTCG.Presentation
         {
             float w = Mathf.Min(900f, UiScale.Width - 40f);
             var r = new Rect(UiScale.Width / 2f - w / 2f, 30f, w, UiScale.Height - 60f);
-            GUI.Box(r, GUIContent.none);
+            GUI.Box(r, Loc.T(GUIContent.none));
             GUILayout.BeginArea(new Rect(r.x + 16, r.y + 16, r.width - 32, r.height - 32));
-            GUILayout.Label("Save folders", ui.Header);
-            GUILayout.Label("Where the Neural AI's brain and your saved decks are kept on this computer. When you choose a new folder, "
+            GUILayout.Label(Loc.T("Save folders"), ui.Header);
+            GUILayout.Label(Loc.T("Where the Neural AI's brain and your saved decks are kept on this computer. When you choose a new folder, "
                             + "the files in the current one are copied there (files already in the new folder are kept), and the old files "
-                            + "stay where they were as a backup.", ui.Label);
+                            + "stay where they were as a backup."), ui.Label);
             GUILayout.Space(10);
 
             DrawFolderRow(ui, FolderBrain, "Neural AI (brain.txt and feedback.txt)", ref brainFolderText,
@@ -140,41 +140,41 @@ namespace PokemonTCG.Presentation
                 SavePaths.DeckFolder, SavePaths.DefaultDeckFolder, SavePaths.DeckFolderIsDefault, null);
 
             GUILayout.Space(10);
-            if (!string.IsNullOrEmpty(foldersMessage)) GUILayout.Label(foldersMessage, foldersMessageIsError ? ui.Error : ui.Good);
-            if (!SavePaths.CanBrowse) GUILayout.Label("Type or paste a full folder path, then press Use this folder.", Hint(ui));
+            if (!string.IsNullOrEmpty(foldersMessage)) GUILayout.Label(Loc.T(foldersMessage), foldersMessageIsError ? ui.Error : ui.Good);
+            if (!SavePaths.CanBrowse) GUILayout.Label(Loc.T("Type or paste a full folder path, then press Use this folder."), Hint(ui));
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Back to menu", GUILayout.Height(32), GUILayout.Width(160))) pendingFoldersBack = true;
+            if (GUILayout.Button(Loc.T("Back to menu"), GUILayout.Height(32), GUILayout.Width(160))) pendingFoldersBack = true;
             GUILayout.EndArea();
         }
 
         private void DrawFolderRow(UiStyles ui, int which, string title, ref string text, string current, string defaultFolder, bool isDefault, string blocked)
         {
-            GUILayout.Label(title, ui.Title);
-            GUILayout.Label("Now: " + current + (isDefault ? "   (default)" : ""), Hint(ui));
+            GUILayout.Label(Loc.T(title), ui.Title);
+            GUILayout.Label(Loc.T("Now: " + current + (isDefault ? "   (default)" : "")), Hint(ui));
             GUILayout.BeginHorizontal();
             text = GUILayout.TextField(text ?? "", GUILayout.MinWidth(300f));
             GUI.enabled = blocked == null;
-            if (SavePaths.CanBrowse && GUILayout.Button("Browse...", GUILayout.Width(110))) pendingBrowse = which;
+            if (SavePaths.CanBrowse && GUILayout.Button(Loc.T("Browse..."), GUILayout.Width(110))) pendingBrowse = which;
             GUI.enabled = true;
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUI.enabled = blocked == null;
-            if (GUILayout.Button("Use this folder", GUILayout.Width(160)))
+            if (GUILayout.Button(Loc.T("Use this folder"), GUILayout.Width(160)))
             {
                 pendingApplyWhich = which;
                 pendingApplyFolder = text;
             }
             GUI.enabled = blocked == null && !isDefault;
-            if (GUILayout.Button("Back to default", GUILayout.Width(160)))
+            if (GUILayout.Button(Loc.T("Back to default"), GUILayout.Width(160)))
             {
                 pendingApplyWhich = which;
                 pendingApplyFolder = defaultFolder;
             }
             GUI.enabled = true;
-            if (GUILayout.Button("Open folder", GUILayout.Width(130))) pendingOpenFolder = current;
+            if (GUILayout.Button(Loc.T("Open folder"), GUILayout.Width(130))) pendingOpenFolder = current;
             GUILayout.EndHorizontal();
-            if (blocked != null) GUILayout.Label(blocked, Hint(ui));
+            if (blocked != null) GUILayout.Label(Loc.T(blocked), Hint(ui));
         }
     }
 }

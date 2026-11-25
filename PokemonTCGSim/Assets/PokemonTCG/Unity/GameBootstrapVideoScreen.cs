@@ -48,28 +48,28 @@ namespace PokemonTCG.Presentation
         {
             var actions = new List<Action>();
             var r = new Rect(10f, 10f, UiScale.Width - 20f, UiScale.Height - 20f);
-            GUI.Box(r, GUIContent.none);
+            GUI.Box(r, Loc.T(GUIContent.none));
 
             // Top bar: the video file.
             GUILayout.BeginArea(new Rect(r.x + 10, r.y + 6, r.width - 20, 70));
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Learn from a video", ui.Header, GUILayout.Width(250));
+            GUILayout.Label(Loc.T("Learn from a video"), ui.Header, GUILayout.Width(250));
             GUI.enabled = videoJob == null && !YouTubeBusy;
-            GUILayout.Label("Video file or YouTube link:", ui.Label, GUILayout.Width(175));
+            GUILayout.Label(Loc.T("Video file or YouTube link:"), ui.Label, GUILayout.Width(175));
             videoPathInput = GUILayout.TextField(videoPathInput ?? "", GUILayout.MinWidth(200));
-            if (GUILayout.Button("Open", GUILayout.Width(70))) actions.Add(() => OpenVideoInput(videoPathInput));
-            if (FilePicker.CanBrowse && GUILayout.Button("Browse...", GUILayout.Width(90))) actions.Add(() => pendingVideoBrowse = true);
+            if (GUILayout.Button(Loc.T("Open"), GUILayout.Width(70))) actions.Add(() => OpenVideoInput(videoPathInput));
+            if (FilePicker.CanBrowse && GUILayout.Button(Loc.T("Browse..."), GUILayout.Width(90))) actions.Add(() => pendingVideoBrowse = true);
             GUI.enabled = true;
-            if (youTube != null && GUILayout.Button("Cancel download", GUILayout.Width(130))) actions.Add(() => youTube.Cancel());
+            if (youTube != null && GUILayout.Button(Loc.T("Cancel download"), GUILayout.Width(130))) actions.Add(() => youTube.Cancel());
             if (youTubeNeedsTool && youTube == null)
             {
                 GUI.enabled = youTubeToolDownload == null;
-                if (GUILayout.Button("Get yt-dlp", GUILayout.Width(100))) actions.Add(StartYouTubeToolDownload);
+                if (GUILayout.Button(Loc.T("Get yt-dlp"), GUILayout.Width(100))) actions.Add(StartYouTubeToolDownload);
                 GUI.enabled = true;
             }
-            if (GUILayout.Button("Back", GUILayout.Width(80))) actions.Add(() => CloseVideoScreen());
+            if (GUILayout.Button(Loc.T("Back"), GUILayout.Width(80))) actions.Add(() => CloseVideoScreen());
             GUILayout.EndHorizontal();
-            if (!string.IsNullOrEmpty(videoMessage)) GUILayout.Label(videoMessage, Hint(ui));
+            if (!string.IsNullOrEmpty(videoMessage)) GUILayout.Label(Loc.T(videoMessage), Hint(ui));
             GUILayout.EndArea();
 
             float panelW = Mathf.Clamp(r.width * 0.36f, 380f, 560f);
@@ -79,7 +79,7 @@ namespace PokemonTCG.Presentation
 
             var panel = new Rect(videoArea.xMax + 10, r.y + 80, panelW, r.height - 90);
             GUILayout.BeginArea(panel);
-            int tab = GUILayout.Toolbar(videoTab, VideoTabs);
+            int tab = GUILayout.Toolbar(videoTab, Loc.T(VideoTabs));
             if (tab != videoTab) actions.Add(() => videoTab = tab);
             videoTabScroll = GUILayout.BeginScrollView(videoTabScroll);
             switch (videoTab)
@@ -99,12 +99,12 @@ namespace PokemonTCG.Presentation
 
         private void DrawVideoView(UiStyles ui, Rect area, List<Action> actions)
         {
-            GUI.Box(area, GUIContent.none);
+            GUI.Box(area, Loc.T(GUIContent.none));
             if (videoFrame == null || !videoReady)
             {
                 GUI.Label(new Rect(area.x + 20, area.y + 20, area.width - 40, 80),
-                    "Open a video of a game: a stream with an overlay, a recording of Pokémon TCG Live, or a camera over the table. "
-                    + "A YouTube link works too: it's downloaded into the Videos folder first (only download videos you're allowed to).", ui.Label);
+                    Loc.T("Open a video of a game: a stream with an overlay, a recording of Pokémon TCG Live, or a camera over the table. "
+                    + "A YouTube link works too: it's downloaded into the Videos folder first (only download videos you're allowed to)."), ui.Label);
                 return;
             }
             float aspect = videoFrame.width / (float)videoFrame.height;
@@ -124,7 +124,7 @@ namespace PokemonTCG.Presentation
                 bool selected = box.Role == videoRole;
                 Color color = box.Kind == VideoBoxKind.CardArt ? new Color(0.2f, 0.9f, 1f) : box.Kind == VideoBoxKind.Icons ? new Color(1f, 0.85f, 0.2f) : new Color(1f, 0.3f, 0.3f);
                 Outline(rect, selected ? Color.white : color, selected ? 3f : 1.5f);
-                if (selected) GUI.Label(new Rect(rect.x, rect.yMax + 1, 260, 18), VideoRoles.Describe(box.Role, VideoPlayerLabels()), Hint(ui));
+                if (selected) GUI.Label(new Rect(rect.x, rect.yMax + 1, 260, 18), Loc.T(VideoRoles.Describe(box.Role, VideoPlayerLabels())), Hint(ui));
             }
 
             // Drawing a box: drag on the video while a role is picked on the Layout tab.
@@ -220,19 +220,19 @@ namespace PokemonTCG.Presentation
             if (can && Mathf.Abs(picked - now) > 0.05f) actions.Add(() => SeekVideo(picked));
             GUILayout.BeginHorizontal();
             bool playing = videoPlayer != null && videoPlayer.isPlaying;
-            if (GUILayout.Button(playing ? "Pause" : "Play", GUILayout.Width(70)))
+            if (GUILayout.Button(Loc.T(playing ? "Pause" : "Play"), GUILayout.Width(70)))
                 actions.Add(() =>
                 {
                     if (videoPlayer == null) return;
                     if (videoPlayer.isPlaying) videoPlayer.Pause();
                     else videoPlayer.Play();
                 });
-            if (GUILayout.Button("-10 s", GUILayout.Width(55))) actions.Add(() => SeekVideo(VideoTime - 10));
-            if (GUILayout.Button("-1 s", GUILayout.Width(50))) actions.Add(() => SeekVideo(VideoTime - 1));
-            if (GUILayout.Button("+1 s", GUILayout.Width(50))) actions.Add(() => SeekVideo(VideoTime + 1));
-            if (GUILayout.Button("+10 s", GUILayout.Width(55))) actions.Add(() => SeekVideo(VideoTime + 10));
+            if (GUILayout.Button(Loc.T("-10 s"), GUILayout.Width(55))) actions.Add(() => SeekVideo(VideoTime - 10));
+            if (GUILayout.Button(Loc.T("-1 s"), GUILayout.Width(50))) actions.Add(() => SeekVideo(VideoTime - 1));
+            if (GUILayout.Button(Loc.T("+1 s"), GUILayout.Width(50))) actions.Add(() => SeekVideo(VideoTime + 1));
+            if (GUILayout.Button(Loc.T("+10 s"), GUILayout.Width(55))) actions.Add(() => SeekVideo(VideoTime + 10));
             GUI.enabled = true;
-            GUILayout.Label(VideoEvent.Clock(VideoTime) + " / " + VideoEvent.Clock(length), ui.Label, GUILayout.Width(140));
+            GUILayout.Label(Loc.T(VideoEvent.Clock(VideoTime) + " / " + VideoEvent.Clock(length)), ui.Label, GUILayout.Width(140));
             GUILayout.EndHorizontal();
             GUILayout.EndArea();
         }
@@ -241,35 +241,35 @@ namespace PokemonTCG.Presentation
 
         private void DrawVideoLayoutTab(UiStyles ui, List<Action> actions)
         {
-            GUILayout.Label("Draw a box over each thing the video shows: pick it below, then drag on the video. A layout is drawn once "
-                            + "and used for every video of that kind. Left is player 1 (on TCG Live: you, at the bottom).", Hint(ui));
+            GUILayout.Label(Loc.T("Draw a box over each thing the video shows: pick it below, then drag on the video. A layout is drawn once "
+                            + "and used for every video of that kind. Left is player 1 (on TCG Live: you, at the bottom)."), Hint(ui));
             var layout = VideoLayoutNow;
             GUILayout.BeginHorizontal();
             GUI.enabled = videoJob == null;
-            if (GUILayout.Button("<", GUILayout.Width(30))) actions.Add(() => { videoLayoutIndex = (videoLayoutIndex + videoLayouts.Count - 1) % videoLayouts.Count; videoRole = ""; });
-            GUILayout.Label(layout.Name + (layout.BuiltIn ? " (built-in)" : ""), ui.Title);
-            if (GUILayout.Button(">", GUILayout.Width(30))) actions.Add(() => { videoLayoutIndex = (videoLayoutIndex + 1) % videoLayouts.Count; videoRole = ""; });
+            if (GUILayout.Button(Loc.T("<"), GUILayout.Width(30))) actions.Add(() => { videoLayoutIndex = (videoLayoutIndex + videoLayouts.Count - 1) % videoLayouts.Count; videoRole = ""; });
+            GUILayout.Label(Loc.T(layout.Name + (layout.BuiltIn ? " (built-in)" : "")), ui.Title);
+            if (GUILayout.Button(Loc.T(">"), GUILayout.Width(30))) actions.Add(() => { videoLayoutIndex = (videoLayoutIndex + 1) % videoLayouts.Count; videoRole = ""; });
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Text on screen:", ui.Label, GUILayout.Width(110));
-            int lang = GUILayout.Toolbar(layout.Language == "ja" ? 1 : 0, new[] { "English", "Japanese" });
+            GUILayout.Label(Loc.T("Text on screen:"), ui.Label, GUILayout.Width(110));
+            int lang = GUILayout.Toolbar(layout.Language == "ja" ? 1 : 0, Loc.T(new[] { "English", "Japanese" }));
             if ((lang == 1) != (layout.Language == "ja"))
                 actions.Add(() => { layout.Language = lang == 1 ? "ja" : "en"; videoLayoutDirty = true; });
             GUILayout.EndHorizontal();
             if (layout.Find(VideoRoles.Banner) != null)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Turn banner, left:", ui.Label, GUILayout.Width(120));
+                GUILayout.Label(Loc.T("Turn banner, left:"), ui.Label, GUILayout.Width(120));
                 string t0 = GUILayout.TextField(layout.TurnText[0] ?? "");
-                GUILayout.Label("right:", ui.Label, GUILayout.Width(40));
+                GUILayout.Label(Loc.T("right:"), ui.Label, GUILayout.Width(40));
                 string t1 = GUILayout.TextField(layout.TurnText[1] ?? "");
                 if (t0 != layout.TurnText[0] || t1 != layout.TurnText[1]) actions.Add(() => { layout.TurnText = new[] { t0, t1 }; videoLayoutDirty = true; });
                 GUILayout.EndHorizontal();
             }
 
             GUILayout.Space(4);
-            int who = GUILayout.Toolbar(videoRolePlayer, new[] { "Left player", "Right player", "Both" });
+            int who = GUILayout.Toolbar(videoRolePlayer, Loc.T(new[] { "Left player", "Right player", "Both" }));
             if (who != videoRolePlayer) actions.Add(() => videoRolePlayer = who);
             var labels = VideoPlayerLabels();
             foreach (var kv in VideoRoles.All())
@@ -282,12 +282,12 @@ namespace PokemonTCG.Presentation
                 GUILayout.BeginHorizontal();
                 bool picked = videoRole == role;
                 string label = (box != null ? "■ " : "□ ") + VideoRoles.Describe(role, labels);
-                if (GUILayout.Toggle(picked, label, ui.Button, GUILayout.MinWidth(220)) != picked)
+                if (GUILayout.Toggle(picked, Loc.T(label), ui.Button, GUILayout.MinWidth(220)) != picked)
                     actions.Add(() => videoRole = picked ? "" : role);
                 if (box != null)
                 {
-                    GUILayout.Label(BoxKindNames[(int)box.Kind], Hint(ui), GUILayout.Width(52));
-                    if (GUILayout.Button("Remove", GUILayout.Width(70)))
+                    GUILayout.Label(Loc.T(BoxKindNames[(int)box.Kind]), Hint(ui), GUILayout.Width(52));
+                    if (GUILayout.Button(Loc.T("Remove"), GUILayout.Width(70)))
                         actions.Add(() => { layout.Remove(role); videoLayoutDirty = true; });
                 }
                 GUILayout.EndHorizontal();
@@ -297,40 +297,40 @@ namespace PokemonTCG.Presentation
             if (chosen != null)
             {
                 GUILayout.Space(4);
-                GUILayout.Label("The picked box is read as:", ui.Label);
-                int kind = GUILayout.Toolbar((int)chosen.Kind, BoxKindNames);
+                GUILayout.Label(Loc.T("The picked box is read as:"), ui.Label);
+                int kind = GUILayout.Toolbar((int)chosen.Kind, Loc.T(BoxKindNames));
                 if (kind != (int)chosen.Kind) actions.Add(() => { chosen.Kind = (VideoBoxKind)kind; videoLayoutDirty = true; });
                 if (chosen.Kind == VideoBoxKind.Icons)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label("Icon places in the row: " + chosen.Slots, ui.Label, GUILayout.Width(190));
-                    if (GUILayout.Button("-", GUILayout.Width(30))) actions.Add(() => { chosen.Slots = Mathf.Max(1, chosen.Slots - 1); videoLayoutDirty = true; });
-                    if (GUILayout.Button("+", GUILayout.Width(30))) actions.Add(() => { chosen.Slots = Mathf.Min(12, chosen.Slots + 1); videoLayoutDirty = true; });
+                    GUILayout.Label(Loc.T("Icon places in the row: " + chosen.Slots), ui.Label, GUILayout.Width(190));
+                    if (GUILayout.Button(Loc.T("-"), GUILayout.Width(30))) actions.Add(() => { chosen.Slots = Mathf.Max(1, chosen.Slots - 1); videoLayoutDirty = true; });
+                    if (GUILayout.Button(Loc.T("+"), GUILayout.Width(30))) actions.Add(() => { chosen.Slots = Mathf.Min(12, chosen.Slots + 1); videoLayoutDirty = true; });
                     GUILayout.EndHorizontal();
                 }
-                GUILayout.Label(KindHelp(chosen.Kind), Hint(ui));
+                GUILayout.Label(Loc.T(KindHelp(chosen.Kind)), Hint(ui));
             }
-            else if (!string.IsNullOrEmpty(videoRole)) GUILayout.Label("Drag on the video to draw this box.", ui.Good);
+            else if (!string.IsNullOrEmpty(videoRole)) GUILayout.Label(Loc.T("Drag on the video to draw this box."), ui.Good);
 
             GUILayout.Space(6);
-            if (layout.BuiltIn) GUILayout.Label("Built-in layouts can't be changed: changes are kept while the app is open; save a copy to keep them.", Hint(ui));
-            else if (videoLayoutDirty) GUILayout.Label("Changed (saved when you leave the screen, or now).", Hint(ui));
+            if (layout.BuiltIn) GUILayout.Label(Loc.T("Built-in layouts can't be changed: changes are kept while the app is open; save a copy to keep them."), Hint(ui));
+            else if (videoLayoutDirty) GUILayout.Label(Loc.T("Changed (saved when you leave the screen, or now)."), Hint(ui));
             GUILayout.BeginHorizontal();
-            if (!layout.BuiltIn && GUILayout.Button("Save", GUILayout.Width(70))) actions.Add(() => SaveVideoLayout(layout));
+            if (!layout.BuiltIn && GUILayout.Button(Loc.T("Save"), GUILayout.Width(70))) actions.Add(() => SaveVideoLayout(layout));
             videoLayoutNameInput = GUILayout.TextField(videoLayoutNameInput ?? "", GUILayout.MinWidth(120));
-            if (GUILayout.Button("Save as a copy", GUILayout.Width(120))) actions.Add(() => SaveVideoLayoutAs(videoLayoutNameInput));
+            if (GUILayout.Button(Loc.T("Save as a copy"), GUILayout.Width(120))) actions.Add(() => SaveVideoLayoutAs(videoLayoutNameInput));
             GUILayout.EndHorizontal();
             if (!layout.BuiltIn)
             {
                 if (!videoConfirmDelete)
                 {
-                    if (GUILayout.Button("Delete this layout", GUILayout.Width(150))) actions.Add(() => videoConfirmDelete = true);
+                    if (GUILayout.Button(Loc.T("Delete this layout"), GUILayout.Width(150))) actions.Add(() => videoConfirmDelete = true);
                 }
                 else
                 {
                     GUILayout.BeginHorizontal();
-                    if (GUILayout.Button("Yes, delete it", GUILayout.Width(120))) actions.Add(() => { DeleteVideoLayout(); videoConfirmDelete = false; });
-                    if (GUILayout.Button("Keep it", GUILayout.Width(90))) actions.Add(() => videoConfirmDelete = false);
+                    if (GUILayout.Button(Loc.T("Yes, delete it"), GUILayout.Width(120))) actions.Add(() => { DeleteVideoLayout(); videoConfirmDelete = false; });
+                    if (GUILayout.Button(Loc.T("Keep it"), GUILayout.Width(90))) actions.Add(() => videoConfirmDelete = false);
                     GUILayout.EndHorizontal();
                 }
             }
@@ -361,87 +361,87 @@ namespace PokemonTCG.Presentation
             var session = videoSession;
             if (session == null || !videoReady)
             {
-                GUILayout.Label("Open a video first.", ui.Label);
+                GUILayout.Label(Loc.T("Open a video first."), ui.Label);
                 return;
             }
-            GUILayout.Label("The video is read a moment at a time with the layout \"" + VideoLayoutNow.Name + "\". A long video takes a "
-                            + "while; you can read a stretch of it (boxes that didn't change aren't read again).", Hint(ui));
+            GUILayout.Label(Loc.T("The video is read a moment at a time with the layout \"" + VideoLayoutNow.Name + "\". A long video takes a "
+                            + "while; you can read a stretch of it (boxes that didn't change aren't read again)."), Hint(ui));
             GUI.enabled = videoJob == null;
             int interval = Array.IndexOf(Intervals, session.Interval);
             if (interval < 0) interval = 1;
-            int newInterval = GUILayout.Toolbar(interval, IntervalLabels);
+            int newInterval = GUILayout.Toolbar(interval, Loc.T(IntervalLabels));
             if (newInterval != interval) actions.Add(() => session.Interval = Intervals[newInterval]);
             GUILayout.BeginHorizontal();
-            GUILayout.Label("From " + VideoEvent.Clock(session.Start) + " to " + (session.Stop > 0 ? VideoEvent.Clock(session.Stop) : "the end"), ui.Label, GUILayout.Width(170));
-            if (GUILayout.Button("From here", GUILayout.Width(85))) actions.Add(() => session.Start = Math.Round(VideoTime, 1));
-            if (GUILayout.Button("To here", GUILayout.Width(70))) actions.Add(() => session.Stop = Math.Round(VideoTime, 1));
-            if (GUILayout.Button("Whole video", GUILayout.Width(95))) actions.Add(() => { session.Start = 0; session.Stop = 0; });
+            GUILayout.Label(Loc.T("From " + VideoEvent.Clock(session.Start) + " to " + (session.Stop > 0 ? VideoEvent.Clock(session.Stop) : "the end")), ui.Label, GUILayout.Width(170));
+            if (GUILayout.Button(Loc.T("From here"), GUILayout.Width(85))) actions.Add(() => session.Start = Math.Round(VideoTime, 1));
+            if (GUILayout.Button(Loc.T("To here"), GUILayout.Width(70))) actions.Add(() => session.Stop = Math.Round(VideoTime, 1));
+            if (GUILayout.Button(Loc.T("Whole video"), GUILayout.Width(95))) actions.Add(() => { session.Start = 0; session.Stop = 0; });
             GUILayout.EndHorizontal();
 
             // The decks, so card recognition only looks at their cards.
             if (VideoLayoutNow.Boxes.Any(b => b.Kind == VideoBoxKind.CardArt))
             {
-                GUILayout.Label("Card recognition: " + ArtIndexStatus() + ". Picking the decks (if you know them) makes it surer:", Hint(ui));
+                GUILayout.Label(Loc.T("Card recognition: " + ArtIndexStatus() + ". Picking the decks (if you know them) makes it surer:"), Hint(ui));
                 for (int p = 0; p < 2; p++)
                 {
                     int seat = p;
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label(p == 0 ? "Left deck:" : "Right deck:", ui.Label, GUILayout.Width(80));
-                    if (GUILayout.Button("<", GUILayout.Width(28))) actions.Add(() => session.Decks[seat] = CycleDeck(session.Decks[seat], -1));
-                    GUILayout.Label(string.IsNullOrEmpty(session.Decks[p]) ? "(any card)" : session.Decks[p], ui.Label);
-                    if (GUILayout.Button(">", GUILayout.Width(28))) actions.Add(() => session.Decks[seat] = CycleDeck(session.Decks[seat], 1));
+                    GUILayout.Label(Loc.T(p == 0 ? "Left deck:" : "Right deck:"), ui.Label, GUILayout.Width(80));
+                    if (GUILayout.Button(Loc.T("<"), GUILayout.Width(28))) actions.Add(() => session.Decks[seat] = CycleDeck(session.Decks[seat], -1));
+                    GUILayout.Label(Loc.T(string.IsNullOrEmpty(session.Decks[p]) ? "(any card)" : session.Decks[p]), ui.Label);
+                    if (GUILayout.Button(Loc.T(">"), GUILayout.Width(28))) actions.Add(() => session.Decks[seat] = CycleDeck(session.Decks[seat], 1));
                     GUILayout.EndHorizontal();
                 }
             }
 
             if (VideoLayoutNow.Language == "ja")
             {
-                GUILayout.Label(videoNames.SpeciesCount > 0
+                GUILayout.Label(Loc.T(videoNames.SpeciesCount > 0
                     ? "Japanese Pokémon names: " + videoNames.SpeciesCount + " known."
-                    : "Japanese names need PokeAPI's list of Pokémon names (a text file, downloaded once).", Hint(ui));
-                if (videoNames.SpeciesCount == 0 && GUILayout.Button(videoNamesDownload != null ? "Downloading..." : "Get the Japanese Pokémon names", GUILayout.Width(260)))
+                    : "Japanese names need PokeAPI's list of Pokémon names (a text file, downloaded once)."), Hint(ui));
+                if (videoNames.SpeciesCount == 0 && GUILayout.Button(Loc.T(videoNamesDownload != null ? "Downloading..." : "Get the Japanese Pokémon names"), GUILayout.Width(260)))
                     actions.Add(() => StartNamesDownload());
             }
-            if (!OcrAvailable) GUILayout.Label("Text is read with Windows' built-in OCR, so names, HP and numbers are only read on Windows.", ui.Error);
+            if (!OcrAvailable) GUILayout.Label(Loc.T("Text is read with Windows' built-in OCR, so names, HP and numbers are only read on Windows."), ui.Error);
             GUI.enabled = true;
 
             GUILayout.Space(4);
             if (videoJob == null)
             {
                 GUI.enabled = videoReady;
-                if (GUILayout.Button(session.Readings.Count > 0 ? "Read it again" : "Start reading", GUILayout.Height(30))) actions.Add(() => StartVideoReading());
+                if (GUILayout.Button(Loc.T(session.Readings.Count > 0 ? "Read it again" : "Start reading"), GUILayout.Height(30))) actions.Add(() => StartVideoReading());
                 GUI.enabled = true;
                 if (session.Readings.Count > 0)
-                    GUILayout.Label(session.Readings.Count + " moments read so far; reading again replaces them (for the stretch read) and finds the events again. "
-                                    + "Your tagged events are kept.", Hint(ui));
+                    GUILayout.Label(Loc.T(session.Readings.Count + " moments read so far; reading again replaces them (for the stretch read) and finds the events again. "
+                                    + "Your tagged events are kept."), Hint(ui));
             }
             else
             {
                 var job = videoJob;
                 float done = job.Total > 0 ? Mathf.Clamp01(job.Read / (float)job.Total) : 0f;
-                GUILayout.Label("Reading: " + job.Read + " of " + job.Total + " moments" + (job.OcrRunning ? " (OCR working...)" : "")
-                                + (job.State == 2 ? ", finishing the text." : "."), ui.Label);
+                GUILayout.Label(Loc.T("Reading: " + job.Read + " of " + job.Total + " moments" + (job.OcrRunning ? " (OCR working...)" : "")
+                                + (job.State == 2 ? ", finishing the text." : ".")), ui.Label);
                 var bar = GUILayoutUtility.GetRect(100, 14, GUILayout.ExpandWidth(true));
-                GUI.Box(bar, GUIContent.none);
+                GUI.Box(bar, Loc.T(GUIContent.none));
                 GUI.DrawTexture(new Rect(bar.x + 1, bar.y + 1, (bar.width - 2) * done, bar.height - 2), ui.Selected);
-                if (GUILayout.Button("Stop", GUILayout.Width(80))) actions.Add(() => job.Cancelled = true);
+                if (GUILayout.Button(Loc.T("Stop"), GUILayout.Width(80))) actions.Add(() => job.Cancelled = true);
             }
 
             if (videoUnknown.Count > 0)
             {
                 GUILayout.Space(6);
-                GUILayout.Label("Names that weren't recognised", ui.Title);
-                GUILayout.Label("Type the card's English name; it's remembered for every video after this.", Hint(ui));
+                GUILayout.Label(Loc.T("Names that weren't recognised"), ui.Title);
+                GUILayout.Label(Loc.T("Type the card's English name; it's remembered for every video after this."), Hint(ui));
                 foreach (var kv in videoUnknown.Take(25))
                 {
                     string shown = kv.Key;
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label(shown + "  (x" + kv.Value + ")", ui.Label, GUILayout.Width(170));
+                    GUILayout.Label(Loc.T(shown + "  (x" + kv.Value + ")"), ui.Label, GUILayout.Width(170));
                     string typed;
                     videoNameFixes.TryGetValue(shown, out typed);
                     string now = GUILayout.TextField(typed ?? "", GUILayout.MinWidth(120));
                     if (now != (typed ?? "")) videoNameFixes[shown] = now;
-                    if (GUILayout.Button("Save", GUILayout.Width(55))) actions.Add(() => SaveVideoNameFix(shown, videoNameFixes.ContainsKey(shown) ? videoNameFixes[shown] : ""));
+                    if (GUILayout.Button(Loc.T("Save"), GUILayout.Width(55))) actions.Add(() => SaveVideoNameFix(shown, videoNameFixes.ContainsKey(shown) ? videoNameFixes[shown] : ""));
                     GUILayout.EndHorizontal();
                 }
             }
@@ -462,16 +462,16 @@ namespace PokemonTCG.Presentation
             var session = videoSession;
             if (session == null)
             {
-                GUILayout.Label("Open a video first.", ui.Label);
+                GUILayout.Label(Loc.T("Open a video first."), ui.Label);
                 return;
             }
             var names = session.PlayerNames();
             int unsure = session.Events.Count(x => x.Enabled && (x.IsUnidentifiedAttack || !x.Sure));
-            GUILayout.Label(session.Events.Count + " events" + (unsure > 0 ? ", " + unsure + " to check (marked ?)" : "") + ". Click a time to see that moment. "
-                            + "Untick an event to leave it out.", Hint(ui));
+            GUILayout.Label(Loc.T(session.Events.Count + " events" + (unsure > 0 ? ", " + unsure + " to check (marked ?)" : "") + ". Click a time to see that moment. "
+                            + "Untick an event to leave it out."), Hint(ui));
             GUILayout.BeginHorizontal();
             GUI.enabled = session.Readings.Count > 0 && videoJob == null;
-            if (GUILayout.Button("Find the events again", GUILayout.Width(170))) actions.Add(() => RebuildVideoEvents());
+            if (GUILayout.Button(Loc.T("Find the events again"), GUILayout.Width(170))) actions.Add(() => RebuildVideoEvents());
             GUI.enabled = true;
             GUILayout.EndHorizontal();
 
@@ -482,15 +482,15 @@ namespace PokemonTCG.Presentation
                 var ev = session.Events[i];
                 int index = i;
                 GUILayout.BeginHorizontal();
-                bool on = GUILayout.Toggle(ev.Enabled, "", GUILayout.Width(18));
+                bool on = GUILayout.Toggle(ev.Enabled, Loc.T(""), GUILayout.Width(18));
                 if (on != ev.Enabled) actions.Add(() => ev.Enabled = on);
-                if (GUILayout.Button(ev.Setup ? "setup" : VideoEvent.Clock(ev.Time), GUILayout.Width(52))) actions.Add(() => SeekVideo(ev.Time));
+                if (GUILayout.Button(Loc.T(ev.Setup ? "setup" : VideoEvent.Clock(ev.Time)), GUILayout.Width(52))) actions.Add(() => SeekVideo(ev.Time));
                 bool check = ev.IsUnidentifiedAttack || !ev.Sure;
                 string text = (check ? "? " : "") + (ev.Manual ? "[tag] " : "") + ev.Describe(names).Substring(ev.Describe(names).IndexOf("  ", StringComparison.Ordinal) + 2);
                 var style = ev.Kind == VideoEventKind.Turn ? ui.Title : check ? ui.Error : ui.Label;
-                GUILayout.Label(text, style);
-                if (ev.IsUnidentifiedAttack && GUILayout.Button("Which?", GUILayout.Width(60))) actions.Add(() => videoAttackPick = videoAttackPick == index ? -1 : index);
-                if (GUILayout.Button("x", GUILayout.Width(22))) actions.Add(() => { session.Events.Remove(ev); videoAttackPick = -1; });
+                GUILayout.Label(Loc.T(text), style);
+                if (ev.IsUnidentifiedAttack && GUILayout.Button(Loc.T("Which?"), GUILayout.Width(60))) actions.Add(() => videoAttackPick = videoAttackPick == index ? -1 : index);
+                if (GUILayout.Button(Loc.T("x"), GUILayout.Width(22))) actions.Add(() => { session.Events.Remove(ev); videoAttackPick = -1; });
                 GUILayout.EndHorizontal();
                 if (videoAttackPick == index && ev.IsUnidentifiedAttack)
                 {
@@ -499,9 +499,9 @@ namespace PokemonTCG.Presentation
                     foreach (var choice in ev.Choices.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries))
                     {
                         string attack = choice;
-                        if (GUILayout.Button(attack)) actions.Add(() => { ev.Attack = attack; ev.Sure = true; videoAttackPick = -1; SaveVideoSession(); });
+                        if (GUILayout.Button(Loc.T(attack))) actions.Add(() => { ev.Attack = attack; ev.Sure = true; videoAttackPick = -1; SaveVideoSession(); });
                     }
-                    if (GUILayout.Button("Not an attack")) actions.Add(() => { ev.Kind = VideoEventKind.Counters; ev.Amount = ev.Amount / 10; ev.Sure = true; videoAttackPick = -1; });
+                    if (GUILayout.Button(Loc.T("Not an attack"))) actions.Add(() => { ev.Kind = VideoEventKind.Counters; ev.Amount = ev.Amount / 10; ev.Sure = true; videoAttackPick = -1; });
                     GUILayout.EndHorizontal();
                 }
             }
@@ -513,12 +513,12 @@ namespace PokemonTCG.Presentation
         private void DrawTagForm(UiStyles ui, List<Action> actions, VideoSession session, string[] names)
         {
             GUILayout.Space(6);
-            GUILayout.Label("Tag a moment (at " + VideoEvent.Clock(VideoTime) + ")", ui.Title);
-            GUILayout.Label("Add what the reader can't see: an attack it couldn't tell, an Ability, a Trainer card, a retreat, the end of a turn. "
-                            + "Names are the cards' English names.", Hint(ui));
-            int kind = GUILayout.SelectionGrid(tagKind, TagKindNames, 4);
+            GUILayout.Label(Loc.T("Tag a moment (at " + VideoEvent.Clock(VideoTime) + ")"), ui.Title);
+            GUILayout.Label(Loc.T("Add what the reader can't see: an attack it couldn't tell, an Ability, a Trainer card, a retreat, the end of a turn. "
+                            + "Names are the cards' English names."), Hint(ui));
+            int kind = GUILayout.SelectionGrid(tagKind, Loc.T(TagKindNames), 4);
             if (kind != tagKind) actions.Add(() => { tagKind = kind; tagError = null; });
-            int player = GUILayout.Toolbar(tagPlayer, new[] { names[0], names[1] });
+            int player = GUILayout.Toolbar(tagPlayer, Loc.T(new[] { names[0], names[1] }));
             if (player != tagPlayer) actions.Add(() => tagPlayer = player);
             var k = TagKinds[Mathf.Clamp(tagKind, 0, TagKinds.Length - 1)];
             switch (k)
@@ -542,12 +542,12 @@ namespace PokemonTCG.Presentation
                 case VideoEventKind.Energy:
                     TagField(ui, "Energy card:", ref tagCard);
                     TagField(ui, "To Pokémon:", ref tagCard2);
-                    tagSpot = GUILayout.Toolbar(tagSpot, new[] { "Active Spot", "Bench" });
+                    tagSpot = GUILayout.Toolbar(tagSpot, Loc.T(new[] { "Active Spot", "Bench" }));
                     break;
                 case VideoEventKind.Evolve:
                     TagField(ui, "Pokémon:", ref tagCard);
                     TagField(ui, "Evolved into:", ref tagCard2);
-                    tagSpot = GUILayout.Toolbar(tagSpot, new[] { "Active Spot", "Bench" });
+                    tagSpot = GUILayout.Toolbar(tagSpot, Loc.T(new[] { "Active Spot", "Bench" }));
                     break;
                 case VideoEventKind.Retreat:
                     TagField(ui, "Retreated Pokémon:", ref tagCard);
@@ -563,14 +563,14 @@ namespace PokemonTCG.Presentation
                     TagField(ui, "Battle log line:", ref tagText);
                     break;
             }
-            if (!string.IsNullOrEmpty(tagError)) GUILayout.Label(tagError, ui.Error);
-            if (GUILayout.Button("Add at " + VideoEvent.Clock(VideoTime), GUILayout.Width(160))) actions.Add(() => AddTag(session, k));
+            if (!string.IsNullOrEmpty(tagError)) GUILayout.Label(Loc.T(tagError), ui.Error);
+            if (GUILayout.Button(Loc.T("Add at " + VideoEvent.Clock(VideoTime)), GUILayout.Width(160))) actions.Add(() => AddTag(session, k));
         }
 
         private void TagField(UiStyles ui, string label, ref string value)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(label, ui.Label, GUILayout.Width(170));
+            GUILayout.Label(Loc.T(label), ui.Label, GUILayout.Width(170));
             value = GUILayout.TextField(value ?? "");
             GUILayout.EndHorizontal();
         }
@@ -671,45 +671,45 @@ namespace PokemonTCG.Presentation
             var session = videoSession;
             if (session == null)
             {
-                GUILayout.Label("Open a video first.", ui.Label);
+                GUILayout.Label(Loc.T("Open a video first."), ui.Label);
                 return;
             }
-            GUILayout.Label("The video is studied as a battle log: the AI learns from the plays it shows (attacks and where they "
+            GUILayout.Label(Loc.T("The video is studied as a battle log: the AI learns from the plays it shows (attacks and where they "
                             + "went for both players; plays from the hand only when you tagged them, and those don't count as decisions "
-                            + "since the hand isn't known). The winner's plays count fully, the loser's half.", Hint(ui));
+                            + "since the hand isn't known). The winner's plays count fully, the loser's half."), Hint(ui));
             for (int p = 0; p < 2; p++)
             {
                 int seat = p;
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(p == 0 ? "Left player:" : "Right player:", ui.Label, GUILayout.Width(95));
+                GUILayout.Label(Loc.T(p == 0 ? "Left player:" : "Right player:"), ui.Label, GUILayout.Width(95));
                 string typed = GUILayout.TextField(session.Names[p] ?? "");
                 if (typed != (session.Names[p] ?? "")) actions.Add(() => session.Names[seat] = typed);
                 GUILayout.EndHorizontal();
             }
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Went first:", ui.Label, GUILayout.Width(95));
-            int first = GUILayout.Toolbar(session.FirstPlayer + 1, new[] { "Not known", "Left", "Right" });
+            GUILayout.Label(Loc.T("Went first:"), ui.Label, GUILayout.Width(95));
+            int first = GUILayout.Toolbar(session.FirstPlayer + 1, Loc.T(new[] { "Not known", "Left", "Right" }));
             if (first != session.FirstPlayer + 1) actions.Add(() => { session.FirstPlayer = first - 1; RebuildVideoEvents(); });
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Won:", ui.Label, GUILayout.Width(95));
-            int winner = GUILayout.Toolbar(session.Winner + 1, new[] { "Not known", "Left", "Right" });
+            GUILayout.Label(Loc.T("Won:"), ui.Label, GUILayout.Width(95));
+            int winner = GUILayout.Toolbar(session.Winner + 1, Loc.T(new[] { "Not known", "Left", "Right" }));
             if (winner != session.Winner + 1) actions.Add(() => session.Winner = winner - 1);
             GUILayout.EndHorizontal();
 
-            GUILayout.Label("The battle log it makes:", ui.Label);
+            GUILayout.Label(Loc.T("The battle log it makes:"), ui.Label);
             string log = session.BuildLog();
             videoLogScroll = GUILayout.BeginScrollView(videoLogScroll, GUI.skin.box, GUILayout.Height(Mathf.Max(160f, UiScale.Height * 0.3f)));
-            GUILayout.Label(log, Hint(ui));
+            GUILayout.Label(Loc.T(log), Hint(ui));
             GUILayout.EndScrollView();
 
             bool busy = videoStudyRunning || brain == null || (trainView != null && trainView.Running) || studyRunningView;
             GUI.enabled = !busy && session.Events.Count > 0;
-            if (GUILayout.Button(session.Studied ? "Study it again (it counts again)" : "Study this video", GUILayout.Height(30)))
+            if (GUILayout.Button(Loc.T(session.Studied ? "Study it again (it counts again)" : "Study this video"), GUILayout.Height(30)))
                 actions.Add(() => { SaveVideoSession(); StudyVideo(); });
             GUI.enabled = true;
-            if (trainView != null && trainView.Running) GUILayout.Label("Videos can be studied once training has finished.", Hint(ui));
-            if (!string.IsNullOrEmpty(videoStudyResult)) GUILayout.Label(videoStudyResult, videoStudyRunning ? ui.Label : ui.Good);
+            if (trainView != null && trainView.Running) GUILayout.Label(Loc.T("Videos can be studied once training has finished."), Hint(ui));
+            if (!string.IsNullOrEmpty(videoStudyResult)) GUILayout.Label(Loc.T(videoStudyResult), videoStudyRunning ? ui.Label : ui.Good);
         }
     }
 }

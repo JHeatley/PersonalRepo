@@ -264,47 +264,47 @@ namespace PokemonTCG.Presentation
 
         private void DrawLogStudyPanel(UiStyles ui, List<Action> actions, bool training)
         {
-            GUILayout.Label("Study game logs", ui.Title);
-            GUILayout.Label("Show the AI games to learn from: a Pokémon TCG Live battle log (paste it below, or save exported logs as .txt files in the "
+            GUILayout.Label(Loc.T("Study game logs"), ui.Title);
+            GUILayout.Label(Loc.T("Show the AI games to learn from: a Pokémon TCG Live battle log (paste it below, or save exported logs as .txt files in the "
                             + "Game logs folder), and the games played in this app (each one is saved there when it ends). It rebuilds every decision "
                             + "in the game with the options the player had and learns from it, the winner's plays fully and the loser's half. "
                             + "In a TCG Live log the log owner's hand is known, so all their plays count; the opponent's hidden hand means only "
-                            + "their attacks, Abilities, retreats and turn ends do.", Hint(ui));
+                            + "their attacks, Abilities, retreats and turn ends do."), Hint(ui));
             bool busy = studyRunningView || training || brain == null;
 
-            GUILayout.Label("Paste a TCG Live battle log:", ui.Label);
+            GUILayout.Label(Loc.T("Paste a TCG Live battle log:"), ui.Label);
             pasteScroll = GUILayout.BeginScrollView(pasteScroll, GUILayout.Height(110));
             pasteLog = GUILayout.TextArea(pasteLog ?? "", GUILayout.ExpandHeight(true));
             GUILayout.EndScrollView();
             GUILayout.BeginHorizontal();
             GUI.enabled = !busy && !string.IsNullOrEmpty(pasteLog) && pasteLog.Trim().Length > 0;
-            if (GUILayout.Button("Study this log", GUILayout.Width(160))) actions.Add(() => StudyPastedLog());
+            if (GUILayout.Button(Loc.T("Study this log"), GUILayout.Width(160))) actions.Add(() => StudyPastedLog());
             GUI.enabled = !busy;
-            if (GUILayout.Button("Paste from clipboard", GUILayout.Width(170))) actions.Add(() => pasteLog = GUIUtility.systemCopyBuffer ?? "");
+            if (GUILayout.Button(Loc.T("Paste from clipboard"), GUILayout.Width(170))) actions.Add(() => pasteLog = GUIUtility.systemCopyBuffer ?? "");
             GUILayout.EndHorizontal();
             // Two rows of two: four in a row are wider than the Train screen's panel.
             GUILayout.BeginHorizontal();
             string newLabel = newLogsView > 0 ? "Study new logs in the folder (" + newLogsView + ")" : "Study new logs in the folder";
             GUI.enabled = !busy && newLogsView != 0;
-            if (GUILayout.Button(newLabel, GUILayout.Width(250))) actions.Add(() => StudyNewLogs());
+            if (GUILayout.Button(Loc.T(newLabel), GUILayout.Width(250))) actions.Add(() => StudyNewLogs());
             GUI.enabled = true;
-            if (GUILayout.Button("Open the Game logs folder", GUILayout.Width(200))) actions.Add(() => SavePaths.OpenInFileBrowser(GameLogFolder));
+            if (GUILayout.Button(Loc.T("Open the Game logs folder"), GUILayout.Width(200))) actions.Add(() => SavePaths.OpenInFileBrowser(GameLogFolder));
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             GUI.enabled = !training;
-            if (GUILayout.Button("Learn from a video...", GUILayout.Width(200))) actions.Add(() => OpenVideoScreen());
+            if (GUILayout.Button(Loc.T("Learn from a video..."), GUILayout.Width(200))) actions.Add(() => OpenVideoScreen());
             GUI.enabled = true;
-            GUILayout.Label("Stream footage with an overlay, TCG Live recordings or a camera over the table (v77).", Hint(ui));
+            GUILayout.Label(Loc.T("Stream footage with an overlay, TCG Live recordings or a camera over the table (v77)."), Hint(ui));
             GUILayout.EndHorizontal();
-            if (training) GUILayout.Label("Logs can be studied once training has finished.", Hint(ui));
-            if (!string.IsNullOrEmpty(studyProgressView)) GUILayout.Label(studyProgressView, studyRunningView ? ui.Label : ui.Good);
+            if (training) GUILayout.Label(Loc.T("Logs can be studied once training has finished."), Hint(ui));
+            if (!string.IsNullOrEmpty(studyProgressView)) GUILayout.Label(Loc.T(studyProgressView), studyRunningView ? ui.Label : ui.Good);
             if (studyRowsView.Count > 0)
             {
                 float listMax = Mathf.Clamp(UiScale.Height * 0.25f, 120f, 300f);
                 var rows = studyRowsView;
                 studyScroll = DrawScrollList(ui, studyScroll, rows.Count, listMax, k => "   " + rows[k]);
             }
-            GUILayout.Label("Game logs folder: " + GameLogFolder, Hint(ui));
+            GUILayout.Label(Loc.T("Game logs folder: " + GameLogFolder), Hint(ui));
             GUILayout.Space(8);
         }
     }

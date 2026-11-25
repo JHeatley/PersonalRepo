@@ -468,9 +468,9 @@ namespace PokemonTCG.Presentation
 
         private void DrawDeckList(Rect area, UiStyles ui, List<System.Action> actions)
         {
-            GUI.Box(area, GUIContent.none);
+            GUI.Box(area, Loc.T(GUIContent.none));
             GUILayout.BeginArea(new Rect(area.x + 8, area.y + 8, area.width - 16, area.height - 16));
-            GUILayout.Label("Decks", ui.Title);
+            GUILayout.Label(Loc.T("Decks"), ui.Title);
             deckListScroll = GUILayout.BeginScrollView(deckListScroll);
             foreach (var d in decks)
             {
@@ -479,33 +479,33 @@ namespace PokemonTCG.Presentation
                 if (confirmDelete == deck)
                 {
                     // v123: delete from the list, after a second press.
-                    GUILayout.Label((deck.BuiltIn ? "Remove the built-in deck \"" : "Delete \"") + deck.Name + "\"?", ui.Error);
+                    GUILayout.Label(Loc.T((deck.BuiltIn ? "Remove the built-in deck \"" : "Delete \"") + deck.Name + "\"?"), ui.Error);
                     GUILayout.BeginHorizontal();
-                    if (GUILayout.Button(deck.BuiltIn ? "Remove" : "Delete")) actions.Add(() => DeleteFromList(deck));
-                    if (GUILayout.Button("Cancel")) actions.Add(() => confirmDelete = null);
+                    if (GUILayout.Button(Loc.T(deck.BuiltIn ? "Remove" : "Delete"))) actions.Add(() => DeleteFromList(deck));
+                    if (GUILayout.Button(Loc.T("Cancel"))) actions.Add(() => confirmDelete = null);
                     GUILayout.EndHorizontal();
                     continue;
                 }
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Toggle(selected, deck.Label, ui.Button) && !selected) actions.Add(() => Load(deck));
-                if (GUILayout.Button("X", GUILayout.Width(26))) actions.Add(() => confirmDelete = deck);
+                if (GUILayout.Toggle(selected, Loc.T(deck.Label), ui.Button) && !selected) actions.Add(() => Load(deck));
+                if (GUILayout.Button(Loc.T("X"), GUILayout.Width(26))) actions.Add(() => confirmDelete = deck);
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndScrollView();
-            if (GUILayout.Button("New deck")) actions.Add(NewDeck);
+            if (GUILayout.Button(Loc.T("New deck"))) actions.Add(NewDeck);
             int hiddenCount = hiddenBuiltIns;
-            if (hiddenCount > 0 && GUILayout.Button("Restore built-in decks (" + hiddenCount + ")")) actions.Add(RestoreBuiltIns);
-            if (GUILayout.Button("Formats...")) actions.Add(() => WantsFormats = true);
+            if (hiddenCount > 0 && GUILayout.Button(Loc.T("Restore built-in decks (" + hiddenCount + ")"))) actions.Add(RestoreBuiltIns);
+            if (GUILayout.Button(Loc.T("Formats..."))) actions.Add(() => WantsFormats = true);
             GUILayout.Space(8);
-            if (GUILayout.Button("Back to menu")) actions.Add(() => WantsClose = true);
+            if (GUILayout.Button(Loc.T("Back to menu"))) actions.Add(() => WantsClose = true);
             GUILayout.EndArea();
         }
 
         private void DrawPool(Rect area, UiStyles ui, List<System.Action> actions, string activeSearch, int activeFilter, bool images)
         {
-            GUI.Box(area, GUIContent.none);
+            GUI.Box(area, Loc.T(GUIContent.none));
             GUILayout.BeginArea(new Rect(area.x + 8, area.y + 8, area.width - 16, area.height - 16));
-            GUILayout.Label("Card pool (" + pool.Count + " cards implemented)", ui.Title);
+            GUILayout.Label(Loc.T("Card pool (" + pool.Count + " cards implemented)"), ui.Title);
             // The tabs are cumulative, like the formats: Expanded shows Standard cards too, Unlimited shows every card.
             var tabs = new List<string>
             {
@@ -515,39 +515,39 @@ namespace PokemonTCG.Presentation
             };
             // A custom format's deck (v123): a fourth tab with exactly the cards it allows.
             if (custom != null) tabs.Add(custom.Name + " (" + CustomPoolCount() + ")");
-            int newCategory = GUILayout.Toolbar(Mathf.Min(category, tabs.Count - 1), tabs.ToArray());
+            int newCategory = GUILayout.Toolbar(Mathf.Min(category, tabs.Count - 1), Loc.T(tabs.ToArray()));
             if (newCategory != category) actions.Add(() => category = newCategory);
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Search", GUILayout.Width(50));
+            GUILayout.Label(Loc.T("Search"), GUILayout.Width(50));
             search = GUILayout.TextField(search ?? "");
             GUILayout.EndHorizontal();
-            filter = GUILayout.Toolbar(filter, Filters);
+            filter = GUILayout.Toolbar(filter, Loc.T(Filters));
             DrawSetRow(ui, actions);
 
             GUILayout.BeginHorizontal();
-            bool toggled = GUILayout.Toggle(images, " Card images", GUILayout.Width(120));
+            bool toggled = GUILayout.Toggle(images, Loc.T(" Card images"), GUILayout.Width(120));
             if (toggled != images) actions.Add(() => showImages = toggled);
-            GUILayout.Label(imagesFound + " of " + pool.Count + " cards have an image" + (altImagesFound > 0 ? " (+" + altImagesFound + " alternate arts)" : ""), Hint(ui));
+            GUILayout.Label(Loc.T(imagesFound + " of " + pool.Count + " cards have an image" + (altImagesFound > 0 ? " (+" + altImagesFound + " alternate arts)" : "")), Hint(ui));
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Reload images", GUILayout.Width(120))) actions.Add(ReloadImages);
+            if (GUILayout.Button(Loc.T("Reload images"), GUILayout.Width(120))) actions.Add(ReloadImages);
             GUILayout.EndHorizontal();
-            bool missingToggled = GUILayout.Toggle(missingImagesOnly, " Only cards missing an image (" + (pool.Count - imagesFound) + ")");
+            bool missingToggled = GUILayout.Toggle(missingImagesOnly, Loc.T(" Only cards missing an image (" + (pool.Count - imagesFound) + ")"));
             if (missingToggled != missingImagesOnly) actions.Add(() => { missingImagesOnly = missingToggled; poolScroll = Vector2.zero; });
             if (imagesFound == 0)
-                GUILayout.Label("No card images found. Put PNG or JPG files named like TWM_130.png in Assets/StreamingAssets/CardImages.", Hint(ui));
+                GUILayout.Label(Loc.T("No card images found. Put PNG or JPG files named like TWM_130.png in Assets/StreamingAssets/CardImages."), Hint(ui));
             if (custom != null && category < 3)
-                GUILayout.Label("Showing a built-in format's cards. This deck is for " + custom.Name + ": only the cards on its tab can go in.", Hint(ui));
+                GUILayout.Label(Loc.T("Showing a built-in format's cards. This deck is for " + custom.Name + ": only the cards on its tab can go in."), Hint(ui));
             if (custom == null && category == 1 && format == DeckFormat.Standard)
-                GUILayout.Label("Showing every Expanded card. Only the Standard ones (H and later) can go in a Standard deck; set this deck's format to Expanded (right) to use the rest.", Hint(ui));
+                GUILayout.Label(Loc.T("Showing every Expanded card. Only the Standard ones (H and later) can go in a Standard deck; set this deck's format to Expanded (right) to use the rest."), Hint(ui));
             if (custom == null && category == 2 && format != DeckFormat.Unlimited)
-                GUILayout.Label("Showing every card. Cards first printed before Black & White are Unlimited only; set this deck's format to Unlimited (right) to use them.", Hint(ui));
-            GUILayout.Label(images
+                GUILayout.Label(Loc.T("Showing every card. Cards first printed before Black & White are Unlimited only; set this deck's format to Unlimited (right) to use them."), Hint(ui));
+            GUILayout.Label(Loc.T(images
                 ? "Drag a card onto your deck to add it, or from your deck back here to remove it. Click a card to see it and pick its art."
-                : "Press + to add a card. Click a card's name to see it and pick its art.", Hint(ui));
+                : "Press + to add a card. Click a card's name to see it and pick its art."), Hint(ui));
 
             var cards = pool.Where(c => MatchesFilter(c, activeSearch, activeFilter, category) && InSetFilter(c) && InImageFilter(c)).ToList();
             if (missingImagesOnly)
-                GUILayout.Label(cards.Count == 0 ? "Every card shown here has an image." : cards.Count + " cards shown here have no image yet.", Hint(ui));
+                GUILayout.Label(Loc.T(cards.Count == 0 ? "Every card shown here has an image." : cards.Count + " cards shown here have no image yet."), Hint(ui));
             if (images)
             {
                 DrawPoolGrid(TakeRemainingRect(), cards, ui);
@@ -561,11 +561,11 @@ namespace PokemonTCG.Presentation
                 var card = c;
                 GUILayout.BeginHorizontal();
                 GUI.enabled = !modal && CanAdd(ArtFor(card));
-                if (GUILayout.Button("+", GUILayout.Width(28))) actions.Add(() => AddCard(card));
+                if (GUILayout.Button(Loc.T("+"), GUILayout.Width(28))) actions.Add(() => AddCard(card));
                 GUI.enabled = !modal;
                 int n = CountCard(card);
                 var shownArt = ArtFor(card);
-                if (GUILayout.Button((n > 0 ? n + "x  " : "") + card.Name + "   <size=11>" + shownArt.SetCode + " " + shownArt.Number + " - " + CardText.Short(card) + "</size>",
+                if (GUILayout.Button(Loc.T((n > 0 ? n + "x  " : "") + card.Name + "   <size=11>" + shownArt.SetCode + " " + shownArt.Number + " - " + CardText.Short(card) + "</size>"),
                     RichLabel(ui)))
                     actions.Add(() => OpenDetail(card, Zone.Pool));
                 GUILayout.EndHorizontal();
@@ -614,38 +614,38 @@ namespace PokemonTCG.Presentation
 
         private void DrawDeck(Rect area, UiStyles ui, List<System.Action> actions, bool images)
         {
-            GUI.Box(area, GUIContent.none);
+            GUI.Box(area, Loc.T(GUIContent.none));
             GUILayout.BeginArea(new Rect(area.x + 8, area.y + 8, area.width - 16, area.height - 16));
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Deck name", GUILayout.Width(80));
+            GUILayout.Label(Loc.T("Deck name"), GUILayout.Width(80));
             deckName = GUILayout.TextField(deckName ?? "");
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Format", GUILayout.Width(80));
+            GUILayout.Label(Loc.T("Format"), GUILayout.Width(80));
             // The built-in formats and your custom ones (v123).
             var formats = AllFormats();
             int current = custom != null ? formats.FindIndex(f => f.Custom == custom) : (int)format;
             if (current < 0) current = (int)format;
-            int newFormat = GUILayout.SelectionGrid(current, formats.Select(f => f.Name).ToArray(), Mathf.Min(4, formats.Count));
+            int newFormat = GUILayout.SelectionGrid(current, Loc.T(formats.Select(f => f.Name).ToArray()), Mathf.Min(4, formats.Count));
             if (newFormat != current && newFormat >= 0 && newFormat < formats.Count)
             {
                 var picked = formats[newFormat];
                 actions.Add(() => { if (picked.IsCustom) SetCustomFormat(picked.Custom); else SetFormat(picked.BuiltIn); });
             }
-            if (GUILayout.Button("Formats...", GUILayout.Width(90))) actions.Add(() => WantsFormats = true);
+            if (GUILayout.Button(Loc.T("Formats..."), GUILayout.Width(90))) actions.Add(() => WantsFormats = true);
             GUILayout.EndHorizontal();
-            GUILayout.Label(custom != null ? FormatSummary(custom)
-                : format == DeckFormat.Standard ? "H and later only" : format == DeckFormat.Expanded ? "Black & White and later" : "any card in the pool", Hint(ui));
+            GUILayout.Label(Loc.T(custom != null ? FormatSummary(custom)
+                : format == DeckFormat.Standard ? "H and later only" : format == DeckFormat.Expanded ? "Black & White and later" : "any card in the pool"), Hint(ui));
 
             var entries = Entries();
             int pokemon = entries.Where(e => e.Card.IsPokemon).Sum(e => e.Count);
             int trainers = entries.Where(e => e.Card.IsTrainer).Sum(e => e.Count);
             int energy = entries.Where(e => e.Card.IsEnergy).Sum(e => e.Count);
-            GUILayout.Label("Pokémon " + pokemon + "   Trainer " + trainers + "   Energy " + energy + "   Total " + (pokemon + trainers + energy) + " / " + deckFmt.DeckSize, ui.Title);
+            GUILayout.Label(Loc.T("Pokémon " + pokemon + "   Trainer " + trainers + "   Energy " + energy + "   Total " + (pokemon + trainers + energy) + " / " + deckFmt.DeckSize), ui.Title);
 
             var problems = deckFmt.Validate(Expanded());
-            if (problems.Count == 0) GUILayout.Label("Legal for " + deckFmt.Name + " and ready to play.", ui.Good);
-            else foreach (var p in problems) GUILayout.Label(p, ui.Error);
+            if (problems.Count == 0) GUILayout.Label(Loc.T("Legal for " + deckFmt.Name + " and ready to play."), ui.Good);
+            else foreach (var p in problems) GUILayout.Label(Loc.T(p), ui.Error);
 
             if (images)
             {
@@ -661,24 +661,24 @@ namespace PokemonTCG.Presentation
             }
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Save")) actions.Add(() => Save(false));
-            if (GUILayout.Button("Save as copy")) actions.Add(() => Save(true));
+            if (GUILayout.Button(Loc.T("Save"))) actions.Add(() => Save(false));
+            if (GUILayout.Button(Loc.T("Save as copy"))) actions.Add(() => Save(true));
             GUI.enabled = !modal && editing != null && !editing.BuiltIn;
-            if (GUILayout.Button("Delete")) actions.Add(DeleteCurrent);
+            if (GUILayout.Button(Loc.T("Delete"))) actions.Add(DeleteCurrent);
             GUI.enabled = !modal;
-            if (GUILayout.Button("Clear")) actions.Add(() => { order.Clear(); counts.Clear(); art.Clear(); });
+            if (GUILayout.Button(Loc.T("Clear"))) actions.Add(() => { order.Clear(); counts.Clear(); art.Clear(); });
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Import deck list")) actions.Add(() => { importOpen = true; importText = ""; importScroll = Vector2.zero; });
-            if (GUILayout.Button("Copy deck list")) actions.Add(CopyToClipboard);
+            if (GUILayout.Button(Loc.T("Import deck list"))) actions.Add(() => { importOpen = true; importText = ""; importScroll = Vector2.zero; });
+            if (GUILayout.Button(Loc.T("Copy deck list"))) actions.Add(CopyToClipboard);
             GUILayout.EndHorizontal();
             // The AI's advice knows the built-in formats' 60-card, 4-copy decks, not custom formats (v123).
             GUI.enabled = !modal && custom == null;
-            if (GUILayout.Button(custom == null ? "AI deck advice" : "AI deck advice (built-in formats only)")) actions.Add(() => OpenAdvice());
+            if (GUILayout.Button(Loc.T(custom == null ? "AI deck advice" : "AI deck advice (built-in formats only)"))) actions.Add(() => OpenAdvice());
             GUI.enabled = !modal;
 
-            if (!string.IsNullOrEmpty(status)) GUILayout.Label(status, statusIsError ? ui.Error : ui.Label);
+            if (!string.IsNullOrEmpty(status)) GUILayout.Label(Loc.T(status), statusIsError ? ui.Error : ui.Label);
             GUILayout.EndArea();
         }
 
@@ -686,16 +686,16 @@ namespace PokemonTCG.Presentation
         {
             var list = items.ToList();
             if (list.Count == 0) return;
-            GUILayout.Label(title + " (" + list.Sum(e => e.Count) + ")", ui.Title);
+            GUILayout.Label(Loc.T(title + " (" + list.Sum(e => e.Count) + ")"), ui.Title);
             foreach (var e in list)
             {
                 var card = e.Card;
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button("-", GUILayout.Width(28))) actions.Add(() => Remove(card));
+                if (GUILayout.Button(Loc.T("-"), GUILayout.Width(28))) actions.Add(() => Remove(card));
                 GUI.enabled = !modal && CanAdd(card);
-                if (GUILayout.Button("+", GUILayout.Width(28))) actions.Add(() => Add(card, 1, true));
+                if (GUILayout.Button(Loc.T("+"), GUILayout.Width(28))) actions.Add(() => Add(card, 1, true));
                 GUI.enabled = !modal;
-                if (GUILayout.Button(e.Count + "  " + card.Name + "   <size=11>" + card.SetCode + " " + card.Number + "</size>", RichLabel(ui)))
+                if (GUILayout.Button(Loc.T(e.Count + "  " + card.Name + "   <size=11>" + card.SetCode + " " + card.Number + "</size>"), RichLabel(ui)))
                     actions.Add(() => OpenDetail(card, Zone.Deck));
                 GUILayout.EndHorizontal();
                 TrackHover(card);
@@ -746,13 +746,13 @@ namespace PokemonTCG.Presentation
             bool mouseInView = view.Contains(Event.current.mousePosition);
             deckScroll = GUI.BeginScrollView(view, deckScroll, content);
             if (entries.Count == 0)
-                GUI.Label(new Rect(0f, 0f, content.width, 60f), "Drag cards here from the card pool.", Hint(ui));
+                GUI.Label(new Rect(0f, 0f, content.width, 60f), Loc.T("Drag cards here from the card pool."), Hint(ui));
             float y = 0f;
             foreach (var sec in sections)
             {
                 var list = sec.Value;
                 if (list.Count == 0) continue;
-                GUI.Label(new Rect(0f, y, content.width, headerH), sec.Key + " (" + list.Sum(e => e.Count) + ")", ui.Title);
+                GUI.Label(new Rect(0f, y, content.width, headerH), Loc.T(sec.Key + " (" + list.Sum(e => e.Count) + ")"), ui.Title);
                 y += headerH;
                 for (int k = 0; k < list.Count; k++)
                 {
@@ -762,9 +762,9 @@ namespace PokemonTCG.Presentation
                     Tile(r, card, card, list[k].Count, mouseInView, Zone.Deck, ui);
                     var minus = new Rect(r.x, r.yMax + 1f, DeckTileW / 2f - 1f, TileButtonsH - 2f);
                     var plus = new Rect(r.x + DeckTileW / 2f + 1f, r.yMax + 1f, DeckTileW / 2f - 1f, TileButtonsH - 2f);
-                    if (GUI.Button(minus, "-")) actions.Add(() => Remove(card));
+                    if (GUI.Button(minus, Loc.T("-"))) actions.Add(() => Remove(card));
                     GUI.enabled = !modal && CanAdd(card);
-                    if (GUI.Button(plus, "+")) actions.Add(() => Add(card, 1, true));
+                    if (GUI.Button(plus, Loc.T("+"))) actions.Add(() => Add(card, 1, true));
                     GUI.enabled = !modal;
                 }
                 y += ((list.Count + perRow - 1) / perRow) * rowH;
@@ -793,7 +793,7 @@ namespace PokemonTCG.Presentation
                 {
                     var badge = new Rect(r.xMax - 32f, r.y + 4f, 28f, 20f);
                     GUI.DrawTexture(badge, ui.BadgeBackground);
-                    GUI.Label(badge, "×" + count, ui.Badge);
+                    GUI.Label(badge, Loc.T("×" + count), ui.Badge);
                 }
                 if (hover && !dragging)
                 {
@@ -826,8 +826,8 @@ namespace PokemonTCG.Presentation
             GUI.DrawTexture(r, CardVisuals.Solid(color));
             var inner = new Rect(r.x + 4f, r.y + 4f, r.width - 8f, r.height - 8f);
             GUI.DrawTexture(inner, CardVisuals.Solid(Color.Lerp(color, Color.white, 0.55f)));
-            GUI.Label(new Rect(inner.x + 2f, inner.y + 4f, inner.width - 4f, inner.height * 0.6f), card.Name, PlaceholderName(ui));
-            GUI.Label(new Rect(inner.x + 2f, inner.yMax - 36f, inner.width - 4f, 34f), card.SetCode + " " + card.Number + "\n" + CardText.Short(card), ui.Small);
+            GUI.Label(new Rect(inner.x + 2f, inner.y + 4f, inner.width - 4f, inner.height * 0.6f), Loc.T(card.Name), PlaceholderName(ui));
+            GUI.Label(new Rect(inner.x + 2f, inner.yMax - 36f, inner.width - 4f, 34f), Loc.T(card.SetCode + " " + card.Number + "\n" + CardText.Short(card)), ui.Small);
         }
 
         private static void DrawFrame(Rect r, Texture2D tex, float t)
@@ -858,7 +858,7 @@ namespace PokemonTCG.Presentation
             {
                 var b = new Rect(r.x, r.yMax + 2f, r.width, 22f);
                 GUI.DrawTexture(b, ui.BadgeBackground);
-                GUI.Label(b, tip, ui.Badge);
+                GUI.Label(b, Loc.T(tip), ui.Badge);
             }
         }
 
@@ -868,7 +868,7 @@ namespace PokemonTCG.Presentation
             var tex = ImageFor(card);
             string text = CardText.Describe(card);
             const float textW = 300f;
-            float textH = ui.Tooltip.CalcHeight(new GUIContent(text), textW);
+            float textH = ui.Tooltip.CalcHeight(new GUIContent(Loc.T(text)), textW);
             float imgH = tex != null ? Mathf.Min(380f, UiScale.Height - 20f) : 0f;
             float imgW = tex != null ? imgH * tex.width / tex.height : 0f;
             float gap = tex != null ? 8f : 0f;
@@ -878,7 +878,7 @@ namespace PokemonTCG.Presentation
             x = Mathf.Max(10f, x);
             float y = Mathf.Clamp(mouse.y - 60f, 10f, Mathf.Max(10f, UiScale.Height - Mathf.Max(imgH, textH) - 10f));
             if (tex != null) GUI.DrawTexture(new Rect(x, y, imgW, imgH), tex, ScaleMode.ScaleToFit);
-            GUI.Box(new Rect(x + imgW + gap, y, textW, textH), text, ui.Tooltip);
+            GUI.Box(new Rect(x + imgW + gap, y, textW, textH), Loc.T(text), ui.Tooltip);
         }
 
         /// <summary>The printing's image (loading it now if needed), or null when it has none.</summary>
@@ -949,13 +949,13 @@ namespace PokemonTCG.Presentation
             var tex = ImageFor(shown);
             if (tex != null) GUI.DrawTexture(cardRect, tex, ScaleMode.ScaleToFit);
             else DrawPlaceholder(cardRect, shown, ui);
-            GUI.Box(textRect, CardText.Describe(shown), ui.Tooltip);
+            GUI.Box(textRect, Loc.T(CardText.Describe(shown)), ui.Tooltip);
 
             int index = detailList.IndexOf(card);
             GUI.enabled = index > 0;
-            if (GUI.Button(leftArrow, "‹", ArrowStyle(ui))) actions.Add(() => Navigate(-1));
+            if (GUI.Button(leftArrow, Loc.T("‹"), ArrowStyle(ui))) actions.Add(() => Navigate(-1));
             GUI.enabled = index >= 0 && index < detailList.Count - 1;
-            if (GUI.Button(rightArrow, "›", ArrowStyle(ui))) actions.Add(() => Navigate(1));
+            if (GUI.Button(rightArrow, Loc.T("›"), ArrowStyle(ui))) actions.Add(() => Navigate(1));
             GUI.enabled = true;
 
             // Art picker, In deck count, - and +.
@@ -964,18 +964,18 @@ namespace PokemonTCG.Presentation
             var printings = db.PrintingsOf(card);
             string artText = "Art:  " + PrintLabel(shown) + (printings.Count > 1 ? (artMenuOpen ? "   ▲" : "   ▼  (" + printings.Count + " versions)") : "");
             GUI.enabled = printings.Count > 1;
-            if (GUI.Button(artButton, artText)) actions.Add(() => artMenuOpen = !artMenuOpen);
+            if (GUI.Button(artButton, Loc.T(artText))) actions.Add(() => artMenuOpen = !artMenuOpen);
             GUI.enabled = true;
 
             int inDeck = CountCard(card);
             var inDeckRect = new Rect(cardRect.center.x - 100f, cy + 46f, 200f, 44f);
-            GUI.Label(inDeckRect, "IN DECK   " + inDeck + (card.IsBasicEnergy || card.AnyNumberInDeck ? "" : " / " + (custom != null ? custom.MaxCopies : 4)), BigLabel(ui));
+            GUI.Label(inDeckRect, Loc.T("IN DECK   " + inDeck + (card.IsBasicEnergy || card.AnyNumberInDeck ? "" : " / " + (custom != null ? custom.MaxCopies : 4))), BigLabel(ui));
             var minus = new Rect(inDeckRect.x - 140f, cy + 46f, 124f, 44f);
             var plus = new Rect(inDeckRect.xMax + 16f, cy + 46f, 124f, 44f);
             GUI.enabled = !artMenuOpen && inDeck > 0;
-            if (GUI.Button(minus, "−", BigButton(ui))) actions.Add(() => RemoveCard(card));
+            if (GUI.Button(minus, Loc.T("−"), BigButton(ui))) actions.Add(() => RemoveCard(card));
             GUI.enabled = !artMenuOpen && CanAdd(shown);
-            if (GUI.Button(plus, "+", BigButton(ui))) actions.Add(() => AddCard(card));
+            if (GUI.Button(plus, Loc.T("+"), BigButton(ui))) actions.Add(() => AddCard(card));
             GUI.enabled = true;
             string blocked = AddBlockReason(shown);
             var cardCategory = Formats.CategoryOf(card);
@@ -985,10 +985,10 @@ namespace PokemonTCG.Presentation
             if (card.IsEnergy && card.IsBasicEnergy) categoryNote = "Basic Energy";
             string fix = blocked == "Expanded only" ? ": set this deck's format to Expanded to add it."
                 : blocked == "Unlimited only" ? ": set this deck's format to Unlimited to add it." : "";
-            GUI.Label(new Rect(minus.x, minus.yMax + 6f, plus.xMax - minus.x, 22f), categoryNote + fix, BigHint(ui));
+            GUI.Label(new Rect(minus.x, minus.yMax + 6f, plus.xMax - minus.x, 22f), Loc.T(categoryNote + fix), BigHint(ui));
 
             var close = new Rect(UiScale.Width - 140f, 16f, 120f, 34f);
-            if (GUI.Button(close, "Close")) actions.Add(CloseDetail);
+            if (GUI.Button(close, Loc.T("Close"))) actions.Add(CloseDetail);
 
             // The art list opens upwards over the card picture, so it never covers the buttons.
             Rect menu = new Rect();
@@ -1049,7 +1049,7 @@ namespace PokemonTCG.Presentation
                 if (row.yMax < artScroll.y || row.y > artScroll.y + view.height) continue;
                 bool own = CardVisuals.HasOwnImageFile(p);
                 bool current = p.Key == shown.Key;
-                if (GUI.Button(row, GUIContent.none)) actions.Add(() => { SetArt(card, p); artMenuOpen = false; });
+                if (GUI.Button(row, Loc.T(GUIContent.none))) actions.Add(() => { SetArt(card, p); artMenuOpen = false; });
                 if (Event.current.type == EventType.Repaint)
                 {
                     var thumb = new Rect(row.x + 4f, row.y + 3f, (row.height - 6f) * 63f / 88f, row.height - 6f);
@@ -1057,7 +1057,7 @@ namespace PokemonTCG.Presentation
                     if (tex != null) GUI.DrawTexture(thumb, tex, ScaleMode.ScaleToFit);
                     else GUI.DrawTexture(thumb, CardVisuals.Solid(CardVisuals.TypeColor(p)));
                     string label = (current ? "<b>" : "") + PrintLabel(p) + (current ? "</b>   <color=#7CE08A>(in use)</color>" : "") + (own ? "" : "   <color=#999999>(no image)</color>");
-                    GUI.Label(new Rect(thumb.xMax + 8f, row.y, row.width - thumb.width - 16f, row.height), label, ArtItem(ui));
+                    GUI.Label(new Rect(thumb.xMax + 8f, row.y, row.width - thumb.width - 16f, row.height), Loc.T(label), ArtItem(ui));
                 }
             }
             GUI.EndScrollView();
@@ -1185,9 +1185,9 @@ namespace PokemonTCG.Presentation
         private void DrawImport(UiStyles ui, List<System.Action> actions)
         {
             var r = ImportRect();
-            GUI.Box(r, GUIContent.none);
-            GUI.Box(r, GUIContent.none);
-            GUI.Label(new Rect(r.x + 12f, r.y + 12f, r.width - 24f, ImportTitleH), "Paste a deck list (TCG Live or Limitless export format)", ui.Title);
+            GUI.Box(r, Loc.T(GUIContent.none));
+            GUI.Box(r, Loc.T(GUIContent.none));
+            GUI.Label(new Rect(r.x + 12f, r.y + 12f, r.width - 24f, ImportTitleH), Loc.T("Paste a deck list (TCG Live or Limitless export format)"), ui.Title);
 
             var view = ImportViewRect();
             var style = ImportStyle();
@@ -1195,7 +1195,7 @@ namespace PokemonTCG.Presentation
             float line = style.lineHeight > 0f ? style.lineHeight : 18f;
             float innerW = Mathf.Max(40f, view.width - Scrollbar - 2f);
             // A spare line under the text, so a new line fits before the box catches up.
-            float textH = Mathf.Max(view.height - 2f, style.CalcHeight(new GUIContent(text), innerW) + line + 4f);
+            float textH = Mathf.Max(view.height - 2f, style.CalcHeight(new GUIContent(Loc.T(text)), innerW) + line + 4f);
             importContentHeight = textH;
             var textRect = new Rect(0f, 0f, innerW, textH);
 
@@ -1218,10 +1218,10 @@ namespace PokemonTCG.Presentation
 
             float bw = (r.width - 24f - 2f * Gap) / 3f;
             float by = r.yMax - 12f - ImportButtonsH;
-            if (GUI.Button(new Rect(r.x + 12f, by, bw, ImportButtonsH), "Paste from clipboard"))
+            if (GUI.Button(new Rect(r.x + 12f, by, bw, ImportButtonsH), Loc.T("Paste from clipboard")))
                 actions.Add(() => { importText = GUIUtility.systemCopyBuffer ?? ""; importScroll = Vector2.zero; GUI.FocusControl(null); });
-            if (GUI.Button(new Rect(r.x + 12f + bw + Gap, by, bw, ImportButtonsH), "Load into editor")) actions.Add(ImportNow);
-            if (GUI.Button(new Rect(r.x + 12f + 2f * (bw + Gap), by, bw, ImportButtonsH), "Cancel")) actions.Add(() => importOpen = false);
+            if (GUI.Button(new Rect(r.x + 12f + bw + Gap, by, bw, ImportButtonsH), Loc.T("Load into editor"))) actions.Add(ImportNow);
+            if (GUI.Button(new Rect(r.x + 12f + 2f * (bw + Gap), by, bw, ImportButtonsH), Loc.T("Cancel"))) actions.Add(() => importOpen = false);
         }
 
         private void FollowImportCaret(GUIStyle style, Rect textRect, float viewHeight, float line)
@@ -1230,7 +1230,7 @@ namespace PokemonTCG.Presentation
             string text = importText ?? "";
             if (editor == null || editor.text != text) return;
             int index = Mathf.Clamp(editor.cursorIndex, 0, text.Length);
-            float y = style.GetCursorPixelPosition(textRect, new GUIContent(text), index).y;
+            float y = style.GetCursorPixelPosition(textRect, new GUIContent(Loc.T(text)), index).y;
             if (y - 2f < importScroll.y) importScroll.y = y - 2f;
             else if (y + line + 4f > importScroll.y + viewHeight) importScroll.y = y + line + 4f - viewHeight;
             importScroll.y = ClampImportScroll(importScroll.y, viewHeight);
