@@ -25,3 +25,11 @@ The game's Japanese option reads two files in `Assets/PokemonTCG/Resources/Lang`
 5. `build_lang.py` writes names_ja.txt (run from `<work>`); with `--ui` it also rebuilds ui_ja.txt from `ui_ordered.json` and `tr/`.
 
 `templates.py` lists the strings the UI code can show; `wrap_calls.py` wrapped the UI's drawing calls in `Loc.T(...)`.
+
+## Japanese card images (v177)
+
+`images_ja.txt` lists each card's Japanese printing's image; the game's menu button "Download Japanese card images" downloads the
+missing ones (1 a second) into a `ja` folder inside each set's folder of `StreamingAssets/CardImages` (e.g. `Base Set/ja/BS_4.jpg`),
+and Japanese mode shows them. `build_images.py` makes the list: official-site images for the Pokémon `match2.py` matched, then pkmn.gg
+cards by Bulbapedia's exact Japanese printing (set and number, from `bulba.py`), then pkmn.gg cards with the same English name and
+illustrator released within 8 months, only when exactly one card fits. `pkmngg_sets.py` lists pkmn.gg's Japanese sets.

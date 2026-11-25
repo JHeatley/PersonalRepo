@@ -63,7 +63,7 @@ if os.path.exists(pcc_file):
                          'atk_texts': tuple(a.get('text', '') for a in c.get('attacks') or []),
                          'ab_texts': tuple('' if isinstance(x, str) else x.get('text', '') for x in c.get('abilities') or []),
                          'stage': STAGE.get(c.get('stage', '')), 'weak': t(c['weakness'][0]) if c.get('weakness') else None,
-                         'retreat': c.get('retreat'), 'reg': None})
+                         'retreat': c.get('retreat'), 'reg': None, 'image': c.get('image')})
 print('japanese printings: tcgdex', n_tcgdex, 'official site', len(ja_cards) - n_tcgdex)
 
 index = collections.defaultdict(list)
@@ -78,6 +78,7 @@ atk_votes = collections.defaultdict(collections.Counter)
 ab_votes = collections.defaultdict(collections.Counter)
 name_votes = collections.defaultdict(collections.Counter)
 text_votes = collections.defaultdict(collections.Counter)
+images = {}  # English card key -> an official site image of a Japanese printing that agreed
 total = matched = ambiguous = 0
 for f in sorted(glob.glob(os.path.join(res, 'CardData', '*_pool.json'))):
     for c in json.load(open(f, encoding='utf-8'))['cards']:
@@ -99,6 +100,9 @@ for f in sorted(glob.glob(os.path.join(res, 'CardData', '*_pool.json'))):
         for a, b in zip(c.get('abilities') or [], ab_ja):
             if b: ab_votes[a['name']][b] += 1
         name_votes[c['name']][name_ja] += 1
+        for j in hits:
+            if j.get('image') and (j['atk_names'], j['ab_names'], j['name']) == (atk_ja, ab_ja, name_ja):
+                images.setdefault('%s-%s' % (c['set'], c['number']), j['image']); break
         # The official Japanese text of each attack and Ability, from the printings that agreed (keyed by the English text shown).
         for j in hits:
             if (j['atk_names'], j['ab_names'], j['name']) != (atk_ja, ab_ja, name_ja): continue
@@ -116,6 +120,6 @@ def agreed(votes):
     return out, dropped
 atk, da = agreed(atk_votes); ab, db_ = agreed(ab_votes); nm, dn = agreed(name_votes)
 texts = {k: cnt.most_common(1)[0][0] for k, cnt in text_votes.items()}
-json.dump({'attacks': atk, 'abilities': ab, 'cards': nm, 'texts': texts}, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=0, sort_keys=True)
+json.dump({'attacks': atk, 'abilities': ab, 'cards': nm, 'texts': texts, 'images': images}, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=0, sort_keys=True)
 print('english pokemon cards', total, 'matched', matched, 'ambiguous', ambiguous)
 print('effect texts', len(texts)); print('attack names', len(atk), '(disagreeing', da, ') abilities', len(ab), '(', db_, ') card names', len(nm), '(', dn, ')')

@@ -69,6 +69,7 @@ def clean(s):
     s = re.sub(r"<[^>]+>|''+|\[\[|\]\]", '', s)
     return s.strip()
 
+jp_prints = {}  # English card key -> [(Japanese set name, Japanese number)] from the page's expansion boxes
 out = {'cards': collections.defaultdict(collections.Counter), 'attacks': collections.defaultdict(collections.Counter),
        'abilities': collections.defaultdict(collections.Counter), 'trainers': collections.defaultdict(collections.Counter)}
 items = list(titles_for.values())
@@ -85,6 +86,13 @@ for i in range(0, len(items), 50):
     for c, t in batch:
         wt = text_of.get(redirects.get(t, t))
         if not wt: continue
+        prints = []
+        for box in re.findall(r'\{\{PokémoncardInfobox/Expansion([^\n]*)\}\}|\{\{TrainercardInfobox/Expansion([^\n]*)\}\}|\{\{EnergycardInfobox/Expansion([^\n]*)\}\}', wt):
+            line = ''.join(box)
+            no = re.search(r'\|jpcardno=([^|}]+)', line)
+            st = re.search(r'\|jp(?:expansion|halfdeck|deck)=\{\{TCG\|([^}|]+)(?:\|([^}]+))?\}\}', line)
+            if no and st: prints.append((st.group(2) or st.group(1), no.group(1).strip()))
+        if prints: jp_prints['%s-%s' % (c['set'], c['number'])] = prints
         jn = clean(field(wt, 'jname'))
         if not jn: continue
         kind = 'cards' if c.get('kind') == 'Pokemon' else 'trainers'
@@ -108,4 +116,6 @@ for k, v in out.items():
         top, n = cnt.most_common(1)[0]
         if n * 3 >= 2 * sum(cnt.values()): final[k][en] = top
 json.dump(final, open(os.path.join(work, 'bulba_names.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=0, sort_keys=True)
+json.dump(jp_prints, open(os.path.join(work, 'bulba_jp_prints.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=0, sort_keys=True)
+print('cards with their Japanese printing', len(jp_prints), flush=True)
 print({k: len(v) for k, v in final.items()}, flush=True)

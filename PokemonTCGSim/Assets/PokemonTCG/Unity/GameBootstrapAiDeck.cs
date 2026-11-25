@@ -46,6 +46,36 @@ namespace PokemonTCG.Presentation
         private readonly object aiGate = new object();
         private int aiBuildCount;
 
+        // ------------------------------------------------------------------ v177: Japanese card images
+
+        private JapaneseImages jaImages;
+        private string jaImagesNote;
+
+        private void ToggleJapaneseImages()
+        {
+            if (jaImages != null && jaImages.Running)
+            {
+                jaImages.Stop();
+                return;
+            }
+            jaImages = JapaneseImages.Missing(db);
+            if (jaImages.Total == 0)
+            {
+                jaImagesNote = "Every Japanese card image the game knows of is already here.";
+                return;
+            }
+            jaImagesNote = null;
+            jaImages.Start();
+        }
+
+        private string JapaneseImagesLine()
+        {
+            if (jaImages == null) return jaImagesNote ?? "Japanese printings for Japanese mode, saved in each set's \"ja\" folder (about 1 a second).";
+            if (jaImages.Running) return "Downloading: " + jaImages.Saved + " saved, " + jaImages.Failed + " failed.";
+            if (jaImagesNote != null) return jaImagesNote;
+            return "Done: " + jaImages.Saved + " saved, " + jaImages.Failed + " failed" + (jaImages.LastError != null && jaImages.Failed > 0 ? " (last: " + jaImages.LastError + ")" : "") + ".";
+        }
+
         // ------------------------------------------------------------------ v175.1: a random deck from the list
 
         private const string PrefMyRandomDeck = "PokemonTCG.MyRandomDeck";

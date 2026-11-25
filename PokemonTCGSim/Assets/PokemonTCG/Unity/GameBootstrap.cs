@@ -407,6 +407,7 @@ namespace PokemonTCG.Presentation
         private void Update()
         {
             UpdateAiBuild(); // v175: a deck the AI finished building
+            if (jaImages != null && jaImages.TakeFinished()) CardVisuals.ReloadImages(); // v177: the new Japanese images show
             CardVisuals.PumpLoads(); // v134.6: card images decoded in the background are finished a couple per frame
             if (pendingStart)
             {
@@ -878,7 +879,15 @@ namespace PokemonTCG.Presentation
             int langPick = GUILayout.Toolbar((int)Loc.Current, Loc.Choices, GUILayout.Width(240));
             GUILayout.Label(Loc.T("  Screens, card names and card text (from the official Japanese cards). The battle log stays in English."), Hint(ui));
             GUILayout.EndHorizontal();
-            if (langPick != (int)Loc.Current) aiActions.Add(() => Loc.Set((Loc.Language)langPick));
+            if (langPick != (int)Loc.Current) aiActions.Add(() => { Loc.Set((Loc.Language)langPick); CardVisuals.ReloadImages(); });
+            // v177: the Japanese printings' card images, downloaded into each set folder's "ja" folder (shown in Japanese mode).
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("", GUILayout.Width(170));
+            bool jaRunning = jaImages != null && jaImages.Running;
+            string jaButton = jaRunning ? Loc.T("Stop downloading") + "  (" + jaImages.Done + " / " + jaImages.Total + ")" : Loc.T("Download Japanese card images");
+            if (GUILayout.Button(jaButton, GUILayout.Width(300))) aiActions.Add(ToggleJapaneseImages);
+            GUILayout.Label(Loc.T(JapaneseImagesLine()), Hint(ui));
+            GUILayout.EndHorizontal();
             // v118: UI size (Auto makes the interface bigger on phones and tablets).
             GUILayout.BeginHorizontal();
             GUILayout.Label(Loc.T("UI size"), GUILayout.Width(170));
