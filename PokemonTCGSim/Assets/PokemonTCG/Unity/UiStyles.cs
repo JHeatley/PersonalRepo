@@ -50,8 +50,9 @@ namespace PokemonTCG.Presentation
         /// <summary>Card-detail popup near the mouse.</summary>
         public void DrawTooltip(string text, Vector2 mouse)
         {
+            text = Loc.T(text); // v176
             float w = 300f;
-            float h = Tooltip.CalcHeight(new GUIContent(text), w);
+            float h = Tooltip.CalcHeight(new GUIContent(Loc.T(text)), w);
             float x = Mathf.Min(mouse.x + 18, UiScale.Width - w - 10);
             float y = Mathf.Min(mouse.y + 18, UiScale.Height - h - 10);
             // Full strength whatever the screen around it is doing (a disabled panel or a faded colour would show the board through).
@@ -62,7 +63,7 @@ namespace PokemonTCG.Presentation
             GUI.backgroundColor = Color.white;
             GUI.enabled = true;
             GUI.DrawTexture(new Rect(x - 1, y - 1, w + 2, h + 2), TooltipEdge);
-            GUI.Box(new Rect(x, y, w, h), text, Tooltip);
+            GUI.Box(new Rect(x, y, w, h), Loc.T(text), Tooltip);
             GUI.color = color;
             GUI.backgroundColor = background;
             GUI.enabled = enabled;
@@ -75,15 +76,15 @@ namespace PokemonTCG.Presentation
         public static string Describe(CardDef d)
         {
             var sb = new StringBuilder();
-            sb.Append("<b>" + d.Name + "</b>  <size=11>" + d.SetCode + " " + d.Number + "</size>\n");
+            sb.Append("<b>" + Loc.NameOf(d) + "</b>  <size=11>" + d.SetCode + " " + d.Number + "</size>\n");
             if (d.IsPokemon)
             {
                 sb.Append(StageText(d) + " " + TypeText(d) + "  HP " + d.Hp + (d.IsEx ? "  (ex: 2 Prizes)" : "") + "\n");
                 string rule = MechanicRule(d);
                 if (rule != null) sb.Append("<i>" + rule + "</i>\n");
                 if (!string.IsNullOrEmpty(d.Strike)) sb.Append("<i>" + d.Strike + " Pokémon</i>\n");
-                if (!string.IsNullOrEmpty(d.EvolvesFrom)) sb.Append("Evolves from " + d.EvolvesFrom + "\n");
-                foreach (var a in d.Abilities) sb.Append("<b>" + (a.VstarPower ? "VSTAR Power - " : "") + (a.IsAbility ? "Ability" : a.Kind) + ": " + a.Name + "</b>\n" + a.Text + "\n");
+                if (!string.IsNullOrEmpty(d.EvolvesFrom)) sb.Append(Loc.T("Evolves from {0}\n").Replace("{0}", Loc.CardName(d.EvolvesFrom)));
+                foreach (var a in d.Abilities) sb.Append("<b>" + (a.VstarPower ? Loc.T("VSTAR Power - ") : "") + Loc.T(a.IsAbility ? "Ability" : a.Kind) + ": " + Loc.AbilityName(a.Name) + "</b>\n" + Loc.Text(a.Text) + "\n");
                 foreach (var a in d.Attacks) AppendAttack(sb, a);
                 sb.Append("Weakness " + (d.Weakness.HasValue ? d.Weakness.Value + (d.SecondWeakness.HasValue ? "/" + d.SecondWeakness.Value : "") + (d.WeaknessAmount > 0 ? " +" + d.WeaknessAmount : "") : "-") +
                           "   Resistance " + (d.Resistance.HasValue ? d.Resistance.Value + (d.SecondResistance.HasValue ? "/" + d.SecondResistance.Value : "") + " -" + d.ResistanceAmount : "-") +
@@ -99,7 +100,7 @@ namespace PokemonTCG.Presentation
             }
             // Strike-style Trainers and Energy (Fusion Strike Energy, Cross Switcher, the Style Mustards), v55.
             if (!d.IsPokemon && !string.IsNullOrEmpty(d.Strike)) sb.Append("<i>" + d.Strike + " card</i>\n");
-            if (!string.IsNullOrEmpty(d.Text)) sb.Append(d.Text);
+            if (!string.IsNullOrEmpty(d.Text)) sb.Append(Loc.Text(d.Text));
             // v168.1: a Trainer or Energy with its own attack or Ability (Mega Rayquaza Cap's Delta Gift, Technical Machines,
             // Rocket's Tricky Gym, Miracle Spheres) shows it, unless the card's text already spells it out.
             if (!d.IsPokemon)
@@ -109,7 +110,7 @@ namespace PokemonTCG.Presentation
                 {
                     if (!string.IsNullOrEmpty(d.Text) && d.Text.IndexOf(a.Name, System.StringComparison.OrdinalIgnoreCase) >= 0) continue;
                     if (first) { sb.Append("\n"); first = false; }
-                    sb.Append("\n<b>" + (a.VstarPower ? "VSTAR Power - " : "") + (a.IsAbility ? "Ability" : a.Kind) + ": " + a.Name + "</b>\n" + a.Text);
+                    sb.Append("\n<b>" + (a.VstarPower ? Loc.T("VSTAR Power - ") : "") + Loc.T(a.IsAbility ? "Ability" : a.Kind) + ": " + Loc.AbilityName(a.Name) + "</b>\n" + Loc.Text(a.Text));
                 }
                 foreach (var a in d.Attacks)
                 {
@@ -127,8 +128,8 @@ namespace PokemonTCG.Presentation
         private static void AppendAttack(StringBuilder sb, AttackDef a)
         {
             string cost = a.Cost.Length == 0 ? "free" : a.CostString;
-            sb.Append("<b>[" + cost + "] " + (a.VstarPower ? "VSTAR Power - " : "") + a.Name + "</b> " + (a.Damage > 0 ? a.Damage + a.DamageSuffix : "") + "\n");
-            if (!string.IsNullOrEmpty(a.Text)) sb.Append(a.Text + "\n");
+            sb.Append("<b>[" + cost + "] " + (a.VstarPower ? Loc.T("VSTAR Power - ") : "") + Loc.AttackName(a.Name) + "</b> " + (a.Damage > 0 ? a.Damage + a.DamageSuffix : "") + "\n");
+            if (!string.IsNullOrEmpty(a.Text)) sb.Append(Loc.Text(a.Text) + "\n");
         }
 
         private static string StageText(CardDef d)

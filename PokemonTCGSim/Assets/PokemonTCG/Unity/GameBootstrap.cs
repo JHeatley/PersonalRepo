@@ -119,6 +119,7 @@ namespace PokemonTCG.Presentation
             board = new GameObject("Board").AddComponent<BoardView>();
             board.Build();
             db = UnityCardData.LoadAllCards();
+            Loc.UseCardPool(db); // v176: the Pokémon names Japanese text swaps
             CardVisuals.WarmIndexInBackground(); // v134.6: list the card images now, off the main thread
             SavePaths.Load();
             LoadSkipCpu();
@@ -406,6 +407,7 @@ namespace PokemonTCG.Presentation
         private void Update()
         {
             UpdateAiBuild(); // v175: a deck the AI finished building
+            if (jaImages != null && jaImages.TakeFinished()) CardVisuals.ReloadImages(); // v177: the new Japanese images show
             CardVisuals.PumpLoads(); // v134.6: card images decoded in the background are finished a couple per frame
             if (pendingStart)
             {
@@ -739,6 +741,7 @@ namespace PokemonTCG.Presentation
             if (PowerSaver.NoteInput(Event.current)) return; // v120: a tap on the black screen only wakes it
             UiScale.HandleShortcuts(Event.current); // v118.2: Ctrl+0 / Ctrl+minus / Ctrl+plus on every screen
             UiScale.Apply(); // v118: bigger UI on phones and tablets (or the menu's UI size)
+            Loc.ApplyFont(); // v176: Noto Sans JP while the game is in Japanese
             if (PowerSaver.Dark)
             {
                 PowerSaver.DrawDark(AiWorkLine());
@@ -784,12 +787,12 @@ namespace PokemonTCG.Presentation
         {
             float w = Mathf.Min(900f, UiScale.Width - 40f);
             var r = new Rect(UiScale.Width / 2f - w / 2f, 30f, w, UiScale.Height - 60f);
-            GUI.Box(r, GUIContent.none);
+            GUI.Box(r, Loc.T(GUIContent.none));
             GUILayout.BeginArea(new Rect(r.x + 16, r.y + 16, r.width - 32, r.height - 32));
             // v118.2: the whole menu scrolls, so every row (UI size included) can be reached on a short screen.
             menuScroll = GUILayout.BeginScrollView(menuScroll, false, false, GUIStyle.none, GUI.skin.verticalScrollbar);
-            GUILayout.Label("Pokémon TCG (offline)", ui.Header);
-            GUILayout.Label("Pick your deck and the deck the bot plays. Build or import your own in the deck builder.", ui.Label);
+            GUILayout.Label(Loc.T("Pokémon TCG (offline)"), ui.Header);
+            GUILayout.Label(Loc.T("Pick your deck and the deck the bot plays. Build or import your own in the deck builder."), ui.Label);
             GUILayout.Space(8);
 
             // v123: the format to play. Its decks are listed, and the game uses its Prize cards and rules.
@@ -798,51 +801,51 @@ namespace PokemonTCG.Presentation
             formatNames.AddRange(CustomFormats.All.Select(f => f.Name));
             int formatPick = menuFormat.Length == 0 ? 0 : Mathf.Max(0, formatNames.FindIndex(n => n.Equals(menuFormat, StringComparison.OrdinalIgnoreCase)));
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Format", GUILayout.Width(80));
-            int newFormatPick = GUILayout.SelectionGrid(formatPick, formatNames.ToArray(), Mathf.Min(5, formatNames.Count));
-            if (GUILayout.Button("Formats...", GUILayout.Width(100))) pendingFormats = true;
+            GUILayout.Label(Loc.T("Format"), GUILayout.Width(80));
+            int newFormatPick = GUILayout.SelectionGrid(formatPick, Loc.T(formatNames.ToArray()), Mathf.Min(5, formatNames.Count));
+            if (GUILayout.Button(Loc.T("Formats..."), GUILayout.Width(100))) pendingFormats = true;
             GUILayout.EndHorizontal();
             var playFormat = menuFormat.Length > 0 ? GameFormat.Named(menuFormat) : null;
-            if (playFormat != null && playFormat.IsCustom) GUILayout.Label(DeckBuilderScreen.FormatSummary(playFormat.Custom), Hint(ui));
-            else if (playFormat == null) GUILayout.Label("Every deck. A game plays by your deck's format (a custom format's Prize cards and rules too).", Hint(ui));
+            if (playFormat != null && playFormat.IsCustom) GUILayout.Label(Loc.T(DeckBuilderScreen.FormatSummary(playFormat.Custom)), Hint(ui));
+            else if (playFormat == null) GUILayout.Label(Loc.T("Every deck. A game plays by your deck's format (a custom format's Prize cards and rules too)."), Hint(ui));
 
             int pickMine = myDeck, pickTheirs = oppDeck;
             float colW = (r.width - 64) / 2f;
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical(GUILayout.Width(colW));
-            GUILayout.Label(botVsBot ? "Bot 1's deck" : "Your deck", ui.Title);
+            GUILayout.Label(Loc.T(botVsBot ? "Bot 1's deck" : "Your deck"), ui.Title);
             // v175.1: a random deck from the list each game.
             LoadRandomDeckPrefs();
             var randomActions = new List<Action>();
-            bool newMyRandom = GUILayout.Toggle(myRandomDeck, " Random deck from the list");
+            bool newMyRandom = GUILayout.Toggle(myRandomDeck, Loc.T(" Random deck from the list"));
             if (newMyRandom != myRandomDeck) randomActions.Add(() => { myRandomDeck = newMyRandom; SaveRandomDeckPrefs(); });
             myScroll = GUILayout.BeginScrollView(myScroll, GUILayout.Height(Mathf.Max(160f, r.height - 410f)));
-            if (myRandomDeck) GUILayout.Label("Each game you get one of these at random:", Hint(ui));
+            if (myRandomDeck) GUILayout.Label(Loc.T("Each game you get one of these at random:"), Hint(ui));
             GUI.enabled = !myRandomDeck;
             for (int i = 0; i < decks.Count; i++)
-                if (InMenuFormat(i) && GUILayout.Toggle(myDeck == i && !myRandomDeck, DeckLabel(i), ui.Button) && myDeck != i) pickMine = i;
+                if (InMenuFormat(i) && GUILayout.Toggle(myDeck == i && !myRandomDeck, Loc.T(DeckLabel(i)), ui.Button) && myDeck != i) pickMine = i;
             GUI.enabled = true;
-            if (!Enumerable.Range(0, decks.Count).Any(InMenuFormat)) GUILayout.Label("No decks for this format yet. Build one in the deck builder.", Hint(ui));
+            if (!Enumerable.Range(0, decks.Count).Any(InMenuFormat)) GUILayout.Label(Loc.T("No decks for this format yet. Build one in the deck builder."), Hint(ui));
             GUILayout.EndScrollView();
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical(GUILayout.Width(colW));
-            GUILayout.Label(botVsBot ? "Bot 2's deck" : "Opponent's deck (bot)", ui.Title);
+            GUILayout.Label(Loc.T(botVsBot ? "Bot 2's deck" : "Opponent's deck (bot)"), ui.Title);
             // v175: the AI can build its own deck (a random one, or around a card you name).
             LoadAiDeckPrefs();
             var aiActions = new List<Action>();
-            bool newAiBuilds = GUILayout.Toggle(aiBuilds, " The AI builds its own deck");
+            bool newAiBuilds = GUILayout.Toggle(aiBuilds, Loc.T(" The AI builds its own deck"));
             if (newAiBuilds != aiBuilds) aiActions.Add(() => { aiBuilds = newAiBuilds; SaveAiDeckPrefs(); });
             if (aiBuilds) DrawAiDeckPanel(ui, Mathf.Max(160f, r.height - 382f), aiActions);
             else
             {
-                bool newOppRandom = GUILayout.Toggle(oppRandomDeck, " Random deck from the list");
+                bool newOppRandom = GUILayout.Toggle(oppRandomDeck, Loc.T(" Random deck from the list"));
                 if (newOppRandom != oppRandomDeck) randomActions.Add(() => { oppRandomDeck = newOppRandom; SaveRandomDeckPrefs(); });
                 oppScroll = GUILayout.BeginScrollView(oppScroll, GUILayout.Height(Mathf.Max(160f, r.height - 438f)));
-                if (oppRandomDeck) GUILayout.Label("Each game the bot gets one of these at random" + (botVsBot ? "." : " (you find out which by playing it)."), Hint(ui));
+                if (oppRandomDeck) GUILayout.Label(Loc.T("Each game the bot gets one of these at random" + (botVsBot ? "." : " (you find out which by playing it).")), Hint(ui));
                 GUI.enabled = !oppRandomDeck;
                 for (int i = 0; i < decks.Count; i++)
-                    if (InMenuFormat(i) && GUILayout.Toggle(oppDeck == i && !oppRandomDeck, DeckLabel(i), ui.Button) && oppDeck != i) pickTheirs = i;
+                    if (InMenuFormat(i) && GUILayout.Toggle(oppDeck == i && !oppRandomDeck, Loc.T(DeckLabel(i)), ui.Button) && oppDeck != i) pickTheirs = i;
                 GUI.enabled = true;
                 GUILayout.EndScrollView();
             }
@@ -850,38 +853,53 @@ namespace PokemonTCG.Presentation
             GUILayout.EndHorizontal();
 
             GUILayout.Space(6);
-            botVsBot = GUILayout.Toggle(botVsBot, " Watch two bots play each other");
+            botVsBot = GUILayout.Toggle(botVsBot, Loc.T(" Watch two bots play each other"));
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Opponent", GUILayout.Width(80));
-            int aiPick = GUILayout.Toolbar(OpponentPick, OpponentChoices, GUILayout.Width(240));
-            GUILayout.Label("  " + BrainLine(), Hint(ui));
+            GUILayout.Label(Loc.T("Opponent"), GUILayout.Width(80));
+            int aiPick = GUILayout.Toolbar(OpponentPick, Loc.T(OpponentChoices), GUILayout.Width(240));
+            GUILayout.Label(Loc.T("  " + BrainLine()), Hint(ui));
             GUILayout.EndHorizontal();
             DrawLookAheadRow(ui);
             // v157: your Elo rating.
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Your Elo", GUILayout.Width(80));
-            GUILayout.Label(RatingMenuLine(), ui.Label);
-            if (GUILayout.Button("Your rating...", GUILayout.Width(130))) pendingRating = true;
+            GUILayout.Label(Loc.T("Your Elo"), GUILayout.Width(80));
+            GUILayout.Label(Loc.T(RatingMenuLine()), ui.Label);
+            if (GUILayout.Button(Loc.T("Your rating..."), GUILayout.Width(130))) pendingRating = true;
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Seed (blank = random)", GUILayout.Width(170));
+            GUILayout.Label(Loc.T("Seed (blank = random)"), GUILayout.Width(170));
             seedText = GUILayout.TextField(seedText ?? "", GUILayout.Width(120));
-            GUILayout.Label("   Pace", GUILayout.Width(60));
-            int newPace = GUILayout.Toolbar(pace, PaceNames, GUILayout.Width(240));
+            GUILayout.Label(Loc.T("   Pace"), GUILayout.Width(60));
+            int newPace = GUILayout.Toolbar(pace, Loc.T(PaceNames), GUILayout.Width(240));
             GUILayout.EndHorizontal();
             int newBirthday = DrawBirthdayRow(ui);
+            // v176: the game's language (English or Japanese).
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(Loc.T("Language"), GUILayout.Width(170));
+            int langPick = GUILayout.Toolbar((int)Loc.Current, Loc.Choices, GUILayout.Width(240));
+            GUILayout.Label(Loc.T("  Screens, card names and card text (from the official Japanese cards). The battle log stays in English."), Hint(ui));
+            GUILayout.EndHorizontal();
+            if (langPick != (int)Loc.Current) aiActions.Add(() => { Loc.Set((Loc.Language)langPick); CardVisuals.ReloadImages(); });
+            // v177: the Japanese printings' card images, downloaded into each set folder's "ja" folder (shown in Japanese mode).
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("", GUILayout.Width(170));
+            bool jaRunning = jaImages != null && jaImages.Running;
+            string jaButton = jaRunning ? Loc.T("Stop downloading") + "  (" + jaImages.Done + " / " + jaImages.Total + ")" : Loc.T("Download Japanese card images");
+            if (GUILayout.Button(jaButton, GUILayout.Width(300))) aiActions.Add(ToggleJapaneseImages);
+            GUILayout.Label(Loc.T(JapaneseImagesLine()), Hint(ui));
+            GUILayout.EndHorizontal();
             // v118: UI size (Auto makes the interface bigger on phones and tablets).
             GUILayout.BeginHorizontal();
-            GUILayout.Label("UI size", GUILayout.Width(170));
+            GUILayout.Label(Loc.T("UI size"), GUILayout.Width(170));
             int uiPick = Mathf.Max(0, Array.IndexOf(UiScale.Choices, UiScale.Setting));
-            int newUiPick = GUILayout.Toolbar(uiPick, UiScale.Choices.Select(UiScale.Label).ToArray(), GUILayout.Width(420));
-            GUILayout.Label(UiScale.Capped ? "  This window fits " + UiScale.EffectivePercent + "%.  Ctrl+0: Auto" : "  Ctrl+0: Auto", Hint(ui));
+            int newUiPick = GUILayout.Toolbar(uiPick, Loc.T(UiScale.Choices.Select(UiScale.Label).ToArray()), GUILayout.Width(420));
+            GUILayout.Label(Loc.T(UiScale.Capped ? "  This window fits " + UiScale.EffectivePercent + "%.  Ctrl+0: Auto" : "  Ctrl+0: Auto"), Hint(ui));
             GUILayout.EndHorizontal();
             // v120: battery saver (Auto: on while unplugged).
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Battery saver", GUILayout.Width(170));
-            int saverPick = GUILayout.Toolbar(PowerSaver.Mode, PowerSaver.ModeNames, GUILayout.Width(240));
-            GUILayout.Label("  " + PowerSaver.StatusLine(), Hint(ui));
+            GUILayout.Label(Loc.T("Battery saver"), GUILayout.Width(170));
+            int saverPick = GUILayout.Toolbar(PowerSaver.Mode, Loc.T(PowerSaver.ModeNames), GUILayout.Width(240));
+            GUILayout.Label(Loc.T("  " + PowerSaver.StatusLine()), Hint(ui));
             GUILayout.EndHorizontal();
             var cpuActions = new List<Action>();
             DrawSkipCpuRow(ui, cpuActions, 170);
@@ -893,29 +911,29 @@ namespace PokemonTCG.Presentation
             bool ready = myReady && oppReady;
             GUILayout.BeginHorizontal();
             GUI.enabled = ready;
-            if (GUILayout.Button("Start game", GUILayout.Height(34))) pendingStart = true;
+            if (GUILayout.Button(Loc.T("Start game"), GUILayout.Height(34))) pendingStart = true;
             GUI.enabled = true;
-            if (GUILayout.Button("Deck builder", GUILayout.Height(34))) pendingBuilder = true;
-            if (GUILayout.Button("Train the AI", GUILayout.Height(34))) pendingTrain = true;
-            if (GUILayout.Button("Regional Sim", GUILayout.Height(34))) pendingRegional = true;
-            if (GUILayout.Button("Play online", GUILayout.Height(34))) pendingOnline = true;
-            if (GUILayout.Button("Save folders", GUILayout.Height(34))) pendingFolders = true;
+            if (GUILayout.Button(Loc.T("Deck builder"), GUILayout.Height(34))) pendingBuilder = true;
+            if (GUILayout.Button(Loc.T("Train the AI"), GUILayout.Height(34))) pendingTrain = true;
+            if (GUILayout.Button(Loc.T("Regional Sim"), GUILayout.Height(34))) pendingRegional = true;
+            if (GUILayout.Button(Loc.T("Play online"), GUILayout.Height(34))) pendingOnline = true;
+            if (GUILayout.Button(Loc.T("Save folders"), GUILayout.Height(34))) pendingFolders = true;
             GUILayout.EndHorizontal();
 
             if (!ready && (myRandomDeck || (aiBuilds || oppRandomDeck)) && !anyListDeck)
-                GUILayout.Label("No deck in this format's list is ready to play for a random pick.", ui.Error);
+                GUILayout.Label(Loc.T("No deck in this format's list is ready to play for a random pick."), ui.Error);
             if (!ready && myDeck >= 0 && (aiBuilds || oppDeck >= 0))
             {
                 var picked = new List<int>();
                 if (!myRandomDeck) picked.Add(myDeck);
                 if (!aiBuilds && !oppRandomDeck) picked.Add(oppDeck);
                 foreach (var i in picked.Distinct())
-                    foreach (var p in deckProblems[i]) GUILayout.Label(decks[i].Name + ": " + p, ui.Error);
+                    foreach (var p in deckProblems[i]) GUILayout.Label(Loc.T(decks[i].Name + ": " + p), ui.Error);
             }
-            if (menuError != null) GUILayout.Label(menuError, ui.Error);
+            if (menuError != null) GUILayout.Label(Loc.T(menuError), ui.Error);
             string onlineLine = OnlineMenuLine();
-            if (onlineLine != null) GUILayout.Label(onlineLine, ui.Good);
-            GUILayout.Label("Your saved decks live in " + SavePaths.DeckFolder + "; the AI's brain in " + SavePaths.BrainFolder + ". Change them with Save folders.", Hint(ui));
+            if (onlineLine != null) GUILayout.Label(Loc.T(onlineLine), ui.Good);
+            GUILayout.Label(Loc.T("Your saved decks live in " + SavePaths.DeckFolder + "; the AI's brain in " + SavePaths.BrainFolder + ". Change them with Save folders."), Hint(ui));
             GUILayout.EndScrollView();
             GUILayout.EndArea();
 
@@ -950,21 +968,21 @@ namespace PokemonTCG.Presentation
             int month = birthday / 100, day = birthday % 100;
             bool showDay = month >= 1 && month <= 12;
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Your birthday", GUILayout.Width(170));
-            if (GUILayout.Button("<", GUILayout.Width(26))) month = month <= 0 ? 12 : month - 1;
-            GUILayout.Label(showDay ? MonthNames[month - 1] : "Not set", GUILayout.Width(80));
-            if (GUILayout.Button(">", GUILayout.Width(26))) month = month >= 12 ? 0 : month + 1;
+            GUILayout.Label(Loc.T("Your birthday"), GUILayout.Width(170));
+            if (GUILayout.Button(Loc.T("<"), GUILayout.Width(26))) month = month <= 0 ? 12 : month - 1;
+            GUILayout.Label(Loc.T(showDay ? MonthNames[month - 1] : "Not set"), GUILayout.Width(80));
+            if (GUILayout.Button(Loc.T(">"), GUILayout.Width(26))) month = month >= 12 ? 0 : month + 1;
             if (showDay)
             {
                 int maxDay = DaysInMonth[birthday / 100 - 1];
                 if (day < 1 || day > maxDay) day = 1;
-                if (GUILayout.Button("<", GUILayout.Width(26))) day = day <= 1 ? maxDay : day - 1;
-                GUILayout.Label(day.ToString(), GUILayout.Width(28));
-                if (GUILayout.Button(">", GUILayout.Width(26))) day = day >= maxDay ? 1 : day + 1;
+                if (GUILayout.Button(Loc.T("<"), GUILayout.Width(26))) day = day <= 1 ? maxDay : day - 1;
+                GUILayout.Label(Loc.T(day.ToString()), GUILayout.Width(28));
+                if (GUILayout.Button(Loc.T(">"), GUILayout.Width(26))) day = day >= maxDay ? 1 : day + 1;
             }
             string note = GameEngine.IsBirthday(birthday, DateTime.Today) ? "Happy birthday! _____'s Pikachu can flip for 50 more damage today."
                 : "For _____'s Pikachu's Birthday Surprise (the bot never has a birthday).";
-            GUILayout.Label("  " + note, Hint(ui));
+            GUILayout.Label(Loc.T("  " + note), Hint(ui));
             GUILayout.EndHorizontal();
             if (month < 1 || month > 12) return 0;
             int max = DaysInMonth[month - 1];
@@ -1044,20 +1062,20 @@ namespace PokemonTCG.Presentation
         private void DrawConcedeConfirm(UiStyles ui)
         {
             var r = new Rect(UiScale.Width / 2f - 220, UiScale.Height / 2f - 85, 440, 170);
-            GUI.Box(r, GUIContent.none);
+            GUI.Box(r, Loc.T(GUIContent.none));
             GUILayout.BeginArea(new Rect(r.x + 14, r.y + 12, r.width - 28, r.height - 24));
-            GUILayout.Label("Are you sure you want to concede?", ui.Title);
-            GUILayout.Label("Your opponent wins this game, and it counts as a loss"
-                            + (regionalGame ? " in your Regional Sim match." : OnlineGame ? " (your friend sees you conceded)." : " (and in your rating)."), ui.Label);
+            GUILayout.Label(Loc.T("Are you sure you want to concede?"), ui.Title);
+            GUILayout.Label(Loc.T("Your opponent wins this game, and it counts as a loss"
+                            + (regionalGame ? " in your Regional Sim match." : OnlineGame ? " (your friend sees you conceded)." : " (and in your rating).")), ui.Label);
             GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Concede", GUILayout.Height(32)))
+            if (GUILayout.Button(Loc.T("Concede"), GUILayout.Height(32)))
                 guiActions.Add(() =>
                 {
                     concedeConfirm = false;
                     ConcedeGame();
                 });
-            if (GUILayout.Button("Keep playing", GUILayout.Height(32))) guiActions.Add(() => concedeConfirm = false);
+            if (GUILayout.Button(Loc.T("Keep playing"), GUILayout.Height(32))) guiActions.Add(() => concedeConfirm = false);
             GUILayout.EndHorizontal();
             GUILayout.EndArea();
         }
@@ -1083,7 +1101,7 @@ namespace PokemonTCG.Presentation
             // Compact (v55.2): it used to reach down over the opponent's deck and Bench on 1366 x 768 screens. The hint line
             // moved into the decision panel.
             hudRect = new Rect(10, 10, 470, 104);
-            GUI.Box(hudRect, GUIContent.none);
+            GUI.Box(hudRect, Loc.T(GUIContent.none));
             if (current != null)
             {
                 var sb = new StringBuilder();
@@ -1098,12 +1116,12 @@ namespace PokemonTCG.Presentation
                 }
                 if (current.Stadium != null) sb.Append("Stadium: " + current.Stadium.Def.Name);
                 if (hudStyle == null) hudStyle = new GUIStyle(ui.Label) { fontSize = 13, wordWrap = false, richText = true, clipping = TextClipping.Clip };
-                GUI.Label(new Rect(18, 12, 455, 68), sb.ToString(), hudStyle);
+                GUI.Label(new Rect(18, 12, 455, 68), Loc.T(sb.ToString()), hudStyle);
             }
-            if (GUI.Button(new Rect(18, 82, 110, 24), regionalGame ? "Back to event" : "Quit to menu")) pendingMenu = true;
-            if (CanConcede && GUI.Button(new Rect(132, 82, 80, 24), "Concede")) guiActions.Add(() => concedeConfirm = true);
-            GUI.Label(new Rect(218, 83, 40, 22), "Pace", ui.Label);
-            int newPace = GUI.Toolbar(new Rect(258, 82, 207, 24), pace, PaceNames);
+            if (GUI.Button(new Rect(18, 82, 110, 24), Loc.T(regionalGame ? "Back to event" : "Quit to menu"))) pendingMenu = true;
+            if (CanConcede && GUI.Button(new Rect(132, 82, 80, 24), Loc.T("Concede"))) guiActions.Add(() => concedeConfirm = true);
+            GUI.Label(new Rect(218, 83, 40, 22), Loc.T("Pace"), ui.Label);
+            int newPace = GUI.Toolbar(new Rect(258, 82, 207, 24), pace, Loc.T(PaceNames));
             if (newPace != pace) guiActions.Add(() => ApplyPace(newPace));
         }
 
@@ -1141,24 +1159,24 @@ namespace PokemonTCG.Presentation
             {
                 const float stripHeight = 44f;
                 logRect = new Rect(10, UiScale.Height - stripHeight - 6, UiScale.Width - 20, stripHeight);
-                GUI.Box(logRect, GUIContent.none);
-                if (GUI.Button(new Rect(logRect.x + 6, logRect.y + 8, 84, 28), "Open log")) guiActions.Add(() => SetLogOpen(true));
+                GUI.Box(logRect, Loc.T(GUIContent.none));
+                if (GUI.Button(new Rect(logRect.x + 6, logRect.y + 8, 84, 28), Loc.T("Open log"))) guiActions.Add(() => SetLogOpen(true));
                 float textX = logRect.x + 98;
                 float textWidth = logRect.width - 104;
                 int n = log.Count;
-                if (n >= 2) GUI.Label(new Rect(textX, logRect.y + 3, textWidth, 19), log[n - 2], logLineStyle);
-                if (n >= 1) GUI.Label(new Rect(textX, logRect.y + 22, textWidth, 19), log[n - 1], logLineStyle);
+                if (n >= 2) GUI.Label(new Rect(textX, logRect.y + 3, textWidth, 19), Loc.T(log[n - 2]), logLineStyle);
+                if (n >= 1) GUI.Label(new Rect(textX, logRect.y + 22, textWidth, 19), Loc.T(log[n - 1]), logLineStyle);
                 return;
             }
 
             float height = Mathf.Min(300f, UiScale.Height - 130f);
             logRect = new Rect(10, UiScale.Height - height - 6, Mathf.Min(470f, UiScale.Width - 20f), height);
-            GUI.Box(logRect, GUIContent.none);
-            if (GUI.Button(new Rect(logRect.xMax - 92, logRect.y + 4, 86, 22), "Close log")) guiActions.Add(() => SetLogOpen(false));
+            GUI.Box(logRect, Loc.T(GUIContent.none));
+            if (GUI.Button(new Rect(logRect.xMax - 92, logRect.y + 4, 86, 22), Loc.T("Close log"))) guiActions.Add(() => SetLogOpen(false));
             GUILayout.BeginArea(new Rect(logRect.x + 6, logRect.y + 4, logRect.width - 12, logRect.height - 8));
-            GUILayout.Label("<b>Battle log</b>", logStyle);
+            GUILayout.Label(Loc.T("<b>Battle log</b>"), logStyle);
             logScroll = GUILayout.BeginScrollView(logScroll);
-            foreach (var line in log) GUILayout.Label(line, logStyle);
+            foreach (var line in log) GUILayout.Label(Loc.T(line), logStyle);
             GUILayout.EndScrollView();
             GUILayout.EndArea();
         }
@@ -1179,7 +1197,7 @@ namespace PokemonTCG.Presentation
                 if (Vector3.Dot(cv.transform.up, Vector3.up) < 0f) continue; // face down
                 var r = cv.ScreenRect(cam);
                 if (r.width < 24f) continue;
-                GUI.Label(new Rect(r.x + 2, r.y + 2, r.width - 4, Mathf.Min(r.height - 4, 48f)), cv.Def.Name, ui.Small);
+                GUI.Label(new Rect(r.x + 2, r.y + 2, r.width - 4, Mathf.Min(r.height - 4, 48f)), Loc.T(cv.Def.Name), ui.Small);
             }
         }
 
@@ -1219,13 +1237,13 @@ namespace PokemonTCG.Presentation
                     string hp = hurt
                         ? "<color=#C81E1E>" + Mathf.Max(0, p.RemainingHp) + "</color><size=" + Mathf.Max(8, fontSize - 4) + ">/" + p.MaxHp + "</size>"
                         : p.MaxHp.ToString();
-                    var hpSize = hpStyle.CalcSize(new GUIContent(hp));
+                    var hpSize = hpStyle.CalcSize(new GUIContent(Loc.T(hp)));
                     var hpBox = facingAway
                         ? new Rect(r.x - hpSize.x * 0.25f - 4f, r.yMax - hpSize.y * 0.65f - 2f, hpSize.x + 10f, hpSize.y + 2f)
                         : new Rect(r.xMax - hpSize.x * 0.75f - 6f, r.y - hpSize.y * 0.35f, hpSize.x + 10f, hpSize.y + 2f);
                     CardDraw.Fill(new Rect(hpBox.x - 1f, hpBox.y - 1f, hpBox.width + 2f, hpBox.height + 2f), new Color(0f, 0f, 0f, 0.8f));
                     CardDraw.Fill(hpBox, Color.white);
-                    GUI.Label(hpBox, hp, hpStyle);
+                    GUI.Label(hpBox, Loc.T(hp), hpStyle);
 
                     // Energy symbols, bottom-left.
                     float d = Mathf.Clamp(r.width * 0.2f, 14f, 30f);
@@ -1252,12 +1270,12 @@ namespace PokemonTCG.Presentation
                     if (parts.Count > 0)
                     {
                         string text = string.Join("  ", parts.ToArray());
-                        var size = ui.Badge.CalcSize(new GUIContent(text));
+                        var size = ui.Badge.CalcSize(new GUIContent(Loc.T(text)));
                         var badge = facingAway
                             ? new Rect(r.center.x - size.x / 2f - 4, r.y - d * 0.45f - 20f, size.x + 8, 20)
                             : new Rect(r.center.x - size.x / 2f - 4, r.yMax + d * 0.45f, size.x + 8, 20);
                         GUI.DrawTexture(badge, p.Conditions != SpecialCondition.None ? ui.BadgeBackground : CardVisuals.Solid(new Color(0.05f, 0.08f, 0.1f, 0.85f)));
-                        GUI.Label(badge, text, ui.Badge);
+                        GUI.Label(badge, Loc.T(text), ui.Badge);
                     }
                 }
             }
@@ -1279,7 +1297,7 @@ namespace PokemonTCG.Presentation
                 if (side.Player < 0 || side.Player > 1) continue;
                 var r = board.DeckScreenRect(cam, side.Player);
                 string text = side.DeckCount == 1 ? "1 card" : side.DeckCount + " cards";
-                var size = ui.Badge.CalcSize(new GUIContent(text));
+                var size = ui.Badge.CalcSize(new GUIContent(Loc.T(text)));
                 Rect badge;
                 if (side.Player == board.BottomSeat) badge = new Rect(r.center.x - size.x / 2f - 4, r.yMax + 2, size.x + 8, 20);
                 else
@@ -1288,18 +1306,18 @@ namespace PokemonTCG.Presentation
                     if (badge.Overlaps(hudRect)) badge = new Rect(r.xMax + 4, r.center.y - 10, size.x + 8, 20);
                 }
                 GUI.DrawTexture(badge, CardVisuals.Solid(new Color(0.05f, 0.08f, 0.1f, 0.85f)));
-                GUI.Label(badge, text, ui.Badge);
+                GUI.Label(badge, Loc.T(text), ui.Badge);
 
                 // The Lost Zone's name and size (v49), beside its sideways pile on the side towards the middle of the table (v69),
                 // clear of the Prize cards and the discard piles.
                 var lz = board.LostZoneScreenRect(cam, side.Player);
                 string lzText = "Lost Zone" + (side.LostZone.Count > 0 ? " · " + side.LostZone.Count : "");
-                var lzSize = ui.Badge.CalcSize(new GUIContent(lzText));
+                var lzSize = ui.Badge.CalcSize(new GUIContent(Loc.T(lzText)));
                 var lzBadge = side.Player == board.BottomSeat
                     ? new Rect(lz.xMax + 4, lz.center.y - 10, lzSize.x + 8, 20)
                     : new Rect(lz.x - lzSize.x - 12, lz.center.y - 10, lzSize.x + 8, 20);
                 GUI.DrawTexture(lzBadge, CardVisuals.Solid(new Color(0.08f, 0.1f, 0.18f, 0.85f)));
-                GUI.Label(lzBadge, lzText, ui.Badge);
+                GUI.Label(lzBadge, Loc.T(lzText), ui.Badge);
 
                 // The VSTAR and GX markers: what they mean, on hover.
                 if (!ModalOpen)
@@ -1352,30 +1370,30 @@ namespace PokemonTCG.Presentation
             if (panelHidden)
             {
                 panelRect = new Rect(UiScale.Width - 370, 10, 360, 40);
-                GUI.Box(panelRect, GUIContent.none);
+                GUI.Box(panelRect, Loc.T(GUIContent.none));
                 string title = req.Prompt ?? "";
                 if (title.Length > 34) title = title.Substring(0, 33) + "...";
-                GUI.Label(new Rect(panelRect.x + 10, panelRect.y + 9, panelRect.width - 110, 22), title, ui.Label);
-                if (GUI.Button(new Rect(panelRect.xMax - 92, panelRect.y + 8, 84, 24), "Show")) guiActions.Add(() => panelHidden = false);
+                GUI.Label(new Rect(panelRect.x + 10, panelRect.y + 9, panelRect.width - 110, 22), Loc.T(title), ui.Label);
+                if (GUI.Button(new Rect(panelRect.xMax - 92, panelRect.y + 8, 84, 24), Loc.T("Show"))) guiActions.Add(() => panelHidden = false);
                 return;
             }
             panelRect = new Rect(UiScale.Width - 370, 10, 360, Mathf.Min(UiScale.Height - 70, 620));
             var area = panelRect;
-            GUI.Box(area, GUIContent.none);
+            GUI.Box(area, Loc.T(GUIContent.none));
             // The Hide button sits on its own row at the top, so a long prompt never runs under it.
-            if (GUI.Button(new Rect(area.xMax - 64, area.y + 4, 56, 20), "Hide")) guiActions.Add(() => panelHidden = true);
+            if (GUI.Button(new Rect(area.xMax - 64, area.y + 4, 56, 20), Loc.T("Hide"))) guiActions.Add(() => panelHidden = true);
             GUILayout.BeginArea(new Rect(area.x + 8, area.y + 26, area.width - 16, area.height - 34));
-            GUILayout.Label(req.Prompt, ui.Title);
-            if (req.Source != null) GUILayout.Label("From: " + req.Source.Name, ui.Label);
+            GUILayout.Label(Loc.T(req.Prompt), ui.Title);
+            if (req.Source != null) GUILayout.Label(Loc.T("From: " + req.Source.Name), ui.Label);
             if (req.Kind == DecisionKind.MainAction && filterCardId == int.MinValue)
-                GUILayout.Label("Drag a card from your hand onto the board or a Pokémon to play it. Click a Pokémon to see its attacks and Abilities, or a discard pile to see it.", Hint(ui));
+                GUILayout.Label(Loc.T("Drag a card from your hand onto the board or a Pokémon to play it. Click a Pokémon to see its attacks and Abilities, or a discard pile to see it."), Hint(ui));
             else if (req.Kind == DecisionKind.SetupActive || req.Kind == DecisionKind.SetupBench)
-                GUILayout.Label("Drag a Basic Pokémon from your hand onto the board. Clicking a card shows its option below.", Hint(ui));
+                GUILayout.Label(Loc.T("Drag a Basic Pokémon from your hand onto the board. Clicking a card shows its option below."), Hint(ui));
             else if (req.Kind == DecisionKind.ChoosePrize)
-                GUILayout.Label("Click one of your Prize cards on the table, or pick one below.", Hint(ui));
+                GUILayout.Label(Loc.T("Click one of your Prize cards on the table, or pick one below."), Hint(ui));
             bool multi = !req.IsSingleChoice;
-            if (multi) GUILayout.Label("Pick " + (req.MinChoices == req.MaxChoices ? req.MinChoices.ToString() : req.MinChoices + " to " + req.MaxChoices) + "  (selected " + multiSelection.Count + ")", ui.Label);
-            if (IsCardChoice(req) && pickerHidden && GUILayout.Button("Show the cards")) guiActions.Add(() => pickerHidden = false);
+            if (multi) GUILayout.Label(Loc.T("Pick " + (req.MinChoices == req.MaxChoices ? req.MinChoices.ToString() : req.MinChoices + " to " + req.MaxChoices) + "  (selected " + multiSelection.Count + ")"), ui.Label);
+            if (IsCardChoice(req) && pickerHidden && GUILayout.Button(Loc.T("Show the cards"))) guiActions.Add(() => pickerHidden = false);
 
             // IMGUI lays controls out twice per event, so state changes are applied after drawing.
             bool showAll = false;
@@ -1384,8 +1402,8 @@ namespace PokemonTCG.Presentation
             int filter = filterCardId;
             if (filter != int.MinValue)
             {
-                GUILayout.Label("Options for the selected card:", ui.Label);
-                if (GUILayout.Button("Show all options")) showAll = true;
+                GUILayout.Label(Loc.T("Options for the selected card:"), ui.Label);
+                if (GUILayout.Button(Loc.T("Show all options"))) showAll = true;
             }
 
             optionScroll = GUILayout.BeginScrollView(optionScroll);
@@ -1396,7 +1414,7 @@ namespace PokemonTCG.Presentation
                 if (multi)
                 {
                     bool on = multiSelection.Contains(i);
-                    bool now = GUILayout.Toggle(on, " " + o.Label);
+                    bool now = GUILayout.Toggle(on, Loc.T(" " + o.Label));
                     if (now != on)
                     {
                         int idx = i;
@@ -1404,7 +1422,7 @@ namespace PokemonTCG.Presentation
                         else guiActions.Add(() => multiSelection.Remove(idx));
                     }
                 }
-                else if (GUILayout.Button(o.Label, ui.Button))
+                else if (GUILayout.Button(Loc.T(o.Label), ui.Button))
                 {
                     clicked = i;
                 }
@@ -1415,7 +1433,7 @@ namespace PokemonTCG.Presentation
             {
                 bool ok = multiSelection.Count >= req.MinChoices && multiSelection.Count <= req.MaxChoices;
                 GUI.enabled = ok && !ModalOpen;
-                if (GUILayout.Button("Confirm")) confirm = true;
+                if (GUILayout.Button(Loc.T("Confirm"))) confirm = true;
                 GUI.enabled = !ModalOpen;
             }
             GUILayout.EndArea();
@@ -1490,25 +1508,25 @@ namespace PokemonTCG.Presentation
             {
                 var r = new Rect(UiScale.Width / 2f - 300, UiScale.Height / 2f - 160, 600, 320);
                 endRect = r;
-                GUI.Box(r, GUIContent.none);
+                GUI.Box(r, Loc.T(GUIContent.none));
                 GUILayout.BeginArea(new Rect(r.x + 10, r.y + 10, r.width - 20, r.height - 20));
-                GUILayout.Label(host is RemoteGameHost ? "The online game stopped" : "Something went wrong in the engine", ui.Title);
-                GUILayout.Label(errorText.Length > 900 ? errorText.Substring(0, 900) + "..." : errorText, ui.Label);
+                GUILayout.Label(Loc.T(host is RemoteGameHost ? "The online game stopped" : "Something went wrong in the engine"), ui.Title);
+                GUILayout.Label(Loc.T(errorText.Length > 900 ? errorText.Substring(0, 900) + "..." : errorText), ui.Label);
                 GUILayout.BeginHorizontal();
                 if (OnlineGame && !regionalGame)
                 {
-                    if (GUILayout.Button("Back to the online screen")) pendingOnlineLobby = true;
+                    if (GUILayout.Button(Loc.T("Back to the online screen"))) pendingOnlineLobby = true;
                 }
                 else if (regionalGame)
                 {
                     // Not counted for the event: play it again or go back.
-                    if (GUILayout.Button("Play this game again")) pendingRegionalGame = true;
-                    if (GUILayout.Button("Back to the event")) pendingRegionalHub = true;
+                    if (GUILayout.Button(Loc.T("Play this game again"))) pendingRegionalGame = true;
+                    if (GUILayout.Button(Loc.T("Back to the event"))) pendingRegionalHub = true;
                 }
                 else
                 {
-                    if (GUILayout.Button("Play again")) pendingRestart = true;
-                    if (GUILayout.Button("Back to menu")) pendingMenu = true;
+                    if (GUILayout.Button(Loc.T("Play again"))) pendingRestart = true;
+                    if (GUILayout.Button(Loc.T("Back to menu"))) pendingMenu = true;
                 }
                 GUILayout.EndHorizontal();
                 GUILayout.EndArea();
@@ -1520,36 +1538,36 @@ namespace PokemonTCG.Presentation
                 float h = (analyzer != null ? 184 : 150) + (regionalGame ? 46 : 0) + 24;
                 var r = new Rect(UiScale.Width / 2f - 210, UiScale.Height / 2f - 70, 420, h);
                 endRect = r;
-                GUI.Box(r, GUIContent.none);
+                GUI.Box(r, Loc.T(GUIContent.none));
                 GUILayout.BeginArea(new Rect(r.x + 10, r.y + 10, r.width - 20, r.height - 20));
-                GUILayout.Label(over.Winner < 0 ? "Draw" : SeatName(over.Winner) + (SeatName(over.Winner) == "You" ? " won!" : " won."), ui.Title);
-                GUILayout.Label(over.EndReason, ui.Label);
-                if (regionalGame && !string.IsNullOrEmpty(regionalGameResultText)) GUILayout.Label(regionalGameResultText, ui.Good);
-                GUILayout.Label(RatingEndLine(), ui.Small); // v157
-                if (analyzer != null && GUILayout.Button("Areas of Improvement")) guiActions.Add(() => reviewOpen = true);
+                GUILayout.Label(Loc.T(over.Winner < 0 ? "Draw" : SeatName(over.Winner) + (SeatName(over.Winner) == "You" ? " won!" : " won.")), ui.Title);
+                GUILayout.Label(Loc.T(over.EndReason), ui.Label);
+                if (regionalGame && !string.IsNullOrEmpty(regionalGameResultText)) GUILayout.Label(Loc.T(regionalGameResultText), ui.Good);
+                GUILayout.Label(Loc.T(RatingEndLine()), ui.Small); // v157
+                if (analyzer != null && GUILayout.Button(Loc.T("Areas of Improvement"))) guiActions.Add(() => reviewOpen = true);
                 GUILayout.BeginHorizontal();
                 if (OnlineGame && !regionalGame && host is EngineHost && onlineHost != null && onlineHost.Guest != null && !onlineHost.Guest.Closed)
                 {
                     // Online, hosting: another game with the same decks (the friend may pick another deck meanwhile), or back.
-                    if (GUILayout.Button("Play again")) pendingOnlineStart = true;
-                    if (GUILayout.Button("Back to the online screen")) pendingOnlineLobby = true;
+                    if (GUILayout.Button(Loc.T("Play again"))) pendingOnlineStart = true;
+                    if (GUILayout.Button(Loc.T("Back to the online screen"))) pendingOnlineLobby = true;
                 }
                 else if (host is RemoteGameHost || (OnlineGame && !regionalGame))
                 {
-                    GUILayout.Label(host is RemoteGameHost ? "The host starts the next game." : "Your friend has left.", ui.Small);
-                    if (host is RemoteGameHost && GUILayout.Button("Ready (Regional)")) guiActions.Add(SendOnlineReady);
-                    if (GUILayout.Button("Back to the online screen")) pendingOnlineLobby = true;
+                    GUILayout.Label(Loc.T(host is RemoteGameHost ? "The host starts the next game." : "Your friend has left."), ui.Small);
+                    if (host is RemoteGameHost && GUILayout.Button(Loc.T("Ready (Regional)"))) guiActions.Add(SendOnlineReady);
+                    if (GUILayout.Button(Loc.T("Back to the online screen"))) pendingOnlineLobby = true;
                 }
                 else if (regionalGame)
                 {
                     // Regional Sim: the next game of the match, or back to the event (a game can't be replayed once it counted).
-                    if (regionalNextGame > 0 && GUILayout.Button((regionalWatch ? "Watch game " : "Play game ") + regionalNextGame)) pendingRegionalGame = true;
-                    if (GUILayout.Button("Back to the event")) pendingRegionalHub = true;
+                    if (regionalNextGame > 0 && GUILayout.Button(Loc.T((regionalWatch ? "Watch game " : "Play game ") + regionalNextGame))) pendingRegionalGame = true;
+                    if (GUILayout.Button(Loc.T("Back to the event"))) pendingRegionalHub = true;
                 }
                 else
                 {
-                    if (GUILayout.Button("Play again")) pendingRestart = true;
-                    if (GUILayout.Button("Back to menu")) pendingMenu = true;
+                    if (GUILayout.Button(Loc.T("Play again"))) pendingRestart = true;
+                    if (GUILayout.Button(Loc.T("Back to menu"))) pendingMenu = true;
                 }
                 GUILayout.EndHorizontal();
                 GUILayout.EndArea();

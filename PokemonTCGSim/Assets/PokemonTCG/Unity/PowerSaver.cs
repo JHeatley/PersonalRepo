@@ -159,7 +159,7 @@ namespace PokemonTCG.Presentation
             var style = darkStyle;
             int slot = (int)(Time.unscaledTime / 30f) % 5;
             float y = UiScale.Height * (0.2f + 0.15f * slot);
-            GUI.Label(new Rect(20f, y, UiScale.Width - 40f, 60f), (string.IsNullOrEmpty(line) ? "The AI is working" : line) + "\nBattery saver: tap to wake", style);
+            GUI.Label(new Rect(20f, y, UiScale.Width - 40f, 60f), Loc.T((string.IsNullOrEmpty(line) ? "The AI is working" : line) + "\nBattery saver: tap to wake"), style);
         }
     }
 }

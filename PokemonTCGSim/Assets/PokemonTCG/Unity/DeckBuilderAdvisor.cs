@@ -313,18 +313,18 @@ namespace PokemonTCG.Presentation
         private void DrawAdvice(UiStyles ui, List<System.Action> actions)
         {
             var r = AdviceRect();
-            GUI.Box(r, GUIContent.none);
-            GUI.Box(r, GUIContent.none);
+            GUI.Box(r, Loc.T(GUIContent.none));
+            GUI.Box(r, Loc.T(GUIContent.none));
             GUILayout.BeginArea(new Rect(r.x + 12f, r.y + 10f, r.width - 24f, r.height - 20f));
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("AI deck advice", ui.Title);
+            GUILayout.Label(Loc.T("AI deck advice"), ui.Title);
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Close", GUILayout.Width(100))) actions.Add(() => CloseAdvice());
+            if (GUILayout.Button(Loc.T("Close"), GUILayout.Width(100))) actions.Add(() => CloseAdvice());
             GUILayout.EndHorizontal();
 
             GUI.enabled = !busyShown;
-            int mode = GUILayout.Toolbar(adviceMode, AdviceModes);
+            int mode = GUILayout.Toolbar(adviceMode, Loc.T(AdviceModes));
             if (mode != adviceMode)
             {
                 int picked = mode;
@@ -345,37 +345,37 @@ namespace PokemonTCG.Presentation
 
         private void DrawImproveInputs(UiStyles ui, List<System.Action> actions)
         {
-            GUILayout.Label("Looks at the deck in the editor (" + Total + " cards, " + Formats.Label(format) + ") and suggests up to " + MaxImproveChanges
+            GUILayout.Label(Loc.T("Looks at the deck in the editor (" + Total + " cards, " + Formats.Label(format) + ") and suggests up to " + MaxImproveChanges
                             + " swaps: what's missing (evolution lines, Energy for the attacks, draw, Pokémon search, gust, switching, recovery), "
                             + "what similar decks in your library agree on, and what the Neural AI's games say about each card. "
-                            + "A deck under 60 cards is filled; one over 60 is trimmed.", AdviceSmall(ui));
+                            + "A deck under 60 cards is filled; one over 60 is trimmed."), AdviceSmall(ui));
             GUI.enabled = !busyShown && Total > 0;
-            if (GUILayout.Button(busyShown ? "Thinking…" : "Suggest changes", GUILayout.Height(30))) actions.Add(() => RunAdvice());
+            if (GUILayout.Button(Loc.T(busyShown ? "Thinking…" : "Suggest changes"), GUILayout.Height(30))) actions.Add(() => RunAdvice());
             GUI.enabled = true;
         }
 
         private void DrawAroundInputs(UiStyles ui, List<System.Action> actions)
         {
-            GUILayout.Label("Pick a card. If decks in your library play it, the deck is their common core; if not, it's built from the card's "
+            GUILayout.Label(Loc.T("Pick a card. If decks in your library play it, the deck is their common core; if not, it's built from the card's "
                             + "evolution line, the Trainers your library plays most for each job and the Energy its attacks need. "
-                            + "Then Load it into the editor and save it.", AdviceSmall(ui));
+                            + "Then Load it into the editor and save it."), AdviceSmall(ui));
             string active = aroundSearch ?? "";
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Card name", GUILayout.Width(80));
+            GUILayout.Label(Loc.T("Card name"), GUILayout.Width(80));
             aroundSearch = GUILayout.TextField(aroundSearch ?? "");
             GUILayout.EndHorizontal();
             var matches = AroundMatches(active);
-            if (active.Trim().Length < 2) GUILayout.Label("Type at least 2 letters of a card's name.", AdviceSmall(ui));
-            else if (matches.Count == 0) GUILayout.Label("No " + Formats.Label(format) + " card has that in its name.", AdviceSmall(ui));
+            if (active.Trim().Length < 2) GUILayout.Label(Loc.T("Type at least 2 letters of a card's name."), AdviceSmall(ui));
+            else if (matches.Count == 0) GUILayout.Label(Loc.T("No " + Formats.Label(format) + " card has that in its name."), AdviceSmall(ui));
             foreach (var d in matches)
             {
                 var card = d;
                 bool selected = aroundCard != null && aroundCard.Key == card.Key;
                 string label = card.Name + "   (" + card.SetCode + " " + card.Number + (card.IsPokemon ? ", " + StageLabel(card) : card.IsTrainer ? ", " + card.TrainerKind : ", Energy") + ")";
-                if (GUILayout.Toggle(selected, label, ui.Button) && !selected) actions.Add(() => aroundCard = card);
+                if (GUILayout.Toggle(selected, Loc.T(label), ui.Button) && !selected) actions.Add(() => aroundCard = card);
             }
             GUI.enabled = !busyShown && aroundCard != null;
-            if (GUILayout.Button(busyShown ? "Thinking…" : aroundCard == null ? "Pick a card above" : "Build a deck around " + aroundCard.Name, GUILayout.Height(30)))
+            if (GUILayout.Button(Loc.T(busyShown ? "Thinking…" : aroundCard == null ? "Pick a card above" : "Build a deck around " + aroundCard.Name), GUILayout.Height(30)))
                 actions.Add(() => RunAdvice());
             GUI.enabled = true;
         }
@@ -412,19 +412,19 @@ namespace PokemonTCG.Presentation
 
         private void DrawCounterInputs(UiStyles ui, List<System.Action> actions)
         {
-            GUILayout.Label("Pick the deck you want to beat. The advice looks at its main attacker (and its Weakness) and at what it relies on "
-                            + "(Abilities, Tools, Special Energy, Items, Stadiums), then suggests up to " + MaxCounterChanges + " swaps for the deck in the editor.", AdviceSmall(ui));
+            GUILayout.Label(Loc.T("Pick the deck you want to beat. The advice looks at its main attacker (and its Weakness) and at what it relies on "
+                            + "(Abilities, Tools, Special Energy, Items, Stadiums), then suggests up to " + MaxCounterChanges + " swaps for the deck in the editor."), AdviceSmall(ui));
             var library = AdviceLibrary();
-            if (library.Count == 0) GUILayout.Label("No legal decks in your library yet.", AdviceSmall(ui));
+            if (library.Count == 0) GUILayout.Label(Loc.T("No legal decks in your library yet."), AdviceSmall(ui));
             for (int i = 0; i < library.Count; i++)
             {
                 int index = i;
                 bool selected = counterIndex == index;
-                if (GUILayout.Toggle(selected, library[i].Name, ui.Button) && !selected) actions.Add(() => counterIndex = index);
+                if (GUILayout.Toggle(selected, Loc.T(library[i].Name), ui.Button) && !selected) actions.Add(() => counterIndex = index);
             }
             bool ready = counterIndex >= 0 && counterIndex < library.Count && Total > 0;
             GUI.enabled = !busyShown && ready;
-            if (GUILayout.Button(busyShown ? "Thinking…" : ready ? "Suggest changes against " + library[counterIndex].Name : "Pick a deck above", GUILayout.Height(30)))
+            if (GUILayout.Button(Loc.T(busyShown ? "Thinking…" : ready ? "Suggest changes against " + library[counterIndex].Name : "Pick a deck above"), GUILayout.Height(30)))
                 actions.Add(() => RunAdvice());
             GUI.enabled = true;
         }
@@ -433,29 +433,29 @@ namespace PokemonTCG.Presentation
         {
             if (busyShown)
             {
-                GUILayout.Label("Thinking…", ui.Title);
+                GUILayout.Label(Loc.T("Thinking…"), ui.Title);
                 return;
             }
             if (advice == null) return;
             if (!string.IsNullOrEmpty(advice.Error))
             {
-                GUILayout.Label(advice.Error, ui.Error);
+                GUILayout.Label(Loc.T(advice.Error), ui.Error);
                 return;
             }
-            GUILayout.Label(advice.Title, ui.Title);
-            foreach (var note in advice.Notes) GUILayout.Label(note, AdviceSmall(ui));
+            GUILayout.Label(Loc.T(advice.Title), ui.Title);
+            foreach (var note in advice.Notes) GUILayout.Label(Loc.T(note), AdviceSmall(ui));
             GUILayout.Space(6);
 
             if (advice.IsWholeDeck)
             {
                 if (advice.Changes.Count > 0)
                 {
-                    GUILayout.Label("Already made to the list:", AdviceBold(ui));
+                    GUILayout.Label(Loc.T("Already made to the list:"), AdviceBold(ui));
                     foreach (var change in advice.Changes) DrawChange(change, ui);
                 }
-                GUILayout.Label(advice.DeckName + " — " + advice.Result.Count + " cards", AdviceBold(ui));
-                GUILayout.Label(Decklist.Format(null, Decklist.Group(advice.Result), advice.Format).Trim(), AdviceWrap(ui));
-                if (GUILayout.Button("Load into the editor", GUILayout.Height(30))) actions.Add(() => LoadAdviceDeck());
+                GUILayout.Label(Loc.T(advice.DeckName + " — " + advice.Result.Count + " cards"), AdviceBold(ui));
+                GUILayout.Label(Loc.T(Decklist.Format(null, Decklist.Group(advice.Result), advice.Format).Trim()), AdviceWrap(ui));
+                if (GUILayout.Button(Loc.T("Load into the editor"), GUILayout.Height(30))) actions.Add(() => LoadAdviceDeck());
                 return;
             }
 
@@ -465,18 +465,18 @@ namespace PokemonTCG.Presentation
                 int index = i;
                 var change = advice.Changes[i];
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(change.Label, AdviceBold(ui));
+                GUILayout.Label(Loc.T(change.Label), AdviceBold(ui));
                 GUILayout.FlexibleSpace();
                 bool applied = adviceApplied.Contains(index);
                 GUI.enabled = !applied;
-                if (GUILayout.Button(applied ? "Applied" : "Apply", GUILayout.Width(100))) actions.Add(() => ApplyAdviceChange(index));
+                if (GUILayout.Button(Loc.T(applied ? "Applied" : "Apply"), GUILayout.Width(100))) actions.Add(() => ApplyAdviceChange(index));
                 GUI.enabled = true;
                 GUILayout.EndHorizontal();
                 DrawChangeReasons(change, ui);
                 GUILayout.Space(4);
             }
             GUI.enabled = adviceApplied.Count < advice.Changes.Count;
-            if (GUILayout.Button("Apply all", GUILayout.Height(28))) actions.Add(() => ApplyAllAdvice());
+            if (GUILayout.Button(Loc.T("Apply all"), GUILayout.Height(28))) actions.Add(() => ApplyAllAdvice());
             GUI.enabled = true;
             GUILayout.Space(8);
             DrawTrial(ui, actions);
@@ -484,53 +484,53 @@ namespace PokemonTCG.Presentation
 
         private void DrawChange(DeckChange change, UiStyles ui)
         {
-            GUILayout.Label(change.Label, AdviceBold(ui));
+            GUILayout.Label(Loc.T(change.Label), AdviceBold(ui));
             DrawChangeReasons(change, ui);
         }
 
         private void DrawChangeReasons(DeckChange change, UiStyles ui)
         {
-            if (change.Add != null && !string.IsNullOrEmpty(change.Why)) GUILayout.Label("In: " + change.Why, AdviceSmall(ui));
-            if (change.Cut != null && !string.IsNullOrEmpty(change.CutWhy)) GUILayout.Label("Out: " + change.Cut.Name + ": " + change.CutWhy + ".", AdviceSmall(ui));
+            if (change.Add != null && !string.IsNullOrEmpty(change.Why)) GUILayout.Label(Loc.T("In: " + change.Why), AdviceSmall(ui));
+            if (change.Cut != null && !string.IsNullOrEmpty(change.CutWhy)) GUILayout.Label(Loc.T("Out: " + change.Cut.Name + ": " + change.CutWhy + "."), AdviceSmall(ui));
         }
 
         private void DrawTrial(UiStyles ui, List<System.Action> actions)
         {
-            GUILayout.Label("Test it", AdviceBold(ui));
-            GUILayout.Label(adviceRunMode == CounterMode
+            GUILayout.Label(Loc.T("Test it"), AdviceBold(ui));
+            GUILayout.Label(Loc.T(adviceRunMode == CounterMode
                 ? "Plays the deck before and after the changes against the same games with " + (adviceRunOpponent == null ? "that deck" : adviceRunOpponent.Name) + " (the classic bot plays both sides)."
-                : "Plays the deck before and after the changes against the same games with up to 4 decks from your library (the classic bot plays both sides).",
+                : "Plays the deck before and after the changes against the same games with up to 4 decks from your library (the classic bot plays both sides)."),
                 AdviceSmall(ui));
             var status = trialStatus;
             bool running = status != null && status.Running;
             GUILayout.BeginHorizontal();
             GUI.enabled = !running;
-            GUILayout.Label("Games per opponent", GUILayout.Width(140));
-            int pick = GUILayout.Toolbar(trialGamesPick, TrialGameNames, GUILayout.Width(300));
+            GUILayout.Label(Loc.T("Games per opponent"), GUILayout.Width(140));
+            int pick = GUILayout.Toolbar(trialGamesPick, Loc.T(TrialGameNames), GUILayout.Width(300));
             if (pick != trialGamesPick)
             {
                 int picked = pick;
                 actions.Add(() => trialGamesPick = picked);
             }
-            if (GUILayout.Button("Test before vs after", GUILayout.Width(180))) actions.Add(() => StartTrial());
+            if (GUILayout.Button(Loc.T("Test before vs after"), GUILayout.Width(180))) actions.Add(() => StartTrial());
             GUI.enabled = running;
-            if (GUILayout.Button("Stop", GUILayout.Width(80))) actions.Add(() => StopAdvisor());
+            if (GUILayout.Button(Loc.T("Stop"), GUILayout.Width(80))) actions.Add(() => StopAdvisor());
             GUI.enabled = true;
             GUILayout.EndHorizontal();
-            if (!string.IsNullOrEmpty(trialNote)) GUILayout.Label(trialNote, ui.Error);
+            if (!string.IsNullOrEmpty(trialNote)) GUILayout.Label(Loc.T(trialNote), ui.Error);
             if (status == null) return;
-            if (running) GUILayout.Label("Playing… " + status.Done + " / " + status.Total + " games", AdviceSmall(ui));
+            if (running) GUILayout.Label(Loc.T("Playing… " + status.Done + " / " + status.Total + " games"), AdviceSmall(ui));
             if (status.GamesBefore > 0 || status.GamesAfter > 0)
             {
-                GUILayout.Label("Before: " + Percent(status.RateBefore) + " wins (" + status.WinsBefore + "/" + status.GamesBefore + ")    After: "
-                                + Percent(status.RateAfter) + " wins (" + status.WinsAfter + "/" + status.GamesAfter + ")",
+                GUILayout.Label(Loc.T("Before: " + Percent(status.RateBefore) + " wins (" + status.WinsBefore + "/" + status.GamesBefore + ")    After: "
+                                + Percent(status.RateAfter) + " wins (" + status.WinsAfter + "/" + status.GamesAfter + ")"),
                     status.RateAfter > status.RateBefore ? ui.Good : AdviceBold(ui));
-                foreach (var line in status.Lines) GUILayout.Label(line, AdviceSmall(ui));
+                foreach (var line in status.Lines) GUILayout.Label(Loc.T(line), AdviceSmall(ui));
                 if (status.Finished)
-                    GUILayout.Label("A handful of games swings a lot: treat a few wins either way as noise, and a big gap over 50 games as a real signal.", AdviceSmall(ui));
+                    GUILayout.Label(Loc.T("A handful of games swings a lot: treat a few wins either way as noise, and a big gap over 50 games as a real signal."), AdviceSmall(ui));
             }
-            if (status.Errors > 0) GUILayout.Label(status.Errors + " game(s) hit an error: " + status.LastError, ui.Error);
-            if (status.Cancelled) GUILayout.Label("Stopped.", AdviceSmall(ui));
+            if (status.Errors > 0) GUILayout.Label(Loc.T(status.Errors + " game(s) hit an error: " + status.LastError), ui.Error);
+            if (status.Cancelled) GUILayout.Label(Loc.T("Stopped."), AdviceSmall(ui));
         }
 
         private static string Percent(double x)

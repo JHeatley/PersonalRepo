@@ -371,39 +371,39 @@ namespace PokemonTCG.Presentation
             bool bg = BackgroundRunning;
             GUILayout.BeginHorizontal();
             GUI.enabled = !runningHere && !bg && TrainDecksReady && brain != null && BackgroundTrainerAvailable;
-            if (GUILayout.Button("Train in the background (fastest)", GUILayout.Height(28))) actions.Add(StartBackgroundTraining);
+            if (GUILayout.Button(Loc.T("Train in the background (fastest)"), GUILayout.Height(28))) actions.Add(StartBackgroundTraining);
             GUI.enabled = bg;
-            if (GUILayout.Button("Stop it", GUILayout.Height(28), GUILayout.Width(80))) actions.Add(StopBackgroundTraining);
+            if (GUILayout.Button(Loc.T("Stop it"), GUILayout.Height(28), GUILayout.Width(80))) actions.Add(StopBackgroundTraining);
             GUI.enabled = true;
             GUILayout.EndHorizontal();
             if (bg && bgStopAsked != null && DateTime.UtcNow - bgStopAsked.Value > ForceStopAfter)
             {
-                GUILayout.Label("It hasn't stopped after " + FormatDuration((DateTime.UtcNow - bgStopAsked.Value).TotalSeconds) + ". Force stop ends the trainer now; "
-                                + "it saves nothing from this session (the AI stays as it was before it started).", ui.Error);
-                if (GUILayout.Button("Force stop", GUILayout.Height(28))) actions.Add(ForceStopBackgroundTraining);
+                GUILayout.Label(Loc.T("It hasn't stopped after " + FormatDuration((DateTime.UtcNow - bgStopAsked.Value).TotalSeconds) + ". Force stop ends the trainer now; "
+                                + "it saves nothing from this session (the AI stays as it was before it started)."), ui.Error);
+                if (GUILayout.Button(Loc.T("Force stop"), GUILayout.Height(28))) actions.Add(ForceStopBackgroundTraining);
             }
             if (bg)
             {
                 int done = BgInt("done"), games = BgInt("games");
                 double rate = BgDouble("gamesPerSecond", 0), seconds = BgDouble("seconds", 0);
                 string left = rate > 0 && games > done ? "  ·  about " + FormatDuration((games - done) / rate) + " left" : "";
-                GUILayout.Label("In the background: " + BgValue("phase", "starting..."), ui.Label);
-                GUILayout.Label("Games " + done.ToString("N0") + " / " + games.ToString("N0") + (rate > 0 ? "  ·  " + rate.ToString("0.0") + " games/s" : "")
+                GUILayout.Label(Loc.T("In the background: " + BgValue("phase", "starting...")), ui.Label);
+                GUILayout.Label(Loc.T("Games " + done.ToString("N0") + " / " + games.ToString("N0") + (rate > 0 ? "  ·  " + rate.ToString("0.0") + " games/s" : "")
                                 + left + (BgInt("evalTotal") > 0 ? "  ·  measuring games " + BgInt("evalDone") + " / " + BgInt("evalTotal") : "")
-                                + "  ·  running " + FormatDuration(seconds), Hint(ui));
+                                + "  ·  running " + FormatDuration(seconds)), Hint(ui));
                 double before = BgDouble("scoreBefore", -1);
-                if (before >= 0) GUILayout.Label("Before training it won " + Math.Round(before * 100) + "% against the classic bot.", Hint(ui));
-                if (!string.IsNullOrEmpty(BgValue("lastError"))) GUILayout.Label(BgValue("lastError"), ui.Error);
-                GUILayout.Label("The app doesn't save the AI meanwhile: when the trainer finishes (or you stop it), it loads what it learned. "
-                                + "Games you play against the AI until then don't teach it.", Hint(ui));
+                if (before >= 0) GUILayout.Label(Loc.T("Before training it won " + Math.Round(before * 100) + "% against the classic bot."), Hint(ui));
+                if (!string.IsNullOrEmpty(BgValue("lastError"))) GUILayout.Label(Loc.T(BgValue("lastError")), ui.Error);
+                GUILayout.Label(Loc.T("The app doesn't save the AI meanwhile: when the trainer finishes (or you stop it), it loads what it learned. "
+                                + "Games you play against the AI until then don't teach it."), Hint(ui));
             }
             else if (!BackgroundTrainerAvailable)
-                GUILayout.Label("Background training needs Windows and Tools/sim-train/sim-train.exe beside the game (a Windows build "
-                                + "includes it) or, in the editor, beside the Assets folder.", Hint(ui));
+                GUILayout.Label(Loc.T("Background training needs Windows and Tools/sim-train/sim-train.exe beside the game (a Windows build "
+                                + "includes it) or, in the editor, beside the Assets folder."), Hint(ui));
             else
-                GUILayout.Label("Runs this session (the decks, games, style and settings above) in a separate trainer program: several times faster "
-                                + "than training in the app, and the app stays light. When it's done, the app loads what it learned.", Hint(ui));
-            if (!string.IsNullOrEmpty(bgMessage)) GUILayout.Label(bgMessage, ui.Good);
+                GUILayout.Label(Loc.T("Runs this session (the decks, games, style and settings above) in a separate trainer program: several times faster "
+                                + "than training in the app, and the app stays light. When it's done, the app loads what it learned."), Hint(ui));
+            if (!string.IsNullOrEmpty(bgMessage)) GUILayout.Label(Loc.T(bgMessage), ui.Good);
         }
 
         private static string FormatDuration(double seconds)

@@ -735,7 +735,7 @@ namespace PokemonTCG.Presentation
             var actions = new List<Action>();
             float w = Mathf.Min(1180f, UiScale.Width - 30f);
             var r = new Rect(UiScale.Width / 2f - w / 2f, 15f, w, UiScale.Height - 30f);
-            GUI.Box(r, GUIContent.none);
+            GUI.Box(r, Loc.T(GUIContent.none));
             float innerH = r.height - 20f;
             float mainH = innerH - RegionalFooterHeight;
             GUILayout.BeginArea(new Rect(r.x + 14, r.y + 10, r.width - 28, mainH));
@@ -743,7 +743,7 @@ namespace PokemonTCG.Presentation
             string title = "Regional Sim  ·  " + v.Format + "  ·  " + (v.BestOfThree ? "best of 3" : "best of 1") + "  ·  " + v.Players.ToString("N0") + " players"
                            + (v.Day1Rounds > 0 ? "  ·  2 days, Day 2 at " + v.Day2Points + " points" : "")
                            + (v.TopCut > 0 ? "  ·  top " + v.TopCut + " cut, " + (v.CutBestOfThree ? "best of 3" : "best of 1") + (v.AsymmetricCut ? ", asymmetrical" : "") : "");
-            GUILayout.Label(title, ui.Header);
+            GUILayout.Label(Loc.T(title), ui.Header);
             string stage;
             if (v.Finished)
                 stage = v.TopCut > 0 && v.Champion >= 0
@@ -759,17 +759,17 @@ namespace PokemonTCG.Presentation
             else if (v.Day1Rounds > 0)
                 stage = "Day 2: round " + v.Round + " of " + v.Rounds + "  ·  " + v.Day2Players.ToString("N0") + " players made Day 2" + (v.TopCut > 0 ? ", then a top " + v.TopCut + " cut" : "");
             else stage = "Round " + v.Round + " of " + v.Rounds + (v.TopCut > 0 ? ", then a top " + v.TopCut + " cut" : "");
-            GUILayout.Label(stage, ui.Title);
+            GUILayout.Label(Loc.T(stage), ui.Title);
 
             DrawRegionalStatus(ui, v, actions, r.width - 28);
-            if (regionalError != null) GUILayout.Label(regionalError, ui.Error);
-            if (!string.IsNullOrEmpty(v.LastError)) GUILayout.Label("AI tables: " + v.AiErrors + " game(s) hit an engine error and counted as draws. Last: " + v.LastError, ui.Error);
-            if (!string.IsNullOrEmpty(learnStatus)) GUILayout.Label(learnStatus, Hint(ui));
+            if (regionalError != null) GUILayout.Label(Loc.T(regionalError), ui.Error);
+            if (!string.IsNullOrEmpty(v.LastError)) GUILayout.Label(Loc.T("AI tables: " + v.AiErrors + " game(s) hit an engine error and counted as draws. Last: " + v.LastError), ui.Error);
+            if (!string.IsNullOrEmpty(learnStatus)) GUILayout.Label(Loc.T(learnStatus), Hint(ui));
 
             GUILayout.Space(4);
             var tabs = v.TopCut > 0 ? RegionalTabsWithCut : RegionalTabs;
             int tab = Mathf.Clamp(regTab, 0, tabs.Length - 1);
-            int newTab = GUILayout.Toolbar(tab, tabs, GUILayout.Width(Mathf.Min(140f * tabs.Length, r.width - 28)));
+            int newTab = GUILayout.Toolbar(tab, Loc.T(tabs), GUILayout.Width(Mathf.Min(140f * tabs.Length, r.width - 28)));
             if (newTab != regTab) actions.Add(() => regTab = newTab);
             if (Event.current.type == EventType.Repaint) regListTop = GUILayoutUtility.GetLastRect().yMax;
             // The table's header row, its frame and the line of notes under it take about 90 more.
@@ -784,47 +784,47 @@ namespace PokemonTCG.Presentation
             GUILayout.BeginArea(new Rect(r.x + 14, r.y + 10 + mainH, r.width - 28, RegionalFooterHeight));
             GUILayout.Space(6);
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Back to menu", GUILayout.Height(30), GUILayout.Width(150)))
+            if (GUILayout.Button(Loc.T("Back to menu"), GUILayout.Height(30), GUILayout.Width(150)))
                 actions.Add(() => { RefreshDecks(); mode = Mode.Menu; });
             if (!v.Finished)
             {
-                if (GUILayout.Button(regionalPaused ? "Resume the AI tables" : "Pause the AI tables", GUILayout.Height(30), GUILayout.Width(190)))
+                if (GUILayout.Button(Loc.T(regionalPaused ? "Resume the AI tables" : "Pause the AI tables"), GUILayout.Height(30), GUILayout.Width(190)))
                 {
                     bool pause = !regionalPaused;
                     actions.Add(() => SetRegionalPaused(pause));
                 }
                 // v120: a black screen while the AI tables play (they keep going; tap to wake).
                 GUI.enabled = !regionalPaused;
-                if (GUILayout.Button("Dark screen", GUILayout.Height(30), GUILayout.Width(110))) actions.Add(PowerSaver.GoDark);
+                if (GUILayout.Button(Loc.T("Dark screen"), GUILayout.Height(30), GUILayout.Width(110))) actions.Add(PowerSaver.GoDark);
                 GUI.enabled = true;
             }
             // v127: drop from the event (the rest plays out without you).
             if (v.YouPlaying && v.YouStillIn && !regionalConfirmEnd && !regionalConfirmDrop)
             {
-                if (GUILayout.Button("Drop from the event", GUILayout.Height(30), GUILayout.Width(170)))
+                if (GUILayout.Button(Loc.T("Drop from the event"), GUILayout.Height(30), GUILayout.Width(170)))
                     actions.Add(() => regionalConfirmDrop = true);
             }
             if (regionalConfirmDrop)
             {
                 var yours = v.YourMatch;
                 bool midMatch = yours != null && !yours.Finished && !yours.IsBye;
-                GUILayout.Label("Drop? " + (midMatch ? "Your match this round counts as a loss, and you" : "You") + " won't be paired again. The event plays out without you, and you keep your place by your record.", ui.Error, GUILayout.Width(470));
-                if (GUILayout.Button("Drop", GUILayout.Height(30), GUILayout.Width(70))) actions.Add(DropFromRegional);
-                if (GUILayout.Button("Cancel", GUILayout.Height(30), GUILayout.Width(80))) actions.Add(() => regionalConfirmDrop = false);
+                GUILayout.Label(Loc.T("Drop? " + (midMatch ? "Your match this round counts as a loss, and you" : "You") + " won't be paired again. The event plays out without you, and you keep your place by your record."), ui.Error, GUILayout.Width(470));
+                if (GUILayout.Button(Loc.T("Drop"), GUILayout.Height(30), GUILayout.Width(70))) actions.Add(DropFromRegional);
+                if (GUILayout.Button(Loc.T("Cancel"), GUILayout.Height(30), GUILayout.Width(80))) actions.Add(() => regionalConfirmDrop = false);
             }
             else if (!regionalConfirmEnd)
             {
-                if (GUILayout.Button(v.Finished ? "New event" : "End this event", GUILayout.Height(30), GUILayout.Width(150)))
+                if (GUILayout.Button(Loc.T(v.Finished ? "New event" : "End this event"), GUILayout.Height(30), GUILayout.Width(150)))
                     actions.Add(() => regionalConfirmEnd = true);
             }
             else
             {
-                GUILayout.Label(v.Finished ? "Start over? This event's results are deleted." : "End it? The event and its results are deleted. What the AI learned is saved first.", ui.Error, GUILayout.Width(420));
-                if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(70))) actions.Add(EndRegional);
-                if (GUILayout.Button("No", GUILayout.Height(30), GUILayout.Width(70))) actions.Add(() => regionalConfirmEnd = false);
+                GUILayout.Label(Loc.T(v.Finished ? "Start over? This event's results are deleted." : "End it? The event and its results are deleted. What the AI learned is saved first."), ui.Error, GUILayout.Width(420));
+                if (GUILayout.Button(Loc.T("Yes"), GUILayout.Height(30), GUILayout.Width(70))) actions.Add(EndRegional);
+                if (GUILayout.Button(Loc.T("No"), GUILayout.Height(30), GUILayout.Width(70))) actions.Add(() => regionalConfirmEnd = false);
             }
             GUILayout.EndHorizontal();
-            GUILayout.Label("The event is saved as you go (" + RegionalPath + "), and the AI tables keep playing while you're elsewhere in the app.", Hint(ui));
+            GUILayout.Label(Loc.T("The event is saved as you go (" + RegionalPath + "), and the AI tables keep playing while you're elsewhere in the app."), Hint(ui));
             GUILayout.EndArea();
 
             foreach (var a in actions) a();
@@ -835,52 +835,52 @@ namespace PokemonTCG.Presentation
         {
             if (v.YouPlaying && v.You != null)
             {
-                GUILayout.Label("You: " + v.You.Record + " (" + v.You.Points + " points), " + Ordinal(v.You.Rank) + " of " + v.Players.ToString("N0")
-                                + "  ·  " + v.You.Deck, ui.Label);
+                GUILayout.Label(Loc.T("You: " + v.You.Record + " (" + v.You.Points + " points), " + Ordinal(v.You.Rank) + " of " + v.Players.ToString("N0")
+                                + "  ·  " + v.You.Deck), ui.Label);
                 var m = v.YourMatch;
                 int yourPlace = v.You.Id < v.Placement.Length ? v.Placement[v.You.Id] : v.You.Rank;
                 bool youMadeCut = v.CutSeeds.Contains(v.You.Id);
                 if (v.YouDropped && !v.Finished)
                 {
-                    GUILayout.Label("You dropped after " + RegionalSim.RoundName(Math.Max(1, v.YouDroppedAfterRound), v.Rounds, v.TopCut, v.PlayInRounds).ToLowerInvariant()
-                                    + ". The event plays out without you: you're " + Ordinal(yourPlace) + " of " + v.Players.ToString("N0") + " so far.", ui.Label);
+                    GUILayout.Label(Loc.T("You dropped after " + RegionalSim.RoundName(Math.Max(1, v.YouDroppedAfterRound), v.Rounds, v.TopCut, v.PlayInRounds).ToLowerInvariant()
+                                    + ". The event plays out without you: you're " + Ordinal(yourPlace) + " of " + v.Players.ToString("N0") + " so far."), ui.Label);
                 }
                 else if (v.Day2Decided && v.You.MissedDay2 && !v.Finished && !v.InTopCut)
                 {
-                    GUILayout.Label("You didn't make Day 2 (" + v.You.Points + " points; " + v.Day2Points + " needed). The event plays out without you: you're "
-                                    + Ordinal(yourPlace) + " of " + v.Players.ToString("N0") + " so far.", ui.Label);
+                    GUILayout.Label(Loc.T("You didn't make Day 2 (" + v.You.Points + " points; " + v.Day2Points + " needed). The event plays out without you: you're "
+                                    + Ordinal(yourPlace) + " of " + v.Players.ToString("N0") + " so far."), ui.Label);
                 }
                 else if (v.Finished)
                 {
                     string how = v.TopCut > 0 && youMadeCut
                         ? (yourPlace == 1 ? "You won the top " + v.TopCut + "! " : "You made the top " + v.TopCut + ". ")
                         : "";
-                    GUILayout.Label(how + "You finished " + Ordinal(yourPlace) + " of " + v.Players.ToString("N0") + " (" + v.You.Record + " in Swiss"
-                                    + (v.YouDropped ? ", dropped" : v.You.MissedDay2 ? ", out after Day 1" : "") + ").", ui.Good);
+                    GUILayout.Label(Loc.T(how + "You finished " + Ordinal(yourPlace) + " of " + v.Players.ToString("N0") + " (" + v.You.Record + " in Swiss"
+                                    + (v.YouDropped ? ", dropped" : v.You.MissedDay2 ? ", out after Day 1" : "") + ")."), ui.Good);
                 }
                 else if (m == null && v.InPlayIn)
                 {
                     bool above = v.PlayInAbove.Contains(v.You.Id);
                     bool inPool = v.PlayInPool.Contains(v.You.Id);
-                    GUILayout.Label(above ? "You're in the top " + v.TopCut + " (above the " + v.PlayInPoints + "-point bubble). Waiting for the play-in: see the Top cut tab."
+                    GUILayout.Label(Loc.T(above ? "You're in the top " + v.TopCut + " (above the " + v.PlayInPoints + "-point bubble). Waiting for the play-in: see the Top cut tab."
                                     : inPool && v.YouStillIn ? "You have a bye this play-in round (a better seed). Waiting for the other tables."
                                     : inPool ? "You lost in the play-in and didn't make the top " + v.TopCut + ". It plays out in the background: see the Top cut tab."
-                                    : "You finished " + Ordinal(v.You.Rank) + " in Swiss and didn't make the top " + v.TopCut + ". It plays out in the background: see the Top cut tab.", ui.Label);
+                                    : "You finished " + Ordinal(v.You.Rank) + " in Swiss and didn't make the top " + v.TopCut + ". It plays out in the background: see the Top cut tab."), ui.Label);
                 }
                 else if (m == null && v.InTopCut)
                 {
-                    GUILayout.Label(youMadeCut
+                    GUILayout.Label(Loc.T(youMadeCut
                         ? "You're out of the top cut (" + Ordinal(yourPlace) + " place so far). It plays out in the background: see the Top cut tab."
                         : v.PlayInPool.Contains(v.You.Id) ? "You lost in the play-in and didn't make the top " + v.TopCut + ". It plays out in the background: see the Top cut tab."
-                        : "You finished " + Ordinal(v.You.Rank) + " in Swiss and didn't make the top " + v.TopCut + ". It plays out in the background: see the Top cut tab.", ui.Label);
+                        : "You finished " + Ordinal(v.You.Rank) + " in Swiss and didn't make the top " + v.TopCut + ". It plays out in the background: see the Top cut tab."), ui.Label);
                 }
                 else if (m == null)
                 {
-                    GUILayout.Label("Waiting for the next round to be paired.", Hint(ui));
+                    GUILayout.Label(Loc.T("Waiting for the next round to be paired."), Hint(ui));
                 }
                 else if (m.IsBye)
                 {
-                    GUILayout.Label("Round " + m.Round + ": you have a bye (it counts as a win). Waiting for the other tables.", ui.Label);
+                    GUILayout.Label(Loc.T("Round " + m.Round + ": you have a bye (it counts as a win). Waiting for the other tables."), ui.Label);
                 }
                 else
                 {
@@ -889,23 +889,23 @@ namespace PokemonTCG.Presentation
                     string you = m.IsCut ? "you (" + m.SeedA + ")" : "you";
                     if (!m.Finished)
                     {
-                        GUILayout.Label(roundName + ", table " + m.Table + ": " + you + " vs " + opp + (m.Games.Count > 0 ? "  ·  " + MatchLine(v, m, false) : ""), ui.Label);
+                        GUILayout.Label(Loc.T(roundName + ", table " + m.Table + ": " + you + " vs " + opp + (m.Games.Count > 0 ? "  ·  " + MatchLine(v, m, false) : "")), ui.Label);
                         if (RegionalSim.HigherSeedChoosesFor(m))
-                            GUILayout.Label(m.SeedA < m.SeedB ? "You're the higher seed: you choose who goes first" + (m.Games.Count == 0 ? " in game 1." : " (a Tie-Breaker game after the drawn one).") : "Your opponent is the higher seed and chooses who goes first" + (m.Games.Count == 0 ? " in game 1." : " (a Tie-Breaker game after the drawn one)."), Hint(ui));
+                            GUILayout.Label(Loc.T(m.SeedA < m.SeedB ? "You're the higher seed: you choose who goes first" + (m.Games.Count == 0 ? " in game 1." : " (a Tie-Breaker game after the drawn one).") : "Your opponent is the higher seed and chooses who goes first" + (m.Games.Count == 0 ? " in game 1." : " (a Tie-Breaker game after the drawn one).")), Hint(ui));
                         string label = m.Games.Count == 0 ? "Play your match" : "Play game " + (m.Games.Count + 1);
-                        if (GUILayout.Button(label, GUILayout.Height(34), GUILayout.Width(220))) actions.Add(() => pendingRegionalGame = true);
+                        if (GUILayout.Button(Loc.T(label), GUILayout.Height(34), GUILayout.Width(220))) actions.Add(() => pendingRegionalGame = true);
                     }
                     else
                     {
-                        GUILayout.Label(roundName + ": " + MatchLine(v, m, false) + "  Waiting for the other tables.", ui.Label);
+                        GUILayout.Label(Loc.T(roundName + ": " + MatchLine(v, m, false) + "  Waiting for the other tables."), ui.Label);
                     }
                 }
             }
             else
             {
-                GUILayout.Label("AI only: every seat is the Neural AI, and it learns from every game of the event.", ui.Label);
+                GUILayout.Label(Loc.T("AI only: every seat is the Neural AI, and it learns from every game of the event."), ui.Label);
                 GUILayout.BeginHorizontal();
-                bool watch = GUILayout.Toggle(v.Watching, " Watch one match each round (picked at random)");
+                bool watch = GUILayout.Toggle(v.Watching, Loc.T(" Watch one match each round (picked at random)"));
                 if (watch != v.Watching)
                 {
                     bool on = watch;
@@ -917,7 +917,7 @@ namespace PokemonTCG.Presentation
                 }
                 if (v.Watching)
                 {
-                    bool auto = GUILayout.Toggle(regAutoWatch, " Open it automatically");
+                    bool auto = GUILayout.Toggle(regAutoWatch, Loc.T(" Open it automatically"));
                     if (auto != regAutoWatch)
                     {
                         bool on = auto;
@@ -933,29 +933,29 @@ namespace PokemonTCG.Presentation
                 if (v.Watching && f != null && !v.Finished)
                 {
                     string line = "Table " + f.Table + ": " + NameOf(v, f.A) + " (" + DeckOf(v, f.A) + ") vs " + NameOf(v, f.B) + " (" + DeckOf(v, f.B) + ")";
-                    if (f.Finished) GUILayout.Label("This round's watched table is over: " + MatchLine(v, f, false), ui.Label);
+                    if (f.Finished) GUILayout.Label(Loc.T("This round's watched table is over: " + MatchLine(v, f, false)), ui.Label);
                     else
                     {
-                        GUILayout.Label(line + (f.Games.Count > 0 ? "  ·  " + MatchLine(v, f, false) : ""), ui.Label);
+                        GUILayout.Label(Loc.T(line + (f.Games.Count > 0 ? "  ·  " + MatchLine(v, f, false) : "")), ui.Label);
                         GUILayout.BeginHorizontal();
-                        if (GUILayout.Button(f.Games.Count == 0 ? "Watch it" : "Watch game " + (f.Games.Count + 1), GUILayout.Height(32), GUILayout.Width(200)))
+                        if (GUILayout.Button(Loc.T(f.Games.Count == 0 ? "Watch it" : "Watch game " + (f.Games.Count + 1)), GUILayout.Height(32), GUILayout.Width(200)))
                             actions.Add(() => pendingRegionalGame = true);
-                        if (GUILayout.Button("Let it play in the background", GUILayout.Height(32), GUILayout.Width(240)))
+                        if (GUILayout.Button(Loc.T("Let it play in the background"), GUILayout.Height(32), GUILayout.Width(240)))
                             actions.Add(() =>
                             {
                                 if (regional != null) regional.ReleaseFeatured();
                                 regionalView = regional != null ? regional.View() : null;
                             });
                         GUILayout.EndHorizontal();
-                        GUILayout.Label("The round waits for this table, so the next one starts once it's been watched (or let go).", Hint(ui));
+                        GUILayout.Label(Loc.T("The round waits for this table, so the next one starts once it's been watched (or let go)."), Hint(ui));
                     }
                 }
                 if (v.Finished && v.Standings.Count > 0)
                 {
                     int champId = v.Champion >= 0 ? v.Champion : v.Standings[0].Id;
                     var champ = v.StandingOf(champId);
-                    GUILayout.Label("Winner: " + NameOf(v, champId) + " with " + DeckOf(v, champId) + (champ != null ? " (" + champ.Record + " in Swiss)" : "")
-                                    + (v.TopCut > 0 ? ", champion of the top " + v.TopCut + "." : "."), ui.Good);
+                    GUILayout.Label(Loc.T("Winner: " + NameOf(v, champId) + " with " + DeckOf(v, champId) + (champ != null ? " (" + champ.Record + " in Swiss)" : "")
+                                    + (v.TopCut > 0 ? ", champion of the top " + v.TopCut + "." : ".")), ui.Good);
                 }
             }
 
@@ -963,10 +963,10 @@ namespace PokemonTCG.Presentation
             {
                 float frac = v.RoundMatches == 0 ? 0f : Mathf.Clamp01((float)v.RoundFinished / v.RoundMatches);
                 var bar = GUILayoutUtility.GetRect(Mathf.Min(width, 700f), 16f, GUILayout.Width(Mathf.Min(width, 700f)));
-                GUI.Box(bar, GUIContent.none);
+                GUI.Box(bar, Loc.T(GUIContent.none));
                 GUI.DrawTexture(new Rect(bar.x + 2, bar.y + 2, (bar.width - 4) * frac, bar.height - 4), ui.Selected);
-                GUILayout.Label(RegionalSim.RoundName(v.Round, v.Rounds, v.TopCut, v.PlayInRounds) + ": " + v.RoundFinished + " of " + v.RoundMatches + " matches finished  ·  " + v.RoundPlaying
-                                + " AI tables playing now" + (regionalPaused ? " (paused)" : "") + "  ·  " + v.AiGames.ToString("N0") + " AI games so far", Hint(ui));
+                GUILayout.Label(Loc.T(RegionalSim.RoundName(v.Round, v.Rounds, v.TopCut, v.PlayInRounds) + ": " + v.RoundFinished + " of " + v.RoundMatches + " matches finished  ·  " + v.RoundPlaying
+                                + " AI tables playing now" + (regionalPaused ? " (paused)" : "") + "  ·  " + v.AiGames.ToString("N0") + " AI games so far"), Hint(ui));
                 DrawRegionalTablesAtOnce(ui, actions, false);
             }
         }
@@ -994,7 +994,7 @@ namespace PokemonTCG.Presentation
             for (int c = 0; c < headers.Length; c++)
             {
                 float cw = c == headers.Length - 1 ? Mathf.Max(40f, head.xMax - hx) : widths[c];
-                GUI.Label(new Rect(hx, head.y, cw - 6f, rowH), headers[c], regHeadStyle);
+                GUI.Label(new Rect(hx, head.y, cw - 6f, rowH), Loc.T(headers[c]), regHeadStyle);
                 hx += widths[c];
             }
             float contentH = Mathf.Max(rowH, count * rowH);
@@ -1012,7 +1012,7 @@ namespace PokemonTCG.Presentation
                     for (int c = 0; c < widths.Length; c++)
                     {
                         float cw = c == widths.Length - 1 ? Mathf.Max(40f, area.xMax - x) : widths[c];
-                        GUI.Label(new Rect(x, area.y + k * rowH, cw - 6f, rowH), cell(k, c), style);
+                        GUI.Label(new Rect(x, area.y + k * rowH, cw - 6f, rowH), Loc.T(cell(k, c)), style);
                         x += widths[c];
                     }
                 }
@@ -1046,9 +1046,9 @@ namespace PokemonTCG.Presentation
                     default: return Mark(s.Human, StandingDeck(v, s));
                 }
             });
-            GUILayout.Label("Win 3 points, tie 1. Ties are broken by opponents' win percentage, then opponents' opponents' (each player's win percentage is at least 25%; byes count as wins but not as opponents)."
+            GUILayout.Label(Loc.T("Win 3 points, tie 1. Ties are broken by opponents' win percentage, then opponents' opponents' (each player's win percentage is at least 25%; byes count as wins but not as opponents)."
                             + (v.Day1Rounds > 0 ? " Once Day 1 is over, everyone who made Day 2 ranks above everyone who didn't." : "")
-                            + " Players who dropped keep their place by their record.", Hint(ui));
+                            + " Players who dropped keep their place by their record."), Hint(ui));
         }
 
         private void DrawRegionalPairings(UiStyles ui, RegionalView v, float height, float width, List<Action> actions)
@@ -1056,11 +1056,11 @@ namespace PokemonTCG.Presentation
             int shown = Mathf.Clamp(regViewRound <= 0 ? v.Round : regViewRound, 1, Math.Max(1, v.Round));
             GUILayout.BeginHorizontal();
             GUI.enabled = shown > 1;
-            if (GUILayout.Button("<", GUILayout.Width(32))) actions.Add(() => regViewRound = shown - 1);
+            if (GUILayout.Button(Loc.T("<"), GUILayout.Width(32))) actions.Add(() => regViewRound = shown - 1);
             GUI.enabled = true;
-            GUILayout.Label(RegionalSim.RoundName(shown, v.Rounds, v.TopCut, v.PlayInRounds) + (shown == v.Round && !v.Finished ? " (now)" : ""), ui.Title, GUILayout.Width(150));
+            GUILayout.Label(Loc.T(RegionalSim.RoundName(shown, v.Rounds, v.TopCut, v.PlayInRounds) + (shown == v.Round && !v.Finished ? " (now)" : "")), ui.Title, GUILayout.Width(150));
             GUI.enabled = shown < v.Round;
-            if (GUILayout.Button(">", GUILayout.Width(32))) actions.Add(() => regViewRound = shown + 1);
+            if (GUILayout.Button(Loc.T(">"), GUILayout.Width(32))) actions.Add(() => regViewRound = shown + 1);
             GUI.enabled = true;
             GUILayout.EndHorizontal();
 
@@ -1095,13 +1095,13 @@ namespace PokemonTCG.Presentation
             if (v.PlayInPool.Count > 0)
             {
                 // v127: the asymmetrical top cut's play-in.
-                GUILayout.Label("Play-in: " + v.PlayInPool.Count + " players on " + v.PlayInPoints + " points for " + v.PlayInSeats + " seat" + (v.PlayInSeats == 1 ? "" : "s")
-                                + (v.PlayInAbove.Count > 0 ? " (" + v.PlayInAbove.Count + " above them are in)" : ""), ui.Title);
+                GUILayout.Label(Loc.T("Play-in: " + v.PlayInPool.Count + " players on " + v.PlayInPoints + " points for " + v.PlayInSeats + " seat" + (v.PlayInSeats == 1 ? "" : "s")
+                                + (v.PlayInAbove.Count > 0 ? " (" + v.PlayInAbove.Count + " above them are in)" : "")), ui.Title);
                 for (int k = 0; k < v.PlayInPool.Count; k++)
                 {
                     int pid = v.PlayInPool[k];
                     var st = v.StandingOf(pid);
-                    GUILayout.Label(Mark(NameOf(v, pid) == "You", "(" + (v.PlayInAbove.Count + k + 1) + ") " + NameOf(v, pid) + "  ·  " + (st != null ? st.Record : "") + "  ·  " + DeckOf(v, pid)), RegionalRowStyle(ui));
+                    GUILayout.Label(Loc.T(Mark(NameOf(v, pid) == "You", "(" + (v.PlayInAbove.Count + k + 1) + ") " + NameOf(v, pid) + "  ·  " + (st != null ? st.Record : "") + "  ·  " + DeckOf(v, pid))), RegionalRowStyle(ui));
                 }
                 GUILayout.Space(4);
                 for (int r = v.Rounds + 1; r <= Math.Min(v.Round, v.CutStart); r++) DrawRegionalCutRound(ui, v, r);
@@ -1110,34 +1110,34 @@ namespace PokemonTCG.Presentation
             {
                 if (!v.InPlayIn)
                 {
-                    GUILayout.Label("The top " + v.TopCut + " is seeded from the standings after round " + v.Rounds + ". If Swiss ended now:", ui.Label);
+                    GUILayout.Label(Loc.T("The top " + v.TopCut + " is seeded from the standings after round " + v.Rounds + ". If Swiss ended now:"), ui.Label);
                     foreach (var s in v.Standings.Take(v.TopCut))
-                        GUILayout.Label(Mark(s.Human, "(" + s.Rank + ") " + s.Name + "  ·  " + s.Record + "  ·  " + StandingDeck(v, s)), RegionalRowStyle(ui));
+                        GUILayout.Label(Loc.T(Mark(s.Human, "(" + s.Rank + ") " + s.Name + "  ·  " + s.Record + "  ·  " + StandingDeck(v, s))), RegionalRowStyle(ui));
                     if (v.AsymmetricCut)
-                        GUILayout.Label("Asymmetrical: everyone on the same match points as the last seat plays for the seats those points hold.", Hint(ui));
+                        GUILayout.Label(Loc.T("Asymmetrical: everyone on the same match points as the last seat plays for the seats those points hold."), Hint(ui));
                 }
             }
             else
             {
                 for (int r = v.CutStart + 1; r <= Math.Min(v.Round, v.CutStart + v.CutRounds); r++) DrawRegionalCutRound(ui, v, r);
-                GUILayout.Label(v.Finished ? "Final places" : "Places so far", ui.Title);
+                GUILayout.Label(Loc.T(v.Finished ? "Final places" : "Places so far"), ui.Title);
                 var places = v.CutSeeds.Select(id => new KeyValuePair<int, int>(id, id < v.Placement.Length ? v.Placement[id] : 0)).OrderBy(kv => kv.Value).ToList();
                 foreach (var place in places)
                 {
                     bool you = NameOf(v, place.Key) == "You";
-                    GUILayout.Label(Mark(you, Ordinal(place.Value) + "  " + NameOf(v, place.Key) + "  ·  " + DeckOf(v, place.Key) + "  ·  seed " + (v.CutSeeds.IndexOf(place.Key) + 1)), RegionalRowStyle(ui));
+                    GUILayout.Label(Loc.T(Mark(you, Ordinal(place.Value) + "  " + NameOf(v, place.Key) + "  ·  " + DeckOf(v, place.Key) + "  ·  seed " + (v.CutSeeds.IndexOf(place.Key) + 1))), RegionalRowStyle(ui));
                 }
             }
             GUILayout.EndScrollView();
-            GUILayout.Label((v.AsymmetricCut ? "Asymmetrical: everyone on the last seat's match points plays single elimination for those seats first (byes to the better seeds; the winners keep their Swiss order). " : "")
+            GUILayout.Label(Loc.T((v.AsymmetricCut ? "Asymmetrical: everyone on the last seat's match points plays single elimination for those seats first (byes to the better seeds; the winners keep their Swiss order). " : "")
                             + "Single elimination, seeded by the Swiss standings. The higher seed chooses who goes first in game 1; a drawn game is followed by a Tie-Breaker game, 6 Prize cards that end at the first Prize lead (after "
-                            + RegionalSim.MaxCutGames + " games, the higher seed goes through).", Hint(ui));
+                            + RegionalSim.MaxCutGames + " games, the higher seed goes through)."), Hint(ui));
         }
 
         /// <summary>One round of the top cut or its play-in (v127: shared by both), its matches and results.</summary>
         private void DrawRegionalCutRound(UiStyles ui, RegionalView v, int roundNumber)
         {
-            GUILayout.Label(RegionalSim.RoundName(roundNumber, v.Rounds, v.TopCut, v.PlayInRounds), ui.Title);
+            GUILayout.Label(Loc.T(RegionalSim.RoundName(roundNumber, v.Rounds, v.TopCut, v.PlayInRounds)), ui.Title);
             foreach (var m in v.Matches.Where(x => x.Round == roundNumber).OrderBy(x => x.Table))
             {
                 bool you = NameOf(v, m.A) == "You" || NameOf(v, m.B) == "You";
@@ -1151,7 +1151,7 @@ namespace PokemonTCG.Presentation
                              + (m.ConcededBy >= 0 ? " (" + NameOf(v, m.ConcededBy) + " dropped)" : m.WinsA == m.WinsB ? " (higher seed, after " + m.Games.Count + " games)" : "");
                 }
                 else result = m.InProgress ? "playing " + m.WinsA + "-" + m.WinsB : m.Games.Count > 0 ? m.WinsA + "-" + m.WinsB + " so far" : "waiting";
-                GUILayout.Label(Mark(you, a + "   vs   " + b + "   ·   " + result), RegionalRowStyle(ui));
+                GUILayout.Label(Loc.T(Mark(you, a + "   vs   " + b + "   ·   " + result)), RegionalRowStyle(ui));
             }
             GUILayout.Space(4);
         }
@@ -1175,7 +1175,7 @@ namespace PokemonTCG.Presentation
                     default: return d.BestRank == int.MaxValue ? "-" : Ordinal(d.BestRank);
                 }
             });
-            GUILayout.Label("Matches and win % leave out byes; a tie counts as half a win.", Hint(ui));
+            GUILayout.Label(Loc.T("Matches and win % leave out byes; a tie counts as half a win."), Hint(ui));
         }
 
         // ------------------------------------------------------------------ Setup screen
@@ -1185,20 +1185,20 @@ namespace PokemonTCG.Presentation
             var actions = new List<Action>();
             float w = Mathf.Min(1000f, UiScale.Width - 30f);
             var r = new Rect(UiScale.Width / 2f - w / 2f, 15f, w, UiScale.Height - 30f);
-            GUI.Box(r, GUIContent.none);
+            GUI.Box(r, Loc.T(GUIContent.none));
             GUILayout.BeginArea(new Rect(r.x + 14, r.y + 10, r.width - 28, r.height - 20));
             // The whole screen scrolls (v69: the AI players' decks made it longer).
             regSetupScroll = GUILayout.BeginScrollView(regSetupScroll);
-            GUILayout.Label("Regional Sim", ui.Header);
-            GUILayout.Label("A Swiss event where every other seat is the Neural AI. It learns from every game as the event goes on. The AI "
+            GUILayout.Label(Loc.T("Regional Sim"), ui.Header);
+            GUILayout.Label(Loc.T("A Swiss event where every other seat is the Neural AI. It learns from every game as the event goes on. The AI "
                             + "players play the decks you choose for them, and the rest pick theirs at random from the legal decks of the format. Your "
                             + "games are played on the board; the other tables play in the background, and a round is paired only when every match "
-                            + "of the previous one is over.", ui.Label);
+                            + "of the previous one is over."), ui.Label);
             GUILayout.Space(6);
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Who plays", GUILayout.Width(150));
-            int who = GUILayout.Toolbar(regAiOnly ? 1 : 0, new[] { "You and the AI", "AI only (you watch)" }, GUILayout.Width(360));
+            GUILayout.Label(Loc.T("Who plays"), GUILayout.Width(150));
+            int who = GUILayout.Toolbar(regAiOnly ? 1 : 0, Loc.T(new[] { "You and the AI", "AI only (you watch)" }), GUILayout.Width(360));
             if (who != (regAiOnly ? 1 : 0)) actions.Add(() => SetRegionalAiOnly(who == 1));
             GUILayout.EndHorizontal();
 
@@ -1206,7 +1206,7 @@ namespace PokemonTCG.Presentation
             int total = regTotal;
             bool playersValid = RegionalPlayersValid();
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Players in all", GUILayout.Width(150));
+            GUILayout.Label(Loc.T("Players in all"), GUILayout.Width(150));
             string typed = GUILayout.TextField(regPlayersText ?? "", 5, RegionalNumberStyle(ui), GUILayout.Width(80), GUILayout.Height(26));
             if (typed != regPlayersText)
             {
@@ -1216,101 +1216,101 @@ namespace PokemonTCG.Presentation
             foreach (int step in new[] { -10, -1, 1, 10 })
             {
                 int d = step;
-                if (GUILayout.Button((d > 0 ? "+" : "") + d, GUILayout.Width(42), GUILayout.Height(26))) actions.Add(() => SetRegionalPlayers(regTotal + d));
+                if (GUILayout.Button(Loc.T((d > 0 ? "+" : "") + d), GUILayout.Width(42), GUILayout.Height(26))) actions.Add(() => SetRegionalPlayers(regTotal + d));
             }
             string who2 = regAiOnly ? "all of them AI players" : "you and " + (total - 1).ToString("N0") + " AI players";
-            GUILayout.Label(playersValid ? "  " + total.ToString("N0") + " players: " + who2 : "", Hint(ui));
+            GUILayout.Label(Loc.T(playersValid ? "  " + total.ToString("N0") + " players: " + who2 : ""), Hint(ui));
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            GUILayout.Label("", GUILayout.Width(150));
-            if (playersValid) GUILayout.Label("Type any number from " + MinRegionalPlayers + " to " + MaxRegionalPlayers.ToString("N0") + ", or pick one:", Hint(ui));
-            else GUILayout.Label("Type a number of players from " + MinRegionalPlayers + " to " + MaxRegionalPlayers.ToString("N0") + ".", ui.Error);
+            GUILayout.Label(Loc.T(""), GUILayout.Width(150));
+            if (playersValid) GUILayout.Label(Loc.T("Type any number from " + MinRegionalPlayers + " to " + MaxRegionalPlayers.ToString("N0") + ", or pick one:"), Hint(ui));
+            else GUILayout.Label(Loc.T("Type a number of players from " + MinRegionalPlayers + " to " + MaxRegionalPlayers.ToString("N0") + "."), ui.Error);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            GUILayout.Label("", GUILayout.Width(150));
+            GUILayout.Label(Loc.T(""), GUILayout.Width(150));
             foreach (int preset in RegionalPresets)
             {
                 int p = preset;
-                if (GUILayout.Button(p.ToString("N0"), GUILayout.Width(p >= 10000 ? 62 : 54))) actions.Add(() => SetRegionalPlayers(p));
+                if (GUILayout.Button(Loc.T(p.ToString("N0")), GUILayout.Width(p >= 10000 ? 62 : 54))) actions.Add(() => SetRegionalPlayers(p));
             }
             GUILayout.EndHorizontal();
 
             int suggested = RegionalSim.SuggestedRounds(total);
             bool twoDays = playersValid && Day2Applies(total);
             GUILayout.BeginHorizontal();
-            GUILayout.Label(twoDays ? "Day 1 rounds" : "Rounds", GUILayout.Width(150));
-            if (GUILayout.Button("<", GUILayout.Width(30))) actions.Add(() => regRounds = Mathf.Clamp(regRounds - 1, 1, MaxRegionalRounds));
-            GUILayout.Label(regRounds.ToString(), ui.Title, GUILayout.Width(36));
-            if (GUILayout.Button(">", GUILayout.Width(30))) actions.Add(() => regRounds = Mathf.Clamp(regRounds + 1, 1, MaxRegionalRounds));
-            if (GUILayout.Button("Use " + suggested + " (the usual for " + total.ToString("N0") + " players)", GUILayout.Width(300))) actions.Add(() => regRounds = suggested);
+            GUILayout.Label(Loc.T(twoDays ? "Day 1 rounds" : "Rounds"), GUILayout.Width(150));
+            if (GUILayout.Button(Loc.T("<"), GUILayout.Width(30))) actions.Add(() => regRounds = Mathf.Clamp(regRounds - 1, 1, MaxRegionalRounds));
+            GUILayout.Label(Loc.T(regRounds.ToString()), ui.Title, GUILayout.Width(36));
+            if (GUILayout.Button(Loc.T(">"), GUILayout.Width(30))) actions.Add(() => regRounds = Mathf.Clamp(regRounds + 1, 1, MaxRegionalRounds));
+            if (GUILayout.Button(Loc.T("Use " + suggested + " (the usual for " + total.ToString("N0") + " players)"), GUILayout.Width(300))) actions.Add(() => regRounds = suggested);
             GUILayout.EndHorizontal();
 
             // v127: Day 1 and Day 2.
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Day 2", GUILayout.Width(150));
-            bool day2 = GUILayout.Toggle(regDay2, " Split big events into 2 days");
+            GUILayout.Label(Loc.T("Day 2"), GUILayout.Width(150));
+            bool day2 = GUILayout.Toggle(regDay2, Loc.T(" Split big events into 2 days"));
             if (day2 != regDay2) actions.Add(() => regDay2 = day2);
             GUILayout.EndHorizontal();
             if (regDay2)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("2 days from", GUILayout.Width(150));
+                GUILayout.Label(Loc.T("2 days from"), GUILayout.Width(150));
                 foreach (int step in new[] { -100, -10 })
                 {
                     int d = step;
-                    if (GUILayout.Button(d.ToString(), GUILayout.Width(46), GUILayout.Height(24))) actions.Add(() => regDay2Min = Mathf.Clamp(regDay2Min + d, MinRegionalPlayers, MaxRegionalPlayers));
+                    if (GUILayout.Button(Loc.T(d.ToString()), GUILayout.Width(46), GUILayout.Height(24))) actions.Add(() => regDay2Min = Mathf.Clamp(regDay2Min + d, MinRegionalPlayers, MaxRegionalPlayers));
                 }
-                GUILayout.Label(regDay2Min.ToString("N0"), ui.Title, GUILayout.Width(64));
+                GUILayout.Label(Loc.T(regDay2Min.ToString("N0")), ui.Title, GUILayout.Width(64));
                 foreach (int step in new[] { 10, 100 })
                 {
                     int d = step;
-                    if (GUILayout.Button("+" + d, GUILayout.Width(46), GUILayout.Height(24))) actions.Add(() => regDay2Min = Mathf.Clamp(regDay2Min + d, MinRegionalPlayers, MaxRegionalPlayers));
+                    if (GUILayout.Button(Loc.T("+" + d), GUILayout.Width(46), GUILayout.Height(24))) actions.Add(() => regDay2Min = Mathf.Clamp(regDay2Min + d, MinRegionalPlayers, MaxRegionalPlayers));
                 }
-                GUILayout.Label("  players (smaller events play 1 day)", Hint(ui));
+                GUILayout.Label(Loc.T("  players (smaller events play 1 day)"), Hint(ui));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Day 2 rounds", GUILayout.Width(150));
-                if (GUILayout.Button("<", GUILayout.Width(30))) actions.Add(() => regDay2Rounds = Mathf.Clamp(regDay2Rounds - 1, 1, MaxDay2Rounds));
-                GUILayout.Label(regDay2Rounds.ToString(), ui.Title, GUILayout.Width(36));
-                if (GUILayout.Button(">", GUILayout.Width(30))) actions.Add(() => regDay2Rounds = Mathf.Clamp(regDay2Rounds + 1, 1, MaxDay2Rounds));
+                GUILayout.Label(Loc.T("Day 2 rounds"), GUILayout.Width(150));
+                if (GUILayout.Button(Loc.T("<"), GUILayout.Width(30))) actions.Add(() => regDay2Rounds = Mathf.Clamp(regDay2Rounds - 1, 1, MaxDay2Rounds));
+                GUILayout.Label(Loc.T(regDay2Rounds.ToString()), ui.Title, GUILayout.Width(36));
+                if (GUILayout.Button(Loc.T(">"), GUILayout.Width(30))) actions.Add(() => regDay2Rounds = Mathf.Clamp(regDay2Rounds + 1, 1, MaxDay2Rounds));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Day 2 needs", GUILayout.Width(150));
-                if (GUILayout.Button("<", GUILayout.Width(30))) actions.Add(() => regDay2Points = Mathf.Max(0, regDay2Points - 1));
-                GUILayout.Label(regDay2Points.ToString(), ui.Title, GUILayout.Width(36));
-                if (GUILayout.Button(">", GUILayout.Width(30))) actions.Add(() => regDay2Points = Mathf.Min(3 * MaxRegionalRounds, regDay2Points + 1));
-                GUILayout.Label("  match points after Day 1 (19 is a 6-2-1 record; win 3, tie 1)", Hint(ui));
+                GUILayout.Label(Loc.T("Day 2 needs"), GUILayout.Width(150));
+                if (GUILayout.Button(Loc.T("<"), GUILayout.Width(30))) actions.Add(() => regDay2Points = Mathf.Max(0, regDay2Points - 1));
+                GUILayout.Label(Loc.T(regDay2Points.ToString()), ui.Title, GUILayout.Width(36));
+                if (GUILayout.Button(Loc.T(">"), GUILayout.Width(30))) actions.Add(() => regDay2Points = Mathf.Min(3 * MaxRegionalRounds, regDay2Points + 1));
+                GUILayout.Label(Loc.T("  match points after Day 1 (19 is a 6-2-1 record; win 3, tie 1)"), Hint(ui));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("", GUILayout.Width(150));
-                if (!playersValid) GUILayout.Label("", Hint(ui));
+                GUILayout.Label(Loc.T(""), GUILayout.Width(150));
+                if (!playersValid) GUILayout.Label(Loc.T(""), Hint(ui));
                 else if (twoDays)
                 {
                     string dayLine = "This event: Day 1 is " + regRounds + " rounds with all " + total.ToString("N0") + " players; everyone with " + regDay2Points
                                      + "+ points plays " + regDay2Rounds + " more on Day 2 (" + (regRounds + regDay2Rounds) + " rounds in all, records carried over)"
                                      + (regTopCut > 0 ? ", then the top " + regTopCut + " cut." : ".") + " Players who miss Day 2 place below everyone who made it.";
-                    GUILayout.Label(regRounds * 3 < regDay2Points ? dayLine + " Nobody can reach " + regDay2Points + " points in " + regRounds + " rounds!" : dayLine,
+                    GUILayout.Label(Loc.T(regRounds * 3 < regDay2Points ? dayLine + " Nobody can reach " + regDay2Points + " points in " + regRounds + " rounds!" : dayLine),
                                     regRounds * 3 < regDay2Points ? ui.Error : Hint(ui));
                 }
-                else GUILayout.Label("This event has " + total.ToString("N0") + " players, fewer than " + regDay2Min.ToString("N0") + ", so it's 1 day of " + regRounds + " rounds.", Hint(ui));
+                else GUILayout.Label(Loc.T("This event has " + total.ToString("N0") + " players, fewer than " + regDay2Min.ToString("N0") + ", so it's 1 day of " + regRounds + " rounds."), Hint(ui));
                 GUILayout.EndHorizontal();
             }
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Matches", GUILayout.Width(150));
-            int bo = GUILayout.Toolbar(regBestOf3 ? 1 : 0, new[] { "Best of 1", "Best of 3" }, GUILayout.Width(240));
+            GUILayout.Label(Loc.T("Matches"), GUILayout.Width(150));
+            int bo = GUILayout.Toolbar(regBestOf3 ? 1 : 0, Loc.T(new[] { "Best of 1", "Best of 3" }), GUILayout.Width(240));
             if (bo != (regBestOf3 ? 1 : 0)) actions.Add(() => regBestOf3 = bo == 1);
-            GUILayout.Label("  In a best of 3 the loser of each game chooses to go first or second in the next one.", Hint(ui));
+            GUILayout.Label(Loc.T("  In a best of 3 the loser of each game chooses to go first or second in the next one."), Hint(ui));
             GUILayout.EndHorizontal();
 
             // Top cut (v70): single elimination after the Swiss rounds.
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Top cut", GUILayout.Width(150));
+            GUILayout.Label(Loc.T("Top cut"), GUILayout.Width(150));
             int cutIndex = Math.Max(0, Array.IndexOf(RegionalCutSizes, regTopCut));
-            int newCut = GUILayout.Toolbar(cutIndex, new[] { "None", "Top 2", "Top 4", "Top 8" }, GUILayout.Width(320));
+            int newCut = GUILayout.Toolbar(cutIndex, Loc.T(new[] { "None", "Top 2", "Top 4", "Top 8" }), GUILayout.Width(320));
             if (newCut != cutIndex)
             {
                 int size = RegionalCutSizes[newCut];
@@ -1320,48 +1320,48 @@ namespace PokemonTCG.Presentation
             if (regTopCut > 0)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Top cut matches", GUILayout.Width(150));
-                int cbo = GUILayout.Toolbar(regCutBestOf3 ? 1 : 0, new[] { "Best of 1", "Best of 3" }, GUILayout.Width(240));
+                GUILayout.Label(Loc.T("Top cut matches"), GUILayout.Width(150));
+                int cbo = GUILayout.Toolbar(regCutBestOf3 ? 1 : 0, Loc.T(new[] { "Best of 1", "Best of 3" }), GUILayout.Width(240));
                 if (cbo != (regCutBestOf3 ? 1 : 0)) actions.Add(() => regCutBestOf3 = cbo == 1);
                 GUILayout.EndHorizontal();
                 // v127: asymmetrical top cut.
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Asymmetrical", GUILayout.Width(150));
-                bool asym = GUILayout.Toggle(regAsymCut, " Ties on the bubble play it out");
+                GUILayout.Label(Loc.T("Asymmetrical"), GUILayout.Width(150));
+                bool asym = GUILayout.Toggle(regAsymCut, Loc.T(" Ties on the bubble play it out"));
                 if (asym != regAsymCut) actions.Add(() => regAsymCut = asym);
                 GUILayout.EndHorizontal();
                 if (regAsymCut)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label("", GUILayout.Width(150));
-                    GUILayout.Label("When Swiss is over, everyone on the same match points as the last top " + regTopCut + " seat (inside the cut by tiebreakers or not) plays single elimination for the seats those points hold, "
-                                    + (regCutBestOf3 ? "best of 3" : "best of 1") + " like the top cut. The better Swiss seeds get the byes, and the winners take the seats in their Swiss order.", Hint(ui));
+                    GUILayout.Label(Loc.T(""), GUILayout.Width(150));
+                    GUILayout.Label(Loc.T("When Swiss is over, everyone on the same match points as the last top " + regTopCut + " seat (inside the cut by tiebreakers or not) plays single elimination for the seats those points hold, "
+                                    + (regCutBestOf3 ? "best of 3" : "best of 1") + " like the top cut. The better Swiss seeds get the byes, and the winners take the seats in their Swiss order."), Hint(ui));
                     GUILayout.EndHorizontal();
                 }
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("", GUILayout.Width(150));
+                GUILayout.Label(Loc.T(""), GUILayout.Width(150));
                 if (regTopCut > total)
-                    GUILayout.Label("A top " + regTopCut + " needs at least " + regTopCut + " players.", ui.Error);
+                    GUILayout.Label(Loc.T("A top " + regTopCut + " needs at least " + regTopCut + " players."), ui.Error);
                 else
-                    GUILayout.Label("After the Swiss rounds the top " + regTopCut + " play single elimination, seeded by the standings"
+                    GUILayout.Label(Loc.T("After the Swiss rounds the top " + regTopCut + " play single elimination, seeded by the standings"
                                     + (regTopCut == 8 ? " (1 v 8, 4 v 5, 2 v 7, 3 v 6)" : regTopCut == 4 ? " (1 v 4, 2 v 3)" : "")
-                                    + ". The higher seed chooses who goes first in game 1, and a drawn game is followed by a Tie-Breaker game (it ends at the first Prize lead).", Hint(ui));
+                                    + ". The higher seed chooses who goes first in game 1, and a drawn game is followed by a Tie-Breaker game (it ends at the first Prize lead)."), Hint(ui));
                 GUILayout.EndHorizontal();
             }
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Format", GUILayout.Width(150));
-            int fmt = GUILayout.Toolbar(regExpanded ? 1 : 0, new[] { "Standard", "Expanded" }, GUILayout.Width(240));
+            GUILayout.Label(Loc.T("Format"), GUILayout.Width(150));
+            int fmt = GUILayout.Toolbar(regExpanded ? 1 : 0, Loc.T(new[] { "Standard", "Expanded" }), GUILayout.Width(240));
             if (fmt != (regExpanded ? 1 : 0)) actions.Add(() => { regExpanded = fmt == 1; regDeck = -1; });
             GUILayout.EndHorizontal();
 
 
             DrawRegionalFriendRow(actions);
-            bool explore = GUILayout.Toggle(regExplore, " The AI games try other plays now and then while learning (it learns faster, like on the Train screen; your own opponents always play their best)");
+            bool explore = GUILayout.Toggle(regExplore, Loc.T(" The AI games try other plays now and then while learning (it learns faster, like on the Train screen; your own opponents always play their best)"));
             if (explore != regExplore) actions.Add(() => regExplore = explore);
             if (regAiOnly)
             {
-                bool watch = GUILayout.Toggle(regWatch, " Watch one match each round on the board (picked at random; the others play in the background)");
+                bool watch = GUILayout.Toggle(regWatch, Loc.T(" Watch one match each round on the board (picked at random; the others play in the background)"));
                 if (watch != regWatch) actions.Add(() => regWatch = watch);
             }
 
@@ -1375,37 +1375,37 @@ namespace PokemonTCG.Presentation
                     int first = pool.Contains(remembered) ? remembered : pool[0];
                     actions.Add(() => regDeck = first);
                 }
-                GUILayout.Label("Your deck (legal " + Formats.Label(format) + " decks)", ui.Title);
+                GUILayout.Label(Loc.T("Your deck (legal " + Formats.Label(format) + " decks)"), ui.Title);
                 regDeckScroll = GUILayout.BeginScrollView(regDeckScroll, GUILayout.Height(Mathf.Clamp(r.height - 520f, 90f, 260f)));
                 foreach (int i in pool)
                 {
                     int k = i;
-                    if (GUILayout.Toggle(regDeck == i, decks[i].Label, ui.Button) && regDeck != i) actions.Add(() => regDeck = k);
+                    if (GUILayout.Toggle(regDeck == i, Loc.T(decks[i].Label), ui.Button) && regDeck != i) actions.Add(() => regDeck = k);
                 }
                 GUILayout.EndScrollView();
             }
             var fieldNames = pool.Select(ix => decks[ix].Name).Distinct().ToList();
             int aiSeatsNow = regAiOnly ? total : total - 1;
             if (pool.Count == 0)
-                GUILayout.Label("There are no legal " + Formats.Label(format) + " decks yet. Decks are Standard unless their list has a \"# Format: Expanded\" line.", ui.Error);
+                GUILayout.Label(Loc.T("There are no legal " + Formats.Label(format) + " decks yet. Decks are Standard unless their list has a \"# Format: Expanded\" line."), ui.Error);
             else
                 DrawRegionalField(ui, fieldNames, aiSeatsNow, actions);
             GUILayout.Space(4);
             DrawRegionalTablesAtOnce(ui, actions, true);
             int matchesPerRound = total / 2;
-            GUILayout.Label("Each round has " + matchesPerRound.ToString("N0") + " matches (about " + (regBestOf3 ? matchesPerRound * 5 / 2 : matchesPerRound).ToString("N0")
-                            + " games), played " + RegionalTablesAtOnce() + " at a time in the background.", Hint(ui));
+            GUILayout.Label(Loc.T("Each round has " + matchesPerRound.ToString("N0") + " matches (about " + (regBestOf3 ? matchesPerRound * 5 / 2 : matchesPerRound).ToString("N0")
+                            + " games), played " + RegionalTablesAtOnce() + " at a time in the background."), Hint(ui));
 
             GUILayout.Space(6);
             GUILayout.BeginHorizontal();
             GUI.enabled = pool.Count > 0 && (regAiOnly || pool.Contains(regDeck)) && brain != null && playersValid
                           && RegionalFieldProblem(fieldNames, aiSeatsNow) == null && regTopCut <= total;
-            if (GUILayout.Button("Start the event", GUILayout.Height(34), GUILayout.Width(200))) actions.Add(StartRegionalEvent);
+            if (GUILayout.Button(Loc.T("Start the event"), GUILayout.Height(34), GUILayout.Width(200))) actions.Add(StartRegionalEvent);
             GUI.enabled = true;
-            if (regional != null && GUILayout.Button("Back to your event", GUILayout.Height(34), GUILayout.Width(200))) actions.Add(() => regionalSetupOpen = false);
-            if (GUILayout.Button("Back to menu", GUILayout.Height(34), GUILayout.Width(150))) actions.Add(() => { RefreshDecks(); mode = Mode.Menu; });
+            if (regional != null && GUILayout.Button(Loc.T("Back to your event"), GUILayout.Height(34), GUILayout.Width(200))) actions.Add(() => regionalSetupOpen = false);
+            if (GUILayout.Button(Loc.T("Back to menu"), GUILayout.Height(34), GUILayout.Width(150))) actions.Add(() => { RefreshDecks(); mode = Mode.Menu; });
             GUILayout.EndHorizontal();
-            if (regionalError != null) GUILayout.Label(regionalError, ui.Error);
+            if (regionalError != null) GUILayout.Label(Loc.T(regionalError), ui.Error);
             GUILayout.EndScrollView();
             GUILayout.EndArea();
 
@@ -1423,38 +1423,38 @@ namespace PokemonTCG.Presentation
             int tables = Mathf.Clamp(regTables, 1, RegionalSim.MaxTablesAtOnce); // your setting (the battery saver may play fewer)
             int playing = RegionalTablesAtOnce();
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Tables at once", GUILayout.Width(150));
+            GUILayout.Label(Loc.T("Tables at once"), GUILayout.Width(150));
             foreach (int step in new[] { -5, -1 })
             {
                 int d = step;
                 GUI.enabled = tables > 1;
-                if (GUILayout.Button(d.ToString(), GUILayout.Width(38), GUILayout.Height(24))) actions.Add(() => SetRegionalTables(tables + d));
+                if (GUILayout.Button(Loc.T(d.ToString()), GUILayout.Width(38), GUILayout.Height(24))) actions.Add(() => SetRegionalTables(tables + d));
             }
             GUI.enabled = true;
-            GUILayout.Label(tables.ToString(), ui.Title, GUILayout.Width(36));
+            GUILayout.Label(Loc.T(tables.ToString()), ui.Title, GUILayout.Width(36));
             foreach (int step in new[] { 1, 5 })
             {
                 int d = step;
                 GUI.enabled = tables < RegionalSim.MaxTablesAtOnce;
-                if (GUILayout.Button("+" + d, GUILayout.Width(38), GUILayout.Height(24))) actions.Add(() => SetRegionalTables(tables + d));
+                if (GUILayout.Button(Loc.T("+" + d), GUILayout.Width(38), GUILayout.Height(24))) actions.Add(() => SetRegionalTables(tables + d));
             }
             GUI.enabled = tables != suggestedTables;
-            if (GUILayout.Button("Use " + suggestedTables + " (best for this computer)", GUILayout.Width(250), GUILayout.Height(24)))
+            if (GUILayout.Button(Loc.T("Use " + suggestedTables + " (best for this computer)"), GUILayout.Width(250), GUILayout.Height(24)))
                 actions.Add(() => SetRegionalTables(suggestedTables));
             GUI.enabled = true;
-            if (playing < tables) GUILayout.Label("  Battery saver: " + playing + " at once for now.", Hint(ui));
-            else if (!withHint && tables > threads) GUILayout.Label("  More than this computer's " + threads + " processor threads: rounds won't finish sooner.", ui.Error);
+            if (playing < tables) GUILayout.Label(Loc.T("  Battery saver: " + playing + " at once for now."), Hint(ui));
+            else if (!withHint && tables > threads) GUILayout.Label(Loc.T("  More than this computer's " + threads + " processor threads: rounds won't finish sooner."), ui.Error);
             GUILayout.EndHorizontal();
             if (withHint)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("", GUILayout.Width(150));
+                GUILayout.Label(Loc.T(""), GUILayout.Width(150));
                 if (tables > threads)
-                    GUILayout.Label("This computer has " + threads + " processor threads. More tables than that won't finish a round sooner: each game "
-                                    + "just gets slower. " + suggestedTables + " keeps it busy and leaves room for the screen and your own game.", ui.Error);
+                    GUILayout.Label(Loc.T("This computer has " + threads + " processor threads. More tables than that won't finish a round sooner: each game "
+                                    + "just gets slower. " + suggestedTables + " keeps it busy and leaves room for the screen and your own game."), ui.Error);
                 else
-                    GUILayout.Label("AI tables played at the same time in the background (1 to " + RegionalSim.MaxTablesAtOnce + "). This computer has " + threads
-                                    + " processor threads, so " + suggestedTables + " is the most that helps. You can change it during the event too.", Hint(ui));
+                    GUILayout.Label(Loc.T("AI tables played at the same time in the background (1 to " + RegionalSim.MaxTablesAtOnce + "). This computer has " + threads
+                                    + " processor threads, so " + suggestedTables + " is the most that helps. You can change it during the event too."), Hint(ui));
                 GUILayout.EndHorizontal();
             }
             DrawSkipCpuRow(ui, actions, 150);
@@ -1575,16 +1575,16 @@ namespace PokemonTCG.Presentation
         private void DrawRegionalField(UiStyles ui, List<string> deckNames, int aiSeats, List<Action> actions)
         {
             GUILayout.Space(4);
-            GUILayout.Label("The AI players' decks", ui.Title);
+            GUILayout.Label(Loc.T("The AI players' decks"), ui.Title);
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Set them by", GUILayout.Width(150));
-            int byPct = GUILayout.Toolbar(regFieldByPercent ? 1 : 0, new[] { "Number of AI players", "Meta share (% of the AI players)" }, GUILayout.Width(460));
+            GUILayout.Label(Loc.T("Set them by"), GUILayout.Width(150));
+            int byPct = GUILayout.Toolbar(regFieldByPercent ? 1 : 0, Loc.T(new[] { "Number of AI players", "Meta share (% of the AI players)" }), GUILayout.Width(460));
             if (byPct != (regFieldByPercent ? 1 : 0)) actions.Add(() => { regFieldByPercent = byPct == 1; GUI.FocusControl(null); });
             GUILayout.EndHorizontal();
-            GUILayout.Label(regFieldByPercent
+            GUILayout.Label(Loc.T(regFieldByPercent
                 ? "Type each deck's share of the AI players in percent (12.5 is fine). Leave a deck empty for none."
-                : "Type how many AI players play each deck. Leave a deck empty for none.", Hint(ui));
-            bool fill = GUILayout.Toggle(regFillRandom, " The AI players left over pick their decks at random from all " + deckNames.Count + " legal decks");
+                : "Type how many AI players play each deck. Leave a deck empty for none."), Hint(ui));
+            bool fill = GUILayout.Toggle(regFillRandom, Loc.T(" The AI players left over pick their decks at random from all " + deckNames.Count + " legal decks"));
             if (fill != regFillRandom) actions.Add(() => regFillRandom = fill);
 
             var seats = RegionalChosenSeats(deckNames, aiSeats);
@@ -1596,7 +1596,7 @@ namespace PokemonTCG.Presentation
             {
                 string deckName = name;
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(deckName, GUILayout.Width(300));
+                GUILayout.Label(Loc.T(deckName), GUILayout.Width(300));
                 string shown = regFieldByPercent ? RegionalFieldPercentText(deckName) : RegionalFieldText(deckName);
                 string typedValue = GUILayout.TextField(shown, regFieldByPercent ? 6 : 5, GUILayout.Width(64), GUILayout.Height(22));
                 if (typedValue != shown)
@@ -1612,11 +1612,11 @@ namespace PokemonTCG.Presentation
                         actions.Add(() => SetRegionalFieldText(deckName, digitsOnly));
                     }
                 }
-                if (regFieldByPercent) GUILayout.Label("%", GUILayout.Width(16));
+                if (regFieldByPercent) GUILayout.Label(Loc.T("%"), GUILayout.Width(16));
                 foreach (int step in steps)
                 {
                     int d = step;
-                    if (GUILayout.Button((d > 0 ? "+" : "") + d, GUILayout.Width(38), GUILayout.Height(22)))
+                    if (GUILayout.Button(Loc.T((d > 0 ? "+" : "") + d), GUILayout.Width(38), GUILayout.Height(22)))
                     {
                         if (regFieldByPercent) actions.Add(() => SetRegionalFieldPercent(deckName, RegionalFieldPercent(deckName) + d));
                         else actions.Add(() => SetRegionalFieldCount(deckName, RegionalFieldCount(deckName) + d));
@@ -1627,7 +1627,7 @@ namespace PokemonTCG.Presentation
                 string note = regFieldByPercent
                     ? (RegionalFieldPercent(deckName) > 0 ? "  " + players.ToString("N0") + (players == 1 ? " AI player" : " AI players") : "")
                     : (players > 0 ? "  " + Pct1((double)players / Math.Max(1, aiSeats)) + " of the AI players" : "");
-                GUILayout.Label(note, Hint(ui));
+                GUILayout.Label(Loc.T(note), Hint(ui));
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndScrollView();
@@ -1639,7 +1639,7 @@ namespace PokemonTCG.Presentation
                 : assigned == aiSeats ? "Every AI player plays a deck you chose (" + assigned.ToString("N0") + ")" + shareNote + "."
                 : assigned.ToString("N0") + " AI players play the decks you chose" + shareNote + "; the other " + (aiSeats - assigned).ToString("N0") + " pick at random.");
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Clear", GUILayout.Width(80)))
+            if (GUILayout.Button(Loc.T("Clear"), GUILayout.Width(80)))
                 actions.Add(() =>
                 {
                     if (regFieldByPercent)
@@ -1654,7 +1654,7 @@ namespace PokemonTCG.Presentation
                     }
                     GUI.FocusControl(null);
                 });
-            GUILayout.Label(summary, problem != null ? ui.Error : Hint(ui));
+            GUILayout.Label(Loc.T(summary), problem != null ? ui.Error : Hint(ui));
             GUILayout.EndHorizontal();
         }
 

@@ -39,6 +39,8 @@ namespace PokemonTCG.Presentation
 
         /// <summary>Card key ("TWM-130") -> image file. Built on first use; ReloadImages() rescans the folder.</summary>
         private static Dictionary<string, string> index;
+        /// <summary>v177: Japanese printings' images (a set folder's "ja" folder), shown in Japanese mode.</summary>
+        private static Dictionary<string, string> jaIndex = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         /// <summary>Files in the image folder that can't be used, with the reason.</summary>
         public static readonly List<string> SkippedFiles = new List<string>();
         /// <summary>Files that matched a card name pattern but couldn't be decoded (often WebP renamed to .png).</summary>
@@ -170,7 +172,8 @@ namespace PokemonTCG.Presentation
         /// <summary>True when an image for this card can be shown (its own, or its main printing's), without loading it.</summary>
         public static bool HasImageFile(CardDef def)
         {
-            return def != null && (Index().ContainsKey(def.Key) || (def.IsAlternatePrint && Index().ContainsKey(def.BaseKey)));
+            string path;
+            return def != null && TryImagePath(def, out path);
         }
 
         /// <summary>True when this exact printing has its own image file.</summary>
@@ -285,7 +288,7 @@ namespace PokemonTCG.Presentation
         {
             if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) return null;
             string path;
-            if (!Index().TryGetValue(def.Key, out path) && !(def.IsAlternatePrint && Index().TryGetValue(def.BaseKey, out path))) return null;
+            if (!TryImagePath(def, out path)) return null;
             if (path.StartsWith("jar:", StringComparison.OrdinalIgnoreCase)) return path; // v118: an image inside the Android app
             // Characters a file address can mistake for something else: read those files directly.
             if (path.IndexOf('#') >= 0 || path.IndexOf('%') >= 0 || path.IndexOf('?') >= 0) return null;
@@ -987,6 +990,9 @@ namespace PokemonTCG.Presentation
             public readonly List<KeyValuePair<string, string>> ToConvert = new List<KeyValuePair<string, string>>();
             /// <summary>v153.1: the names of the PNGs already in the convert folder.</summary>
             public readonly HashSet<string> Converted = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            /// <summary>v177: Japanese printings (in a set folder's "ja" folder): card key -> file, and the ones to convert.</summary>
+            public readonly Dictionary<string, string> JaIndex = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            public readonly List<KeyValuePair<string, string>> ToConvertJa = new List<KeyValuePair<string, string>>();
         }
 
         /// <summary>
@@ -1113,6 +1119,7 @@ namespace PokemonTCG.Presentation
             SkippedFiles.Clear();
             SkippedFiles.AddRange(built.Skipped);
             index = built.Index;
+            jaIndex = built.JaIndex;
             return index;
         }
 
@@ -1158,6 +1165,22 @@ namespace PokemonTCG.Presentation
                     if (!b.Index.ContainsKey(key)) b.Index[key] = done.Value;
                 }
             }
+            if (b.ConvertCache != null && b.ToConvertJa.Count > 0)
+            {
+                var pairs = new List<KeyValuePair<string, string>>();
+                var keyOf = new Dictionary<string, string>();
+                foreach (var kv in b.ToConvertJa)
+                {
+                    if (b.JaIndex.ContainsKey(kv.Key) || keyOf.ContainsKey(kv.Value)) continue;
+                    keyOf[kv.Value] = kv.Key;
+                    pairs.Add(new KeyValuePair<string, string>(kv.Value, ImageConverter.CachedPngPath(b.ConvertCache, kv.Value)));
+                }
+                foreach (var done in ImageConverter.ConvertAll(pairs, b.Skipped))
+                {
+                    string key = keyOf[done.Key];
+                    if (!b.JaIndex.ContainsKey(key)) b.JaIndex[key] = done.Value;
+                }
+            }
             foreach (var kv in b.Fallbacks)
                 if (!b.Index.ContainsKey(kv.Key)) b.Index[kv.Key] = kv.Value;
             return b;
@@ -1195,6 +1218,15 @@ namespace PokemonTCG.Presentation
                 }
             }
             string bare = Path.GetFileNameWithoutExtension(fileName);
+            // v177: a Japanese printing, in a "ja" folder inside the set's folder: its own index, used in Japanese mode.
+            if (folders != null && folders.Count > 0 && string.Equals(folders[0], JapaneseFolderName, StringComparison.OrdinalIgnoreCase))
+            {
+                string jaKey = KeyFor(bare, folders.Skip(1).ToList());
+                if (jaKey == null) { b.Skipped.Add(fileName + " (a Japanese image should be named like TWM_130.jpg)"); return; }
+                if (convert) b.ToConvertJa.Add(new KeyValuePair<string, string>(jaKey, path));
+                else if (!b.JaIndex.ContainsKey(jaKey)) b.JaIndex[jaKey] = ConvertedCopy(b, path) ?? path;
+                return;
+            }
             string fallback = convert ? null : FallbackKeyFromPkmncardsName(bare);
             if (fallback != null)
             {
@@ -1227,11 +1259,34 @@ namespace PokemonTCG.Presentation
             catch (Exception) { return false; }
         }
 
+        /// <summary>The folder name for Japanese printings inside a set's folder (v177).</summary>
+        public const string JapaneseFolderName = "ja";
+
+        /// <summary>
+        /// The image file for a card: in Japanese mode its Japanese printing when there is one (v177), otherwise its own image, or its
+        /// main printing's for an alternate printing without its own.
+        /// </summary>
+        private static bool TryImagePath(CardDef def, out string path)
+        {
+            var idx = Index();
+            if (Loc.IsJapanese && (jaIndex.TryGetValue(def.Key, out path) || (def.IsAlternatePrint && jaIndex.TryGetValue(def.BaseKey, out path)))) return true;
+            return idx.TryGetValue(def.Key, out path) || (def.IsAlternatePrint && idx.TryGetValue(def.BaseKey, out path));
+        }
+
+        /// <summary>v177: there is a Japanese printing's image for this card (its own or its main printing's).</summary>
+        public static bool HasJapaneseImage(CardDef def)
+        {
+            Index();
+            return def != null && (jaIndex.ContainsKey(def.Key) || jaIndex.ContainsKey(def.BaseKey));
+        }
+
+        public static int JapaneseImageCount { get { Index(); return jaIndex.Count; } }
+
         private static Texture2D LoadImage(CardDef def)
         {
             string path;
             // An alternate printing without its own image shows the main printing's art.
-            if (!Index().TryGetValue(def.Key, out path) && !(def.IsAlternatePrint && Index().TryGetValue(def.BaseKey, out path))) return null;
+            if (!TryImagePath(def, out path)) return null;
             byte[] bytes;
             if (path.StartsWith("jar:", StringComparison.OrdinalIgnoreCase))
             {

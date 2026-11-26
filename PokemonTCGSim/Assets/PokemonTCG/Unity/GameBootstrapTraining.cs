@@ -253,10 +253,10 @@ namespace PokemonTCG.Presentation
         {
             if (!CpuThreads.Supported) return;
             GUILayout.BeginHorizontal();
-            GUILayout.Label("CPU threads", GUILayout.Width(labelWidth));
-            bool newSkip = GUILayout.Toggle(skipCpu, " Don't use", GUILayout.Width(100));
+            GUILayout.Label(Loc.T("CPU threads"), GUILayout.Width(labelWidth));
+            bool newSkip = GUILayout.Toggle(skipCpu, Loc.T(" Don't use"), GUILayout.Width(100));
             string newSkipText = GUILayout.TextField(skipCpuText, GUILayout.Width(90));
-            GUILayout.Label("  " + (skipCpu && skipCpuMessage != null ? skipCpuMessage : "Off: every thread is used.") + " For a faulty CPU core.", Hint(ui));
+            GUILayout.Label(Loc.T("  " + (skipCpu && skipCpuMessage != null ? skipCpuMessage : "Off: every thread is used.") + " For a faulty CPU core."), Hint(ui));
             GUILayout.EndHorizontal();
             if (newSkip != skipCpu || newSkipText != skipCpuText) actions.Add(() => SetSkipCpu(newSkip, newSkipText));
         }
@@ -307,10 +307,10 @@ namespace PokemonTCG.Presentation
         private void DrawLookAheadRow(UiStyles ui)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Look-ahead", GUILayout.Width(80));
-            int pick = GUILayout.Toolbar(lookAhead, LookAheadNames, GUILayout.Width(240));
-            GUILayout.Label("  Neural AI only: it plays its best few moves out a turn ahead (Deep: two) on guesses at your hidden cards, "
-                            + "never your real ones. Quick: under a second a move; Deep: a few seconds.", Hint(ui));
+            GUILayout.Label(Loc.T("Look-ahead"), GUILayout.Width(80));
+            int pick = GUILayout.Toolbar(lookAhead, Loc.T(LookAheadNames), GUILayout.Width(240));
+            GUILayout.Label(Loc.T("  Neural AI only: it plays its best few moves out a turn ahead (Deep: two) on guesses at your hidden cards, "
+                            + "never your real ones. Quick: under a second a move; Deep: a few seconds."), Hint(ui));
             GUILayout.EndHorizontal();
             if (pick != lookAhead)
             {
@@ -682,12 +682,12 @@ namespace PokemonTCG.Presentation
             // The whole window's width (on a PC the screen has room for it), less a margin.
             float w = UiScale.Width - 30f;
             var r = new Rect(UiScale.Width / 2f - w / 2f, 15f, w, UiScale.Height - 30f);
-            GUI.Box(r, GUIContent.none);
+            GUI.Box(r, Loc.T(GUIContent.none));
             GUILayout.BeginArea(new Rect(r.x + 14, r.y + 10, r.width - 28, r.height - 20));
-            GUILayout.Label("Train the AI", ui.Header);
-            GUILayout.Label("Pick two decks: built-in or your own. The AI plays them against each other, learns from every game, and keeps what it learns for your games against it. "
-                            + "It also learns from every game you play against it, and from your answers on the Areas of Improvement screen.", ui.Label);
-            if (brainError != null) GUILayout.Label(brainError, ui.Error);
+            GUILayout.Label(Loc.T("Train the AI"), ui.Header);
+            GUILayout.Label(Loc.T("Pick two decks: built-in or your own. The AI plays them against each other, learns from every game, and keeps what it learns for your games against it. "
+                            + "It also learns from every game you play against it, and from your answers on the Areas of Improvement screen."), ui.Label);
+            if (brainError != null) GUILayout.Label(Loc.T(brainError), ui.Error);
 
             // The settings column gets at least the room its widest row needs; the deck lists and the info panel share the rest.
             float setW = Mathf.Clamp((r.width - 28f) * 0.36f, 460f, 640f);
@@ -701,32 +701,32 @@ namespace PokemonTCG.Presentation
             GUILayout.BeginHorizontal();
 
             GUILayout.BeginVertical(GUILayout.Width(colW));
-            GUILayout.Label("Deck A", ui.Title);
+            GUILayout.Label(Loc.T("Deck A"), ui.Title);
             GUI.enabled = !running;
-            bool newRandomA = GUILayout.Toggle(trainRandomA, " A random deck every game");
+            bool newRandomA = GUILayout.Toggle(trainRandomA, Loc.T(" A random deck every game"));
             if (newRandomA != trainRandomA) actions.Add(() => SetTrainRandom(newRandomA, trainRandomB));
             GUI.enabled = !running && !trainRandomA;
             trainScrollA = GUILayout.BeginScrollView(trainScrollA, GUILayout.Height(listH));
             for (int i = 0; i < decks.Count; i++)
             {
                 int k = i;
-                if (GUILayout.Toggle(trainA == i, DeckLabel(i), ui.Button) && trainA != i) actions.Add(() => trainA = k);
+                if (GUILayout.Toggle(trainA == i, Loc.T(DeckLabel(i)), ui.Button) && trainA != i) actions.Add(() => trainA = k);
             }
             GUILayout.EndScrollView();
             GUI.enabled = true;
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical(GUILayout.Width(colW));
-            GUILayout.Label("Deck B", ui.Title);
+            GUILayout.Label(Loc.T("Deck B"), ui.Title);
             GUI.enabled = !running;
-            bool newRandomB = GUILayout.Toggle(trainRandomB, " A random deck every game");
+            bool newRandomB = GUILayout.Toggle(trainRandomB, Loc.T(" A random deck every game"));
             if (newRandomB != trainRandomB) actions.Add(() => SetTrainRandom(trainRandomA, newRandomB));
             GUI.enabled = !running && !trainRandomB;
             trainScrollB = GUILayout.BeginScrollView(trainScrollB, GUILayout.Height(listH));
             for (int i = 0; i < decks.Count; i++)
             {
                 int k = i;
-                if (GUILayout.Toggle(trainB == i, DeckLabel(i), ui.Button) && trainB != i) actions.Add(() => trainB = k);
+                if (GUILayout.Toggle(trainB == i, Loc.T(DeckLabel(i)), ui.Button) && trainB != i) actions.Add(() => trainB = k);
             }
             GUILayout.EndScrollView();
             GUI.enabled = true;
@@ -750,36 +750,36 @@ namespace PokemonTCG.Presentation
             trainScrollSettings = GUILayout.BeginScrollView(trainScrollSettings, false, false, GUIStyle.none, GUI.skin.verticalScrollbar, GUILayout.ExpandHeight(true));
             // Held to the column's width (less its scroll bar), so long lines wrap instead of running off the right edge.
             GUILayout.BeginVertical(GUILayout.Width(setW - 20f));
-            GUILayout.Label("Games to play", ui.Title);
+            GUILayout.Label(Loc.T("Games to play"), ui.Title);
             GUI.enabled = !running;
             int countPick = Array.IndexOf(TrainCounts, trainGames);
-            int newCount = GUILayout.SelectionGrid(countPick, TrainCountLabels, TrainCountsPerRow);
+            int newCount = GUILayout.SelectionGrid(countPick, Loc.T(TrainCountLabels), TrainCountsPerRow);
             if (newCount != countPick && newCount >= 0) actions.Add(() => SetTrainGames(TrainCounts[newCount]));
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Or type any number:", GUILayout.Width(140));
+            GUILayout.Label(Loc.T("Or type any number:"), GUILayout.Width(140));
             string newGamesText = GUILayout.TextField(trainGamesText, GUILayout.Width(130));
             GUILayout.EndHorizontal();
-            GUILayout.Label(trainGames.ToString("N0") + " games (up to " + MaxTrainGames.ToString("N0") + ")", Hint(ui));
+            GUILayout.Label(Loc.T(trainGames.ToString("N0") + " games (up to " + MaxTrainGames.ToString("N0") + ")"), Hint(ui));
             if (newGamesText != trainGamesText) actions.Add(() => TypeTrainGames(newGamesText));
             if (TrainAll)
-                GUILayout.Label("All decks against all decks: every game picks two of your " + AllTrainDecks().Count + " legal decks at random (mirrors too), "
-                                + "the way the Python bot trained. Decks for a custom format aren't included.", Hint(ui));
+                GUILayout.Label(Loc.T("All decks against all decks: every game picks two of your " + AllTrainDecks().Count + " legal decks at random (mirrors too), "
+                                + "the way the Python bot trained. Decks for a custom format aren't included."), Hint(ui));
             else if (TrainFocus)
             {
                 int f = TrainFocusDeck;
-                GUILayout.Label("Focused practice: " + (f >= 0 && f < decks.Count ? decks[f].Name : "the deck you pick on the other side")
-                                + " plays every game, against a random deck from your " + TrainPoolFor(f).Count + " legal decks (mirrors too).", Hint(ui));
+                GUILayout.Label(Loc.T("Focused practice: " + (f >= 0 && f < decks.Count ? decks[f].Name : "the deck you pick on the other side")
+                                + " plays every game, against a random deck from your " + TrainPoolFor(f).Count + " legal decks (mirrors too)."), Hint(ui));
             }
-            bool newMeasure = GUILayout.Toggle(trainMeasure, " Measure it against the classic bot before and after (+" + (MeasureGames * 2) + " games)");
+            bool newMeasure = GUILayout.Toggle(trainMeasure, Loc.T(" Measure it against the classic bot before and after (+" + (MeasureGames * 2) + " games)"));
             if (newMeasure != trainMeasure) actions.Add(() => trainMeasure = newMeasure);
             if (trainMeasure)
-                GUILayout.Label("A test it takes twice: before training it plays " + MeasureGames + " games against the classic bot (the sim's original AI, which never "
+                GUILayout.Label(Loc.T("A test it takes twice: before training it plays " + MeasureGames + " games against the classic bot (the sim's original AI, which never "
                                 + "learns); after training it replays the same " + MeasureGames + " games (same decks, seats and shuffles), so the difference "
                                 + "comes from what it learned, not luck. It doesn't learn from these games. 50% = as good as the classic bot"
-                                + "; the Neural AI is also checked (100 games) every fifth of the session.", Hint(ui));
+                                + "; the Neural AI is also checked (100 games) every fifth of the session."), Hint(ui));
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Speed", GUILayout.Width(60));
-            int speed = GUILayout.Toolbar(trainFast ? 1 : 0, new[] { "Gentle", "Fast" });
+            GUILayout.Label(Loc.T("Speed"), GUILayout.Width(60));
+            int speed = GUILayout.Toolbar(trainFast ? 1 : 0, Loc.T(new[] { "Gentle", "Fast" }));
             GUILayout.EndHorizontal();
             if ((speed == 1) != trainFast)
                 actions.Add(() =>
@@ -787,13 +787,13 @@ namespace PokemonTCG.Presentation
                     trainFast = speed == 1;
                     PlayerPrefs.SetInt(PrefTrainFast, trainFast ? 1 : 0);
                 });
-            GUILayout.Label(trainFast
+            GUILayout.Label(Loc.T(trainFast
                 ? "Fast (Neural AI training): " + FastThreads + " games at once and no rests, about 1.5 to 2 times Gentle's speed. It works the CPU hard: keep \"Don't use CPU threads\" on while your CPU has a faulty core."
-                : "Gentle (Neural AI training): half the CPU's threads, with a short rest after each learning step: cooler and quieter.", Hint(ui));
+                : "Gentle (Neural AI training): half the CPU's threads, with a short rest after each learning step: cooler and quieter."), Hint(ui));
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Games per second", GUILayout.Width(120));
+            GUILayout.Label(Loc.T("Games per second"), GUILayout.Width(120));
             string newRate = GUILayout.TextField(trainRateText, GUILayout.Width(60));
-            GUILayout.Label(TrainRate > 0 ? "  at most " + TrainRate.ToString("0.#") + " a second" : "  blank: as fast as it can", Hint(ui));
+            GUILayout.Label(Loc.T(TrainRate > 0 ? "  at most " + TrainRate.ToString("0.#") + " a second" : "  blank: as fast as it can"), Hint(ui));
             GUILayout.EndHorizontal();
             if (newRate != trainRateText)
                 actions.Add(() =>
@@ -802,7 +802,7 @@ namespace PokemonTCG.Presentation
                     PlayerPrefs.SetString(PrefTrainRate, trainRateText ?? "");
                 });
             GUILayout.BeginHorizontal();
-            bool newGpu = GUILayout.Toggle(trainGpu, " Learn on the GPU at");
+            bool newGpu = GUILayout.Toggle(trainGpu, Loc.T(" Learn on the GPU at"));
             string newGpuAddress = GUILayout.TextField(trainGpuAddress, GUILayout.Width(130));
             GUILayout.EndHorizontal();
             if (newGpu != trainGpu || newGpuAddress != trainGpuAddress)
@@ -816,87 +816,87 @@ namespace PokemonTCG.Presentation
             // Expert roadmap step 2: learning from the look-ahead.
             // The label above and the five choices in rows of three: on one line they're wider than the column, which
             // widens everything in it past the scroll view's edge.
-            GUILayout.Label("Learn from look-ahead", ui.Label);
-            int newLookAhead = GUILayout.SelectionGrid(trainLookAhead, TrainLookAheadNames, 3);
+            GUILayout.Label(Loc.T("Learn from look-ahead"), ui.Label);
+            int newLookAhead = GUILayout.SelectionGrid(trainLookAhead, Loc.T(TrainLookAheadNames), 3);
             if (newLookAhead != trainLookAhead)
                 actions.Add(() =>
                 {
                     trainLookAhead = newLookAhead;
                     PlayerPrefs.SetInt(PrefTrainLookAhead, trainLookAhead);
                 });
-            GUILayout.Label("Neural AI only. In these games the network looks ahead before some of the moves it isn't sure of, plays the move the "
+            GUILayout.Label(Loc.T("Neural AI only. In these games the network looks ahead before some of the moves it isn't sure of, plays the move the "
                             + "look-ahead found, and learns to judge moves the way the look-ahead did: that's how the look-ahead's strength (it wins "
                             + "about 70% against the network alone) gets built into the network. Fewer games per hour, but each teaches more. "
                             + "10% of games trains about 40% slower and 25% about twice as slow (about 2 moves a game learned from the look-ahead); "
                             + "Every game about 6 times slower (about 16 a game); Every move, which looks ahead before every move it isn't sure of, "
                             + "about 16 times slower (about 50 a game). The champion checks show whether it's paying off."
-                            + (trainGpu ? " Learning on the GPU needs the updated learner.py for this." : ""), Hint(ui));
+                            + (trainGpu ? " Learning on the GPU needs the updated learner.py for this." : "")), Hint(ui));
             // Expert roadmap step 6: the league's exploiters.
-            bool newExploiters = GUILayout.Toggle(trainExploiters, " Train exploiters for the league");
+            bool newExploiters = GUILayout.Toggle(trainExploiters, Loc.T(" Train exploiters for the league"));
             if (newExploiters != trainExploiters)
                 actions.Add(() =>
                 {
                     trainExploiters = newExploiters;
                     PlayerPrefs.SetInt(PrefTrainExploiters, trainExploiters ? 1 : 0);
                 });
-            GUILayout.Label("Neural AI only. Every " + ExploiterEveryText + " training games, a copy of the network trains "
+            GUILayout.Label(Loc.T("Neural AI only. Every " + ExploiterEveryText + " training games, a copy of the network trains "
                             + TrainingSession.DefaultExploiterGames.ToString("N0") + " games learning only to beat it; if it then wins " + Math.Round(ChampionGate.PromoteAt * 100)
                             + "% or more, it found a weakness and joins the league (the past versions it trains against, under What the AI knows), so "
                             + "the network learns to cover it. About 5% more training time (around 10 to 15% when choosing moves on the GPU: an "
-                            + "exploiter's moves are chosen on the CPU).", Hint(ui));
+                            + "exploiter's moves are chosen on the CPU)."), Hint(ui));
             if (trainGpu)
             {
-                bool newGpuMoves = GUILayout.Toggle(trainGpuMoves, " Choose moves on the GPU too (many games at once)");
+                bool newGpuMoves = GUILayout.Toggle(trainGpuMoves, Loc.T(" Choose moves on the GPU too (many games at once)"));
                 if (newGpuMoves != trainGpuMoves)
                     actions.Add(() =>
                     {
                         trainGpuMoves = newGpuMoves;
                         PlayerPrefs.SetInt(PrefTrainGpuMoves, trainGpuMoves ? 1 : 0);
                     });
-                GUILayout.Label("Running the network for each move is about half of a training game's work on the CPU. With this on, about 4 games "
+                GUILayout.Label(Loc.T("Running the network for each move is about half of a training game's work on the CPU. With this on, about 4 games "
                                 + "per thread play at once and the GPU learner chooses all their moves together, so the CPU only runs the games. "
-                                + "Needs the updated learner.py.", Hint(ui));
+                                + "Needs the updated learner.py."), Hint(ui));
             }
             if (trainGpu)
-                GUILayout.Label("Neural AI training plays its games here and learns on the graphics card: start the GPU learner first "
+                GUILayout.Label(Loc.T("Neural AI training plays its games here and learns on the graphics card: start the GPU learner first "
                                 + "(GpuLearner/start_gpu_learner.bat beside the game, or in PokemonTCGSim/GpuLearner; see its README). Learning is most of the training time, so this is about 2 to 3 times as fast and keeps that work off the CPU. "
-                                + "If the learner isn't running, it learns on the CPU and says so.", Hint(ui));
+                                + "If the learner isn't running, it learns on the CPU and says so."), Hint(ui));
             GUI.enabled = true;
             if (CpuThreads.Supported)
             {
                 GUILayout.BeginHorizontal();
-                bool newSkip = GUILayout.Toggle(skipCpu, " Don't use CPU threads");
+                bool newSkip = GUILayout.Toggle(skipCpu, Loc.T(" Don't use CPU threads"));
                 string newSkipText = GUILayout.TextField(skipCpuText, GUILayout.Width(90));
                 GUILayout.EndHorizontal();
                 if (newSkip != skipCpu || newSkipText != skipCpuText) actions.Add(() => SetSkipCpu(newSkip, newSkipText));
-                GUILayout.Label((skipCpu && skipCpuMessage != null ? skipCpuMessage + " " : "")
+                GUILayout.Label(Loc.T((skipCpu && skipCpuMessage != null ? skipCpuMessage + " " : "")
                                 + "For a faulty CPU core: the whole app stays off these threads, numbered as in Task Manager's Set affinity "
-                                + "(CPU 0, 1, 2...) and OCCT's logical cores.", Hint(ui));
+                                + "(CPU 0, 1, 2...) and OCCT's logical cores."), Hint(ui));
             }
             GUILayout.Space(6);
             GUILayout.BeginHorizontal();
             bool background = BackgroundRunning;
             GUI.enabled = !running && !background && TrainDecksReady && brain != null;
-            if (GUILayout.Button("Start training", GUILayout.Height(32))) actions.Add(StartTraining);
+            if (GUILayout.Button(Loc.T("Start training"), GUILayout.Height(32))) actions.Add(StartTraining);
             GUI.enabled = running;
-            if (GUILayout.Button("Stop", GUILayout.Height(32), GUILayout.Width(100))) actions.Add(() => training.Cancel());
+            if (GUILayout.Button(Loc.T("Stop"), GUILayout.Height(32), GUILayout.Width(100))) actions.Add(() => training.Cancel());
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             // v120: a black screen while it trains (it keeps going; tap to wake).
-            if (GUILayout.Button("Dark screen", GUILayout.Height(32))) actions.Add(PowerSaver.GoDark);
+            if (GUILayout.Button(Loc.T("Dark screen"), GUILayout.Height(32))) actions.Add(PowerSaver.GoDark);
             GUI.enabled = true;
-            if (GUILayout.Button("Back to menu", GUILayout.Height(32))) actions.Add(() => { RefreshDecks(); mode = Mode.Menu; });
+            if (GUILayout.Button(Loc.T("Back to menu"), GUILayout.Height(32))) actions.Add(() => { RefreshDecks(); mode = Mode.Menu; });
             GUILayout.EndHorizontal();
             DrawBackgroundTraining(ui, actions, running);
-            if (running && PowerSaver.Active) GUILayout.Label("Battery saver on: training plays half the time and rests the other half.", Hint(ui));
+            if (running && PowerSaver.Active) GUILayout.Label(Loc.T("Battery saver on: training plays half the time and rests the other half."), Hint(ui));
             if (!TrainDecksReady && TrainAll)
-                GUILayout.Label("There are no legal decks to train with.", ui.Error);
+                GUILayout.Label(Loc.T("There are no legal decks to train with."), ui.Error);
             else if (!TrainDecksReady && TrainFocus)
-                GUILayout.Label("Pick a legal deck on the side that isn't random.", ui.Error);
+                GUILayout.Label(Loc.T("Pick a legal deck on the side that isn't random."), ui.Error);
             else if (!TrainDecksReady && trainA >= 0 && trainB >= 0)
-                GUILayout.Label("Both decks must be legal to train with them.", ui.Error);
-            if (!trainRandomA && !trainRandomB && trainA >= 0 && trainA == trainB) GUILayout.Label("Same deck on both sides: a mirror match. The AI learns that deck's own play.", Hint(ui));
-            if (trainMessage != null) GUILayout.Label(trainMessage, ui.Good);
+                GUILayout.Label(Loc.T("Both decks must be legal to train with them."), ui.Error);
+            if (!trainRandomA && !trainRandomB && trainA >= 0 && trainA == trainB) GUILayout.Label(Loc.T("Same deck on both sides: a mirror match. The AI learns that deck's own play."), Hint(ui));
+            if (trainMessage != null) GUILayout.Label(Loc.T(trainMessage), ui.Good);
             DrawTrainProgress(ui, st, setW - 34f);
             GUILayout.EndVertical();
             GUILayout.EndScrollView();
@@ -911,12 +911,12 @@ namespace PokemonTCG.Presentation
         {
             if (st == null) return;
             GUILayout.Space(6);
-            GUILayout.Label(st.Phase, ui.Label);
+            GUILayout.Label(Loc.T(st.Phase), ui.Label);
             int total = st.Games + st.EvalTotal;
             int done = st.Done + st.EvalDone;
             float frac = total == 0 ? 0f : Mathf.Clamp01((float)done / total);
             var bar = GUILayoutUtility.GetRect(width, 18f);
-            GUI.Box(bar, GUIContent.none);
+            GUI.Box(bar, Loc.T(GUIContent.none));
             GUI.DrawTexture(new Rect(bar.x + 2, bar.y + 2, (bar.width - 4) * frac, bar.height - 4), ui.Selected);
             string speed = st.GamesPerSecond > 0 ? "  ·  " + st.GamesPerSecond.ToString("0.0") + " games/s" : "";
             string left = "";
@@ -925,9 +925,9 @@ namespace PokemonTCG.Presentation
                 double seconds = (total - done) / st.GamesPerSecond;
                 left = "  ·  about " + TimeLeft(seconds) + " left";
             }
-            GUILayout.Label("Training games " + st.Done + " / " + st.Games + (st.EvalTotal > 0 ? "   ·   measuring games " + st.EvalDone + " / " + st.EvalTotal : "") + speed + left, Hint(ui));
-            if (st.Errors > 0) GUILayout.Label(st.Errors + " game(s) hit an engine error and were skipped. Last: " + st.LastError, ui.Error);
-            else if (!string.IsNullOrEmpty(st.LastError)) GUILayout.Label(st.LastError, ui.Error);
+            GUILayout.Label(Loc.T("Training games " + st.Done + " / " + st.Games + (st.EvalTotal > 0 ? "   ·   measuring games " + st.EvalDone + " / " + st.EvalTotal : "") + speed + left), Hint(ui));
+            if (st.Errors > 0) GUILayout.Label(Loc.T(st.Errors + " game(s) hit an engine error and were skipped. Last: " + st.LastError), ui.Error);
+            else if (!string.IsNullOrEmpty(st.LastError)) GUILayout.Label(Loc.T(st.LastError), ui.Error);
         }
 
         private void DrawTrainResults(UiStyles ui, TrainingStatus st, List<Action> actions)
@@ -936,49 +936,49 @@ namespace PokemonTCG.Presentation
             bool all = training.AllDecksMode, focus = training.FocusMode;
             // In focus mode the focused deck's wins are on its own side (A or B).
             bool focusIsA = focus && !training.RandomA;
-            GUILayout.Label("This session: " + (all || focus ? training.MatchLabel : training.DeckA + " (A) vs " + training.DeckB + " (B)") + ", as the " + training.StyleLabel, ui.Title);
+            GUILayout.Label(Loc.T("This session: " + (all || focus ? training.MatchLabel : training.DeckA + " (A) vs " + training.DeckB + " (B)") + ", as the " + training.StyleLabel), ui.Title);
             int played = st.WinsA + st.WinsB + st.Draws;
             if (played > 0 && all)
-                GUILayout.Label(played.ToString("N0") + " games played" + (st.Draws > 0 ? ", " + st.Draws + " unfinished" : "") + ".", ui.Label);
+                GUILayout.Label(Loc.T(played.ToString("N0") + " games played" + (st.Draws > 0 ? ", " + st.Draws + " unfinished" : "") + "."), ui.Label);
             else if (played > 0 && focus)
             {
                 int focusWins = focusIsA ? st.WinsA : st.WinsB;
-                GUILayout.Label(training.FocusDeck + " won " + Pct(focusWins, played) + " (" + focusWins + " of " + played.ToString("N0") + ") against random decks"
-                                + (st.Draws > 0 ? ", " + st.Draws + " unfinished" : "") + ".", ui.Label);
+                GUILayout.Label(Loc.T(training.FocusDeck + " won " + Pct(focusWins, played) + " (" + focusWins + " of " + played.ToString("N0") + ") against random decks"
+                                + (st.Draws > 0 ? ", " + st.Draws + " unfinished" : "") + "."), ui.Label);
             }
             else if (played > 0)
-                GUILayout.Label("Deck A won " + Pct(st.WinsA, played) + " (" + st.WinsA + "), deck B won " + Pct(st.WinsB, played) + " (" + st.WinsB + ")"
-                                + (st.Draws > 0 ? ", " + st.Draws + " unfinished" : "") + ". Seats alternate, so each deck goes first half the time.", ui.Label);
+                GUILayout.Label(Loc.T("Deck A won " + Pct(st.WinsA, played) + " (" + st.WinsA + "), deck B won " + Pct(st.WinsB, played) + " (" + st.WinsB + ")"
+                                + (st.Draws > 0 ? ", " + st.Draws + " unfinished" : "") + ". Seats alternate, so each deck goes first half the time."), ui.Label);
             foreach (var b in st.Blocks)
             {
                 int n = b.Played;
                 if (n == 0) continue;
                 string tried = b.Decisions > 0 ? "  ·  tried something new in " + (100.0 * b.Explored / b.Decisions).ToString("0.0") + "% of decisions" : "";
                 string wins = all ? "" : focus ? training.FocusDeck + " " + Pct(focusIsA ? b.WinsA : b.WinsB, n) + "  ·  " : "A " + Pct(b.WinsA, n) + "  ·  B " + Pct(b.WinsB, n) + "  ·  ";
-                GUILayout.Label("Games " + b.From + "–" + b.To + ":  " + wins
-                                + b.AverageTurns.ToString("0.0") + " turns on average" + tried, Hint(ui));
+                GUILayout.Label(Loc.T("Games " + b.From + "–" + b.To + ":  " + wins
+                                + b.AverageTurns.ToString("0.0") + " turns on average" + tried), Hint(ui));
             }
             if (st.ScoreBefore >= 0 || st.ScoreAfter >= 0)
             {
                 string before = st.ScoreBefore >= 0 ? (st.ScoreBefore * 100).ToString("0") + "%" : "-";
                 string after = st.ScoreAfter >= 0 ? (st.ScoreAfter * 100).ToString("0") + "%" : (st.Running ? "measuring..." : "-");
-                GUILayout.Label("Test against the classic bot: won " + before + " before training, " + after + " after", ui.Title);
-                GUILayout.Label("The same " + MeasureGames + " games both times (" + (all ? "random decks" : focus ? training.FocusDeck + " against random decks" : "half with each deck")
-                                + ", same seats and shuffles), so the change comes from what it learned. 50% = as good as the classic bot; unfinished games count as half a win.", Hint(ui));
+                GUILayout.Label(Loc.T("Test against the classic bot: won " + before + " before training, " + after + " after"), ui.Title);
+                GUILayout.Label(Loc.T("The same " + MeasureGames + " games both times (" + (all ? "random decks" : focus ? training.FocusDeck + " against random decks" : "half with each deck")
+                                + ", same seats and shuffles), so the change comes from what it learned. 50% = as good as the classic bot; unfinished games count as half a win."), Hint(ui));
                 if (st.ScoreBefore >= 0 && st.ScoreAfter >= 0)
                 {
                     double delta = (st.ScoreAfter - st.ScoreBefore) * 100;
                     string verdict = delta >= 5 ? "It got better."
                         : delta <= -5 ? "It got worse this time: you can undo the session below."
                         : "No clear change: with " + MeasureGames + " games, differences under about 5 points are mostly luck.";
-                    GUILayout.Label((delta >= 0 ? "+" : "") + delta.ToString("0") + " points. " + verdict, delta <= -5 ? ui.Error : ui.Good);
+                    GUILayout.Label(Loc.T((delta >= 0 ? "+" : "") + delta.ToString("0") + " points. " + verdict), delta <= -5 ? ui.Error : ui.Good);
                 }
             }
             if (st.Finished && !sessionUndone && !string.IsNullOrEmpty(training.BrainBefore))
             {
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button("Undo this session", GUILayout.Width(170))) actions.Add(UndoSession);
-                GUILayout.Label("Puts the AI back to how it was before these games.", Hint(ui));
+                if (GUILayout.Button(Loc.T("Undo this session"), GUILayout.Width(170))) actions.Add(UndoSession);
+                GUILayout.Label(Loc.T("Puts the AI back to how it was before these games."), Hint(ui));
                 GUILayout.EndHorizontal();
             }
             GUILayout.Space(8);
@@ -992,10 +992,10 @@ namespace PokemonTCG.Presentation
             var measured = b.History.Where(rec => rec.ScoreAfter >= 0).ToList();
             if (measured.Count == 0)
             {
-                GUILayout.Label("Growth: train with \"Measure it against the classic bot\" on to see how the AI improves over time.", Hint(ui));
+                GUILayout.Label(Loc.T("Growth: train with \"Measure it against the classic bot\" on to see how the AI improves over time."), Hint(ui));
                 return;
             }
-            GUILayout.Label("Growth: the AI against the classic bot after each measured session (the line is 50%, as good as the classic bot)", ui.Title);
+            GUILayout.Label(Loc.T("Growth: the AI against the classic bot after each measured session (the line is 50%, as good as the classic bot)"), ui.Title);
             if (chartLabel == null)
             {
                 chartLabel = new GUIStyle(ui.Small);
@@ -1014,13 +1014,13 @@ namespace PokemonTCG.Presentation
                 float x = area.x + 10f + i * slot + (slot - barW) / 2f;
                 float bh = (float)s.ScoreAfter * h;
                 GUI.DrawTexture(new Rect(x, baseY - bh, barW, bh), ChartTexture(ref chartBar, new Color(0.35f, 0.75f, 1f, 0.9f)));
-                GUI.Label(new Rect(x - 6f, baseY - bh - 16f, barW + 12f, 16f), (s.ScoreAfter * 100).ToString("0"), chartLabel);
-                GUI.Label(new Rect(x - 6f, baseY + 1f, barW + 12f, 16f), "#" + (measured.Count - shown.Count + i + 1), chartLabel);
+                GUI.Label(new Rect(x - 6f, baseY - bh - 16f, barW + 12f, 16f), Loc.T((s.ScoreAfter * 100).ToString("0")), chartLabel);
+                GUI.Label(new Rect(x - 6f, baseY + 1f, barW + 12f, 16f), Loc.T("#" + (measured.Count - shown.Count + i + 1)), chartLabel);
             }
             GUI.DrawTexture(new Rect(area.x + 4f, baseY - 0.5f * h, area.width - 8f, 1f), ChartTexture(ref chartLine, new Color(1f, 0.85f, 0.2f, 0.9f)));
             var last = shown[shown.Count - 1];
-            GUILayout.Label("Last session: " + last.DeckA + " vs " + last.DeckB + (string.IsNullOrEmpty(last.Style) ? "" : " as the " + last.Style) + ", " + last.Games + " games on " + last.When
-                            + (last.ScoreBefore >= 0 ? ", " + (last.ScoreBefore * 100).ToString("0") + "% → " + (last.ScoreAfter * 100).ToString("0") + "%" : "") + ".", Hint(ui));
+            GUILayout.Label(Loc.T("Last session: " + last.DeckA + " vs " + last.DeckB + (string.IsNullOrEmpty(last.Style) ? "" : " as the " + last.Style) + ", " + last.Games + " games on " + last.When
+                            + (last.ScoreBefore >= 0 ? ", " + (last.ScoreBefore * 100).ToString("0") + "% → " + (last.ScoreAfter * 100).ToString("0") + "%" : "") + "."), Hint(ui));
             GUILayout.Space(8);
         }
 
@@ -1037,73 +1037,73 @@ namespace PokemonTCG.Presentation
         {
             var b = brainView;
             if (b == null) return;
-            GUILayout.Label("What the AI knows", ui.Title);
-            GUILayout.Label("Trained on " + b.GamesTrained.ToString("N0") + " games · learned from " + b.GamesVsYou + " of your games (" + b.DecisionsStudied.ToString("N0")
+            GUILayout.Label(Loc.T("What the AI knows"), ui.Title);
+            GUILayout.Label(Loc.T("Trained on " + b.GamesTrained.ToString("N0") + " games · learned from " + b.GamesVsYou + " of your games (" + b.DecisionsStudied.ToString("N0")
                             + " of your decisions studied) · " + b.Feedback + " answers on Areas of Improvement · " + b.LogsStudied.ToString("N0") + " game logs studied ("
-                            + b.LogDecisions.ToString("N0") + " decisions) · " + b.Weights.ToString("N0") + " things learned.", ui.Label);
-            GUILayout.Label("Neural network: " + (string.IsNullOrEmpty(b.NetOrigin) ? "" : "started from the " + b.NetOrigin + " · ")
+                            + b.LogDecisions.ToString("N0") + " decisions) · " + b.Weights.ToString("N0") + " things learned."), ui.Label);
+            GUILayout.Label(Loc.T("Neural network: " + (string.IsNullOrEmpty(b.NetOrigin) ? "" : "started from the " + b.NetOrigin + " · ")
                             + (b.NetSteps > 0
                                 ? b.NetSteps.ToString("N0") + " learning steps here · loss " + b.NetLoss.ToString("0.00")
                                   + " (how far off its guesses of who wins were, lately: not a score, since its opponent is itself and gets better too; "
                                   + "a sudden jump to several times its usual size means something went wrong)"
                                 : "no learning steps here yet (train it on this screen)")
-                            + ".", ui.Label);
+                            + "."), ui.Label);
             GUILayout.BeginHorizontal();
             if (b.NetBlocks < PolicyNet.BigBlocks)
             {
                 GUI.enabled = !running && !BackgroundRunning;
-                if (GUILayout.Button("Make the network bigger (" + PolicyNet.BigBlocks + " blocks)", GUILayout.Width(280))) actions.Add(GrowNetwork);
+                if (GUILayout.Button(Loc.T("Make the network bigger (" + PolicyNet.BigBlocks + " blocks)"), GUILayout.Width(280))) actions.Add(GrowNetwork);
                 GUI.enabled = true;
-                GUILayout.Label("Network size: " + b.NetBlocks + " blocks. Bigger (" + PolicyNet.BigBlocks + ") can learn more: it keeps everything it knows and plays "
+                GUILayout.Label(Loc.T("Network size: " + b.NetBlocks + " blocks. Bigger (" + PolicyNet.BigBlocks + ") can learn more: it keeps everything it knows and plays "
                                 + "exactly the same at first, and training puts the new blocks to use. " + GrowCostText + " It can't be made smaller "
-                                + "again (Reset the AI goes back to the starting network)." + (running || BackgroundRunning ? " (Not while training runs.)" : ""), Hint(ui));
+                                + "again (Reset the AI goes back to the starting network)." + (running || BackgroundRunning ? " (Not while training runs.)" : "")), Hint(ui));
             }
             else
-                GUILayout.Label("Network size: " + b.NetBlocks + " blocks (made bigger). " + GrowCostText, Hint(ui));
+                GUILayout.Label(Loc.T("Network size: " + b.NetBlocks + " blocks (made bigger). " + GrowCostText), Hint(ui));
             GUILayout.EndHorizontal();
             // Each list scrolls on its own (scroll with the mouse over it, or drag its scroll bar) and holds everything.
             float listMax = Mathf.Clamp(UiScale.Height * 0.3f, 150f, 360f);
             // The yardstick (ChampionGate): the network's champion version and its checks.
             if (b.ChampionVersion > 0)
             {
-                GUILayout.Label("Champion: version " + b.ChampionVersion + ". The yardstick: every " + ChampionEveryText + " Neural AI training games, and at the "
+                GUILayout.Label(Loc.T("Champion: version " + b.ChampionVersion + ". The yardstick: every " + ChampionEveryText + " Neural AI training games, and at the "
                                 + "end of a session of " + ChampionMinText + " or more, the network plays " + ChampionGate.DefaultGames + " games against the champion (the "
                                 + "same games each time, all your legal decks). It takes over at " + Math.Round(ChampionGate.PromoteAt * 100) + "% or more, so a new "
-                                + "version means it really got better · " + b.ChampionChecks.Count + (b.ChampionChecks.Count == 1 ? " check" : " checks"), Hint(ui));
+                                + "version means it really got better · " + b.ChampionChecks.Count + (b.ChampionChecks.Count == 1 ? " check" : " checks")), Hint(ui));
                 trainScrollChampion = DrawScrollList(ui, trainScrollChampion, b.ChampionChecks.Count, Mathf.Min(listMax, 150f), b.ChampionRow);
             }
             else
-                GUILayout.Label("Champion: none yet. The next Neural AI training session keeps the network as it is as the first champion, the yardstick it "
-                                + "has to beat later.", Hint(ui));
+                GUILayout.Label(Loc.T("Champion: none yet. The next Neural AI training session keeps the network as it is as the first champion, the yardstick it "
+                                + "has to beat later."), Hint(ui));
             // The league (League): past versions it trains against, and what happened there.
             if (b.League.Count > 0 || b.LeagueEvents.Count > 0)
             {
-                GUILayout.Label("League: past versions it trains against besides itself (in 15 to 30% of its training games, the ones it does worst against "
+                GUILayout.Label(Loc.T("League: past versions it trains against besides itself (in 15 to 30% of its training games, the ones it does worst against "
                                 + "most often). A champion it replaces joins, a snapshot every " + TrainingSession.LeagueSnapshotEvery.ToString("N0")
                                 + " games, and exploiters that find a weakness; at most " + League.Capacity + ", the easiest leaves first · "
-                                + b.League.Count + (b.League.Count == 1 ? " past version" : " past versions"), Hint(ui));
+                                + b.League.Count + (b.League.Count == 1 ? " past version" : " past versions")), Hint(ui));
                 trainScrollLeague = DrawScrollList(ui, trainScrollLeague, b.League.Count + b.LeagueEvents.Count, Mathf.Min(listMax, 180f), b.LeagueRow);
             }
             else
-                GUILayout.Label("League: none yet. The next Neural AI training session starts it with the champion, a past version it keeps "
-                                + "training against as it moves on.", Hint(ui));
+                GUILayout.Label(Loc.T("League: none yet. The next Neural AI training session starts it with the champion, a past version it keeps "
+                                + "training against as it moves on."), Hint(ui));
             if (b.Decks.Count > 0)
             {
-                GUILayout.Label("How well the Neural AI knows each deck it has trained with, most games first (about 0.6 = plays it confidently, 0.9 = still "
+                GUILayout.Label(Loc.T("How well the Neural AI knows each deck it has trained with, most games first (about 0.6 = plays it confidently, 0.9 = still "
                                 + "working it out; the deck advisor counts the decks it wins more with more) · " + b.Decks.Count.ToString("N0")
-                                + (b.Decks.Count == 1 ? " deck" : " decks"), Hint(ui));
+                                + (b.Decks.Count == 1 ? " deck" : " decks")), Hint(ui));
                 trainScrollDecks = DrawScrollList(ui, trainScrollDecks, b.Decks.Count, listMax, b.DeckRow);
             }
             if (b.Matchups.Count > 0)
             {
-                GUILayout.Label("Matchups it has played, most games first (that deck's win rate) · " + b.Matchups.Count.ToString("N0")
-                                + (b.Matchups.Count == 1 ? " matchup" : " matchups"), Hint(ui));
+                GUILayout.Label(Loc.T("Matchups it has played, most games first (that deck's win rate) · " + b.Matchups.Count.ToString("N0")
+                                + (b.Matchups.Count == 1 ? " matchup" : " matchups")), Hint(ui));
                 trainScrollMatchups = DrawScrollList(ui, trainScrollMatchups, b.Matchups.Count, listMax, b.MatchupRow);
             }
             if (b.Lessons.Count > 0)
             {
-                GUILayout.Label("Its lessons, strongest first (+ plays it likes more than the classic bot, − plays it likes less) · "
-                                + b.Lessons.Count.ToString("N0") + (b.Lessons.Count == 1 ? " lesson" : " lessons"), Hint(ui));
+                GUILayout.Label(Loc.T("Its lessons, strongest first (+ plays it likes more than the classic bot, − plays it likes less) · "
+                                + b.Lessons.Count.ToString("N0") + (b.Lessons.Count == 1 ? " lesson" : " lessons")), Hint(ui));
                 trainScrollLessons = DrawScrollList(ui, trainScrollLessons, b.Lessons.Count, listMax, b.LessonRow);
             }
             GUILayout.Space(6);
@@ -1111,18 +1111,18 @@ namespace PokemonTCG.Presentation
             GUI.enabled = !running;
             if (!confirmReset)
             {
-                if (GUILayout.Button("Reset the AI", GUILayout.Width(140))) actions.Add(() => confirmReset = true);
-                GUILayout.Label("Erases everything it learned (training, your games, your feedback), the neural network included.", Hint(ui));
+                if (GUILayout.Button(Loc.T("Reset the AI"), GUILayout.Width(140))) actions.Add(() => confirmReset = true);
+                GUILayout.Label(Loc.T("Erases everything it learned (training, your games, your feedback), the neural network included."), Hint(ui));
             }
             else
             {
-                GUILayout.Label("Erase everything the AI learned?", ui.Error);
-                if (GUILayout.Button("Yes, reset it", GUILayout.Width(120))) actions.Add(ResetBrain);
-                if (GUILayout.Button("Cancel", GUILayout.Width(80))) actions.Add(() => confirmReset = false);
+                GUILayout.Label(Loc.T("Erase everything the AI learned?"), ui.Error);
+                if (GUILayout.Button(Loc.T("Yes, reset it"), GUILayout.Width(120))) actions.Add(ResetBrain);
+                if (GUILayout.Button(Loc.T("Cancel"), GUILayout.Width(80))) actions.Add(() => confirmReset = false);
             }
             GUI.enabled = true;
             GUILayout.EndHorizontal();
-            GUILayout.Label("The AI's file: " + BrainPath, Hint(ui));
+            GUILayout.Label(Loc.T("The AI's file: " + BrainPath), Hint(ui));
         }
 
         /// <summary>
@@ -1143,7 +1143,7 @@ namespace PokemonTCG.Presentation
                 int first = Mathf.Clamp(Mathf.FloorToInt((scroll.y - area.y) / rowH), 0, count - 1);
                 int last = Mathf.Clamp(Mathf.CeilToInt((scroll.y - area.y + viewH) / rowH), 0, count - 1);
                 for (int k = first; k <= last; k++)
-                    GUI.Label(new Rect(area.x, area.y + k * rowH, area.width, rowH), rowText(k), style);
+                    GUI.Label(new Rect(area.x, area.y + k * rowH, area.width, rowH), Loc.T(rowText(k)), style);
             }
             GUILayout.EndScrollView();
             GUILayout.EndVertical();
@@ -1157,7 +1157,7 @@ namespace PokemonTCG.Presentation
             {
                 listRowStyle = new GUIStyle(Hint(ui)) { wordWrap = false, clipping = TextClipping.Clip, alignment = TextAnchor.MiddleLeft };
                 listRowStyle.margin = new RectOffset(0, 0, 0, 0);
-                listRowHeight = Mathf.Max(18f, Mathf.Ceil(listRowStyle.CalcHeight(new GUIContent("Ag"), 1000f)) + 2f);
+                listRowHeight = Mathf.Max(18f, Mathf.Ceil(listRowStyle.CalcHeight(new GUIContent(Loc.T("Ag")), 1000f)) + 2f);
             }
             return listRowStyle;
         }

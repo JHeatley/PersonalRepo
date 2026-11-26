@@ -285,7 +285,7 @@ namespace PokemonTCG.Presentation
                 : "Drop it on a highlighted Pokémon";
             var tipRect = new Rect(r.x - 60f, r.yMax + 4f, r.width + 120f, 24f);
             GUI.DrawTexture(tipRect, ui.BadgeBackground);
-            GUI.Label(tipRect, tip, ui.Badge);
+            GUI.Label(tipRect, Loc.T(tip), ui.Badge);
         }
 
         private PokemonView PokemonOfCard(int id)
@@ -315,7 +315,7 @@ namespace PokemonTCG.Presentation
             if (string.IsNullOrEmpty(toast) || Time.time >= toastUntil) return;
             var r = new Rect(UiScale.Width / 2f - 300f, 14f, 600f, 34f);
             CardDraw.Fill(r, new Color(0.55f, 0.1f, 0.1f, 0.92f));
-            GUI.Label(r, toast, WhiteSmall());
+            GUI.Label(r, Loc.T(toast), WhiteSmall());
         }
 
         // ================================================================== The opponent's plays, shown large
@@ -368,7 +368,7 @@ namespace PokemonTCG.Presentation
             float bandH = Mathf.Min(UiScale.Height * 0.62f, 540f);
             var band = new Rect(0f, (UiScale.Height - bandH) / 2f, UiScale.Width, bandH);
             CardDraw.Fill(band, new Color(0f, 0f, 0f, 0.62f));
-            GUI.Label(new Rect(band.x + 30f, band.y + 8f, band.width - 60f, 62f), revealCaption ?? "", CardDraw.BigCaption());
+            GUI.Label(new Rect(band.x + 30f, band.y + 8f, band.width - 60f, 62f), Loc.T(revealCaption ?? ""), CardDraw.BigCaption());
 
             int n = Mathf.Min(revealCards.Count, 8);
             float cardH = band.height - 120f;
@@ -387,7 +387,7 @@ namespace PokemonTCG.Presentation
             float y = band.y + 76f;
             for (int i = 0; i < n; i++) CardDraw.Card(new Rect(x + i * (cardW + gap), y, cardW, cardH), revealCards[i]);
             string more = revealCards.Count > n ? "+" + (revealCards.Count - n) + " more  ·  " : "";
-            GUI.Label(new Rect(band.x, band.yMax - 32f, band.width, 26f), more + "Click to continue", WhiteSmall());
+            GUI.Label(new Rect(band.x, band.yMax - 32f, band.width, 26f), Loc.T(more + "Click to continue"), WhiteSmall());
 
             var e = Event.current;
             if (e.type == EventType.MouseDown && !ModalOpen)
@@ -426,13 +426,13 @@ namespace PokemonTCG.Presentation
             var header = new Rect(r.x, r.y, r.width, 78f);
             CardDraw.Fill(header, new Color(0.1f, 0.36f, 0.7f, 1f));
             string who = SeatName(mulliganSeat);
-            GUI.Label(new Rect(header.x, header.y + 6f, header.width, 28f), who, CardDraw.Banner());
-            GUI.Label(new Rect(header.x, header.y + 34f, header.width, 40f), "<size=28><i>MULLIGANS</i></size>", CardDraw.Banner());
+            GUI.Label(new Rect(header.x, header.y + 6f, header.width, 28f), Loc.T(who), CardDraw.Banner());
+            GUI.Label(new Rect(header.x, header.y + 34f, header.width, 40f), Loc.T("<size=28><i>MULLIGANS</i></size>"), CardDraw.Banner());
 
             int n = mulliganHands.Count;
             var msgRect = new Rect(r.x + 20f, header.yMax + 14f, r.width - 40f, 58f);
             CardDraw.Fill(msgRect, Color.white);
-            GUI.Label(msgRect, who + " had to take " + n + (n == 1 ? " mulligan" : " mulligans") + " before drawing a Basic Pokémon.", DarkCentered());
+            GUI.Label(msgRect, Loc.T(who + " had to take " + n + (n == 1 ? " mulligan" : " mulligans") + " before drawing a Basic Pokémon."), DarkCentered());
 
             var list = new Rect(r.x + 20f, msgRect.yMax + 14f, r.width - 40f, r.yMax - msgRect.yMax - 100f);
             const int perRow = 4;
@@ -449,7 +449,7 @@ namespace PokemonTCG.Presentation
                 var hand = mulliganHands[k];
                 var box = new Rect(0f, y, content.width, 52f + ((hand.Count + perRow - 1) / perRow) * (cardH + gap) + 8f);
                 CardDraw.Fill(box, Color.white);
-                GUI.Label(new Rect(0f, y + 8f, content.width, 36f), "<size=22><b>MULLIGAN " + (k + 1) + "</b></size>", DarkCentered());
+                GUI.Label(new Rect(0f, y + 8f, content.width, 36f), Loc.T("<size=22><b>MULLIGAN " + (k + 1) + "</b></size>"), DarkCentered());
                 float rowW = Mathf.Min(perRow, hand.Count) * (cardW + gap) - gap;
                 float x0 = (content.width - rowW) / 2f;
                 for (int i = 0; i < hand.Count; i++)
@@ -464,7 +464,7 @@ namespace PokemonTCG.Presentation
             var done = new Rect(r.x + 20f, r.yMax - 72f, r.width - 40f, 56f);
             var e = Event.current;
             bool key = e.type == EventType.KeyDown && (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter || e.keyCode == KeyCode.Escape);
-            if (GUI.Button(done, "DONE", DoneStyle()) || key)
+            if (GUI.Button(done, Loc.T("DONE"), DoneStyle()) || key)
             {
                 if (key) e.Use();
                 guiActions.Add(() => mulliganSeat = -1);
@@ -495,13 +495,13 @@ namespace PokemonTCG.Presentation
             CardDraw.Fill(r, new Color(0.11f, 0.12f, 0.15f, 0.98f));
             string owner = host != null ? host.Possessive(pileSeat) : SeatName(pileSeat) + "'s";
             GUI.Label(new Rect(r.x + 20f, r.y + 10f, r.width - 180f, 34f),
-                "<size=22><b>" + owner + (pileIsLostZone ? " Lost Zone" : " discard pile") + "</b></size>   " + pile.Count + (pile.Count == 1 ? " card" : " cards") + "  (newest first)", CardDraw.PanelText());
+                Loc.T("<size=22><b>" + owner + (pileIsLostZone ? " Lost Zone" : " discard pile") + "</b></size>   " + pile.Count + (pile.Count == 1 ? " card" : " cards") + "  (newest first)"), CardDraw.PanelText());
             var close = new Rect(r.xMax - 140f, r.y + 10f, 120f, 34f);
-            bool closeNow = GUI.Button(close, "Close");
+            bool closeNow = GUI.Button(close, Loc.T("Close"));
 
             // A count of each card, then the cards themselves.
             var counts = pile.GroupBy(c => c.Def.Name).Select(g => g.Key + " ×" + g.Count()).ToArray();
-            GUI.Label(new Rect(r.x + 20f, r.y + 48f, r.width - 40f, 44f), string.Join("   ", counts), CardDraw.PanelText());
+            GUI.Label(new Rect(r.x + 20f, r.y + 48f, r.width - 40f, 44f), Loc.T(string.Join("   ", counts)), CardDraw.PanelText());
 
             var grid = new Rect(r.x + 20f, r.y + 96f, r.width - 40f, r.height - 110f);
             const float cardW = 112f, cardH = 156f, gap = 10f;
@@ -519,7 +519,7 @@ namespace PokemonTCG.Presentation
                 if (cr.Contains(Event.current.mousePosition)) hover = c.Def;
             }
             GUI.EndScrollView();
-            if (pile.Count == 0) GUI.Label(grid, "Empty.", CardDraw.PanelText());
+            if (pile.Count == 0) GUI.Label(grid, Loc.T("Empty."), CardDraw.PanelText());
 
             if (hover != null && grid.Contains(mouseGui)) DrawCardPreview(ui, hover);
 
@@ -544,14 +544,14 @@ namespace PokemonTCG.Presentation
             float w = h * 63f / 88f;
             string text = CardText.Describe(def);
             const float textW = 300f;
-            float textH = ui.Tooltip.CalcHeight(new GUIContent(text), textW);
+            float textH = ui.Tooltip.CalcHeight(new GUIContent(Loc.T(text)), textW);
             float total = w + 8f + textW;
             float x = mouseGui.x + 24f;
             if (x + total > UiScale.Width - 10f) x = mouseGui.x - 24f - total;
             x = Mathf.Max(10f, x);
             float y = Mathf.Clamp(mouseGui.y - 80f, 10f, Mathf.Max(10f, UiScale.Height - Mathf.Max(h, textH) - 10f));
             CardDraw.Card(new Rect(x, y, w, h), def);
-            GUI.Box(new Rect(x + w + 8f, y, textW, textH), text, ui.Tooltip);
+            GUI.Box(new Rect(x + w + 8f, y, textW, textH), Loc.T(text), ui.Tooltip);
         }
 
         // ================================================================== Pokémon pop-up
@@ -625,10 +625,10 @@ namespace PokemonTCG.Presentation
             if (fan.Count > 1)
             {
                 var arrow = new Rect(cardRect.xMax - 22f, cardRect.center.y - 22f, 44f, 44f);
-                if (GUI.Button(arrow, "\u203A")) guiActions.Add(() => popupFront = (popupFront + 1) % Mathf.Max(1, fan.Count));
+                if (GUI.Button(arrow, Loc.T("\u203A"))) guiActions.Add(() => popupFront = (popupFront + 1) % Mathf.Max(1, fan.Count));
                 if (popupFront != 0)
                     GUI.Label(new Rect(cardRect.x, cardRect.yMax + 4f, cardRect.width, 22f),
-                        (fanUnder[popupFront] ? "Under " + def.Name + " (it evolved from this)" : "Attached to " + def.Name) + "  (" + popupFront + " of " + (fan.Count - 1) + ")",
+                        Loc.T((fanUnder[popupFront] ? "Under " + def.Name + " (it evolved from this)" : "Attached to " + def.Name) + "  (" + popupFront + " of " + (fan.Count - 1) + ")"),
                         CardDraw.PanelText());
             }
             CardDraw.Fill(panel, new Color(0.11f, 0.12f, 0.15f, 0.97f));
@@ -637,20 +637,20 @@ namespace PokemonTCG.Presentation
             int clicked = -1;
             bool close = false;
             GUILayout.BeginArea(new Rect(panel.x + 12f, panel.y + 10f, panel.width - 24f, panel.height - 20f));
-            GUILayout.Label("<size=22><b>" + def.Name + "</b></size>     <size=18>HP " + Mathf.Max(0, pv.RemainingHp) + " / " + pv.MaxHp + "</size>", text);
+            GUILayout.Label(Loc.T("<size=22><b>" + Loc.NameOf(def) + "</b></size>     <size=18>HP " + Mathf.Max(0, pv.RemainingHp) + " / " + pv.MaxHp + "</size>"), text);
             bool active = current.Sides[pv.Owner].Active == pv;
             string whose = host != null ? host.Possessive(pv.Owner) : "";
-            GUILayout.Label(def.Stage + " " + def.PokemonType + (def.IsEx ? " ex" : "") + "   ·   " + whose + (active ? " Active Pokémon" : " Benched Pokémon"), text);
+            GUILayout.Label(Loc.T(def.Stage + " " + def.PokemonType + (def.IsEx ? " ex" : "") + "   ·   " + whose + (active ? " Active Pokémon" : " Benched Pokémon")), text);
             if (pv.Tools.Count > 0 || pv.Energy.Count > 0 || pv.Attached.Count > 0)
             {
                 var energyNames = pv.Energy.GroupBy(c => c.Def.Name).Select(g => g.Key + (g.Count() > 1 ? " ×" + g.Count() : "")).ToArray();
                 string attached = "<b>Energy (" + pv.Energy.Count + "):</b> " + (pv.Energy.Count == 0 ? "none" : string.Join(", ", energyNames));
-                foreach (var tool in pv.Tools) attached += "\n<b>Tool:</b> " + tool.Def.Name + " – " + tool.Def.Text;
+                foreach (var tool in pv.Tools) attached += "\n<b>Tool:</b> " + Loc.TrainerName(tool.Def.Name) + " – " + Loc.Text(tool.Def.Text);
                 foreach (var extra in pv.Attached) attached += "\n<b>Attached:</b> " + extra.Def.Name;
-                GUILayout.Box(attached, CardDraw.Panel());
+                GUILayout.Box(Loc.T(attached), CardDraw.Panel());
             }
-            else GUILayout.Label("No Energy or Tools attached.", text);
-            if (canAct) GUILayout.Label("<color=#9BE39F>Green = you can use it now. Click it to use it.</color>", text);
+            else GUILayout.Label(Loc.T("No Energy or Tools attached."), text);
+            if (canAct) GUILayout.Label(Loc.T("<color=#9BE39F>Green = you can use it now. Click it to use it.</color>"), text);
 
             popupScroll = GUILayout.BeginScrollView(popupScroll);
             for (int i = 0; i < def.Abilities.Count; i++)
@@ -659,12 +659,12 @@ namespace PokemonTCG.Presentation
                 int index = i;
                 int opt = canAct ? req.Options.FindIndex(o => o.Action == ActionType.UseAbility && o.PokemonUid == pv.Uid && o.Card == def && o.Index == index) : -1;
                 string kindLabel = (a.VstarPower ? "VSTAR Power " : "") + (a.IsAbility ? "Ability" : a.Kind);
-                string body = "<color=#FF7A7A><b>" + kindLabel + "</b></color>   <b>" + a.Name + "</b>" + (pv.AbilitiesActive || !a.IsAbility ? "" : "   <i>(blocked right now)</i>") + "\n" + a.Text;
+                string body = "<color=#FF7A7A><b>" + kindLabel + "</b></color>   <b>" + Loc.AbilityName(a.Name) + "</b>" + (pv.AbilitiesActive || !a.IsAbility ? "" : "   <i>(blocked right now)</i>") + "\n" + Loc.Text(a.Text);
                 if (opt >= 0)
                 {
-                    if (GUILayout.Button(body, CardDraw.PanelHot())) clicked = opt;
+                    if (GUILayout.Button(Loc.T(body), CardDraw.PanelHot())) clicked = opt;
                 }
-                else GUILayout.Box(body, CardDraw.Panel());
+                else GUILayout.Box(Loc.T(body), CardDraw.Panel());
             }
             // Poké-Powers a LV.X keeps from the Pokémon under it.
             if (canAct)
@@ -675,8 +675,8 @@ namespace PokemonTCG.Presentation
                     if (o.Action != ActionType.UseAbility || o.PokemonUid != pv.Uid || o.Card == null || o.Card == def) continue;
                     if (o.Index < 0 || o.Index >= o.Card.Abilities.Count) continue;
                     var inherited = o.Card.Abilities[o.Index];
-                    string label = "<color=#FF7A7A><b>" + (inherited.VstarPower ? "VSTAR Power " : "") + inherited.Kind + "</b></color>   <b>" + inherited.Name + "</b>   <i>(" + o.Card.Name + ")</i>\n" + inherited.Text;
-                    if (GUILayout.Button(label, CardDraw.PanelHot())) clicked = i;
+                    string label = "<color=#FF7A7A><b>" + (inherited.VstarPower ? "VSTAR Power " : "") + inherited.Kind + "</b></color>   <b>" + Loc.AbilityName(inherited.Name) + "</b>   <i>(" + Loc.NameOf(o.Card) + ")</i>\n" + Loc.Text(inherited.Text);
+                    if (GUILayout.Button(Loc.T(label), CardDraw.PanelHot())) clicked = i;
                 }
             }
             for (int i = 0; i < def.Attacks.Count; i++)
@@ -686,9 +686,9 @@ namespace PokemonTCG.Presentation
                 int opt = canAct ? req.Options.FindIndex(o => o.Action == ActionType.Attack && o.PokemonUid == pv.Uid && o.Card == def && o.Index == index) : -1;
                 if (opt >= 0)
                 {
-                    if (GUILayout.Button(AttackText(atk, null), CardDraw.PanelHot())) clicked = opt;
+                    if (GUILayout.Button(Loc.T(AttackText(atk, null)), CardDraw.PanelHot())) clicked = opt;
                 }
-                else GUILayout.Box(AttackText(atk, null), CardDraw.Panel());
+                else GUILayout.Box(Loc.T(AttackText(atk, null)), CardDraw.Panel());
             }
             if (canAct)
             {
@@ -698,29 +698,29 @@ namespace PokemonTCG.Presentation
                     var o = req.Options[i];
                     if (o.Action != ActionType.Attack || o.PokemonUid != pv.Uid || o.Card == null || o.Card == def) continue;
                     if (o.Index < 0 || o.Index >= o.Card.Attacks.Count) continue;
-                    if (GUILayout.Button(AttackText(o.Card.Attacks[o.Index], o.Card.Name), CardDraw.PanelHot())) clicked = i;
+                    if (GUILayout.Button(Loc.T(AttackText(o.Card.Attacks[o.Index], o.Card.Name)), CardDraw.PanelHot())) clicked = i;
                 }
             }
-            if (def.Abilities.Count == 0 && def.Attacks.Count == 0) GUILayout.Label("No Abilities or attacks.", text);
+            if (def.Abilities.Count == 0 && def.Attacks.Count == 0) GUILayout.Label(Loc.T("No Abilities or attacks."), text);
 
             GUILayout.Space(6f);
             string weak = pv.Weakness.HasValue ? pv.Weakness.Value + (pv.Weakness2.HasValue ? "/" + pv.Weakness2.Value : "") + (def.WeaknessAmount > 0 ? " +" + def.WeaknessAmount : " ×2") : "none";
             string res = def.Resistance.HasValue ? def.Resistance.Value + (def.SecondResistance.HasValue ? "/" + def.SecondResistance.Value : "") + " −" + def.ResistanceAmount : "none";
-            GUILayout.Label("Weakness " + weak + "     Resistance " + res + "     Retreat " + pv.RetreatCost, text);
-            if (pv.Conditions != SpecialCondition.None) GUILayout.Label("Special Conditions: " + pv.Conditions, text);
-            if (pv.Notes.Count > 0) GUILayout.Label("Effects: " + string.Join("; ", pv.Notes.ToArray()), text);
-            if (pv.Stack.Count > 1) GUILayout.Label("Evolved from: " + string.Join(" → ", pv.Stack.Take(pv.Stack.Count - 1).Select(c => c.Def.Name).ToArray()), text);
-            if (mine && !canAct) GUILayout.Label("<i>You can use these during your turn.</i>", text);
+            GUILayout.Label(Loc.T("Weakness " + weak + "     Resistance " + res + "     Retreat " + pv.RetreatCost), text);
+            if (pv.Conditions != SpecialCondition.None) GUILayout.Label(Loc.T("Special Conditions: " + pv.Conditions), text);
+            if (pv.Notes.Count > 0) GUILayout.Label(Loc.T("Effects: " + string.Join("; ", pv.Notes.ToArray())), text);
+            if (pv.Stack.Count > 1) GUILayout.Label(Loc.T("Evolved from: " + string.Join(" → ", pv.Stack.Take(pv.Stack.Count - 1).Select(c => c.Def.Name).ToArray())), text);
+            if (mine && !canAct) GUILayout.Label(Loc.T("<i>You can use these during your turn.</i>"), text);
             GUILayout.EndScrollView();
 
             GUILayout.BeginHorizontal();
             int retreat = canAct ? req.Options.FindIndex(o => o.Action == ActionType.Retreat && o.PokemonUid == pv.Uid) : -1;
-            if (retreat >= 0 && GUILayout.Button("Retreat (cost " + pv.RetreatCost + ")", GUILayout.Height(38f))) clicked = retreat;
+            if (retreat >= 0 && GUILayout.Button(Loc.T("Retreat (cost " + pv.RetreatCost + ")"), GUILayout.Height(38f))) clicked = retreat;
             int discardFossil = canAct ? req.Options.FindIndex(o => o.Action == ActionType.DiscardFossil && o.PokemonUid == pv.Uid) : -1;
-            if (discardFossil >= 0 && GUILayout.Button("Discard from play", GUILayout.Height(38f))) clicked = discardFossil;
+            if (discardFossil >= 0 && GUILayout.Button(Loc.T("Discard from play"), GUILayout.Height(38f))) clicked = discardFossil;
             int flipOver = canAct ? req.Options.FindIndex(o => o.Action == ActionType.FlipFaceDown && o.PokemonUid == pv.Uid) : -1;
-            if (flipOver >= 0 && GUILayout.Button("Flip it over", GUILayout.Height(38f))) clicked = flipOver;
-            if (GUILayout.Button("Close", GUILayout.Height(38f))) close = true;
+            if (flipOver >= 0 && GUILayout.Button(Loc.T("Flip it over"), GUILayout.Height(38f))) clicked = flipOver;
+            if (GUILayout.Button(Loc.T("Close"), GUILayout.Height(38f))) close = true;
             GUILayout.EndHorizontal();
             GUILayout.EndArea();
 
@@ -762,9 +762,9 @@ namespace PokemonTCG.Presentation
         {
             string dmg = atk.Damage > 0 ? atk.Damage + atk.DamageSuffix : "";
             string cost = atk.Cost.Length == 0 ? "free" : atk.CostString;
-            return "<b>[" + cost + "]   " + (atk.VstarPower ? "VSTAR Power: " : "") + atk.Name + "</b>" + (dmg.Length > 0 ? "     <size=18><b>" + dmg + "</b></size>" : "")
+            return "<b>[" + cost + "]   " + (atk.VstarPower ? "VSTAR Power: " : "") + Loc.AttackName(atk.Name) + "</b>" + (dmg.Length > 0 ? "     <size=18><b>" + dmg + "</b></size>" : "")
                    + (fromCard != null ? "   <i>(from " + fromCard + ")</i>" : "")
-                   + (string.IsNullOrEmpty(atk.Text) ? "" : "\n" + atk.Text);
+                   + (string.IsNullOrEmpty(atk.Text) ? "" : "\n" + Loc.Text(atk.Text));
         }
 
         // ================================================================== Card picker (Valid / All)
@@ -803,13 +803,13 @@ namespace PokemonTCG.Presentation
             var validRect = new Rect(40f, top - 50f, 180f, 40f);
             var allRect = new Rect(226f, top - 50f, 180f, 40f);
             GUI.enabled = !nothingValid;
-            if (GUI.Toggle(validRect, !allTab, "VALID   " + req.Options.Count, TabStyle()) && allTab) guiActions.Add(() => pickerAllTab = false);
+            if (GUI.Toggle(validRect, !allTab, Loc.T("VALID   " + req.Options.Count), TabStyle()) && allTab) guiActions.Add(() => pickerAllTab = false);
             GUI.enabled = true;
             if (hasAll)
             {
-                if (GUI.Toggle(allRect, allTab, "ALL   " + req.SeenCards.Count, TabStyle()) && !allTab) guiActions.Add(() => pickerAllTab = true);
+                if (GUI.Toggle(allRect, allTab, Loc.T("ALL   " + req.SeenCards.Count), TabStyle()) && !allTab) guiActions.Add(() => pickerAllTab = true);
                 if (allTab && !string.IsNullOrEmpty(req.SeenTitle))
-                    GUI.Label(new Rect(allRect.xMax + 16f, top - 46f, 500f, 34f), req.SeenTitle + " (dimmed cards can't be chosen)", WhiteSmall());
+                    GUI.Label(new Rect(allRect.xMax + 16f, top - 46f, 500f, 34f), Loc.T(req.SeenTitle + " (dimmed cards can't be chosen)"), WhiteSmall());
             }
 
             // The card being played, on the right.
@@ -837,11 +837,11 @@ namespace PokemonTCG.Presentation
                     CardDraw.Frame(cr, ui.Selected, 5f);
                     var tag = new Rect(cr.x, cr.yMax - 26f, cr.width, 26f);
                     GUI.DrawTexture(tag, CardVisuals.Solid(new Color(0.1f, 0.55f, 0.25f, 0.92f)));
-                    GUI.Label(tag, "SELECTED", ui.Badge);
+                    GUI.Label(tag, Loc.T("SELECTED"), ui.Badge);
                 }
                 else if (valid) CardDraw.Frame(cr, ui.Highlight, 2f);
                 if (cr.Contains(Event.current.mousePosition)) hover = kv.Key;
-                if (valid && GUI.Button(cr, GUIContent.none, GUIStyle.none))
+                if (valid && GUI.Button(cr, Loc.T(GUIContent.none), GUIStyle.none))
                 {
                     int idx = kv.Value;
                     guiActions.Add(() => TogglePick(req, idx));
@@ -852,20 +852,20 @@ namespace PokemonTCG.Presentation
             // Banner: what to choose, how many are selected, Done.
             var banner = new Rect(0f, UiScale.Height - 104f, UiScale.Width, 96f);
             CardDraw.Fill(banner, new Color(0.08f, 0.33f, 0.66f, 0.96f));
-            GUI.Label(new Rect(30f, banner.y + 6f, UiScale.Width - 440f, 52f), req.Prompt, CardDraw.Banner());
+            GUI.Label(new Rect(30f, banner.y + 6f, UiScale.Width - 440f, 52f), Loc.T(req.Prompt), CardDraw.Banner());
             string count = nothingValid
                 ? "None of these cards can be chosen. Press Done when you've finished looking."
                 : "Selected " + multiSelection.Count
                   + (req.MaxChoices == 1 ? "" : " (up to " + req.MaxChoices + ")")
                   + (req.MinChoices > 0 && req.MinChoices != req.MaxChoices ? ", at least " + req.MinChoices : "")
                   + (req.MinChoices == 0 ? "  ·  You may choose none" : "");
-            GUI.Label(new Rect(30f, banner.y + 58f, UiScale.Width - 440f, 28f), count, WhiteSmall());
+            GUI.Label(new Rect(30f, banner.y + 58f, UiScale.Width - 440f, 28f), Loc.T(count), WhiteSmall());
             bool ok = multiSelection.Count >= req.MinChoices && multiSelection.Count <= req.MaxChoices;
             GUI.enabled = ok;
-            if (GUI.Button(new Rect(UiScale.Width - 390f, banner.y + 18f, 170f, 58f), "DONE", DoneStyle()))
+            if (GUI.Button(new Rect(UiScale.Width - 390f, banner.y + 18f, 170f, 58f), Loc.T("DONE"), DoneStyle()))
                 guiActions.Add(() => Submit(multiSelection.OrderBy(x => x).ToList()));
             GUI.enabled = true;
-            if (GUI.Button(new Rect(UiScale.Width - 205f, banner.y + 18f, 175f, 58f), "Inspect board"))
+            if (GUI.Button(new Rect(UiScale.Width - 205f, banner.y + 18f, 175f, 58f), Loc.T("Inspect board")))
                 guiActions.Add(() => pickerHidden = true);
 
             if (hover != null && grid.Contains(mouseGui)) ui.DrawTooltip(CardText.Describe(hover), mouseGui);
@@ -888,7 +888,7 @@ namespace PokemonTCG.Presentation
         {
             if (!pickerHidden || shownRequest == null || human == null || !IsCardChoice(shownRequest) || ModalOpen) return;
             var r = new Rect(UiScale.Width / 2f - 150f, 12f, 300f, 44f);
-            if (GUI.Button(r, "Back to choosing cards", DoneStyle())) guiActions.Add(() => pickerHidden = false);
+            if (GUI.Button(r, Loc.T("Back to choosing cards"), DoneStyle())) guiActions.Add(() => pickerHidden = false);
         }
 
         // ================================================================== Styles

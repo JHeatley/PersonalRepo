@@ -139,35 +139,35 @@ namespace PokemonTCG.Presentation
             var r = Rating;
             float w = Mathf.Min(900f, UiScale.Width - 40f);
             var box = new Rect(UiScale.Width / 2f - w / 2f, 30f, w, UiScale.Height - 60f);
-            GUI.Box(box, GUIContent.none);
+            GUI.Box(box, Loc.T(GUIContent.none));
             GUILayout.BeginArea(new Rect(box.x + 16, box.y + 16, box.width - 32, box.height - 32));
             ratingScroll = GUILayout.BeginScrollView(ratingScroll, false, false, GUIStyle.none, GUI.skin.verticalScrollbar);
-            GUILayout.Label("Your rating", ui.Header);
+            GUILayout.Label(Loc.T("Your rating"), ui.Header);
 
-            GUILayout.Label("Elo " + Math.Round(r.Rating) + "  —  " + PlayerRating.Level(r.Rating), ui.Title);
-            if (r.Games == 0) GUILayout.Label("No games rated yet. Every game you play against the AI counts (normal games and your Regional Sim games).", ui.Label);
+            GUILayout.Label(Loc.T("Elo " + Math.Round(r.Rating) + "  —  " + PlayerRating.Level(r.Rating)), ui.Title);
+            if (r.Games == 0) GUILayout.Label(Loc.T("No games rated yet. Every game you play against the AI counts (normal games and your Regional Sim games)."), ui.Label);
             else
             {
-                GUILayout.Label(r.Wins + " wins, " + r.Losses + " losses" + (r.Draws > 0 ? ", " + r.Draws + " draws" : "") + " in " + r.Games + " games. Peak " + Math.Round(r.Peak) + "."
-                                + (r.Provisional ? " Placement: your first " + PlayerRating.PlacementGames + " games move it faster (" + (PlayerRating.PlacementGames - r.Games) + " to go)." : ""), ui.Label);
+                GUILayout.Label(Loc.T(r.Wins + " wins, " + r.Losses + " losses" + (r.Draws > 0 ? ", " + r.Draws + " draws" : "") + " in " + r.Games + " games. Peak " + Math.Round(r.Peak) + "."
+                                + (r.Provisional ? " Placement: your first " + PlayerRating.PlacementGames + " games move it faster (" + (PlayerRating.PlacementGames - r.Games) + " to go)." : "")), ui.Label);
                 double q = r.AverageQuality(10);
-                if (q >= 0) GUILayout.Label("Play quality, last 10 reviewed games: " + Math.Round(q) + "/100 (60 is par). " + r.Trend(), ui.Label);
+                if (q >= 0) GUILayout.Label(Loc.T("Play quality, last 10 reviewed games: " + Math.Round(q) + "/100 (60 is par). " + r.Trend()), ui.Label);
             }
 
             GUILayout.Space(8);
-            GUILayout.Label("What to work on", ui.Title);
-            foreach (var line in r.Improvements()) GUILayout.Label("• " + line, ui.Label);
+            GUILayout.Label(Loc.T("What to work on"), ui.Title);
+            foreach (var line in r.Improvements()) GUILayout.Label(Loc.T("• " + line), ui.Label);
 
             if (r.Opponents.Count > 0)
             {
                 GUILayout.Space(8);
-                GUILayout.Label("Your opponents", ui.Title);
+                GUILayout.Label(Loc.T("Your opponents"), ui.Title);
                 foreach (var kv in r.Opponents.OrderBy(x => x.Key))
                 {
                     var games = r.History.Where(g => g.Opponent == kv.Key).ToList();
                     int wins = games.Count(g => g.Result >= 1);
-                    GUILayout.Label(kv.Key + ": rated " + Math.Round(kv.Value) + ". You're " + wins + "-" + games.Count(g => g.Result <= 0) + " against it; you'd be expected to win "
-                                    + Math.Round(PlayerRating.Expected(r.Rating, kv.Value) * 100) + "% now.", ui.Label);
+                    GUILayout.Label(Loc.T(kv.Key + ": rated " + Math.Round(kv.Value) + ". You're " + wins + "-" + games.Count(g => g.Result <= 0) + " against it; you'd be expected to win "
+                                    + Math.Round(PlayerRating.Expected(r.Rating, kv.Value) * 100) + "% now."), ui.Label);
                 }
             }
 
@@ -175,37 +175,37 @@ namespace PokemonTCG.Presentation
             if (recent.Count > 0)
             {
                 GUILayout.Space(8);
-                GUILayout.Label("Recent games", ui.Title);
+                GUILayout.Label(Loc.T("Recent games"), ui.Title);
                 for (int i = recent.Count - 1; i >= 0; i--)
                 {
                     var game = recent[i];
-                    GUILayout.Label(game.When.ToString("MMM d HH:mm") + "   " + game.ResultText + "   " + game.YourDeck + " vs " + game.TheirDeck + " (" + game.Opponent + ")   "
-                                    + (game.Quality >= 0 ? "play " + Math.Round(game.Quality) + "/100   " : "") + game.ChangeText, Hint(ui));
+                    GUILayout.Label(Loc.T(game.When.ToString("MMM d HH:mm") + "   " + game.ResultText + "   " + game.YourDeck + " vs " + game.TheirDeck + " (" + game.Opponent + ")   "
+                                    + (game.Quality >= 0 ? "play " + Math.Round(game.Quality) + "/100   " : "") + game.ChangeText), Hint(ui));
                 }
             }
 
             GUILayout.Space(8);
-            GUILayout.Label("How it's worked out", ui.Title);
-            GUILayout.Label("Each game moves your rating two ways. The result: standard Elo against your opponent's rating (the classic bot and the Neural AI each have "
+            GUILayout.Label(Loc.T("How it's worked out"), ui.Title);
+            GUILayout.Label(Loc.T("Each game moves your rating two ways. The result: standard Elo against your opponent's rating (the classic bot and the Neural AI each have "
                             + "their own, and it moves too, so beating a stronger AI is worth more). The play: a 0-100 score from the Areas of Improvement review "
                             + "(how often you made the AI's choice, the win chance its simulations say your key mistakes cost, and the habits it flagged). Above 60 "
                             + "adds a little, below takes a little, up to " + PlayerRating.QualityNudge + " a game (" + PlayerRating.PlacementQualityNudge + " while placing), "
-                            + "win or lose. The levels are measured against this game's AI, not real tournaments. Saved in " + SavePaths.RatingPath + ".", Hint(ui));
-            if (ratingError != null) GUILayout.Label(ratingError, ui.Error);
+                            + "win or lose. The levels are measured against this game's AI, not real tournaments. Saved in " + SavePaths.RatingPath + "."), Hint(ui));
+            if (ratingError != null) GUILayout.Label(Loc.T(ratingError), ui.Error);
             GUILayout.EndScrollView();
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Back to menu", GUILayout.Height(32), GUILayout.Width(160))) pendingRatingBack = true;
+            if (GUILayout.Button(Loc.T("Back to menu"), GUILayout.Height(32), GUILayout.Width(160))) pendingRatingBack = true;
             GUILayout.FlexibleSpace();
             if (!ratingResetArmed)
             {
-                if (r.Games > 0 && GUILayout.Button("Reset rating...", GUILayout.Height(32), GUILayout.Width(160))) ratingResetArmed = true;
+                if (r.Games > 0 && GUILayout.Button(Loc.T("Reset rating..."), GUILayout.Height(32), GUILayout.Width(160))) ratingResetArmed = true;
             }
             else
             {
-                GUILayout.Label("Start again from 1500 and forget every rated game?", ui.Error);
-                if (GUILayout.Button("Yes, reset", GUILayout.Height(32), GUILayout.Width(110))) pendingRatingReset = true;
-                if (GUILayout.Button("Cancel", GUILayout.Height(32), GUILayout.Width(90))) ratingResetArmed = false;
+                GUILayout.Label(Loc.T("Start again from 1500 and forget every rated game?"), ui.Error);
+                if (GUILayout.Button(Loc.T("Yes, reset"), GUILayout.Height(32), GUILayout.Width(110))) pendingRatingReset = true;
+                if (GUILayout.Button(Loc.T("Cancel"), GUILayout.Height(32), GUILayout.Width(90))) ratingResetArmed = false;
             }
             GUILayout.EndHorizontal();
             GUILayout.EndArea();

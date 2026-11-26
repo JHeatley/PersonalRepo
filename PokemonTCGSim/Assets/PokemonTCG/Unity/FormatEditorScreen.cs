@@ -188,77 +188,77 @@ namespace PokemonTCG.Presentation
 
         private void DrawList(Rect area, UiStyles ui, List<Action> actions)
         {
-            GUI.Box(area, GUIContent.none);
+            GUI.Box(area, Loc.T(GUIContent.none));
             GUILayout.BeginArea(new Rect(area.x + 8, area.y + 8, area.width - 16, area.height - 16));
-            GUILayout.Label("Your formats", ui.Title);
-            GUILayout.Label("Standard, Expanded and Unlimited are built in. Formats you make here show up in the deck builder and the menu.", Hint(ui));
+            GUILayout.Label(Loc.T("Your formats"), ui.Title);
+            GUILayout.Label(Loc.T("Standard, Expanded and Unlimited are built in. Formats you make here show up in the deck builder and the menu."), Hint(ui));
             listScroll = GUILayout.BeginScrollView(listScroll);
             foreach (var f in CustomFormats.All)
             {
                 var format = f;
                 bool selected = original == format;
-                if (GUILayout.Toggle(selected, format.Name, ui.Button) && !selected)
+                if (GUILayout.Toggle(selected, Loc.T(format.Name), ui.Button) && !selected)
                     actions.Add(() =>
                     {
                         Open(format);
                         if (dirty) SetStatus("", false);
                     });
             }
-            if (CustomFormats.All.Count == 0) GUILayout.Label("No formats yet.", Hint(ui));
+            if (CustomFormats.All.Count == 0) GUILayout.Label(Loc.T("No formats yet."), Hint(ui));
             GUILayout.EndScrollView();
-            if (GUILayout.Button("New format")) actions.Add(() => Open(null));
+            if (GUILayout.Button(Loc.T("New format"))) actions.Add(() => Open(null));
             GUILayout.Space(8);
-            if (GUILayout.Button("Back")) actions.Add(() => WantsClose = true);
-            if (dirty) GUILayout.Label("Unsaved changes are kept while you're away, until you open another format.", Hint(ui));
+            if (GUILayout.Button(Loc.T("Back"))) actions.Add(() => WantsClose = true);
+            if (dirty) GUILayout.Label(Loc.T("Unsaved changes are kept while you're away, until you open another format."), Hint(ui));
             GUILayout.EndArea();
         }
 
         private bool Toggle(bool value, string label, string note, UiStyles ui)
         {
-            bool v = GUILayout.Toggle(value, " " + label);
-            if (!string.IsNullOrEmpty(note)) GUILayout.Label("      " + note, Hint(ui));
+            bool v = GUILayout.Toggle(value, Loc.T(" " + label));
+            if (!string.IsNullOrEmpty(note)) GUILayout.Label(Loc.T("      " + note), Hint(ui));
             return v;
         }
 
         private int Stepper(string label, int value, int min, int max, int[] quick)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(label, GUILayout.Width(110));
-            if (GUILayout.Button("-10", GUILayout.Width(40))) value -= 10;
-            if (GUILayout.Button("-", GUILayout.Width(30))) value -= 1;
-            GUILayout.Label(value.ToString(), GUILayout.Width(36));
-            if (GUILayout.Button("+", GUILayout.Width(30))) value += 1;
-            if (GUILayout.Button("+10", GUILayout.Width(40))) value += 10;
+            GUILayout.Label(Loc.T(label), GUILayout.Width(110));
+            if (GUILayout.Button(Loc.T("-10"), GUILayout.Width(40))) value -= 10;
+            if (GUILayout.Button(Loc.T("-"), GUILayout.Width(30))) value -= 1;
+            GUILayout.Label(Loc.T(value.ToString()), GUILayout.Width(36));
+            if (GUILayout.Button(Loc.T("+"), GUILayout.Width(30))) value += 1;
+            if (GUILayout.Button(Loc.T("+10"), GUILayout.Width(40))) value += 10;
             if (quick != null)
                 foreach (var q in quick)
-                    if (GUILayout.Button(q.ToString(), GUILayout.Width(36))) value = q;
+                    if (GUILayout.Button(Loc.T(q.ToString()), GUILayout.Width(36))) value = q;
             GUILayout.EndHorizontal();
             return Mathf.Clamp(value, min, max);
         }
 
         private void DrawSettings(Rect area, UiStyles ui, List<Action> actions)
         {
-            GUI.Box(area, GUIContent.none);
+            GUI.Box(area, Loc.T(GUIContent.none));
             GUILayout.BeginArea(new Rect(area.x + 8, area.y + 8, area.width - 16, area.height - 16));
             var f = draft;
-            GUILayout.Label(original == null ? "New format" : "Edit format", ui.Title);
+            GUILayout.Label(Loc.T(original == null ? "New format" : "Edit format"), ui.Title);
             settingsScroll = GUILayout.BeginScrollView(settingsScroll);
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Name", GUILayout.Width(110));
+            GUILayout.Label(Loc.T("Name"), GUILayout.Width(110));
             var name = GUILayout.TextField(f.Name ?? "", 40);
             GUILayout.EndHorizontal();
             if (name != f.Name) { f.Name = name; dirty = true; }
             var nameProblem = CustomFormat.NameProblem(f.Name, CustomFormats.All.Where(x => x != original), null);
-            if (nameProblem != null) GUILayout.Label(nameProblem, ui.Error);
+            if (nameProblem != null) GUILayout.Label(Loc.T(nameProblem), ui.Error);
 
             GUILayout.Space(6);
-            GUILayout.Label("Decks", ui.Title);
+            GUILayout.Label(Loc.T("Decks"), ui.Title);
             int size = Stepper("Cards per deck", f.DeckSize, CustomFormat.MinDeckSize, CustomFormat.MaxDeckSize, new[] { 40, 60 });
             if (size != f.DeckSize) { f.DeckSize = size; Changed(); }
             int prizes = Stepper("Prize cards", f.PrizeCount, CustomFormat.MinPrizes, CustomFormat.MaxPrizes, new[] { 1, 3, 4, 6 });
             if (prizes != f.PrizeCount) { f.PrizeCount = prizes; Changed(); }
-            if (f.PrizeCount >= f.DeckSize - 7) GUILayout.Label("Too many Prize cards for that deck size (a hand of 7 has to fit too).", ui.Error);
+            if (f.PrizeCount >= f.DeckSize - 7) GUILayout.Label(Loc.T("Too many Prize cards for that deck size (a hand of 7 has to fit too)."), ui.Error);
 
             bool singleton = Toggle(f.Singleton, "Singleton", "Every card except basic Energy is limited to 1 copy (instead of 4).", ui);
             if (singleton != f.Singleton) { f.Singleton = singleton; Changed(); }
@@ -268,7 +268,7 @@ namespace PokemonTCG.Presentation
             if (ace != f.AllowAceSpec) { f.AllowAceSpec = ace; Changed(); }
 
             GUILayout.Space(6);
-            GUILayout.Label("Game rules", ui.Title);
+            GUILayout.Label(Loc.T("Game rules"), ui.Title);
             var r = f.Rules;
             bool attack = Toggle(r.FirstTurnAttack, "The player going first can attack on their first turn", null, ui);
             if (attack != r.FirstTurnAttack) { r.FirstTurnAttack = attack; Changed(); }
@@ -284,42 +284,42 @@ namespace PokemonTCG.Presentation
 
             GUILayout.Space(6);
             if (legalCount < 0) legalCount = pool.Count(d => f.Allows(db, d));
-            GUILayout.Label(legalCount + " of " + pool.Count + " cards are legal.", Hint(ui));
+            GUILayout.Label(Loc.T(legalCount + " of " + pool.Count + " cards are legal."), Hint(ui));
             GUILayout.EndScrollView();
 
             GUILayout.BeginHorizontal();
             GUI.enabled = nameProblem == null && f.PrizeCount < f.DeckSize - 7;
-            if (GUILayout.Button(original == null ? "Save new format" : "Save", GUILayout.Height(30))) actions.Add(Save);
+            if (GUILayout.Button(Loc.T(original == null ? "Save new format" : "Save"), GUILayout.Height(30))) actions.Add(Save);
             GUI.enabled = original != null && dirty;
-            if (GUILayout.Button("Undo changes", GUILayout.Height(30))) actions.Add(() => Open(original));
+            if (GUILayout.Button(Loc.T("Undo changes"), GUILayout.Height(30))) actions.Add(() => Open(original));
             GUI.enabled = true;
-            if (GUILayout.Button("Duplicate", GUILayout.Height(30))) actions.Add(Duplicate);
+            if (GUILayout.Button(Loc.T("Duplicate"), GUILayout.Height(30))) actions.Add(Duplicate);
             if (!confirmDelete)
             {
-                if (GUILayout.Button(original == null ? "Discard" : "Delete", GUILayout.Height(30))) actions.Add(() => confirmDelete = true);
+                if (GUILayout.Button(Loc.T(original == null ? "Discard" : "Delete"), GUILayout.Height(30))) actions.Add(() => confirmDelete = true);
             }
             GUILayout.EndHorizontal();
             if (confirmDelete)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(original == null ? "Discard this new format?" : "Delete \"" + original.Name + "\"?", ui.Error);
-                if (GUILayout.Button("Yes", GUILayout.Width(60))) actions.Add(Delete);
-                if (GUILayout.Button("No", GUILayout.Width(60))) actions.Add(() => confirmDelete = false);
+                GUILayout.Label(Loc.T(original == null ? "Discard this new format?" : "Delete \"" + original.Name + "\"?"), ui.Error);
+                if (GUILayout.Button(Loc.T("Yes"), GUILayout.Width(60))) actions.Add(Delete);
+                if (GUILayout.Button(Loc.T("No"), GUILayout.Width(60))) actions.Add(() => confirmDelete = false);
                 GUILayout.EndHorizontal();
             }
-            if (!string.IsNullOrEmpty(status)) GUILayout.Label(status, statusIsError ? ui.Error : ui.Good);
+            if (!string.IsNullOrEmpty(status)) GUILayout.Label(Loc.T(status), statusIsError ? ui.Error : ui.Good);
             GUILayout.EndArea();
         }
 
         private void DrawCardLists(Rect area, UiStyles ui, List<Action> actions)
         {
-            GUI.Box(area, GUIContent.none);
+            GUI.Box(area, Loc.T(GUIContent.none));
             GUILayout.BeginArea(new Rect(area.x + 8, area.y + 8, area.width - 16, area.height - 16));
             var f = draft;
             float half = (area.height - 16) * 0.5f;
 
-            GUILayout.Label("Legal sets", ui.Title);
-            bool all = GUILayout.Toggle(f.AllSets, " Every set (sets added in later updates too)");
+            GUILayout.Label(Loc.T("Legal sets"), ui.Title);
+            bool all = GUILayout.Toggle(f.AllSets, Loc.T(" Every set (sets added in later updates too)"));
             if (all != f.AllSets)
             {
                 f.AllSets = all;
@@ -328,18 +328,18 @@ namespace PokemonTCG.Presentation
             if (!f.AllSets)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Search", GUILayout.Width(50));
+                GUILayout.Label(Loc.T("Search"), GUILayout.Width(50));
                 setSearch = GUILayout.TextField(setSearch ?? "");
-                if (GUILayout.Button("All", GUILayout.Width(40))) actions.Add(() => { foreach (var s in ShownSets()) f.Sets.Add(s.Code); Changed(); });
-                if (GUILayout.Button("None", GUILayout.Width(50))) actions.Add(() => { foreach (var s in ShownSets()) f.Sets.Remove(s.Code); Changed(); });
+                if (GUILayout.Button(Loc.T("All"), GUILayout.Width(40))) actions.Add(() => { foreach (var s in ShownSets()) f.Sets.Add(s.Code); Changed(); });
+                if (GUILayout.Button(Loc.T("None"), GUILayout.Width(50))) actions.Add(() => { foreach (var s in ShownSets()) f.Sets.Remove(s.Code); Changed(); });
                 GUILayout.EndHorizontal();
-                GUILayout.Label(f.Sets.Count + " of " + sets.Count + " sets chosen. A card is legal when any of its printings is from a chosen set; basic Energy always is.", Hint(ui));
+                GUILayout.Label(Loc.T(f.Sets.Count + " of " + sets.Count + " sets chosen. A card is legal when any of its printings is from a chosen set; basic Energy always is."), Hint(ui));
                 setScroll = GUILayout.BeginScrollView(setScroll, GUILayout.Height(Mathf.Max(120f, half - 110f)));
                 foreach (var s in ShownSets())
                 {
                     var set = s;
                     bool on = f.Sets.Contains(set.Code);
-                    bool now = GUILayout.Toggle(on, " " + set.Name + "  (" + set.Code + ", " + set.Cards + ")");
+                    bool now = GUILayout.Toggle(on, Loc.T(" " + set.Name + "  (" + set.Code + ", " + set.Cards + ")"));
                     if (now != on)
                         actions.Add(() =>
                         {
@@ -352,9 +352,9 @@ namespace PokemonTCG.Presentation
             }
 
             GUILayout.Space(8);
-            GUILayout.Label("Banned cards (" + f.Banned.Count + ")", ui.Title);
+            GUILayout.Label(Loc.T("Banned cards (" + f.Banned.Count + ")"), ui.Title);
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Ban", GUILayout.Width(50));
+            GUILayout.Label(Loc.T("Ban"), GUILayout.Width(50));
             banSearch = GUILayout.TextField(banSearch ?? "");
             GUILayout.EndHorizontal();
             var needle = (banSearch ?? "").Trim();
@@ -366,22 +366,22 @@ namespace PokemonTCG.Presentation
                 {
                     var card = d;
                     GUILayout.BeginHorizontal();
-                    if (GUILayout.Button("Ban", GUILayout.Width(50))) actions.Add(() => { f.Banned.Add(card.BaseKey); Changed(); });
-                    GUILayout.Label(card.Name + "  <size=11>" + card.SetCode + " " + card.Number + "</size>", RichHint(ui));
+                    if (GUILayout.Button(Loc.T("Ban"), GUILayout.Width(50))) actions.Add(() => { f.Banned.Add(card.BaseKey); Changed(); });
+                    GUILayout.Label(Loc.T(card.Name + "  <size=11>" + card.SetCode + " " + card.Number + "</size>"), RichHint(ui));
                     GUILayout.EndHorizontal();
                 }
-                if (matches.Count == 0) GUILayout.Label("No card by that name (or it's banned already).", Hint(ui));
+                if (matches.Count == 0) GUILayout.Label(Loc.T("No card by that name (or it's banned already)."), Hint(ui));
                 GUILayout.EndScrollView();
             }
-            else GUILayout.Label("Type 2 or more letters of a card's name to ban it. A ban covers every printing of the card.", Hint(ui));
+            else GUILayout.Label(Loc.T("Type 2 or more letters of a card's name to ban it. A ban covers every printing of the card."), Hint(ui));
             bannedScroll = GUILayout.BeginScrollView(bannedScroll);
             foreach (var key in f.Banned.OrderBy(x => x).ToList())
             {
                 var k = key;
                 var card = db.Get(k);
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button("Unban", GUILayout.Width(60))) actions.Add(() => { f.Banned.Remove(k); Changed(); });
-                GUILayout.Label(card != null ? card.Name + "  <size=11>" + card.SetCode + " " + card.Number + "</size>" : k, RichHint(ui));
+                if (GUILayout.Button(Loc.T("Unban"), GUILayout.Width(60))) actions.Add(() => { f.Banned.Remove(k); Changed(); });
+                GUILayout.Label(Loc.T(card != null ? card.Name + "  <size=11>" + card.SetCode + " " + card.Number + "</size>" : k), RichHint(ui));
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndScrollView();

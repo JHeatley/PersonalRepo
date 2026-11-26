@@ -71,7 +71,7 @@ namespace PokemonTCG.Presentation
 
             float now = Time.time;
             bool landed = now >= coinLands;
-            GUI.Label(new Rect(band.x + 30f, band.y + 8f, band.width - 60f, 56f), landed ? coinCaption : coinSpinCaption, CardDraw.BigCaption());
+            GUI.Label(new Rect(band.x + 30f, band.y + 8f, band.width - 60f, 56f), Loc.T(landed ? coinCaption : coinSpinCaption), CardDraw.BigCaption());
 
             float size = Mathf.Min(170f, bandH * 0.42f);
             var center = new Vector2(UiScale.Width / 2f, band.y + bandH * 0.5f);
@@ -97,15 +97,15 @@ namespace PokemonTCG.Presentation
             GUI.DrawTexture(rect, face ? coinHeadsTex : coinTailsTex);
             coinLetter.fontSize = Mathf.RoundToInt(size * 0.48f);
             coinLetter.normal.textColor = face ? new Color(0.45f, 0.3f, 0.05f) : new Color(0.28f, 0.3f, 0.36f);
-            GUI.Label(rect, face ? "H" : "T", coinLetter);
+            GUI.Label(rect, Loc.T(face ? "H" : "T"), coinLetter);
             GUI.matrix = prev;
 
             if (landed)
             {
                 coinResult.normal.textColor = coinHeads ? new Color(1f, 0.85f, 0.35f) : new Color(0.85f, 0.88f, 0.95f);
-                GUI.Label(new Rect(band.x, rect.yMax + 8f, band.width, 44f), coinHeads ? "HEADS" : "TAILS", coinResult);
+                GUI.Label(new Rect(band.x, rect.yMax + 8f, band.width, 44f), Loc.T(coinHeads ? "HEADS" : "TAILS"), coinResult);
             }
-            GUI.Label(new Rect(band.x, band.yMax - 30f, band.width, 24f), "Click to continue", WhiteSmall());
+            GUI.Label(new Rect(band.x, band.yMax - 30f, band.width, 24f), Loc.T("Click to continue"), WhiteSmall());
 
             var e = Event.current;
             if (e.type == EventType.MouseDown && mulliganSeat < 0)
@@ -144,8 +144,8 @@ namespace PokemonTCG.Presentation
             float w = Mathf.Min(560f, UiScale.Width - 40f), h = 330f;
             var r = new Rect((UiScale.Width - w) / 2f, (UiScale.Height - h) / 2f, w, h);
             CardDraw.Fill(r, new Color(0.09f, 0.11f, 0.15f, 0.97f));
-            GUI.Label(new Rect(r.x + 20f, r.y + 14f, r.width - 40f, 40f), "Call the coin flip", CardDraw.BigCaption());
-            GUI.Label(new Rect(r.x + 20f, r.y + 54f, r.width - 40f, 26f), "The winner chooses to go first or second.", WhiteSmall());
+            GUI.Label(new Rect(r.x + 20f, r.y + 14f, r.width - 40f, 40f), Loc.T("Call the coin flip"), CardDraw.BigCaption());
+            GUI.Label(new Rect(r.x + 20f, r.y + 54f, r.width - 40f, 26f), Loc.T("The winner chooses to go first or second."), WhiteSmall());
 
             float bw = Mathf.Min(200f, (r.width - 60f) / 2f), bh = 200f;
             float top = r.y + 96f;
@@ -155,14 +155,14 @@ namespace PokemonTCG.Presentation
                 int idx = req.Options.FindIndex(o => o.Label == calls[k]);
                 if (idx < 0) continue;
                 var b = new Rect(r.center.x + (k == 0 ? -bw - 10f : 10f), top, bw, bh);
-                bool clicked = GUI.Button(b, GUIContent.none);
+                bool clicked = GUI.Button(b, Loc.T(GUIContent.none));
                 float coin = bh - 60f;
                 var coinRect = new Rect(b.center.x - coin / 2f, b.y + 12f, coin, coin);
                 GUI.DrawTexture(coinRect, k == 0 ? coinHeadsTex : coinTailsTex);
                 coinLetter.fontSize = Mathf.RoundToInt(coin * 0.48f);
                 coinLetter.normal.textColor = k == 0 ? new Color(0.45f, 0.3f, 0.05f) : new Color(0.28f, 0.3f, 0.36f);
-                GUI.Label(coinRect, k == 0 ? "H" : "T", coinLetter);
-                GUI.Label(new Rect(b.x, coinRect.yMax + 8f, b.width, 30f), calls[k], CardDraw.Banner());
+                GUI.Label(coinRect, Loc.T(k == 0 ? "H" : "T"), coinLetter);
+                GUI.Label(new Rect(b.x, coinRect.yMax + 8f, b.width, 30f), Loc.T(calls[k]), CardDraw.Banner());
                 if (clicked)
                 {
                     int pick = idx;
