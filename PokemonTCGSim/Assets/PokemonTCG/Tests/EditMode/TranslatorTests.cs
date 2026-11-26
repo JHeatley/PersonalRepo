@@ -61,9 +61,10 @@ namespace PokemonTCG.Tests
             Assert.AreEqual("Tackle the problem first", t.Translate("Tackle the problem first"), "a word in a sentence isn't an attack");
         }
 
-        private static string Res(string file)
+        /// <summary>A shipped file in Resources/Lang, found from this test file's own place in the project.</summary>
+        private static string Res(string file, [System.Runtime.CompilerServices.CallerFilePath] string here = "")
         {
-            return File.ReadAllText(Path.Combine(UnityCardData.Res, "Lang", file));
+            return File.ReadAllText(Path.Combine(Path.GetDirectoryName(here), "..", "..", "Resources", "Lang", file));
         }
 
         [Test]
