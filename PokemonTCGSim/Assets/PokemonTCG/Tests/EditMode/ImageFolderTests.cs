@@ -225,6 +225,11 @@ namespace PokemonTCG.Tests
             // v174: the Japanese card ID (050856 is #1), wherever the file is.
             Assert.AreEqual("ASK-1", CardVisuals.KeyFor("050856_P_MADATSUBOMI", new string[0]));
             Assert.AreEqual("ASK-16", CardVisuals.KeyFor("050871_P_KAMEKKUSU", new[] { "Base Set" }));
+            // v177.1: from #47 on the IDs start 0509 (050902 is Falinks, #47).
+            Assert.AreEqual("ASK-47", CardVisuals.KeyFor("050902_P_TAIRETSU", new[] { "M7" }));
+            Assert.AreEqual("ASK-54", CardVisuals.KeyFor("050909_P_MKIRAFURORUIEKKUSU", new[] { "M7" }));
+            Assert.AreEqual("ASK-58", CardVisuals.KeyFor("050913_P_SHIXYUBARUGO", new[] { "M7" }));
+            Assert.AreEqual("ASK-73", CardVisuals.KeyFor("050928_P_REJIGIGASU", new[] { "M7" }));
             Assert.AreEqual("ASK-74", CardVisuals.KeyFor("050929_T_KIZUNANOTASUKI", new string[0]));
             Assert.AreEqual("ASK-77", CardVisuals.KeyFor("050932_T_REPOTA", new string[0]));
             Assert.AreEqual("ASK-78", CardVisuals.KeyFor("050933_T_FAITOARIINA", new string[0]));

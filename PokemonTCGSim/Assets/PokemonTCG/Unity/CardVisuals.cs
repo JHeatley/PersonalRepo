@@ -849,7 +849,7 @@ namespace PokemonTCG.Presentation
         }
 
         // v174: Aura Seeker's Japanese card IDs run 050856 (#1) to 050933 (#78): "050856_P_MADATSUBOMI", "050929_T_KIZUNANOTASUKI".
-        private static readonly Regex AuraSeekerId = new Regex(@"^(?<id>0508\d{2})_[PTE]_", RegexOptions.IgnoreCase);
+        private static readonly Regex AuraSeekerId = new Regex(@"^(?<id>05\d{4})_[PTE]_", RegexOptions.IgnoreCase); // 050856-050933 (v177.1: 0509xx too, #47 on)
         // v174: "m7-017-n8hgm", "m7-075-h3g27", "m7-017": m7 is Aura Seeker's Japanese code (not M7A, Mega x Mega Parade).
         private static readonly Regex AuraSeekerM7 = new Regex(@"^m7[-_](?<num>\d{1,3})(?:[-_]|$)", RegexOptions.IgnoreCase);
         const int AuraSeekerFirstId = 50856, AuraSeekerCount = 78;
